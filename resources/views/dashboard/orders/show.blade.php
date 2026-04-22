@@ -227,7 +227,7 @@
                             @foreach(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'] as $s)
                                 <option value="{{ $s }}" {{ $order->status === $s ? 'selected' : '' }}>
                                     {{ ucfirst($s) }}
-                                </option>
+                                </option>   
                             @endforeach
                         </select>
                         <button type="submit"
