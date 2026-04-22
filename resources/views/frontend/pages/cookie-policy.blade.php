@@ -1,0 +1,8 @@
+@extends('frontend.layouts.app')
+@section('title', 'Cookie Policy')
+@section('content')
+<div class="max-w-3xl mx-auto px-4 py-12">
+    <h1 class="nunito font-extrabold text-3xl text-gray-800 mb-4">Cookie Policy</h1>
+    <p class="text-gray-600 leading-relaxed">We use cookies to improve your browsing experience on FarmSea.</p>
+</div>
+@endsection

@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class Order extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'user_id', 'order_number', 'status', 'subtotal', 'discount',
+        'shipping_cost', 'delivery_charge', 'platform_fee',
+        'vendor_total', 'admin_commission', 'tax', 'total',
+        'shipping_address', 'payment_method', 'payment_status',
+    ];
+
+    protected $casts = [
+        'shipping_address' => 'array',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function getStatusBadgeClassAttribute(): string
+    {
+        return match ($this->status) {
+            'pending'    => 'bg-amber-100 text-amber-700',
+            'confirmed'  => 'bg-blue-100 text-blue-700',
+            'processing' => 'bg-yellow-100 text-yellow-700',
+            'shipped'    => 'bg-indigo-100 text-indigo-700',
+            'delivered'  => 'bg-emerald-100 text-emerald-700',
+            'cancelled'  => 'bg-red-100 text-red-700',
+            default      => 'bg-gray-100 text-gray-700',
+        };
+    }
+}
