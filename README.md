@@ -1,35 +1,46 @@
-# FarmSea Vendor Dashboard
+# FarmSea Dashboard
 
-Laravel-based vendor/admin dashboard for FarmSea e-commerce platform.
-
-## Installation
-
-1. Copy `.env.example` to `.env`
-2. Run `composer install`
-3. Run `php artisan key:generate`
-4. Configure database in `.env`
-5. Run `php artisan migrate --seed`
-6. Run `php artisan serve` or configure with Apache/Nginx
-
-## Features
-
-- Dashboard home with stats & charts
-- Product management (Categories, Sub-categories, Products)
-- Order management (Live orders, Order history)
-- User management
-- Notifications system
-- Coupons & offers
-- Reports (Total orders, Category orders)
-- Vendor profile
-
-## Default Login
-
-- Email: `admin@farmsea.in`
-- Password: `password`
+Laravel-based admin dashboard + customer frontend for FarmSea e-commerce platform.
 
 ## Tech Stack
+- Laravel 11 · PHP 8.2+
+- MySQL (XAMPP)
+- Tailwind CSS (CDN)
+- Chart.js · Font Awesome 6
+- Laravel Sanctum (API auth)
 
-- Laravel 11
-- Tailwind CSS (via CDN)
-- Chart.js
-- Font Awesome 6
+## Quick Start
+
+```bash
+composer install
+php artisan key:generate
+# Configure .env (DB_DATABASE, DB_USERNAME, DB_PASSWORD)
+php artisan migrate --seed
+php artisan storage:link
+php artisan serve
+```
+
+## Default Credentials
+
+| Role  | Email              | Password |
+|-------|--------------------|----------|
+| Admin | admin@farmsea.in   | password |
+
+## URLs
+
+| Area            | URL                          |
+|-----------------|------------------------------|
+| Admin Login     | /login                       |
+| Admin Dashboard | /dashboard                   |
+| User Home       | /home                        |
+| Shop            | /shop                        |
+| User Login      | /account/login               |
+| User Register   | /account/register            |
+| Cart            | /cart                        |
+| Checkout        | /checkout                    |
+| Track Order     | /track-order                 |
+
+## API Base URL
+`http://127.0.0.1:8000/api`
+
+Key endpoints: `POST /api/login`, `POST /api/register`, `GET /api/products`, `POST /api/orders`

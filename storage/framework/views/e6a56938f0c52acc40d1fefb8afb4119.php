@@ -18,6 +18,15 @@
 /* Cart drawer */
 #cart-drawer { transform: translateX(100%); transition: transform .35s cubic-bezier(.4,0,.2,1); }
 #cart-drawer.open { transform: translateX(0); }
+/* Mobile responsive fixes */
+@media (max-width: 640px) {
+    .container { padding-left: 12px !important; padding-right: 12px !important; }
+}
+/* Prevent horizontal overflow */
+html, body { overflow-x: hidden; max-width: 100vw; }
+/* Scrollbar hide utility */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
 <?php echo $__env->yieldContent('styles'); ?>
 </head>
@@ -102,7 +111,10 @@
             <?php if(file_exists(public_path('images/farmsea-logo.png'))): ?>
                 <img src="<?php echo e(asset('images/farmsea-logo.png')); ?>" alt="FarmSea" class="h-10 w-auto object-contain">
             <?php else: ?>
-                <span class="text-xl font-extrabold text-green-700">🌿 FarmSea</span>
+                <span class="text-xl font-extrabold text-green-700"><img src="<?php echo e(asset('images/farmsea.png')); ?>"
+                     alt="FarmSea"
+                     class="h-14 w-auto object-contain"
+                     onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex'"></span>
             <?php endif; ?>
         </a>
         <form action="<?php echo e(route('frontend.products')); ?>" method="GET" class="hidden md:flex flex-grow max-w-lg mx-4 relative">
@@ -158,16 +170,16 @@
         </div>
     </div>
     <!-- Nav strip -->
-    <div class="border-t border-gray-100 hidden md:block">
-        <div class="max-w-screen-xl mx-auto px-6 flex items-center gap-1 h-10 text-sm overflow-visible">
-            <a href="<?php echo e(route('frontend.products')); ?>" class="px-3 py-1.5 bg-gray-100 text-gray-600 font-semibold whitespace-nowrap rounded-md">All Products</a>
-            <a href="<?php echo e(route('frontend.products', ['category' => 'Chicken'])); ?>" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-red-50 rounded-md">Chicken</a>
-            <a href="<?php echo e(route('frontend.products', ['category' => 'Mutton'])); ?>" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-red-50 rounded-md">Mutton</a>
-            <a href="<?php echo e(route('frontend.products', ['category' => 'Fish'])); ?>" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-red-50 rounded-md">Fish</a>
-            <a href="<?php echo e(route('frontend.products', ['category' => 'Seafood'])); ?>" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-red-50 rounded-md">Seafood</a>
+    <div class="border-t border-gray-100 hidden md:block overflow-x-auto">
+        <div class="max-w-screen-xl mx-auto px-4 flex items-center gap-1 h-10 text-sm scrollbar-hide">
+            <a href="<?php echo e(route('frontend.products')); ?>" class="px-3 py-1.5 bg-gray-100 text-gray-600 font-semibold whitespace-nowrap rounded-md flex-shrink-0">All Products</a>
+            <a href="<?php echo e(route('frontend.products', ['category' => 'Chicken'])); ?>" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-red-50 rounded-md flex-shrink-0">Chicken</a>
+            <a href="<?php echo e(route('frontend.products', ['category' => 'Mutton'])); ?>" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-red-50 rounded-md flex-shrink-0">Mutton</a>
+            <a href="<?php echo e(route('frontend.products', ['category' => 'Fish'])); ?>" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-red-50 rounded-md flex-shrink-0">Fish</a>
+            <a href="<?php echo e(route('frontend.products', ['category' => 'Seafood'])); ?>" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-red-50 rounded-md flex-shrink-0">Seafood</a>
             <span class="w-px h-5 bg-gray-200 mx-1 shrink-0"></span>
-            <a href="<?php echo e(route('frontend.products', ['category' => 'Vegetables'])); ?>" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-green-50 rounded-md">Vegetables</a>
-            <a href="<?php echo e(route('frontend.products', ['category' => 'Fruits'])); ?>" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-green-50 rounded-md">Fruits</a>
+            <a href="<?php echo e(route('frontend.products', ['category' => 'Vegetables'])); ?>" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-green-50 rounded-md flex-shrink-0">Vegetables</a>
+            <a href="<?php echo e(route('frontend.products', ['category' => 'Fruits'])); ?>" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-green-50 rounded-md flex-shrink-0">Fruits</a>
         </div>
     </div>
 </header>

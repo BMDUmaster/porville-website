@@ -6,15 +6,11 @@
     <title>@yield('title', 'Dashboard') | FarmSea</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <!--cdn -->
-     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <!-- fa icon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <!-- Fonts -->
+    <!--Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -39,6 +35,7 @@
     <style>
         body { font-family: 'Poppins', sans-serif; }
         body.sidebar-open { overflow: hidden; }
+        html, body { overflow-x: hidden; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
         .active-link {
@@ -48,6 +45,14 @@
             box-shadow: 0 4px 14px rgba(59,130,246,0.35);
         }
         .active-link i { color: #ffffff !important; }
+        /* Responsive table fix */
+        @media (max-width: 768px) {
+            table { font-size: 12px; }
+            .lg\:ml-72 { margin-left: 0 !important; }
+        }
+        /* Prevent icon overflow in cards */
+        .stat-card { overflow: hidden; }
+        .stat-card .icon-box { flex-shrink: 0; }
         @yield('styles')
     </style>
 </head>
@@ -63,7 +68,7 @@
                   transform transition-transform duration-300 lg:translate-x-0 -translate-x-full">
 
         <!-- Logo -->
-        <div class="p-4 border-b border-green-200 bg-success flex items-center justify-between">
+        <div class="p-4 border-b border-green-200 bg-green-400 flex items-center justify-between">
             <a href="{{ route('dashboard.home') }}" class="flex items-center">
                 <img src="{{ asset('images/farmsea.png') }}"
                      alt="FarmSea"
@@ -178,13 +183,7 @@
                 <span>Profile</span>
             </a>
 
-             <a href=""
-               class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl 
-                      hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
-                       
-                <i class="fa-solid fa-circle-user w-5 text-green-700"></i>
-                <span>Contact us</span>
-            </a>
+            
         </nav>
     </aside>
 

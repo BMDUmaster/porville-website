@@ -19,9 +19,7 @@
         <div class="flex gap-3">
             <a href="{{ route('frontend.products') }}"
                class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold text-sm rounded-lg transition">Shop Now</a>
-            <a href="{{ route('frontend.categories') }}"
-               class="px-6 py-3 bg-white/15 hover:bg-white/25 text-white font-bold text-sm rounded-lg border border-white/30 transition">View Categories</a>
-        </div>
+           
     </div>
 </section>
 
@@ -43,35 +41,90 @@
 </div>
 
 {{-- Shop by Category --}}
-<section class="py-12 bg-white">
+<section class="py-14 bg-white">
     <div class="max-w-6xl mx-auto px-4">
-        <div class="flex items-end justify-between mb-6">
+
+        {{-- Section Header --}}
+        <div class="flex items-end justify-between mb-8">
             <div>
-                <h2 class="text-2xl font-extrabold text-gray-800">Shop by <span class="text-blue-600">Category</span></h2>
-                <p class="text-xs text-gray-500 mt-1">Farm-to-table freshness across every cut and kind.</p>
+                <p class="text-xs font-bold text-green-600 uppercase tracking-widest mb-1">Browse</p>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900">Shop by <span class="text-blue-600">Category</span></h2>
+                <p class="text-sm text-gray-400 mt-1">Farm-to-table freshness across every cut and kind.</p>
             </div>
-            <a href="{{ route('frontend.categories') }}" class="text-blue-600 font-bold text-xs uppercase tracking-wider hover:underline">See All →</a>
+            <a href="{{ route('frontend.categories') }}"
+               class="hidden sm:flex items-center gap-1.5 text-blue-600 font-bold text-xs uppercase tracking-wider hover:text-blue-800 transition">
+                See All <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
         </div>
-        <div class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-            @forelse($categories as $cat)
+
+        @php
+        $catColors = [
+            0 => ['bg' => 'from-green-50 to-green-100', 'border' => 'border-green-200', 'hover' => 'hover:border-green-400', 'badge' => 'bg-green-600', 'text' => 'text-green-700'],
+            1 => ['bg' => 'from-red-50 to-orange-50', 'border' => 'border-red-200', 'hover' => 'hover:border-red-400', 'badge' => 'bg-red-500', 'text' => 'text-red-600'],
+            2 => ['bg' => 'from-blue-50 to-indigo-50', 'border' => 'border-blue-200', 'hover' => 'hover:border-blue-400', 'badge' => 'bg-blue-600', 'text' => 'text-blue-600'],
+            3 => ['bg' => 'from-amber-50 to-yellow-50', 'border' => 'border-amber-200', 'hover' => 'hover:border-amber-400', 'badge' => 'bg-amber-500', 'text' => 'text-amber-600'],
+            4 => ['bg' => 'from-purple-50 to-pink-50', 'border' => 'border-purple-200', 'hover' => 'hover:border-purple-400', 'badge' => 'bg-purple-600', 'text' => 'text-purple-600'],
+            5 => ['bg' => 'from-teal-50 to-cyan-50', 'border' => 'border-teal-200', 'hover' => 'hover:border-teal-400', 'badge' => 'bg-teal-600', 'text' => 'text-teal-600'],
+            6 => ['bg' => 'from-rose-50 to-red-50', 'border' => 'border-rose-200', 'hover' => 'hover:border-rose-400', 'badge' => 'bg-rose-500', 'text' => 'text-rose-600'],
+            7 => ['bg' => 'from-lime-50 to-green-50', 'border' => 'border-lime-200', 'hover' => 'hover:border-lime-400', 'badge' => 'bg-lime-600', 'text' => 'text-lime-700'],
+        ];
+        $catEmojis = ['🐔','🥩','🐟','🥦','🍎','🥚','🦐','🍳'];
+        @endphp
+
+        {{-- Category Grid --}}
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 md:gap-5">
+            @forelse($categories as $i => $cat)
+            @php $c = $catColors[$i % 8]; @endphp
             <a href="{{ route('frontend.products', ['category' => $cat->slug]) }}"
-               class="min-w-[140px] rounded-2xl overflow-hidden bg-white border border-gray-100 hover:border-green-400 hover:shadow-lg transition flex-shrink-0 block">
-                <div class="aspect-square bg-gray-50 overflow-hidden">
+               class="group relative rounded-2xl border {{ $c['border'] }} {{ $c['hover'] }} bg-gradient-to-br {{ $c['bg'] }} overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 block">
+
+                {{-- Image area --}}
+                <div class="relative aspect-square overflow-hidden">
                     @if($cat->image)
-                        <img src="{{ asset('storage/'.$cat->image) }}" class="w-full h-full object-cover">
+                        <img src="{{ asset('storage/'.$cat->image) }}"
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                     @else
-                        <div class="w-full h-full flex items-center justify-center text-4xl">🥩</div>
+                        <div class="w-full h-full flex items-center justify-center text-5xl md:text-6xl bg-white/40">
+                            {{ $catEmojis[$i % 8] }}
+                        </div>
                     @endif
+                    {{-- Overlay on hover --}}
+                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300"></div>
+                    {{-- Items badge --}}
+                    <div class="absolute top-2.5 right-2.5">
+                        <span class="{{ $c['badge'] }} text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
+                            {{ $cat->products_count }} items
+                        </span>
+                    </div>
                 </div>
-                <div class="p-3 text-center border-t border-gray-50">
-                    <p class="text-xs font-bold text-gray-800">{{ $cat->name }}</p>
-                    <p class="text-[10px] text-green-600 font-bold mt-1 uppercase tracking-wider">{{ $cat->products_count }} items</p>
+
+                {{-- Info --}}
+                <div class="px-3 py-3">
+                    <p class="font-extrabold text-sm text-gray-800 group-hover:{{ $c['text'] }} transition-colors leading-tight">
+                        {{ $cat->name }}
+                    </p>
+                    <div class="flex items-center gap-1 mt-1.5">
+                        <span class="{{ $c['text'] }} text-[10px] font-semibold">Shop now</span>
+                        <i class="fa-solid fa-arrow-right {{ $c['text'] }} text-[9px] group-hover:translate-x-1 transition-transform"></i>
+                    </div>
                 </div>
             </a>
             @empty
-            <p class="text-gray-400 text-sm">No categories yet.</p>
+            <div class="col-span-4 text-center py-12 text-gray-400">
+                <i class="fa-solid fa-layer-group text-4xl mb-3 block opacity-30"></i>
+                <p class="text-sm">No categories yet.</p>
+            </div>
             @endforelse
         </div>
+
+        {{-- Mobile See All --}}
+        <div class="mt-6 text-center sm:hidden">
+            <a href="{{ route('frontend.categories') }}"
+               class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm px-6 py-2.5 rounded-xl transition">
+                See All Categories <i class="fa-solid fa-arrow-right text-xs"></i>
+            </a>
+        </div>
+
     </div>
 </section>
 

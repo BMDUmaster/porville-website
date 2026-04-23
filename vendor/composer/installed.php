@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'farmsea/dashboard',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => null,
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
+        'reference' => 'ed62e42ebd278b87ad9229bb883a4e57b36e8902',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -95,9 +95,9 @@
             'dev_requirement' => true,
         ),
         'farmsea/dashboard' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => null,
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => 'ed62e42ebd278b87ad9229bb883a4e57b36e8902',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

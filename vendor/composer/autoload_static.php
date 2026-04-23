@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit1f3a7555c3629e101218f8dceb1dfbed
+class ComposerStaticInit74731dc5aeea165ce1565eeb684e82b6
 {
     public static $files = array (
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
@@ -539,7 +539,15 @@ class ComposerStaticInit1f3a7555c3629e101218f8dceb1dfbed
         'App\\Http\\Controllers\\Dashboard\\ProfileController' => __DIR__ . '/../..' . '/app/Http/Controllers/Dashboard/ProfileController.php',
         'App\\Http\\Controllers\\Dashboard\\SubcategoryController' => __DIR__ . '/../..' . '/app/Http/Controllers/Dashboard/SubcategoryController.php',
         'App\\Http\\Controllers\\Dashboard\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/Dashboard/UserController.php',
-        'App\\Http\\Middleware\\VendorMiddleware' => __DIR__ . '/../..' . '/app/Http/Middleware/VendorMiddleware.php',
+        'App\\Http\\Controllers\\Frontend\\AuthController' => __DIR__ . '/../..' . '/app/Http/Controllers/Frontend/AuthController.php',
+        'App\\Http\\Controllers\\Frontend\\CartController' => __DIR__ . '/../..' . '/app/Http/Controllers/Frontend/CartController.php',
+        'App\\Http\\Controllers\\Frontend\\CheckoutController' => __DIR__ . '/../..' . '/app/Http/Controllers/Frontend/CheckoutController.php',
+        'App\\Http\\Controllers\\Frontend\\HomeController' => __DIR__ . '/../..' . '/app/Http/Controllers/Frontend/HomeController.php',
+        'App\\Http\\Controllers\\Frontend\\OrderController' => __DIR__ . '/../..' . '/app/Http/Controllers/Frontend/OrderController.php',
+        'App\\Http\\Controllers\\Frontend\\PageController' => __DIR__ . '/../..' . '/app/Http/Controllers/Frontend/PageController.php',
+        'App\\Http\\Controllers\\Frontend\\ProductController' => __DIR__ . '/../..' . '/app/Http/Controllers/Frontend/ProductController.php',
+        'App\\Http\\Controllers\\Frontend\\ProfileController' => __DIR__ . '/../..' . '/app/Http/Controllers/Frontend/ProfileController.php',
+        'App\\Http\\Middleware\\AdminMiddleware' => __DIR__ . '/../..' . '/app/Http/Middleware/AdminMiddleware.php',
         'App\\Models\\Category' => __DIR__ . '/../..' . '/app/Models/Category.php',
         'App\\Models\\Coupon' => __DIR__ . '/../..' . '/app/Models/Coupon.php',
         'App\\Models\\Notification' => __DIR__ . '/../..' . '/app/Models/Notification.php',
@@ -6897,9 +6905,9 @@ class ComposerStaticInit1f3a7555c3629e101218f8dceb1dfbed
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit1f3a7555c3629e101218f8dceb1dfbed::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit1f3a7555c3629e101218f8dceb1dfbed::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit1f3a7555c3629e101218f8dceb1dfbed::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit74731dc5aeea165ce1565eeb684e82b6::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit74731dc5aeea165ce1565eeb684e82b6::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit74731dc5aeea165ce1565eeb684e82b6::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -27,7 +27,7 @@ use App\Http\Controllers\Frontend\PageController;
 
 // ROOT
 
-Route::get('/', fn() => redirect()->route('dashboard.login'));
+Route::get('/', fn() => redirect()->route('frontend.home'));
 
 
 // ADMIN DASHBOARD AUTH

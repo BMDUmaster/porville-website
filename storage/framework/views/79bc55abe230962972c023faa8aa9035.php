@@ -1,140 +1,278 @@
-
 <?php $__env->startSection('title', 'Dashboard'); ?>
 <?php $__env->startSection('page_title', 'Dashboard'); ?>
 
+<?php
+    $salesChangePositive = $stats['sales_change'] >= 0;
+?>
+
 <?php $__env->startSection('content'); ?>
-<div class="p-5 sm:p-6 lg:p-10 fade-in">
+<div class="p-5 sm:p-6 lg:p-8 space-y-8">
 
-    
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6 mb-10">
-
-        <div class="bg-white rounded-xl border border-gray-200 p-6 hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
-            <div class="flex justify-between items-start">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+        <div class="stat-card rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-start justify-between gap-4">
                 <div>
-                    <p class="text-sm text-gray-500 font-medium">Today's Sales</p>
-                    <p class="text-2xl lg:text-3xl font-semibold text-mayview-blue mt-2">₹<?php echo e(number_format($stats['today_sales'], 2)); ?></p>
+                    <p class="text-sm font-medium text-slate-500">Today's Sales</p>
+                    <p class="mt-2 text-3xl font-bold tracking-tight text-mayview-blue">
+                        &#8377;<?php echo e(number_format($stats['today_sales'], 2)); ?>
+
+                    </p>
+                    <p class="mt-3 text-xs font-medium <?php echo e($salesChangePositive ? 'text-emerald-600' : 'text-rose-600'); ?>">
+                        <i class="fa-solid <?php echo e($salesChangePositive ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'); ?> mr-1"></i>
+                        <?php echo e($salesChangePositive ? '+' : ''); ?><?php echo e(number_format($stats['sales_change'], 1)); ?>% vs yesterday
+                    </p>
                 </div>
-                <div class="bg-blue-100 text-mayview-blue p-3 rounded-xl">
+                <div class="icon-box rounded-2xl bg-blue-100 px-4 py-3 text-mayview-blue">
                     <i class="fa-solid fa-indian-rupee-sign text-xl"></i>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl border border-gray-200 p-6 hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
-            <div class="flex justify-between items-start">
+        <div class="stat-card rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-start justify-between gap-4">
                 <div>
-                    <p class="text-sm text-gray-500 font-medium">Pending Orders</p>
-                    <p class="text-2xl lg:text-3xl font-semibold text-admin-orange mt-2"><?php echo e($stats['pending_orders']); ?></p>
+                    <p class="text-sm font-medium text-slate-500">Pending Orders</p>
+                    <p class="mt-2 text-3xl font-bold tracking-tight text-admin-orange"><?php echo e($stats['pending_orders']); ?></p>
+                    <p class="mt-3 text-xs text-slate-500">Orders waiting for the next update</p>
                 </div>
-                <div class="bg-orange-100 text-admin-orange p-3 rounded-xl">
-                    <i class="fa-solid fa-clock-rotate-left text-xl"></i>
+                <div class="icon-box rounded-2xl bg-orange-100 px-4 py-3 text-admin-orange">
+                    <i class="fa-solid fa-rotate-left text-xl"></i>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl border border-gray-200 p-6 hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
-            <div class="flex justify-between items-start">
+        <div class="stat-card rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-start justify-between gap-4">
                 <div>
-                    <p class="text-sm text-gray-500 font-medium">Total Products</p>
-                    <p class="text-2xl lg:text-3xl font-semibold text-emerald-600 mt-2"><?php echo e($stats['total_products']); ?></p>
+                    <p class="text-sm font-medium text-slate-500">Active Customers</p>
+                    <p class="mt-2 text-3xl font-bold tracking-tight text-emerald-600"><?php echo e($stats['active_users']); ?></p>
+                    <p class="mt-3 text-xs text-slate-500">Customer accounts currently active</p>
                 </div>
-                <div class="bg-emerald-100 text-emerald-600 p-3 rounded-xl">
-                    <i class="fa-solid fa-box text-xl"></i>
+                <div class="icon-box rounded-2xl bg-emerald-100 px-4 py-3 text-emerald-600">
+                    <i class="fa-solid fa-user-group text-xl"></i>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl border border-gray-200 p-6 hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
-            <div class="flex justify-between items-start">
+        <div class="stat-card rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-start justify-between gap-4">
                 <div>
-                    <p class="text-sm text-gray-500 font-medium">Low Stock Alert</p>
-                    <p class="text-2xl lg:text-3xl font-semibold text-rose-600 mt-2"><?php echo e($stats['low_stock']); ?></p>
+                    <p class="text-sm font-medium text-slate-500">Low Stock Alert</p>
+                    <p class="mt-2 text-3xl font-bold tracking-tight text-rose-600"><?php echo e($stats['low_stock']); ?></p>
+                    <p class="mt-3 text-xs text-slate-500">Restock recommended for these items</p>
                 </div>
-                <div class="bg-rose-100 text-rose-600 p-3 rounded-xl">
+                <div class="icon-box rounded-2xl bg-rose-100 px-4 py-3 text-rose-600">
                     <i class="fa-solid fa-triangle-exclamation text-xl"></i>
                 </div>
             </div>
-            <div class="mt-3 text-xs text-gray-500">Restock recommended</div>
         </div>
     </div>
 
-    
-    <div class="grid lg:grid-cols-2 gap-6 lg:gap-8 mb-10">
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-            <h3 class="text-base font-semibold text-gray-800 mb-6">Orders by Status</h3>
-            <div class="h-64">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]">
+        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <h2 id="salesTrendTitle" class="text-lg font-semibold text-slate-900">Sales Trend (Last 30 Days)</h2>
+
+                <label for="salesRangeSelect" class="relative inline-flex items-center">
+                    <select id="salesRangeSelect"
+                            class="appearance-none rounded-xl border border-blue-300 bg-white py-2 pl-4 pr-10 text-sm font-medium text-slate-700 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                        <option value="30d">Last 30 days</option>
+                        <option value="90d">Last 90 days</option>
+                        <option value="1y">This year</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down pointer-events-none absolute right-4 text-xs text-slate-500"></i>
+                </label>
+            </div>
+
+            <div class="h-[300px]">
+                <canvas id="salesTrendChart"></canvas>
+            </div>
+        </section>
+
+        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 class="text-lg font-semibold text-slate-900">Orders by Status</h2>
+            <div class="mt-6 h-[300px]">
                 <canvas id="ordersChart"></canvas>
             </div>
-        </div>
+        </section>
+    </div>
 
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-            <h3 class="text-base font-semibold text-gray-800 mb-6">Quick Actions</h3>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(360px,0.9fr)]">
+        <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                <h2 class="text-lg font-semibold text-slate-900">Recent Orders</h2>
+                <a href="<?php echo e(route('dashboard.orders')); ?>" class="text-sm font-medium text-mayview-blue transition hover:text-blue-700">View All</a>
+            </div>
+
+            <div class="divide-y divide-slate-100">
+                <?php $__empty_1 = true; $__currentLoopData = $recent_orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <div class="flex items-center justify-between gap-4 px-5 py-4">
+                        <div class="min-w-0">
+                            <p class="text-sm font-semibold text-slate-900">#ORD-<?php echo e(str_pad($order->id, 4, '0', STR_PAD_LEFT)); ?></p>
+                            <p class="mt-1 truncate text-xs text-slate-500">
+                                <?php echo e($order->user->name ?? 'Guest'); ?>
+
+                                <?php if(data_get($order->shipping_address, 'city')): ?>
+                                    - <?php echo e(data_get($order->shipping_address, 'city')); ?>
+
+                                <?php endif; ?>
+                            </p>
+                        </div>
+
+                        <div class="text-right">
+                            <p class="text-sm font-bold text-emerald-600">&#8377;<?php echo e(number_format($order->total, 2)); ?></p>
+                            <span class="mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-medium <?php echo e($order->status_badge_class); ?>">
+                                <?php echo e(ucfirst($order->status)); ?>
+
+                            </span>
+                        </div>
+                    </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <div class="px-5 py-10 text-center text-sm text-slate-400">No recent orders available.</div>
+                <?php endif; ?>
+            </div>
+        </section>
+
+        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 class="text-lg font-semibold text-slate-900">Quick Actions</h2>
+
+            <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-2">
                 <a href="<?php echo e(route('dashboard.products')); ?>"
-                   class="flex flex-col items-center p-5 border border-gray-200 rounded-xl hover:border-mayview-blue hover:bg-blue-50 transition group">
-                    <i class="fa-solid fa-plus text-2xl text-mayview-blue mb-2 group-hover:scale-110 transition-transform"></i>
-                    <span class="text-xs font-medium text-gray-700">Add Product</span>
+                   class="group flex min-h-[92px] flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-5 text-center transition hover:border-blue-300 hover:bg-blue-50">
+                    <i class="fa-solid fa-plus text-2xl text-mayview-blue transition group-hover:scale-110"></i>
+                    <span class="mt-3 text-sm font-medium text-slate-700">Add Product</span>
                 </a>
+
                 <a href="<?php echo e(route('dashboard.orders')); ?>"
-                   class="flex flex-col items-center p-5 border border-gray-200 rounded-xl hover:border-admin-orange hover:bg-orange-50 transition group">
-                    <i class="fa-solid fa-truck-fast text-2xl text-admin-orange mb-2 group-hover:scale-110 transition-transform"></i>
-                    <span class="text-xs font-medium text-gray-700">View Orders</span>
+                   class="group flex min-h-[92px] flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-5 text-center transition hover:border-orange-300 hover:bg-orange-50">
+                    <i class="fa-solid fa-truck-fast text-2xl text-admin-orange transition group-hover:scale-110"></i>
+                    <span class="mt-3 text-sm font-medium text-slate-700">Ship Orders</span>
                 </a>
+
                 <a href="<?php echo e(route('dashboard.coupons')); ?>"
-                   class="flex flex-col items-center p-5 border border-gray-200 rounded-xl hover:border-emerald-600 hover:bg-emerald-50 transition group">
-                    <i class="fa-solid fa-tags text-2xl text-emerald-600 mb-2 group-hover:scale-110 transition-transform"></i>
-                    <span class="text-xs font-medium text-gray-700">Coupons</span>
+                   class="group flex min-h-[92px] flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-5 text-center transition hover:border-emerald-300 hover:bg-emerald-50">
+                    <i class="fa-solid fa-tags text-2xl text-emerald-600 transition group-hover:scale-110"></i>
+                    <span class="mt-3 text-sm font-medium text-slate-700">New Offer</span>
                 </a>
+
                 <a href="<?php echo e(route('dashboard.orders.report')); ?>"
-                   class="flex flex-col items-center p-5 border border-gray-200 rounded-xl hover:border-purple-600 hover:bg-purple-50 transition group">
-                    <i class="fa-solid fa-chart-simple text-2xl text-purple-600 mb-2 group-hover:scale-110 transition-transform"></i>
-                    <span class="text-xs font-medium text-gray-700">Reports</span>
+                   class="group flex min-h-[92px] flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-5 text-center transition hover:border-violet-300 hover:bg-violet-50">
+                    <i class="fa-solid fa-chart-column text-2xl text-violet-600 transition group-hover:scale-110"></i>
+                    <span class="mt-3 text-sm font-medium text-slate-700">Sales Reports</span>
                 </a>
+
                 <a href="<?php echo e(route('dashboard.notifications')); ?>"
-                   class="flex flex-col items-center p-5 border border-gray-200 rounded-xl hover:border-amber-500 hover:bg-amber-50 transition group col-span-2 sm:col-span-1">
-                    <i class="fa-regular fa-bell text-2xl text-amber-500 mb-2 group-hover:scale-110 transition-transform"></i>
-                    <span class="text-xs font-medium text-gray-700">Notifications</span>
+                   class="group flex min-h-[92px] flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-5 text-center transition hover:border-amber-300 hover:bg-amber-50 sm:col-span-2">
+                    <i class="fa-regular fa-bell text-2xl text-amber-500 transition group-hover:scale-110"></i>
+                    <span class="mt-3 text-sm font-medium text-slate-700">Notifications</span>
                 </a>
             </div>
-        </div>
+        </section>
     </div>
-
-    
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-10">
-        <div class="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
-            <h3 class="text-base font-semibold text-gray-800">Recent Orders</h3>
-            <a href="<?php echo e(route('dashboard.orders')); ?>" class="text-mayview-blue hover:underline text-sm font-medium">View All</a>
-        </div>
-        <div class="divide-y divide-gray-100">
-            <?php $__empty_1 = true; $__currentLoopData = $recent_orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-            <div class="px-6 py-4 hover:bg-gray-50 transition">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="font-medium text-sm">#ORD-<?php echo e(str_pad($order->id, 4, '0', STR_PAD_LEFT)); ?></p>
-                        <p class="text-xs text-gray-500 mt-0.5"><?php echo e($order->user->name ?? 'Guest'); ?></p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-semibold text-sm text-emerald-600">₹<?php echo e(number_format($order->total, 2)); ?></p>
-                        <span class="text-xs px-2.5 py-0.5 rounded-full mt-1 inline-block font-medium <?php echo e($order->status_badge_class); ?>">
-                            <?php echo e(ucfirst($order->status)); ?>
-
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-            <div class="px-6 py-8 text-center text-gray-400 text-sm">No orders yet.</div>
-            <?php endif; ?>
-        </div>
-    </div>
-
 </div>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('scripts'); ?>
 <script>
-const ordersCtx = document.getElementById('ordersChart').getContext('2d');
-new Chart(ordersCtx, {
+const salesTrendSets = <?php echo json_encode($sales_trends, 15, 512) ?>;
+const salesRangeLabels = {
+    '30d': 'Last 30 Days',
+    '90d': 'Last 90 Days',
+    '1y': 'This Year'
+};
+
+const salesCanvas = document.getElementById('salesTrendChart');
+const salesContext = salesCanvas.getContext('2d');
+const salesGradient = salesContext.createLinearGradient(0, 0, 0, 300);
+salesGradient.addColorStop(0, 'rgba(37, 99, 235, 0.24)');
+salesGradient.addColorStop(1, 'rgba(37, 99, 235, 0.02)');
+
+const formatINR = (value) => new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0
+}).format(value);
+
+const salesTrendChart = new Chart(salesContext, {
+    type: 'line',
+    data: {
+        labels: salesTrendSets['30d'].labels,
+        datasets: [{
+            data: salesTrendSets['30d'].data,
+            borderColor: '#1d4ed8',
+            backgroundColor: salesGradient,
+            fill: true,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            pointBorderWidth: 2,
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: '#1d4ed8',
+            tension: 0.35
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+            mode: 'index',
+            intersect: false
+        },
+        plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                callbacks: {
+                    label: (context) => formatINR(context.parsed.y || 0)
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    color: '#64748b',
+                    maxRotation: 0,
+                    autoSkip: true,
+                    maxTicksLimit: 8
+                }
+            },
+            y: {
+                beginAtZero: true,
+                border: {
+                    display: false
+                },
+                ticks: {
+                    color: '#64748b',
+                    callback: (value) => formatINR(value)
+                },
+                grid: {
+                    color: 'rgba(148, 163, 184, 0.18)'
+                }
+            }
+        }
+    }
+});
+
+document.getElementById('salesRangeSelect').addEventListener('change', function (event) {
+    const rangeKey = event.target.value;
+    const trend = salesTrendSets[rangeKey];
+
+    if (!trend) {
+        return;
+    }
+
+    salesTrendChart.data.labels = trend.labels;
+    salesTrendChart.data.datasets[0].data = trend.data;
+    salesTrendChart.update();
+
+    document.getElementById('salesTrendTitle').textContent = `Sales Trend (${salesRangeLabels[rangeKey]})`;
+});
+
+const ordersContext = document.getElementById('ordersChart').getContext('2d');
+new Chart(ordersContext, {
     type: 'doughnut',
     data: {
         labels: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
@@ -147,13 +285,32 @@ new Chart(ordersCtx, {
                 <?php echo e($orders_by_status['cancelled']); ?>
 
             ],
-            backgroundColor: ['#f97316','#eab308','#3b82f6','#10b981','#ef4444'],
-            borderWidth: 2, borderColor: '#fff'
+            backgroundColor: ['#f97316', '#eab308', '#3b82f6', '#10b981', '#ef4444'],
+            borderColor: '#ffffff',
+            borderWidth: 2,
+            hoverOffset: 6
         }]
     },
     options: {
-        responsive: true, maintainAspectRatio: false, cutout: '65%',
-        plugins: { legend: { position: 'bottom', labels: { padding: 16, font: { size: 11 } } } }
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '68%',
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    usePointStyle: false,
+                    boxWidth: 28,
+                    boxHeight: 8,
+                    padding: 18,
+                    color: '#64748b',
+                    font: {
+                        size: 11,
+                        family: 'Poppins'
+                    }
+                }
+            }
+        }
     }
 });
 </script>
