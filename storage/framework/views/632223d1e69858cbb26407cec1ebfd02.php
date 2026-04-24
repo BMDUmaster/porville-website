@@ -218,7 +218,7 @@
                                 <p class="text-xs text-gray-500 mb-1">MRP</p>
                                 <div class="relative">
                                     <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
-                                    <input type="number" name="variants[0][mrp]" min="0" step="0.01"
+                                    <input type="number" name="variants[0][mrp]" min="0" step="0.01" data-variant-mrp
                                            class="w-full border border-gray-300 rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
                                 </div>
                             </div>
@@ -226,32 +226,20 @@
                                 <p class="text-xs text-gray-500 mb-1">Selling Price</p>
                                 <div class="relative">
                                     <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
-                                    <input type="number" name="variants[0][selling_price]" min="0" step="0.01"
+                                    <input type="number" name="variants[0][selling_price]" min="0" step="0.01" data-variant-selling-price
                                            class="w-full border border-gray-300 rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
                                 </div>
                             </div>
                             <div class="flex-1">
                                 <p class="text-xs text-gray-500 mb-1">Save Offer (%)</p>
                                 <div class="relative">
-                                    <input type="number" name="variants[0][save_offer]" min="0" max="100" step="0.1"
-                                           class="w-full border border-gray-300 rounded px-2 pr-5 py-2 text-sm outline-none focus:border-blue-400">
+                                    <input type="number" name="variants[0][save_offer]" min="0" max="100" step="0.1" data-variant-save-offer readonly
+                                           class="w-full border border-gray-300 rounded bg-slate-50 px-2 pr-5 py-2 text-sm outline-none focus:border-blue-400">
                                     <span class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">%</span>
                                 </div>
                             </div>
                             <button type="button" onclick="removeVariant(this)"
                                     class="mt-5 text-gray-400 hover:text-red-500 text-lg leading-none">&times;</button>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <p class="text-xs text-gray-500 mb-1">Admin Amount(Rs)</p>
-                                <input type="number" name="variants[0][admin_amount]" min="0" step="0.01"
-                                       class="w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-500 mb-1">Vendor Amount(Rs)</p>
-                                <input type="number" name="variants[0][vendor_amount]" min="0" step="0.01"
-                                       class="w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -350,10 +338,12 @@ function updateFileLabel(input, labelId) {
 function loadSubcategories(categoryId) {
     const select = document.getElementById('addSubcategorySelect');
     const options = select.querySelectorAll('option');
+
     options.forEach(opt => {
         if (opt.value === '') return;
         opt.style.display = (!categoryId || opt.dataset.parent == categoryId) ? '' : 'none';
     });
+
     select.value = '';
 }
 
@@ -391,7 +381,7 @@ function addVariant() {
                 <p class="text-xs text-gray-500 mb-1">MRP</p>
                 <div class="relative">
                     <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
-                    <input type="number" name="variants[${idx}][mrp]" min="0" step="0.01"
+                    <input type="number" name="variants[${idx}][mrp]" min="0" step="0.01" data-variant-mrp
                            class="w-full border border-gray-300 rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
                 </div>
             </div>
@@ -399,32 +389,20 @@ function addVariant() {
                 <p class="text-xs text-gray-500 mb-1">Selling Price</p>
                 <div class="relative">
                     <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
-                    <input type="number" name="variants[${idx}][selling_price]" min="0" step="0.01"
+                    <input type="number" name="variants[${idx}][selling_price]" min="0" step="0.01" data-variant-selling-price
                            class="w-full border border-gray-300 rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
                 </div>
             </div>
             <div class="flex-1">
                 <p class="text-xs text-gray-500 mb-1">Save Offer (%)</p>
                 <div class="relative">
-                    <input type="number" name="variants[${idx}][save_offer]" min="0" max="100" step="0.1"
-                           class="w-full border border-gray-300 rounded px-2 pr-5 py-2 text-sm outline-none focus:border-blue-400">
+                    <input type="number" name="variants[${idx}][save_offer]" min="0" max="100" step="0.1" data-variant-save-offer readonly
+                           class="w-full border border-gray-300 rounded bg-slate-50 px-2 pr-5 py-2 text-sm outline-none focus:border-blue-400">
                     <span class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">%</span>
                 </div>
             </div>
             <button type="button" onclick="removeVariant(this)"
                     class="mt-5 text-gray-400 hover:text-red-500 text-lg leading-none">&times;</button>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-            <div>
-                <p class="text-xs text-gray-500 mb-1">Admin Amount(Rs)</p>
-                <input type="number" name="variants[${idx}][admin_amount]" min="0" step="0.01"
-                       class="w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
-            </div>
-            <div>
-                <p class="text-xs text-gray-500 mb-1">Vendor Amount(Rs)</p>
-                <input type="number" name="variants[${idx}][vendor_amount]" min="0" step="0.01"
-                       class="w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
-            </div>
         </div>`;
     container.appendChild(div);
 }
@@ -435,6 +413,34 @@ function removeVariant(btn) {
         btn.closest('.variant-row').remove();
     }
 }
+
+function updateVariantSaveOffer(row) {
+    const mrpInput = row.querySelector('[data-variant-mrp]');
+    const sellingPriceInput = row.querySelector('[data-variant-selling-price]');
+    const saveOfferInput = row.querySelector('[data-variant-save-offer]');
+
+    if (!mrpInput || !sellingPriceInput || !saveOfferInput) return;
+
+    const mrp = parseFloat(mrpInput.value);
+    const sellingPrice = parseFloat(sellingPriceInput.value);
+
+    if (!mrp || !sellingPrice || mrp <= 0 || sellingPrice >= mrp) {
+        saveOfferInput.value = '';
+        return;
+    }
+
+    const saveOffer = ((mrp - sellingPrice) / mrp) * 100;
+    saveOfferInput.value = saveOffer.toFixed(1);
+}
+
+document.addEventListener('input', (event) => {
+    if (!event.target.matches('[data-variant-mrp], [data-variant-selling-price]')) return;
+
+    const row = event.target.closest('.variant-row');
+    if (row) {
+        updateVariantSaveOffer(row);
+    }
+});
 </script>
 <?php $__env->stopSection(); ?>
 
