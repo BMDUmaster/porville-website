@@ -139,6 +139,7 @@ Route::get('/track-order', [FrontOrderController::class, 'track'])->name('fronte
 
 // ── Static Pages
 Route::get('/about-us',             [PageController::class, 'about'])->name('frontend.about');
+Route::get('/our-farms',            [PageController::class, 'farms'])->name('frontend.farms');
 Route::get('/contact-us',           [PageController::class, 'contact'])->name('frontend.contact');
 Route::get('/blog',                 [PageController::class, 'blog'])->name('frontend.blog');
 Route::get('/privacy-policy',       [PageController::class, 'privacy'])->name('frontend.privacy');

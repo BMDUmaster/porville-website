@@ -116,7 +116,13 @@ class CartController extends Controller
     public function count()
     {
         $cart = session('cart', []);
-        return response()->json(['count' => array_sum(array_column($cart, 'quantity'))]);
+        $items = $this->buildCartItems($cart);
+
+        return response()->json([
+            'count' => array_sum(array_column($cart, 'quantity')),
+            'items' => $items,
+            'subtotal' => collect($items)->sum('subtotal'),
+        ]);
     }
 
     private function buildCartItems(array $cart): array
@@ -124,6 +130,8 @@ class CartController extends Controller
         return array_map(function ($item, $key) {
             $item['key']      = $key;
             $item['subtotal'] = $item['price'] * $item['quantity'];
+            $item['image_url'] = $item['image'] ? asset('storage/' . $item['image']) : null;
+            $item['product_url'] = route('frontend.product.show', $item['slug']);
             return $item;
         }, array_values($cart), array_keys($cart));
     }

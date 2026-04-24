@@ -21,13 +21,11 @@
                     <a href="{{ route('frontend.products') }}" class="text-xs text-blue-600 font-semibold hover:underline">Clear All</a>
                 </div>
 
-                {{-- Search --}}
                 <div>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search products..."
                            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-green-500">
                 </div>
 
-                {{-- Category --}}
                 <div>
                     <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3">Category</h4>
                     @foreach($categories as $cat)
@@ -40,7 +38,6 @@
                     @endforeach
                 </div>
 
-                {{-- Sort --}}
                 <div>
                     <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3">Sort By</h4>
                     <select name="sort" onchange="document.getElementById('filterForm').submit()"
@@ -72,7 +69,7 @@
                     @if($product->images && count($product->images))
                         <img src="{{ asset('storage/'.$product->images[0]) }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
                     @else
-                        <div class="w-full h-full flex items-center justify-center text-5xl">🥩</div>
+                        <div class="w-full h-full flex items-center justify-center text-5xl">M</div>
                     @endif
                     @if($product->mrp && $product->mrp > $product->price)
                         <span class="absolute top-2 right-2 bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded">
@@ -81,15 +78,14 @@
                     @endif
                 </a>
                 <div class="p-3 flex flex-col flex-1">
-                    <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">{{ $product->unit }}</p>
                     <a href="{{ route('frontend.product.show', $product->slug) }}"
-                       class="text-sm font-bold text-gray-800 hover:text-green-700 mt-1 leading-snug line-clamp-2">{{ $product->name }}</a>
+                       class="text-sm font-bold text-gray-800 hover:text-green-700 leading-snug line-clamp-2">{{ $product->name }}</a>
                     <p class="text-[10px] text-gray-400 mt-1">{{ $product->category->name ?? '' }}</p>
                     <div class="flex items-center justify-between mt-auto pt-3">
                         <div>
-                            <p class="text-lg font-extrabold text-gray-800">₹{{ number_format($product->price, 0) }}</p>
+                            <p class="text-lg font-extrabold text-gray-800">Rs{{ number_format($product->price, 0) }}<span class="ml-1 text-xs font-semibold text-gray-400">/{{ $product->unit ?: 'unit' }}</span></p>
                             @if($product->mrp && $product->mrp > $product->price)
-                                <p class="text-xs text-gray-400 line-through">₹{{ number_format($product->mrp, 0) }}</p>
+                                <p class="text-xs text-gray-400 line-through">Rs{{ number_format($product->mrp, 0) }}</p>
                             @endif
                         </div>
                         <button onclick="addToCart({{ $product->id }})"
