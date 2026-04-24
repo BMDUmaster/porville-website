@@ -1,0 +1,58 @@
+name: Laravel CI/CD Pipeline
+
+# Trigger workflow on push to main branch
+on:
+  push:
+    branches:
+      - main
+      - ManojDevs
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # Step 1: Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Setup PHP environment
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+
+      # Step 3: Install Composer dependencies
+      - name: Install Dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      # Step 4: Copy environment file
+      - name: Setup ENV
+        run: cp .env.example .env
+
+      # Step 5: Generate App Key
+      - name: Generate Key
+        run: php artisan key:generate
+
+      # Step 6: Run Migrations
+      - name: Run Migrations
+        run: php artisan migrate --force
+
+      # Step 7: Clear Cache
+      - name: Clear Cache
+        run: php artisan optimize:clear
+
+      # Step 8: Deploy to Server via SSH
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /var/www/laravel-app
+            git pull origin main
+            composer install --no-dev --optimize-autoloader
+            php artisan migrate --force
+            php artisan optimize:clear
