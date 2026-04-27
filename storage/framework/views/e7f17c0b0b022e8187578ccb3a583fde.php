@@ -73,16 +73,16 @@
 ?>
 
 <div class="space-y-6 p-4 md:p-8">
-    <div class="grid gap-4 xl:grid-cols-4 md:grid-cols-2">
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <?php $__currentLoopData = $statCards; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $card): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="rounded-[22px] border border-slate-200 bg-white p-5 shadow-sm">
                 <div class="flex items-center gap-4">
                     <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-<?php echo e($card['color']); ?>-100 text-<?php echo e($card['color']); ?>-600">
                         <i class="fa-solid <?php echo e($card['icon']); ?> text-lg"></i>
                     </div>
-                    <div>
+                    <div class="min-w-0">
                         <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-400"><?php echo e($card['label']); ?></p>
-                        <h2 class="mt-1 text-[38px] font-black leading-none text-slate-900"><?php echo e($card['value']); ?></h2>
+                        <h2 class="mt-1 text-3xl font-black leading-none text-slate-900 sm:text-[38px]"><?php echo e($card['value']); ?></h2>
                         <p class="mt-1 text-sm font-medium text-<?php echo e($card['color']); ?>-600"><?php echo e($card['hint']); ?></p>
                     </div>
                 </div>
@@ -90,7 +90,7 @@
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
 
-    <div class="grid gap-4 xl:grid-cols-4 md:grid-cols-2">
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <?php $__currentLoopData = $quickActions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $action): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <button type="button"
                     onclick='openCouponModal(<?php echo json_encode($action["payload"], 15, 512) ?>)'
@@ -98,8 +98,8 @@
                 <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-<?php echo e($action['color']); ?>-100 text-<?php echo e($action['color']); ?>-600">
                     <i class="fa-solid <?php echo e($action['icon']); ?> text-lg"></i>
                 </span>
-                <span>
-                    <span class="block text-2xl font-black leading-none text-slate-900"><?php echo e($action['title']); ?></span>
+                <span class="min-w-0">
+                    <span class="block text-xl font-black leading-tight text-slate-900 sm:text-2xl"><?php echo e($action['title']); ?></span>
                     <span class="mt-1 block text-sm text-slate-400"><?php echo e($action['subtitle']); ?></span>
                 </span>
             </button>
@@ -107,7 +107,7 @@
     </div>
 
     <div class="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm">
-        <form method="GET" class="grid gap-3 xl:grid-cols-[1.3fr_1fr_1fr_1.1fr_1.1fr_1.05fr_1.15fr]">
+        <form method="GET" class="grid gap-3 md:grid-cols-2 xl:grid-cols-[1.3fr_1fr_1fr_1.1fr_1.1fr_1.05fr_1.15fr]">
             <input type="hidden" name="segment" value="<?php echo e($activeSegment); ?>">
             <input type="text" name="search" value="<?php echo e(request('search')); ?>" placeholder="Search by code/name"
                    class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500">
@@ -136,7 +136,8 @@
         </form>
     </div>
 
-    <div class="flex flex-wrap gap-3">
+    <div class="overflow-x-auto pb-1 coupon-scrollbar">
+        <div class="flex w-max min-w-full gap-3">
         <?php $__currentLoopData = $tabs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $segment => $tab): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <?php
                 $tabUrl = route('dashboard.coupons', $rangeBase->merge(['segment' => $segment])->all());
@@ -149,11 +150,12 @@
 
             </a>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </div>
     </div>
 
     <div class="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
         <div class="flex flex-col gap-4 border-b border-slate-200 px-5 py-5 md:flex-row md:items-center md:justify-between">
-            <h2 class="text-[28px] font-black tracking-tight text-slate-900"><?php echo e($tableTitle); ?></h2>
+            <h2 class="text-2xl font-black tracking-tight text-slate-900 md:text-[28px]"><?php echo e($tableTitle); ?></h2>
             <button type="button" onclick="openCouponModal()"
                     class="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-indigo-700">
                 <i class="fa-solid fa-circle-plus"></i>
@@ -366,7 +368,7 @@
                 Active
             </label>
 
-            <div class="flex gap-3 pt-2">
+            <div class="flex flex-col gap-3 pt-2 sm:flex-row">
                 <button type="submit" class="flex-1 rounded-xl bg-indigo-600 py-3 text-sm font-bold text-white">Save Entry</button>
                 <button type="button" onclick="closeCouponModal()" class="flex-1 rounded-xl bg-slate-100 py-3 text-sm font-bold text-slate-600">Cancel</button>
             </div>

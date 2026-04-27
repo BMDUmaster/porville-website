@@ -3,11 +3,11 @@
 <?php $__env->startSection('page_title', 'Notification Management'); ?>
 
 <?php $__env->startSection('content'); ?>
-<div class="p-4 md:p-8 space-y-6">
+<div class="space-y-6 p-4 md:p-8">
 
     
     <form method="GET" class="flex justify-end">
-        <div class="flex items-center gap-2">
+        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
             <label class="text-sm font-bold text-gray-600">Search:</label>
             <input type="text" name="search" value="<?php echo e(request('search')); ?>"
                    class="border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -35,7 +35,7 @@
                     <td class="px-4 py-4 text-sm font-semibold text-gray-800"><?php echo e($notif->subject); ?></td>
                     <td class="px-4 py-4 text-sm text-gray-600 max-w-md truncate"><?php echo e($notif->message); ?></td>
                     <td class="px-4 py-4 text-center">
-                        <div class="flex justify-center gap-2">
+                        <div class="flex flex-wrap justify-center gap-2">
                             <button onclick="openViewModal('<?php echo e(addslashes($notif->subject)); ?>', '<?php echo e(addslashes($notif->message)); ?>')"
                                     class="px-3 py-1 text-xs font-bold text-blue-600 hover:bg-blue-50 rounded-lg">View</button>
                             <button onclick="openEditModal(<?php echo e($notif->id); ?>, '<?php echo e(addslashes($notif->subject)); ?>', '<?php echo e(addslashes($notif->message)); ?>')"
@@ -55,26 +55,26 @@
         </table>
     </div>
 
-    <div class="flex justify-between items-center">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div><?php echo e($notifications->withQueryString()->links()); ?></div>
         <button onclick="openAddModal()"
-                class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition shadow-md">
+                class="w-full rounded-lg bg-blue-600 px-6 py-2 font-bold text-white transition shadow-md hover:bg-blue-700 sm:w-auto">
             Send New Notification
         </button>
     </div>
 </div>
 
 
-<div id="notifModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm">
-    <div class="w-full max-w-[920px] overflow-hidden rounded-[18px] bg-white shadow-[0_24px_70px_rgba(15,23,42,0.25)]">
-        <div class="flex items-center justify-between border-b border-slate-200 px-8 py-7">
+<div id="notifModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+    <div class="max-h-[92vh] w-full max-w-[920px] overflow-y-auto rounded-[18px] bg-white shadow-[0_24px_70px_rgba(15,23,42,0.25)]">
+        <div class="flex items-center justify-between border-b border-slate-200 px-5 py-5 sm:px-8 sm:py-7">
             <h2 id="modalTitle" class="text-[22px] font-extrabold tracking-tight text-slate-800">New Notification</h2>
             <button onclick="closeModal()" class="text-4xl font-light leading-none text-slate-300 transition hover:text-slate-500">&times;</button>
         </div>
         <form id="notifForm" method="POST" action="<?php echo e(route('dashboard.notifications.store')); ?>">
             <?php echo csrf_field(); ?>
             <span id="methodField"></span>
-            <div class="space-y-9 px-8 py-8">
+            <div class="space-y-7 px-5 py-5 sm:space-y-9 sm:px-8 sm:py-8">
                 <div id="userSelectSection" class="space-y-4">
                     <label class="block text-[15px] font-bold text-slate-700">Select Users</label>
                     <input type="text" id="userSearchInput" placeholder="Search user by name or ID..."
@@ -117,19 +117,19 @@
                               class="w-full rounded-[10px] border border-slate-300 px-5 py-4 text-base text-slate-700 outline-none transition focus:border-blue-500"></textarea>
                 </div>
             </div>
-            <div class="flex justify-end gap-4 border-t border-slate-200 bg-slate-50/70 px-8 py-5">
+            <div class="flex flex-col gap-3 border-t border-slate-200 bg-slate-50/70 px-5 py-5 sm:flex-row sm:justify-end sm:gap-4 sm:px-8">
                 <button type="button" onclick="closeModal()"
-                        class="min-w-44 rounded-[10px] bg-slate-200 px-6 py-3 text-[15px] font-bold text-slate-700 transition hover:bg-slate-300">Cancel</button>
+                        class="w-full rounded-[10px] bg-slate-200 px-6 py-3 text-[15px] font-bold text-slate-700 transition hover:bg-slate-300 sm:min-w-44 sm:w-auto">Cancel</button>
                 <button type="submit" id="submitNotifButton"
-                        class="min-w-44 rounded-[10px] bg-blue-600 px-6 py-3 text-[15px] font-bold text-white transition hover:bg-blue-700">Send Now</button>
+                        class="w-full rounded-[10px] bg-blue-600 px-6 py-3 text-[15px] font-bold text-white transition hover:bg-blue-700 sm:min-w-44 sm:w-auto">Send Now</button>
             </div>
         </form>
     </div>
 </div>
 
 
-<div id="viewModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm">
-    <div class="bg-white w-full max-w-lg rounded-lg shadow-2xl p-6">
+<div id="viewModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-lg rounded-lg bg-white p-5 shadow-2xl sm:p-6">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-lg font-bold">Notification Details</h2>
             <button onclick="closeViewModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>

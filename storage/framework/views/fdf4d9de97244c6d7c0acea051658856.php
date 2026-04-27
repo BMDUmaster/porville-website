@@ -141,7 +141,67 @@
                 <h2 class="text-lg font-black text-slate-900">Full Order History</h2>
                 <p class="mt-1 text-sm text-slate-500">User ke saare orders, payment aur delivery assignment details.</p>
             </div>
-            <div class="overflow-x-auto">
+            <div class="space-y-4 p-4 md:hidden">
+                <?php $__empty_1 = true; $__currentLoopData = $user->orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <article class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 shadow-sm">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <div class="font-black text-blue-600 break-all"><?php echo e($order->order_number ?? '#ORD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT)); ?></div>
+                                <div class="mt-1 text-xs text-slate-400">ID <?php echo e($order->id); ?></div>
+                            </div>
+                            <span class="shrink-0 rounded-full px-3 py-1 text-xs font-black <?php echo e($order->status_badge_class); ?>">
+                                <?php echo e($order->status_label); ?>
+
+                            </span>
+                        </div>
+
+                        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                            <div>
+                                <p class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">Placed On</p>
+                                <p class="mt-1 text-sm font-bold text-slate-800"><?php echo e($order->created_at->format('d M Y')); ?></p>
+                                <p class="text-xs text-slate-400"><?php echo e($order->created_at->format('h:i A')); ?></p>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">Amount</p>
+                                <p class="mt-1 text-sm font-black text-slate-900">Rs<?php echo e(number_format($order->total, 2)); ?></p>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">Items</p>
+                                <p class="mt-1 text-sm font-bold text-slate-800"><?php echo e($order->items->count()); ?> item(s)</p>
+                                <p class="mt-1 text-xs text-slate-400">
+                                    <?php echo e($order->items->pluck('product.name')->filter()->take(2)->implode(', ') ?: 'No item names'); ?>
+
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">Payment</p>
+                                <p class="mt-1 text-sm font-bold uppercase text-slate-800"><?php echo e($order->payment_method ?? 'COD'); ?></p>
+                                <p class="text-xs uppercase text-slate-400"><?php echo e($order->payment_status ?? 'pending'); ?></p>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <p class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">Delivery Boy</p>
+                                <?php if($order->deliveryBoy): ?>
+                                    <p class="mt-1 text-sm font-bold text-slate-800"><?php echo e($order->deliveryBoy->partner_name); ?></p>
+                                    <p class="text-xs text-slate-400"><?php echo e($order->deliveryBoy->phone_number); ?></p>
+                                <?php else: ?>
+                                    <p class="mt-1 text-xs text-slate-400">Not assigned</p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <a href="<?php echo e(route('dashboard.orders.show', $order)); ?>"
+                           class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-50 px-3 py-3 text-xs font-black text-blue-600 hover:bg-blue-100">
+                            <i class="fa-solid fa-eye"></i> View Order
+                        </a>
+                    </article>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <div class="rounded-2xl border border-dashed border-slate-200 px-4 py-10 text-center text-slate-400">
+                        No orders yet.
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <div class="hidden overflow-x-auto md:block">
                 <table class="w-full min-w-[1080px] text-sm">
                     <thead class="border-b bg-slate-50 text-slate-500">
                         <tr>

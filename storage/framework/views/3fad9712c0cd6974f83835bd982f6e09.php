@@ -8,7 +8,7 @@
         <div class="overflow-hidden rounded-[28px] bg-gradient-to-r from-[#2245b6] via-[#2c67d8] to-[#4288f0] text-white shadow-[0_22px_45px_rgba(37,99,235,0.26)]">
             <div class="flex flex-col gap-6 px-6 py-7 md:px-8 lg:flex-row lg:items-center lg:justify-between">
                 <div class="flex items-center gap-5">
-                    <div class="h-24 w-24 overflow-hidden rounded-full border-4 border-white/20 bg-white/15 text-4xl font-black shadow-lg">
+                    <div class="h-20 w-20 overflow-hidden rounded-full border-4 border-white/20 bg-white/15 text-3xl font-black shadow-lg sm:h-24 sm:w-24 sm:text-4xl">
                         <?php if($user->photo ?? false): ?>
                             <img src="<?php echo e(asset('storage/'.$user->photo)); ?>" class="h-full w-full object-cover" alt="<?php echo e($user->name); ?>">
                         <?php else: ?>
@@ -20,13 +20,13 @@
                     </div>
                     <div>
                         <p class="text-xs font-bold uppercase tracking-[0.28em] text-white/70">Admin Profile</p>
-                        <h1 class="mt-1 text-3xl font-black tracking-tight"><?php echo e($user->name); ?></h1>
+                        <h1 class="mt-1 text-2xl font-black tracking-tight sm:text-3xl"><?php echo e($user->name); ?></h1>
                         <p class="mt-1 text-sm font-semibold text-white/85 capitalize"><?php echo e($user->role); ?></p>
                         <p class="text-sm text-white/70"><?php echo e($user->email); ?></p>
                     </div>
                 </div>
 
-                <div class="grid gap-3 sm:grid-cols-3 lg:min-w-[420px]">
+                <div class="grid w-full gap-3 sm:grid-cols-3 lg:max-w-xl">
                     <div class="rounded-2xl border border-white/15 bg-white/10 px-4 py-4 backdrop-blur-sm">
                         <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-white/60">Phone</p>
                         <p class="mt-2 text-base font-bold text-white"><?php echo e($user->phone ?: 'Not added'); ?></p>
@@ -83,7 +83,7 @@
                     </div>
 
                     <div class="md:col-span-2 pt-1">
-                        <button type="submit" class="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-8 py-3 text-sm font-bold text-white transition hover:bg-blue-700">
+                        <button type="submit" class="inline-flex w-full items-center justify-center rounded-2xl bg-blue-600 px-8 py-3 text-sm font-bold text-white transition hover:bg-blue-700 sm:w-auto">
                             Update Profile
                         </button>
                     </div>
@@ -132,7 +132,7 @@ unset($__errorArgs, $__bag); ?>
                     </div>
 
                     <div class="pt-1">
-                        <button type="submit" class="inline-flex items-center justify-center rounded-2xl bg-red-500 px-8 py-3 text-sm font-bold text-white transition hover:bg-red-600">
+                        <button type="submit" class="inline-flex w-full items-center justify-center rounded-2xl bg-red-500 px-8 py-3 text-sm font-bold text-white transition hover:bg-red-600 sm:w-auto">
                             Update Password
                         </button>
                     </div>
