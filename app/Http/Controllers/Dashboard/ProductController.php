@@ -33,7 +33,7 @@ class ProductController extends Controller
             'total'        => Product::count(),
             'active'       => Product::where('is_active', true)->count(),
             'inactive'     => Product::where('is_active', false)->count(),
-            'out_of_stock' => Product::where('stock', 0)->count(),
+            'out_of_stock' => Product::where('is_active', false)->count(),
         ];
 
         $categories = Category::parents()->get();
@@ -82,9 +82,10 @@ class ProductController extends Controller
             ]);
         }
 
+        $data['unit'] = (string) ($data['variants'][0]['unit'] ?? 'Unit');
         $data['price'] = ! empty($data['variants']) ? (float) ($data['variants'][0]['selling_price'] ?? 0) : 0;
         $data['mrp'] = ! empty($data['variants']) ? (float) ($data['variants'][0]['mrp'] ?? 0) : 0;
-        $data['stock'] = 0;
+        $data['stock'] = $data['is_active'] ? 1 : 0;
 
         $imagePaths = [];
         if ($request->hasFile('images')) {
@@ -116,7 +117,6 @@ class ProductController extends Controller
             'description'           => 'nullable|string',
             'price'                 => 'required|numeric|min:0|max:99999999.99',
             'mrp'                   => 'nullable|numeric|min:0|max:99999999.99',
-            'stock'                 => 'required|integer|min:0',
             'is_active'             => 'boolean',
             'variants'              => 'nullable|array',
             'variants.*.quantity'   => 'nullable|string|max:50',
@@ -141,9 +141,12 @@ class ProductController extends Controller
         $data['variants'] = $this->normalizeVariants($request->input('variants', []));
 
         if (! empty($data['variants'])) {
+            $data['unit'] = (string) ($data['variants'][0]['unit'] ?? ($product->unit ?: 'Unit'));
             $data['price'] = (float) ($data['variants'][0]['selling_price'] ?? $data['price'] ?? 0);
             $data['mrp'] = (float) ($data['variants'][0]['mrp'] ?? $data['mrp'] ?? 0);
         }
+
+        $data['stock'] = $data['is_active'] ? 1 : 0;
 
         if ($request->filled('existing_images_present')) {
             $keptImages = array_values(array_filter($request->input('existing_images', [])));

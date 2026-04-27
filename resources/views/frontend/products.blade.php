@@ -34,7 +34,7 @@
                     FarmSea Fresh Marketplace
                 </div>
 
-                <h1 class="mt-4 text-[42px] font-black leading-[0.92] tracking-[-0.04em] text-white md:text-[64px] lg:text-[74px]">
+                <h1 class="mt-4 text-[34px] font-black leading-[0.95] tracking-[-0.04em] text-white sm:text-[42px] md:text-[64px] lg:text-[74px]">
                     All <span class="italic text-[#9be278]">Products.</span>
                 </h1>
 
@@ -43,12 +43,12 @@
                 </p>
             </div>
 
-            <div class="flex flex-wrap items-stretch gap-5 text-white lg:justify-end">
-                <div class="min-w-[120px] border-l border-white/15 pl-5">
+            <div class="flex w-full flex-col gap-4 text-white sm:w-auto sm:flex-row sm:flex-wrap sm:items-stretch sm:gap-5 lg:justify-end">
+                <div class="w-full border-t border-white/15 pt-4 sm:w-auto sm:min-w-[120px] sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0">
                     <div class="text-[46px] font-black leading-none md:text-[56px]">{{ $products->total() }}+</div>
                     <div class="mt-2 text-[11px] font-extrabold uppercase tracking-[0.28em] text-white/65">Fresh Products</div>
                 </div>
-                <div class="min-w-[150px] border-l border-white/15 pl-5">
+                <div class="w-full border-t border-white/15 pt-4 sm:w-auto sm:min-w-[150px] sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0">
                     <div class="text-[46px] font-black leading-none md:text-[56px]">Daily</div>
                     <div class="mt-2 text-[11px] font-extrabold uppercase tracking-[0.28em] text-white/65">Fresh Sourcing</div>
                 </div>
@@ -246,7 +246,7 @@
             <p class="text-sm text-gray-500 font-semibold">{{ $products->total() }} products found</p>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             @forelse($products as $product)
             <div class="bg-white rounded-2xl border border-gray-100 hover:border-green-300 hover:shadow-lg transition overflow-hidden flex flex-col">
                 <a href="{{ route('frontend.product.show', $product->slug) }}" class="block aspect-square overflow-hidden bg-gray-50 relative">
@@ -255,6 +255,11 @@
                     @else
                         <div class="w-full h-full flex items-center justify-center text-5xl">M</div>
                     @endif
+                    @unless($product->is_active)
+                        <span class="absolute left-2 top-2 rounded bg-red-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white shadow">
+                            Out of Stock
+                        </span>
+                    @endunless
                     @if($product->mrp && $product->mrp > $product->price)
                         <span class="absolute top-2 right-2 bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded">
                             -{{ round((($product->mrp - $product->price) / $product->mrp) * 100) }}%
@@ -272,10 +277,16 @@
                                 <p class="text-xs text-gray-400 line-through">Rs{{ number_format($product->mrp, 0) }}</p>
                             @endif
                         </div>
-                        <button onclick="addToCart({{ $product->id }})"
-                                class="w-9 h-9 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center text-sm transition">
-                            <i class="fa-solid fa-cart-shopping"></i>
-                        </button>
+                        @if($product->is_active)
+                            <button onclick="addToCart({{ $product->id }})"
+                                    class="w-9 h-9 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center text-sm transition">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                            </button>
+                        @else
+                            <span class="inline-flex rounded-lg bg-red-50 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-red-600">
+                                Out
+                            </span>
+                        @endif
                     </div>
                 </div>
             </div>

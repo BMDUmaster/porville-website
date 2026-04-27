@@ -398,9 +398,15 @@
                                     <p class="text-xs text-gray-400 line-through">Rs{{ number_format($product->mrp, 0) }}</p>
                                 @endif
                             </div>
-                            <button onclick="addToCart({{ $product->id }})" class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-sm text-white transition hover:bg-blue-700">
-                                <i class="fa-solid fa-cart-shopping"></i>
-                            </button>
+                            @if($product->is_active)
+                                <button onclick="addToCart({{ $product->id }})" class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-sm text-white transition hover:bg-blue-700">
+                                    <i class="fa-solid fa-cart-shopping"></i>
+                                </button>
+                            @else
+                                <span class="inline-flex h-9 items-center justify-center rounded-lg bg-red-50 px-3 text-[10px] font-extrabold uppercase tracking-[0.14em] text-red-600">
+                                    Out
+                                </span>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -575,10 +581,16 @@
                                         <p class="text-xs text-slate-400 line-through">Rs{{ number_format($typeShowcaseLead->mrp, 0) }}</p>
                                     @endif
                                 </div>
-                                <button onclick="addToCart({{ $typeShowcaseLead->id }})" class="inline-flex items-center gap-2 rounded-xl bg-green-700 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-green-800">
-                                    <i class="fa-solid fa-cart-plus text-[11px]"></i>
-                                    Add
-                                </button>
+                                @if($typeShowcaseLead->is_active)
+                                    <button onclick="addToCart({{ $typeShowcaseLead->id }})" class="inline-flex items-center gap-2 rounded-xl bg-green-700 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-green-800">
+                                        <i class="fa-solid fa-cart-plus text-[11px]"></i>
+                                        Add
+                                    </button>
+                                @else
+                                    <span class="inline-flex items-center rounded-xl bg-red-50 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-red-600">
+                                        Out of Stock
+                                    </span>
+                                @endif
                             </div>
                         </div>
 
@@ -621,9 +633,15 @@
                                 </a>
                                 <div class="mt-3 flex items-end justify-between gap-3">
                                     <p class="text-[17px] font-black text-slate-950">Rs{{ number_format($product->price, 0) }}<span class="ml-1 text-[11px] font-semibold text-slate-400">/{{ $product->unit ?: 'unit' }}</span></p>
-                                    <button onclick="addToCart({{ $product->id }})" class="rounded-lg border border-[#dbe8d7] bg-[#f8fbf6] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-green-700 transition duration-300 hover:border-green-300 hover:bg-green-50 group-hover:-translate-y-0.5 group-hover:shadow-sm">
-                                        + Add
-                                    </button>
+                                    @if($product->is_active)
+                                        <button onclick="addToCart({{ $product->id }})" class="rounded-lg border border-[#dbe8d7] bg-[#f8fbf6] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-green-700 transition duration-300 hover:border-green-300 hover:bg-green-50 group-hover:-translate-y-0.5 group-hover:shadow-sm">
+                                            + Add
+                                        </button>
+                                    @else
+                                        <span class="rounded-lg bg-red-50 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-red-600">
+                                            Out
+                                        </span>
+                                    @endif
                                 </div>
                             </div>
                         </article>
@@ -794,7 +812,7 @@
                 @php
                     $favoriteImage = $product->images && count($product->images) ? asset('storage/' . $product->images[0]) : null;
                     $favoriteLabel = $favoriteLabels[$index % count($favoriteLabels)];
-                    $favoriteUnit = $product->unit ?: ($product->weight ? $product->weight . ' g' : 'Fresh Cut');
+                    $favoriteUnit = $product->unit ?: 'unit';
                 @endphp
 
                 <article class="favorite-card group min-w-[255px] max-w-[255px] rounded-[28px] p-3">
@@ -838,9 +856,15 @@
                                     <p class="text-xs text-slate-400 line-through">Rs{{ number_format($product->mrp, 0) }}</p>
                                 @endif
                             </div>
-                            <button onclick="addToCart({{ $product->id }})" class="rounded-xl bg-green-700 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-green-800">
-                                Add To Cart
-                            </button>
+                            @if($product->is_active)
+                                <button onclick="addToCart({{ $product->id }})" class="rounded-xl bg-green-700 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-green-800">
+                                    Add To Cart
+                                </button>
+                            @else
+                                <span class="inline-flex items-center rounded-xl bg-red-50 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-red-600">
+                                    Out of Stock
+                                </span>
+                            @endif
                         </div>
                     </div>
                 </article>

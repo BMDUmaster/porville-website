@@ -13,7 +13,7 @@
         </div>
 
         <span class="inline-flex rounded-full px-4 py-2 text-xs font-black <?php echo e($product->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'); ?>">
-            <?php echo e($product->is_active ? 'ACTIVE' : 'INACTIVE'); ?>
+            <?php echo e($product->is_active ? 'ACTIVE' : 'DEACTIVE'); ?>
 
         </span>
     </div>
@@ -47,7 +47,7 @@
                         'Sub Category' => $product->subcategory->name ?? '—',
                         'Price' => '₹' . number_format($product->price, 2),
                         'MRP' => $product->mrp ? '₹' . number_format($product->mrp, 2) : '—',
-                        'Stock' => $product->stock,
+                        'Stock' => $product->is_active ? 'Active' : 'Deactive',
                         'Slug' => $product->slug ?: '—',
                     ]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $label => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="border-b border-slate-100 px-5 py-4 md:border-r even:md:border-r-0">

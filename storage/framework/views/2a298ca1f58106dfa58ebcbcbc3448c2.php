@@ -200,6 +200,15 @@ html, body { overflow-x: hidden; max-width: 100vw; }
             </button>
         </div>
     </div>
+    <div class="px-3 pb-3 md:hidden">
+        <form action="<?php echo e(route('frontend.products')); ?>" method="GET" class="relative">
+            <input type="text" name="search" placeholder="Search fresh items"
+                   class="w-full rounded-xl border border-gray-200 px-4 py-2.5 pr-11 text-sm focus:border-green-500 focus:outline-none transition">
+            <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-600">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </form>
+    </div>
     <!-- Nav strip -->
     <div class="border-t border-gray-100 hidden md:block overflow-visible bg-white">
         <div class="max-w-screen-xl mx-auto px-4 flex items-center gap-1 h-10 text-sm scrollbar-hide overflow-visible">
@@ -399,6 +408,10 @@ function closeCart() {
     document.getElementById('cart-drawer').classList.remove('open');
     document.body.style.overflow = '';
 }
+
+function showCartAddedAlert(message = 'Product added to cart successfully.') {
+    alert(message);
+}
 // Add to cart (AJAX)
 function addToCart(productId, variantIndex) {
     fetch('<?php echo e(route("frontend.cart.add")); ?>', {
@@ -412,10 +425,13 @@ function addToCart(productId, variantIndex) {
     })
     .then(r => r.json())
     .then(data => {
-        if (data.success) {
-            document.getElementById('header-cart-badge').textContent = data.cart_count;
-            openCart();
+        if (!data.success) {
+            alert(data.message || 'This product is currently unavailable.');
+            return;
         }
+
+        document.getElementById('header-cart-badge').textContent = data.cart_count;
+        showCartAddedAlert('Product cart me add ho gaya.');
     });
 }
 function formatCartCurrency(amount) {

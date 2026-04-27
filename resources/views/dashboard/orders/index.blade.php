@@ -8,11 +8,11 @@
 @endphp
 <div class="p-4 md:p-8 space-y-6">
 
-    <form method="GET" class="flex flex-wrap items-center justify-between gap-3">
+    <form method="GET" class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <h1 class="text-2xl font-bold text-gray-800">Live Orders</h1>
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search customer / ID..."
-                   class="border rounded px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                   class="w-full rounded border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 sm:w-auto">
             <select name="status" class="border rounded px-3 py-1.5 text-sm outline-none">
                 <option value="">All Status</option>
                 @foreach($statusOptions as $status)
@@ -26,7 +26,86 @@
         </div>
     </form>
 
-    <div class="overflow-x-auto rounded-lg border bg-white shadow-sm">
+    <div class="space-y-4 md:hidden">
+        @forelse($orders as $order)
+            <article class="rounded-2xl border bg-white p-4 shadow-sm">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="break-all text-sm font-bold text-blue-600">#ORD-{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</p>
+                        <p class="mt-1 text-xs text-gray-400">{{ $order->created_at->format('d M Y, h:i A') }}</p>
+                    </div>
+                    <span class="rounded-full px-2 py-1 text-[10px] font-bold uppercase {{ $order->status_badge_class }}">
+                        {{ $order->status_label }}
+                    </span>
+                </div>
+
+                <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Customer</p>
+                        <p class="mt-1 text-sm font-semibold text-gray-800">{{ $order->user->name ?? 'Guest' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Items</p>
+                        <p class="mt-1 text-sm text-gray-700">{{ $order->items->count() }} item(s)</p>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Amount</p>
+                        <p class="mt-1 text-sm font-bold text-gray-900">Rs{{ number_format($order->total, 2) }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Payment</p>
+                        <p class="mt-1 text-sm font-semibold uppercase text-gray-700">{{ $order->payment_method ?? 'COD' }}</p>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Delivery Boy</p>
+                        @if($order->deliveryBoy)
+                            <p class="mt-1 text-sm font-bold text-gray-800">{{ $order->deliveryBoy->partner_name }}</p>
+                            <p class="text-xs text-gray-500">{{ $order->deliveryBoy->phone_number }} | {{ $order->deliveryBoy->area }}</p>
+                        @else
+                            <p class="mt-1 text-xs text-gray-400">Not assigned</p>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="mt-4 space-y-3">
+                    <a href="{{ route('dashboard.orders.show', $order) }}"
+                       class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-50 px-3 py-2.5 text-xs font-bold text-blue-600 hover:bg-blue-100">
+                        <i class="fa-solid fa-eye"></i> View
+                    </a>
+
+                    <form method="POST" action="{{ route('dashboard.orders.status', $order) }}" class="space-y-2 rounded-xl border border-gray-200 bg-gray-50 p-3">
+                        @csrf
+                        @method('PATCH')
+                        <select name="status" onchange="toggleDeliveryBoySelect(this, '{{ $order->id }}')" class="w-full rounded border px-3 py-2 text-xs outline-none">
+                            @foreach($statusOptions as $status)
+                                <option value="{{ $status }}" {{ $order->status === $status ? 'selected' : '' }}>
+                                    {{ ucwords(str_replace('_', ' ', $status)) }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <select name="delivery_boy_id" data-delivery-boy-select
+                                class="w-full rounded border px-3 py-2 text-xs outline-none {{ $order->status === 'out_for_delivery' ? '' : 'hidden' }}">
+                            <option value="">Choose delivery boy</option>
+                            @foreach($deliveryBoysByOrder[$order->id] ?? [] as $deliveryBoy)
+                                <option value="{{ $deliveryBoy->id }}" {{ $order->delivery_boy_id === $deliveryBoy->id ? 'selected' : '' }}>
+                                    {{ $deliveryBoy->partner_name }} | {{ $deliveryBoy->phone_number }} | {{ $deliveryBoy->area }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <button type="submit" class="w-full rounded bg-blue-600 px-3 py-2 text-[11px] font-bold text-white hover:bg-blue-700">
+                            Save
+                        </button>
+                    </form>
+                </div>
+            </article>
+        @empty
+            <div class="rounded-2xl border border-dashed bg-white px-4 py-10 text-center text-gray-400">No orders found.</div>
+        @endforelse
+    </div>
+
+    <div class="hidden overflow-x-auto rounded-lg border bg-white shadow-sm md:block">
         <table class="w-full min-w-[1180px] text-left">
             <thead class="border-b bg-gray-50">
                 <tr>
@@ -85,7 +164,7 @@
                                         @endforeach
                                     </select>
 
-                                    <select name="delivery_boy_id" id="delivery-boy-select-{{ $order->id }}"
+                                    <select name="delivery_boy_id" data-delivery-boy-select
                                             class="border rounded px-2 py-1 text-xs outline-none {{ $order->status === 'out_for_delivery' ? '' : 'hidden' }}">
                                         <option value="">Choose delivery boy</option>
                                         @foreach($deliveryBoysByOrder[$order->id] ?? [] as $deliveryBoy)
@@ -118,7 +197,8 @@
 @section('scripts')
 <script>
 function toggleDeliveryBoySelect(select, orderId) {
-    const deliverySelect = document.getElementById(`delivery-boy-select-${orderId}`);
+    const form = select.closest('form');
+    const deliverySelect = form ? form.querySelector('[data-delivery-boy-select]') : null;
 
     if (!deliverySelect) {
         return;

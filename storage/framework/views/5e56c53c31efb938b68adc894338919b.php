@@ -7,7 +7,7 @@
 ?>
 <div class="p-4 md:p-8 space-y-6">
 
-    <div class="grid grid-cols-2 gap-5 xl:grid-cols-4">
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <?php $__currentLoopData = [["Today's Orders",$stats['today'],'purple','fa-calendar-day'],['Pending',$stats['pending'],'emerald','fa-hourglass-split'],['Delivered',$stats['delivered'],'blue','fa-bag-check'],['Cancelled',$stats['cancelled'],'red','fa-circle-xmark']]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as [$label,$val,$color,$icon]): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="flex items-center gap-4 rounded-2xl border bg-white p-5 shadow-sm">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-<?php echo e($color); ?>-500 text-white shadow-lg">
@@ -21,9 +21,9 @@
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
 
-    <form method="GET" class="grid grid-cols-2 gap-3 rounded-2xl border bg-white p-4 shadow-sm md:grid-cols-6">
+    <form method="GET" class="grid grid-cols-1 gap-3 rounded-2xl border bg-white p-4 shadow-sm sm:grid-cols-2 md:grid-cols-6">
         <input type="text" name="search" value="<?php echo e(request('search')); ?>" placeholder="Search"
-               class="col-span-2 rounded-full border bg-gray-50 px-4 py-2.5 text-sm outline-none md:col-span-1">
+               class="rounded-full border bg-gray-50 px-4 py-2.5 text-sm outline-none sm:col-span-2 md:col-span-1">
         <input type="text" name="order_id" value="<?php echo e(request('order_id')); ?>" placeholder="Order ID"
                class="rounded-full border bg-gray-50 px-4 py-2.5 text-sm outline-none">
         <select name="status" class="rounded-full border bg-gray-50 px-4 py-2.5 text-sm outline-none">
@@ -42,7 +42,58 @@
         <button type="submit" class="rounded-full bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white">Filter</button>
     </form>
 
-    <div class="overflow-x-auto rounded-2xl border bg-white shadow-sm">
+    <div class="space-y-4 md:hidden">
+        <?php $__empty_1 = true; $__currentLoopData = $orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+            <article class="rounded-2xl border bg-white p-4 shadow-sm">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold text-gray-400">#<?php echo e($orders->firstItem() + $i); ?></p>
+                        <p class="mt-1 break-all text-sm font-bold text-indigo-600">#ORD-<?php echo e(str_pad($order->id, 4, '0', STR_PAD_LEFT)); ?></p>
+                    </div>
+                    <span class="rounded-full px-3 py-1 text-xs font-bold <?php echo e($order->status_badge_class); ?>">
+                        <?php echo e($order->status_label); ?>
+
+                    </span>
+                </div>
+
+                <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Date</p>
+                        <p class="mt-1 text-sm font-semibold text-gray-800"><?php echo e($order->created_at->format('d M Y')); ?></p>
+                        <p class="text-xs text-gray-500"><?php echo e($order->created_at->format('h:i A')); ?></p>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Amount</p>
+                        <p class="mt-1 text-sm font-bold text-indigo-600">Rs<?php echo e(number_format($order->total, 2)); ?></p>
+                        <p class="text-xs font-bold uppercase text-blue-600"><?php echo e($order->payment_method ?? 'COD'); ?></p>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Customer</p>
+                        <p class="mt-1 text-sm font-bold text-gray-800"><?php echo e($order->user->name ?? 'Guest'); ?></p>
+                        <p class="text-xs text-gray-500">ID: <?php echo e($order->user_id); ?></p>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Delivery Boy</p>
+                        <?php if($order->deliveryBoy): ?>
+                            <p class="mt-1 text-sm font-bold text-gray-800"><?php echo e($order->deliveryBoy->partner_name); ?></p>
+                            <p class="text-xs text-gray-500"><?php echo e($order->deliveryBoy->area); ?></p>
+                        <?php else: ?>
+                            <p class="mt-1 text-xs text-gray-400">Not assigned</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <a href="<?php echo e(route('dashboard.orders.show', $order)); ?>"
+                   class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-50 px-4 py-2.5 text-sm font-medium text-indigo-600 hover:bg-indigo-100">
+                    <i class="fas fa-eye"></i> View
+                </a>
+            </article>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+            <div class="rounded-2xl border border-dashed bg-white px-4 py-10 text-center text-gray-400">No order history found.</div>
+        <?php endif; ?>
+    </div>
+
+    <div class="hidden overflow-x-auto rounded-2xl border bg-white shadow-sm md:block">
         <table class="w-full min-w-[1040px] text-left text-sm">
             <thead class="bg-indigo-600 text-xs uppercase tracking-wider text-white">
                 <tr>

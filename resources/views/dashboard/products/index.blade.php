@@ -6,7 +6,7 @@
 <div class="p-4 sm:p-6">
 
     {{-- Stats --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         @foreach([['Total Products','total','indigo','fa-box'],['Active','active','green','fa-circle-check'],['Inactive','inactive','orange','fa-circle-xmark'],['Out of Stock','out_of_stock','purple','fa-battery-empty']] as [$label,$key,$color,$icon])
         <div class="bg-white p-5 rounded-2xl shadow-sm border flex items-center gap-4">
             <div class="w-12 h-12 bg-{{ $color }}-100 text-{{ $color }}-600 rounded-xl flex items-center justify-center text-xl">
@@ -21,9 +21,9 @@
     </div>
 
     {{-- Filters --}}
-    <form method="GET" class="bg-white p-4 rounded-2xl shadow-sm border mb-6 flex flex-wrap gap-3 items-center">
+    <form method="GET" class="mb-6 flex flex-col gap-3 rounded-2xl border bg-white p-4 shadow-sm sm:flex-row sm:flex-wrap sm:items-center">
         <input type="text" name="search" value="{{ request('search') }}" placeholder="Search products..."
-               class="flex-1 min-w-[150px] bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm outline-none focus:border-indigo-500">
+               class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm outline-none focus:border-indigo-500 sm:min-w-[150px] sm:flex-1">
         <select name="category" class="bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm outline-none">
             <option value="">All Categories</option>
             @foreach($categories as $cat)
@@ -44,7 +44,74 @@
     </form>
 
     {{-- Table --}}
-    <div class="bg-white rounded-2xl shadow-sm border overflow-x-auto">
+    <div class="space-y-4 md:hidden">
+        @forelse($products as $i => $product)
+        <article class="rounded-2xl border bg-white p-4 shadow-sm">
+            <div class="flex items-start gap-3">
+                @if($product->images && count($product->images))
+                    <img src="{{ asset('storage/'.$product->images[0]) }}" class="h-16 w-16 rounded-xl object-cover">
+                @else
+                    <div class="flex h-16 w-16 items-center justify-center rounded-xl bg-gray-100 text-gray-400 text-sm"><i class="fa-regular fa-image"></i></div>
+                @endif
+                <div class="min-w-0 flex-1">
+                    <p class="text-xs font-bold text-slate-400">#{{ $products->firstItem() + $i }}</p>
+                    <p class="mt-1 text-sm font-bold text-slate-800">{{ $product->name }}</p>
+                    <p class="mt-1 text-xs text-slate-500">{{ $product->category->name ?? '-' }} | {{ $product->subcategory->name ?? '-' }}</p>
+                </div>
+                <span class="rounded px-2 py-1 text-[10px] font-bold {{ $product->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                    {{ $product->is_active ? 'ACTIVE' : 'DEACTIVE' }}
+                </span>
+            </div>
+
+            <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Price</p>
+                    <p class="mt-1 text-sm font-semibold text-slate-700">Rs{{ number_format($product->price, 2) }}</p>
+                </div>
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Stock</p>
+                    <p class="mt-1 text-sm font-bold {{ $product->is_active ? 'text-green-700' : 'text-red-600' }}">{{ $product->is_active ? 'Active' : 'Deactive' }}</p>
+                </div>
+            </div>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+                <a href="{{ route('dashboard.products.show', $product) }}"
+                   class="inline-flex items-center rounded-lg bg-blue-50 p-2 text-xs text-blue-600 hover:bg-blue-100">
+                    <i class="fa-solid fa-eye"></i>
+                </a>
+                @php
+                    $editProductPayload = [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'category_id' => $product->category_id,
+                        'subcategory_id' => $product->subcategory_id,
+                        'description' => $product->description,
+                        'price' => $product->price,
+                        'is_active' => $product->is_active ? 1 : 0,
+                        'images_count' => is_array($product->images) ? count($product->images) : 0,
+                        'images' => is_array($product->images) ? array_values($product->images) : [],
+                        'variants' => is_array($product->variants) ? array_values($product->variants) : [],
+                    ];
+                @endphp
+                <button onclick='openEditModal(@json($editProductPayload))'
+                        class="inline-flex items-center rounded-lg bg-indigo-50 p-2 text-xs text-indigo-600 hover:bg-indigo-100">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <form method="POST" action="{{ route('dashboard.products.destroy', $product) }}"
+                      onsubmit="return confirm('Delete this product?')">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="inline-flex items-center rounded-lg bg-red-50 p-2 text-xs text-red-500 hover:bg-red-100">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </form>
+            </div>
+        </article>
+        @empty
+        <div class="rounded-2xl border bg-white px-6 py-12 text-center text-gray-400">No products found.</div>
+        @endforelse
+    </div>
+
+    <div class="hidden overflow-x-auto rounded-2xl bg-white border shadow-sm md:block">
         <table class="w-full text-left min-w-[820px]">
             <thead class="bg-slate-50 border-b">
                 <tr class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
@@ -54,7 +121,6 @@
                     <th class="px-6 py-4">Sub Category</th>
                     <th class="px-6 py-4">Price</th>
                     <th class="px-6 py-4">Stock</th>
-                    <th class="px-6 py-4">Status</th>
                     <th class="px-6 py-4 text-right">Actions</th>
                 </tr>
             </thead>
@@ -78,10 +144,9 @@
                     <td class="px-6 py-4 text-xs font-semibold text-slate-600">{{ $product->category->name ?? '—' }}</td>
                     <td class="px-6 py-4 text-xs font-semibold text-slate-600">{{ $product->subcategory->name ?? '�' }}</td>
                     <td class="px-6 py-4 text-xs font-semibold text-slate-700">₹{{ number_format($product->price, 2) }}</td>
-                    <td class="px-6 py-4 text-xs {{ $product->stock < 10 ? 'text-red-600 font-bold' : 'text-slate-600' }}">{{ $product->stock }}</td>
                     <td class="px-6 py-4">
                         <span class="text-xs font-bold px-2 py-1 rounded {{ $product->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
-                            {{ $product->is_active ? 'ACTIVE' : 'INACTIVE' }}
+                            {{ $product->is_active ? 'ACTIVE' : 'DEACTIVE' }}
                         </span>
                     </td>
                     <td class="px-6 py-4 text-right">
@@ -98,7 +163,6 @@
                                     'subcategory_id' => $product->subcategory_id,
                                     'description' => $product->description,
                                     'price' => $product->price,
-                                    'stock' => $product->stock,
                                     'is_active' => $product->is_active ? 1 : 0,
                                     'images_count' => is_array($product->images) ? count($product->images) : 0,
                                     'images' => is_array($product->images) ? array_values($product->images) : [],
@@ -120,7 +184,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="8" class="px-6 py-8 text-center text-gray-400">No products found.</td></tr>
+                <tr><td colspan="7" class="px-6 py-8 text-center text-gray-400">No products found.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -200,6 +264,15 @@
                 <label class="block text-sm text-gray-700 mb-1">Product Description</label>
                 <textarea name="description" rows="4" placeholder="Enter Product Description"
                           class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none resize-none focus:border-blue-400"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm text-gray-700 mb-1">Stock Status</label>
+                <select name="is_active"
+                        class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-blue-400">
+                    <option value="1">Active</option>
+                    <option value="0">Deactive</option>
+                </select>
             </div>
 
             {{-- Product Variants --}}
@@ -339,16 +412,18 @@
                     <div id="editNewImagePreviews" class="flex flex-wrap gap-3"></div>
                 </div>
             </div>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                     <label class="text-xs font-bold text-slate-600 block mb-1">Price (₹)</label>
                     <input type="number" name="price" id="editPrice" min="0" step="0.01"
                            class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-600 block mb-1">Stock</label>
-                    <input type="number" name="stock" id="editStock" min="0"
-                           class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
+                    <label class="text-xs font-bold text-slate-600 block mb-1">Stock Status</label>
+                    <select name="is_active" id="editIsActive" class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
+                        <option value="1">Active</option>
+                        <option value="0">Deactive</option>
+                    </select>
                 </div>
             </div>
             <div>
@@ -361,13 +436,6 @@
                 </div>
 
                 <div id="editVariantsContainer" class="space-y-3"></div>
-            </div>
-            <div>
-                <label class="text-xs font-bold text-slate-600 block mb-1">Status</label>
-                <select name="is_active" id="editIsActive" class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
-                    <option value="1">Active</option>
-                    <option value="0">Inactive</option>
-                </select>
             </div>
             <div class="flex justify-end gap-3 pt-4">
                 <button type="submit" class="bg-indigo-600 text-white px-8 py-2.5 rounded-lg font-bold text-sm">Update</button>
@@ -529,7 +597,6 @@ function openEditModal(product) {
     document.getElementById('editCatId').value        = product.category_id ?? '';
     document.getElementById('editDescription').value  = product.description ?? '';
     document.getElementById('editPrice').value        = product.price ?? '';
-    document.getElementById('editStock').value        = product.stock ?? '';
     document.getElementById('editIsActive').value     = product.is_active ?? 1;
     document.getElementById('editImageHint').textContent = 'Current images neeche dikhengi. Delete icon se hata sakte ho, aur new images add karne ke liye image choose karke Add dabao.';
     resetEditProductImages(false);

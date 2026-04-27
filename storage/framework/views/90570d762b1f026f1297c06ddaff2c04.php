@@ -7,11 +7,11 @@
 ?>
 <div class="p-4 md:p-8 space-y-6">
 
-    <form method="GET" class="flex flex-wrap items-center justify-between gap-3">
+    <form method="GET" class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <h1 class="text-2xl font-bold text-gray-800">Live Orders</h1>
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <input type="text" name="search" value="<?php echo e(request('search')); ?>" placeholder="Search customer / ID..."
-                   class="border rounded px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                   class="w-full rounded border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 sm:w-auto">
             <select name="status" class="border rounded px-3 py-1.5 text-sm outline-none">
                 <option value="">All Status</option>
                 <?php $__currentLoopData = $statusOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -26,7 +26,89 @@
         </div>
     </form>
 
-    <div class="overflow-x-auto rounded-lg border bg-white shadow-sm">
+    <div class="space-y-4 md:hidden">
+        <?php $__empty_1 = true; $__currentLoopData = $orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+            <article class="rounded-2xl border bg-white p-4 shadow-sm">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="break-all text-sm font-bold text-blue-600">#ORD-<?php echo e(str_pad($order->id, 4, '0', STR_PAD_LEFT)); ?></p>
+                        <p class="mt-1 text-xs text-gray-400"><?php echo e($order->created_at->format('d M Y, h:i A')); ?></p>
+                    </div>
+                    <span class="rounded-full px-2 py-1 text-[10px] font-bold uppercase <?php echo e($order->status_badge_class); ?>">
+                        <?php echo e($order->status_label); ?>
+
+                    </span>
+                </div>
+
+                <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Customer</p>
+                        <p class="mt-1 text-sm font-semibold text-gray-800"><?php echo e($order->user->name ?? 'Guest'); ?></p>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Items</p>
+                        <p class="mt-1 text-sm text-gray-700"><?php echo e($order->items->count()); ?> item(s)</p>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Amount</p>
+                        <p class="mt-1 text-sm font-bold text-gray-900">Rs<?php echo e(number_format($order->total, 2)); ?></p>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Payment</p>
+                        <p class="mt-1 text-sm font-semibold uppercase text-gray-700"><?php echo e($order->payment_method ?? 'COD'); ?></p>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Delivery Boy</p>
+                        <?php if($order->deliveryBoy): ?>
+                            <p class="mt-1 text-sm font-bold text-gray-800"><?php echo e($order->deliveryBoy->partner_name); ?></p>
+                            <p class="text-xs text-gray-500"><?php echo e($order->deliveryBoy->phone_number); ?> | <?php echo e($order->deliveryBoy->area); ?></p>
+                        <?php else: ?>
+                            <p class="mt-1 text-xs text-gray-400">Not assigned</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="mt-4 space-y-3">
+                    <a href="<?php echo e(route('dashboard.orders.show', $order)); ?>"
+                       class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-50 px-3 py-2.5 text-xs font-bold text-blue-600 hover:bg-blue-100">
+                        <i class="fa-solid fa-eye"></i> View
+                    </a>
+
+                    <form method="POST" action="<?php echo e(route('dashboard.orders.status', $order)); ?>" class="space-y-2 rounded-xl border border-gray-200 bg-gray-50 p-3">
+                        <?php echo csrf_field(); ?>
+                        <?php echo method_field('PATCH'); ?>
+                        <select name="status" onchange="toggleDeliveryBoySelect(this, '<?php echo e($order->id); ?>')" class="w-full rounded border px-3 py-2 text-xs outline-none">
+                            <?php $__currentLoopData = $statusOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($status); ?>" <?php echo e($order->status === $status ? 'selected' : ''); ?>>
+                                    <?php echo e(ucwords(str_replace('_', ' ', $status))); ?>
+
+                                </option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </select>
+
+                        <select name="delivery_boy_id" data-delivery-boy-select
+                                class="w-full rounded border px-3 py-2 text-xs outline-none <?php echo e($order->status === 'out_for_delivery' ? '' : 'hidden'); ?>">
+                            <option value="">Choose delivery boy</option>
+                            <?php $__currentLoopData = $deliveryBoysByOrder[$order->id] ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $deliveryBoy): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($deliveryBoy->id); ?>" <?php echo e($order->delivery_boy_id === $deliveryBoy->id ? 'selected' : ''); ?>>
+                                    <?php echo e($deliveryBoy->partner_name); ?> | <?php echo e($deliveryBoy->phone_number); ?> | <?php echo e($deliveryBoy->area); ?>
+
+                                </option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </select>
+
+                        <button type="submit" class="w-full rounded bg-blue-600 px-3 py-2 text-[11px] font-bold text-white hover:bg-blue-700">
+                            Save
+                        </button>
+                    </form>
+                </div>
+            </article>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+            <div class="rounded-2xl border border-dashed bg-white px-4 py-10 text-center text-gray-400">No orders found.</div>
+        <?php endif; ?>
+    </div>
+
+    <div class="hidden overflow-x-auto rounded-lg border bg-white shadow-sm md:block">
         <table class="w-full min-w-[1180px] text-left">
             <thead class="border-b bg-gray-50">
                 <tr>
@@ -87,7 +169,7 @@
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </select>
 
-                                    <select name="delivery_boy_id" id="delivery-boy-select-<?php echo e($order->id); ?>"
+                                    <select name="delivery_boy_id" data-delivery-boy-select
                                             class="border rounded px-2 py-1 text-xs outline-none <?php echo e($order->status === 'out_for_delivery' ? '' : 'hidden'); ?>">
                                         <option value="">Choose delivery boy</option>
                                         <?php $__currentLoopData = $deliveryBoysByOrder[$order->id] ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $deliveryBoy): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -121,7 +203,8 @@
 <?php $__env->startSection('scripts'); ?>
 <script>
 function toggleDeliveryBoySelect(select, orderId) {
-    const deliverySelect = document.getElementById(`delivery-boy-select-${orderId}`);
+    const form = select.closest('form');
+    const deliverySelect = form ? form.querySelector('[data-delivery-boy-select]') : null;
 
     if (!deliverySelect) {
         return;

@@ -21,12 +21,11 @@ class HomeController extends Controller
             ->withCount('products')
             ->get();
 
-        $latestActiveProducts = Product::with('category')
-            ->active()
+        $latestProducts = Product::with('category')
             ->orderByDesc('created_at')
             ->orderByDesc('id');
 
-        $newArrivals = (clone $latestActiveProducts)
+        $newArrivals = (clone $latestProducts)
             ->take(8)
             ->get();
 
@@ -39,7 +38,6 @@ class HomeController extends Controller
         }
 
         $featuredProducts = Product::with('category')
-            ->active()
             ->inRandomOrder()
             ->take(4)
             ->get();
@@ -49,7 +47,6 @@ class HomeController extends Controller
         }
 
         $bestSellers = Product::with('category')
-            ->active()
             ->withSum([
                 'orderItems as ordered_quantity' => fn($query) => $query->whereHas(
                     'order',

@@ -29,6 +29,19 @@ class CartController extends Controller
         $qty          = $request->get('quantity', 1);
         $variantIndex = $request->get('variant_index');
 
+        if (! $product->is_active) {
+            $message = 'This product is currently out of stock.';
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                ], 422);
+            }
+
+            return back()->with('error', $message);
+        }
+
         $cart = session('cart', []);
         $key  = $product->id . ($variantIndex !== null ? '_v' . $variantIndex : '');
 

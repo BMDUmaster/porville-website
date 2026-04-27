@@ -27,7 +27,7 @@ class DashboardController extends Controller
             'sales_change'   => $this->calculateSalesChange($todaySales, $yesterdaySales),
             'pending_orders' => Order::where('status', 'pending')->count(),
             'active_users'   => User::where('role', 'customer')->where('status', 'active')->count(),
-            'low_stock'      => Product::where('stock', '<', 10)->count(),
+            'low_stock'      => Product::where('is_active', false)->count(),
         ];
 
         $recent_orders = Order::with('user')

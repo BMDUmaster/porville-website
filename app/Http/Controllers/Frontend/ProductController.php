@@ -13,7 +13,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::with(['category', 'subcategory'])->active();
+        $query = Product::with(['category', 'subcategory']);
 
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
@@ -74,7 +74,7 @@ class ProductController extends Controller
             ->take(3)
             ->get();
 
-        $sidebarMaxPrice = (int) ceil((Product::active()->max('price') ?? 500) / 50) * 50;
+        $sidebarMaxPrice = (int) ceil((Product::max('price') ?? 500) / 50) * 50;
         $sidebarMaxPrice = max($sidebarMaxPrice, 500);
 
         return view('frontend.products', compact(
@@ -89,7 +89,6 @@ class ProductController extends Controller
     public function show($slug)
     {
         $product = Product::with(['category', 'subcategory'])
-            ->active()
             ->where('slug', $slug)
             ->firstOrFail();
 

@@ -16,7 +16,7 @@
         $variantCollection = collect([
             [
                 'quantity' => $product->weight ?: '1',
-                'unit' => $product->unit ?: 'kg',
+                'unit' => $product->unit ?: 'unit',
                 'piece' => null,
                 'mrp' => $product->mrp ?: $product->price,
                 'selling_price' => $product->price,
@@ -44,12 +44,13 @@
     })->values();
 
     $defaultVariant = $variantPayload->first();
-    $selectedPackLabel = $defaultVariant['label'] ?: (($product->weight ?: '1') . ' ' . ($product->unit ?: 'kg'));
+    $selectedPackLabel = $defaultVariant['label'] ?: (($product->weight ?: '1') . ' ' . ($product->unit ?: 'unit'));
     $selectedSaveAmount = max(($defaultVariant['mrp'] ?? 0) - ($defaultVariant['selling_price'] ?? 0), 0);
     $productShortDescription = 'Pasture-raised, grain-fed whole chicken. Cleaned & ready to cook. Our whole farm chicken is sourced fresh daily and never frozen. Every batch is quality-checked before dispatch.';
     $productOrigin = $product->subcategory->name ?? $product->category->name ?? 'FarmSea Farms';
     $productCategory = $product->category->name ?? 'Fresh Cuts';
     $productTagline = 'Pasture-Raised • Grain-Fed • Air-Chilled';
+    $isProductAvailable = (bool) $product->is_active;
 
     $trustHighlights = [
         ['icon' => 'fa-leaf', 'title' => 'Natural Feed', 'copy' => 'Clean source'],
@@ -367,9 +368,9 @@
 
             <div class="rounded-[24px] border border-[#bce8c3] bg-[#f2fbf3] p-5 shadow-[0_18px_45px_rgba(47,140,67,0.08)]">
                 <div class="flex flex-wrap items-end gap-3">
-                    <span id="detailCurrentPrice" class="text-[40px] font-black leading-none text-slate-900 md:text-[46px]">
-                        Rs<?php echo e(number_format($defaultVariant['selling_price'] ?? $product->price, 0)); ?>
-
+                    <span class="text-[40px] font-black leading-none text-slate-900 md:text-[46px]">
+                        Rs<span id="detailCurrentPrice"><?php echo e(number_format($defaultVariant['selling_price'] ?? $product->price, 0)); ?></span>
+                        <span id="detailCurrentPriceUnit" class="ml-1 text-[14px] font-bold text-slate-400 md:text-[16px]">/<?php echo e($product->unit ?: 'unit'); ?></span>
                     </span>
                     <span id="detailMrpWrap" class="<?php echo e(($defaultVariant['mrp'] ?? 0) > ($defaultVariant['selling_price'] ?? 0) ? '' : 'hidden'); ?> flex items-center gap-2">
                         <span id="detailMrp" class="text-[16px] font-bold text-slate-400 line-through">
@@ -381,8 +382,8 @@
                         </span>
                     </span>
                 </div>
-                <div class="mt-2 text-[12px] font-semibold text-slate-500">
-                    1 kg pack • Inclusive of all taxes
+                <div id="detailPackMeta" class="mt-2 text-[12px] font-semibold text-slate-500">
+                    <span id="detailPackLabel"><?php echo e($selectedPackLabel); ?></span> | Inclusive of all taxes
                 </div>
                 <div id="detailSaveRow" class="<?php echo e($selectedSaveAmount > 0 ? '' : 'hidden'); ?> mt-3 inline-flex rounded-xl border border-[#8bd39a] bg-[#dff6e3] px-3 py-1.5 text-[11px] font-black text-[#2f8c43]">
                     You save Rs <span id="detailSaveAmount" class="ml-1"><?php echo e(number_format($selectedSaveAmount, 0)); ?></span> on this order
@@ -390,9 +391,9 @@
             </div>
 
             <div class="flex flex-wrap gap-2">
-                <span class="inline-flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-[11px] font-black text-green-700">
-                    <i class="fa-solid fa-circle-check text-[10px]"></i>
-                    <?php echo e($product->stock > 0 ? 'In Stock' : 'Out of Stock'); ?>
+                <span class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-[11px] font-black <?php echo e($isProductAvailable ? 'border border-green-200 bg-green-50 text-green-700' : 'border border-red-200 bg-red-50 text-red-600'); ?>">
+                    <i class="fa-solid <?php echo e($isProductAvailable ? 'fa-circle-check' : 'fa-ban'); ?> text-[10px]"></i>
+                    <?php echo e($isProductAvailable ? 'In Stock' : 'Out of Stock'); ?>
 
                 </span>
                 <span class="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-[11px] font-black text-blue-700">
@@ -423,23 +424,32 @@
             </div>
 
             <div class="flex flex-wrap items-stretch gap-3">
-                <div class="flex items-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                    <button type="button" onclick="changeQty(-1)" class="flex h-12 w-11 items-center justify-center text-slate-500 transition hover:bg-slate-50 hover:text-slate-800">-</button>
-                    <span id="qty-display" class="flex h-12 min-w-[48px] items-center justify-center border-x border-slate-200 px-3 text-[15px] font-black text-slate-800">1</span>
-                    <button type="button" onclick="changeQty(1)" class="flex h-12 w-11 items-center justify-center text-slate-500 transition hover:bg-slate-50 hover:text-slate-800">+</button>
-                </div>
+                <?php if($isProductAvailable): ?>
+                    <div class="flex items-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                        <button type="button" onclick="changeQty(-1)" class="flex h-12 w-11 items-center justify-center text-slate-500 transition hover:bg-slate-50 hover:text-slate-800">-</button>
+                        <span id="qty-display" class="flex h-12 min-w-[48px] items-center justify-center border-x border-slate-200 px-3 text-[15px] font-black text-slate-800">1</span>
+                        <button type="button" onclick="changeQty(1)" class="flex h-12 w-11 items-center justify-center text-slate-500 transition hover:bg-slate-50 hover:text-slate-800">+</button>
+                    </div>
+                <?php endif; ?>
 
-                <button type="button" onclick="addToCartWithQty(<?php echo e($product->id); ?>)"
-                        class="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#1f9d47] px-5 py-3 text-[13px] font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_rgba(31,157,71,0.22)] transition hover:-translate-y-0.5 hover:bg-[#18823a]">
-                    <i class="fa-solid fa-cart-shopping text-[12px]"></i>
-                    Add To Cart
-                </button>
+                <?php if($isProductAvailable): ?>
+                    <button type="button" onclick="addToCartWithQty(<?php echo e($product->id); ?>)"
+                            class="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#1f9d47] px-5 py-3 text-[13px] font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_rgba(31,157,71,0.22)] transition hover:-translate-y-0.5 hover:bg-[#18823a]">
+                        <i class="fa-solid fa-cart-shopping text-[12px]"></i>
+                        Add To Cart
+                    </button>
 
-                <button type="button" onclick="buyNowWithQty(<?php echo e($product->id); ?>)"
-                        class="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#1f5ea8] px-5 py-3 text-[13px] font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_rgba(31,94,168,0.24)] transition hover:-translate-y-0.5 hover:bg-[#174c89]">
-                    <i class="fa-solid fa-bolt text-[12px]"></i>
-                    Buy Now
-                </button>
+                    <button type="button" onclick="buyNowWithQty(<?php echo e($product->id); ?>)"
+                            class="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#1f5ea8] px-5 py-3 text-[13px] font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_rgba(31,94,168,0.24)] transition hover:-translate-y-0.5 hover:bg-[#174c89]">
+                        <i class="fa-solid fa-bolt text-[12px]"></i>
+                        Buy Now
+                    </button>
+                <?php else: ?>
+                    <div class="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-5 py-3 text-[13px] font-black uppercase tracking-[0.14em] text-red-600">
+                        <i class="fa-solid fa-ban text-[12px]"></i>
+                        Out Of Stock
+                    </div>
+                <?php endif; ?>
 
                 <button type="button"
                         class="hidden h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-green-200 hover:text-green-700 sm:flex">
@@ -808,15 +818,17 @@ function selectVariant(index) {
     });
 
     const currentPrice = document.getElementById('detailCurrentPrice');
+    const currentPriceUnit = document.getElementById('detailCurrentPriceUnit');
     const mrpWrap = document.getElementById('detailMrpWrap');
     const mrp = document.getElementById('detailMrp');
     const offer = document.getElementById('detailOffer');
-    const packLabel = document.getElementById('detailPackLabel');
+    const packMeta = document.getElementById('detailPackMeta');
     const saveRow = document.getElementById('detailSaveRow');
     const saveAmount = document.getElementById('detailSaveAmount');
 
-    if (currentPrice) currentPrice.textContent = 'Rs' + Math.round(variant.selling_price || 0);
-    if (packLabel) packLabel.textContent = variant.label || 'Standard Pack';
+    if (currentPrice) currentPrice.textContent = Math.round(variant.selling_price || 0);
+    if (currentPriceUnit) currentPriceUnit.textContent = '/<?php echo e($product->unit ?: 'unit'); ?>';
+    if (packMeta) packMeta.textContent = (variant.label || 'Standard Pack') + ' | Inclusive of all taxes';
 
     const canShowDiscount = Number(variant.mrp || 0) > Number(variant.selling_price || 0);
     const saveValue = Math.max(Number(variant.mrp || 0) - Number(variant.selling_price || 0), 0);
@@ -841,7 +853,10 @@ function sendCartRequest(productId, redirectToCheckout = false) {
     })
     .then(response => response.json())
     .then(data => {
-        if (!data.success) return;
+        if (!data.success) {
+            alert(data.message || 'This product is currently unavailable.');
+            return;
+        }
 
         const headerBadge = document.getElementById('header-cart-badge');
         if (headerBadge) {
@@ -853,8 +868,10 @@ function sendCartRequest(productId, redirectToCheckout = false) {
             return;
         }
 
-        if (typeof openCart === 'function') {
-            openCart();
+        if (typeof showCartAddedAlert === 'function') {
+            showCartAddedAlert('Product cart me add ho gaya.');
+        } else {
+            alert('Product cart me add ho gaya.');
         }
     });
 }
