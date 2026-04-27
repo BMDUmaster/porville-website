@@ -23,20 +23,18 @@
 
     <div class="w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-white/10">
 
-        <!-- Header -->
         <div class="bg-mayview-dark px-8 pt-8 pb-7 text-center relative overflow-hidden">
             <div class="absolute inset-0 opacity-10"
                  style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 22px 22px;"></div>
             <div class="relative z-10 flex flex-col items-center">
-                <div class="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center mb-3">
-                    <span class="text-white font-extrabold text-2xl">🌿</span>
+                <div class="mb-3 flex h-20 w-20 items-center justify-center rounded-2xl bg-white p-3 shadow-lg shadow-black/10">
+                    <img src="{{ asset('images/Farmsea.webp') }}" alt="FarmSea" class="max-h-full max-w-full object-contain">
                 </div>
                 <h1 class="text-xl font-extrabold text-white tracking-tight">FarmSea Portal</h1>
-                <div class="h-0.5 w-10 bg-mayview-light rounded-full mt-2"></div>
+                <div class="mt-2 h-0.5 w-10 rounded-full bg-mayview-light"></div>
             </div>
         </div>
 
-        <!-- Form -->
         <div class="bg-white px-8 py-7">
             @if($errors->any())
                 <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
@@ -66,7 +64,7 @@
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fas fa-lock text-slate-400 text-sm"></i>
                         </div>
-                        <input type="password" name="password" id="password" required placeholder="••••••••"
+                        <input type="password" name="password" id="password" required placeholder="********"
                                class="w-full pl-11 pr-11 py-3.5 border border-slate-200 rounded-xl bg-slate-50 text-sm
                                       focus:outline-none focus:ring-2 focus:ring-mayview-light/20 focus:border-mayview-light focus:bg-white transition-all">
                         <button type="button" onclick="togglePass()"
@@ -93,7 +91,6 @@
             </form>
         </div>
 
-        <!-- Footer -->
         <div class="bg-slate-50 border-t border-slate-100 px-8 py-4 text-center">
             <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                 &copy; {{ date('Y') }} FarmSea &bull; Admin Dashboard

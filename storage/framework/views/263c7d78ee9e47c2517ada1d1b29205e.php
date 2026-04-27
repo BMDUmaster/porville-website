@@ -4,18 +4,39 @@
 <?php $__env->startSection('content'); ?>
 <div class="max-w-2xl mx-auto px-4 py-12">
     <h1 class="nunito font-extrabold text-2xl text-gray-800 mb-2">Track Your Order</h1>
-    <p class="text-gray-500 text-sm mb-8">Enter your order number to track your delivery status.</p>
+    <p class="text-gray-500 text-sm mb-8">
+        Enter your order number
+        <?php if(auth()->guard('web_frontend')->guest()): ?>
+            and delivery phone number
+        <?php endif; ?>
+        to track your delivery status.
+    </p>
 
     <form method="GET" class="bg-white rounded-2xl border p-6 mb-6">
-        <label class="block text-sm font-semibold text-gray-700 mb-2">Order Number</label>
-        <div class="flex gap-3">
-            <input type="text" name="order_number" value="<?php echo e(request('order_number')); ?>"
-                   placeholder="e.g. ORD-ABCDEF123456"
-                   class="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-500">
+        <div class="grid gap-4 md:grid-cols-2">
+            <div class="md:col-span-1">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Order Number</label>
+                <input type="text" name="order_number" value="<?php echo e(request('order_number')); ?>"
+                       placeholder="e.g. ORD-ABCDEF123456"
+                       class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-500">
+            </div>
+            <?php if(auth()->guard('web_frontend')->guest()): ?>
+            <div class="md:col-span-1">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Delivery Phone</label>
+                <input type="text" name="phone" value="<?php echo e(request('phone')); ?>"
+                       placeholder="Enter delivery phone number"
+                       class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-500">
+            </div>
+            <?php endif; ?>
+        </div>
+        <div class="mt-4 flex justify-end">
             <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white font-bold px-6 py-3 rounded-xl text-sm transition">
                 Track
             </button>
         </div>
+        <?php if(auth()->guard('web_frontend')->guest()): ?>
+            <p class="mt-3 text-xs text-gray-400">For guest tracking, phone number must match the order delivery phone.</p>
+        <?php endif; ?>
     </form>
 
     <?php if(request('order_number')): ?>
@@ -24,7 +45,7 @@
             <div class="flex items-center justify-between mb-4">
                 <h2 class="font-bold text-gray-800"><?php echo e($order->order_number); ?></h2>
                 <span class="text-xs font-bold px-3 py-1 rounded-full <?php echo e($order->status_badge_class); ?>">
-                    <?php echo e(ucfirst($order->status)); ?>
+                    <?php echo e($order->status_label); ?>
 
                 </span>
             </div>
@@ -32,7 +53,7 @@
 
             
             <?php
-                $steps = ['pending','confirmed','processing','shipped','delivered'];
+                $steps = ['pending','confirmed','processing','out_for_delivery','delivered'];
                 $currentIdx = array_search($order->status, $steps);
             ?>
             <div class="flex items-center gap-0 mb-6">
@@ -48,7 +69,7 @@
 
                             <?php endif; ?>
                         </div>
-                        <p class="text-[9px] text-gray-500 mt-1 capitalize whitespace-nowrap"><?php echo e($step); ?></p>
+                        <p class="mt-1 whitespace-nowrap text-[9px] text-gray-500"><?php echo e(ucwords(str_replace('_', ' ', $step))); ?></p>
                     </div>
                     <?php if($idx < count($steps)-1): ?>
                     <div class="flex-1 h-0.5 mx-1 <?php echo e($currentIdx !== false && $idx < $currentIdx ? 'bg-green-600' : 'bg-gray-200'); ?>"></div>

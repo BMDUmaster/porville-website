@@ -28,6 +28,16 @@ class AuthController extends Controller
         ]);
 
         if (Auth::guard('web_frontend')->attempt($credentials, $request->boolean('remember'))) {
+            $user = Auth::guard('web_frontend')->user();
+
+            if ($user && in_array($user->status, ['blocked', 'inactive'], true)) {
+                Auth::guard('web_frontend')->logout();
+
+                return back()->withErrors([
+                    'email' => 'Your account has been blocked. Please contact support.',
+                ])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
             return redirect()->intended(route('frontend.profile'));
         }

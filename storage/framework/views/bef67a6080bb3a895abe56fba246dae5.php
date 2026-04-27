@@ -70,7 +70,7 @@
         <!-- Logo -->
         <div class="p-4 border-b border-green-200 bg-green-400 flex items-center justify-between">
             <a href="<?php echo e(route('dashboard.home')); ?>" class="flex items-center">
-                <img src="<?php echo e(asset('images/farmsea.png')); ?>"
+                <img src="<?php echo e(asset('images/Farmsea.webp')); ?>"
                      alt="FarmSea"
                      class="h-14 w-auto object-contain"
                      onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex'">
@@ -158,6 +158,14 @@
                       <?php echo e(request()->routeIs('dashboard.users*') ? 'active-link' : 'text-slate-700'); ?>">
                 <i class="fa-solid fa-user w-5 text-green-700"></i>
                 <span>Users</span>
+            </a>
+
+            <a href="<?php echo e(route('dashboard.delivery-boys')); ?>"
+               class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
+                      hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
+                      <?php echo e(request()->routeIs('dashboard.delivery-boys*') ? 'active-link' : 'text-slate-700'); ?>">
+                <i class="fa-solid fa-motorcycle w-5 text-green-700"></i>
+                <span>Delivery Boys</span>
             </a>
 
             <a href="<?php echo e(route('dashboard.notifications')); ?>"
@@ -259,6 +267,14 @@
 
                 </div>
             <?php endif; ?>
+            <?php if($errors->any()): ?>
+                <div class="mx-6 mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                        <span><?php echo e($errors->first()); ?></span>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <?php echo $__env->yieldContent('content'); ?>
         </main>
@@ -271,7 +287,7 @@
                 </p>
                 <div class="flex items-center gap-2 px-4 py-1.5 bg-slate-50 rounded-full border border-slate-100">
                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Design & Developed by</span>
-                    <span class="text-xs font-black text-mayview-dark">Manok kumar</span>
+                    <span class="text-xs font-black text-mayview-dark">BMDU</span>
                     <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 </div>
             </div>

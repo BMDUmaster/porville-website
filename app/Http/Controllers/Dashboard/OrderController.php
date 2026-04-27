@@ -3,43 +3,95 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Models\DeliveryBoy;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Order::with('user', 'items.product');
+        $query = Order::with('user', 'items.product', 'deliveryBoy');
 
         if ($request->filled('search')) {
-            $query->whereHas('user', fn($q) => $q->where('name', 'like', '%' . $request->search . '%'))
-                  ->orWhere('id', $request->search);
+            $search = $request->search;
+
+            $query->where(function ($searchQuery) use ($search) {
+                $searchQuery->whereHas('user', fn ($userQuery) => $userQuery->where('name', 'like', '%' . $search . '%'))
+                    ->orWhere('id', $search);
+            });
         }
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
         $orders = $query->latest()->paginate(20);
-        return view('dashboard.orders.index', compact('orders'));
+        $deliveryBoysByOrder = $orders->getCollection()->mapWithKeys(function (Order $order) {
+            return [$order->id => $this->availableDeliveryBoys($order)];
+        });
+
+        return view('dashboard.orders.index', compact('orders', 'deliveryBoysByOrder'));
     }
 
     public function show(Order $order)
     {
-        $order->load('user', 'items.product');
-        return view('dashboard.orders.show', compact('order'));
+        $order->load('user', 'items.product', 'deliveryBoy');
+        $deliveryBoys = $this->availableDeliveryBoys($order);
+
+        return view('dashboard.orders.show', compact('order', 'deliveryBoys'));
     }
 
     public function updateStatus(Request $request, Order $order)
     {
-        $request->validate(['status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled']);
-        $order->update(['status' => $request->status]);
+        $validated = $request->validate([
+            'status' => ['required', Rule::in(Order::STATUSES)],
+            'delivery_boy_id' => [
+                Rule::requiredIf($request->input('status') === 'out_for_delivery'),
+                'nullable',
+                'integer',
+                Rule::exists('delivery_boys', 'id'),
+            ],
+        ]);
+
+        if ($validated['status'] === 'out_for_delivery') {
+            $deliveryBoy = DeliveryBoy::query()
+                ->where('id', $validated['delivery_boy_id'])
+                ->where('status', 'active')
+                ->first();
+
+            if (!$deliveryBoy) {
+                return back()->withErrors([
+                    'delivery_boy_id' => 'Selected delivery boy is not available.',
+                ]);
+            }
+
+            $isBusy = Order::query()
+                ->where('delivery_boy_id', $deliveryBoy->id)
+                ->where('status', 'out_for_delivery')
+                ->where('id', '!=', $order->id)
+                ->exists();
+
+            if ($isBusy) {
+                return back()->withErrors([
+                    'delivery_boy_id' => 'This delivery boy is already assigned to another active delivery.',
+                ]);
+            }
+
+            $validated['delivery_boy_id'] = $deliveryBoy->id;
+            $deliveryBoy->update(['last_assigned' => now()]);
+        } else {
+            unset($validated['delivery_boy_id']);
+        }
+
+        $order->update($validated);
+
         return back()->with('success', 'Order status updated.');
     }
 
     public function history(Request $request)
     {
-        $query = Order::with('user')->whereIn('status', ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']);
+        $query = Order::with('user', 'deliveryBoy')->whereIn('status', Order::STATUSES);
 
         if ($request->filled('search')) {
             $query->whereHas('user', fn($q) => $q->where('name', 'like', '%' . $request->search . '%'));
@@ -127,5 +179,32 @@ class OrderController extends Controller
         }
 
         return view('dashboard.orders.report', compact('byCategory', 'totalSales', 'totalQty', 'date'));
+    }
+
+    private function availableDeliveryBoys(?Order $order = null)
+    {
+        $currentAssignedId = $order?->delivery_boy_id;
+        $busyIds = Order::query()
+            ->whereNotNull('delivery_boy_id')
+            ->where('status', 'out_for_delivery')
+            ->when($currentAssignedId, fn ($query) => $query->where('delivery_boy_id', '!=', $currentAssignedId))
+            ->pluck('delivery_boy_id');
+
+        return DeliveryBoy::query()
+            ->where(function ($query) use ($busyIds, $currentAssignedId) {
+                $query->where(function ($activeQuery) use ($busyIds) {
+                    $activeQuery->where('status', 'active');
+
+                    if ($busyIds->isNotEmpty()) {
+                        $activeQuery->whereNotIn('id', $busyIds->all());
+                    }
+                });
+
+                if ($currentAssignedId) {
+                    $query->orWhere('id', $currentAssignedId);
+                }
+            })
+            ->orderBy('partner_name')
+            ->get();
     }
 }

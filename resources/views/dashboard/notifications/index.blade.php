@@ -66,29 +66,62 @@
 
 {{-- Add/Edit Modal --}}
 <div id="notifModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm">
-    <div class="bg-white w-full max-w-2xl rounded-lg shadow-2xl overflow-hidden">
-        <div class="bg-gray-50 px-6 py-4 border-b flex justify-between items-center">
-            <h2 id="modalTitle" class="text-xl font-bold text-gray-800">New Notification</h2>
-            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+    <div class="w-full max-w-[920px] overflow-hidden rounded-[18px] bg-white shadow-[0_24px_70px_rgba(15,23,42,0.25)]">
+        <div class="flex items-center justify-between border-b border-slate-200 px-8 py-7">
+            <h2 id="modalTitle" class="text-[22px] font-extrabold tracking-tight text-slate-800">New Notification</h2>
+            <button onclick="closeModal()" class="text-4xl font-light leading-none text-slate-300 transition hover:text-slate-500">&times;</button>
         </div>
-        <form id="notifForm" method="POST" action="{{ route('dashboard.notifications.store') }}" class="p-6 space-y-6">
+        <form id="notifForm" method="POST" action="{{ route('dashboard.notifications.store') }}">
             @csrf
             <span id="methodField"></span>
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1">Title</label>
-                <input type="text" name="subject" id="notifTitle" placeholder="Enter Notification Title"
-                       class="w-full border border-gray-300 rounded px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            <div class="space-y-9 px-8 py-8">
+                <div id="userSelectSection" class="space-y-4">
+                    <label class="block text-[15px] font-bold text-slate-700">Select Users</label>
+                    <input type="text" id="userSearchInput" placeholder="Search user by name or ID..."
+                           class="w-full rounded-[10px] border border-slate-300 px-5 py-3 text-base text-slate-700 outline-none transition focus:border-blue-500">
+                    <label class="flex items-center gap-3 text-[15px] font-medium text-slate-600">
+                        <input type="checkbox" id="selectAllUsers"
+                               class="h-6 w-6 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                        <span>Select All Users</span>
+                    </label>
+                    <div id="userListBox" class="max-h-56 overflow-y-auto rounded-[12px] border border-slate-200 bg-slate-50/70 p-3">
+                        <div class="grid gap-2">
+                            @forelse($users as $user)
+                                <label class="user-option flex items-center gap-3 rounded-xl border border-transparent bg-white px-3 py-2.5 text-sm text-slate-700 transition hover:border-blue-200 hover:bg-blue-50/60"
+                                       data-search="{{ strtolower($user->name . ' ' . $user->email . ' ' . $user->id) }}">
+                                    <input type="checkbox" name="user_ids[]" value="{{ $user->id }}"
+                                           class="user-checkbox h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                    <span class="min-w-0">
+                                        <span class="block truncate font-semibold text-slate-800">{{ $user->name }}</span>
+                                        <span class="block truncate text-xs text-slate-400">#{{ $user->id }} · {{ $user->email }}</span>
+                                    </span>
+                                </label>
+                            @empty
+                                <div class="rounded-xl border border-dashed border-slate-200 bg-white px-4 py-6 text-center text-sm text-slate-400">
+                                    No active users available right now.
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="mb-2 block text-[15px] font-bold text-slate-700">Title</label>
+                    <input type="text" name="subject" id="notifTitle" placeholder="Enter Notification Title"
+                           class="w-full rounded-[10px] border border-slate-300 px-5 py-3 text-base text-slate-700 outline-none transition focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label class="mb-2 block text-[15px] font-bold text-slate-700">Message</label>
+                    <textarea name="message" id="notifMessage" rows="6" placeholder="Enter your message"
+                              class="w-full rounded-[10px] border border-slate-300 px-5 py-4 text-base text-slate-700 outline-none transition focus:border-blue-500"></textarea>
+                </div>
             </div>
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1">Message</label>
-                <textarea name="message" id="notifMessage" rows="4" placeholder="Enter your message"
-                          class="w-full border border-gray-300 rounded px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
-            </div>
-            <div class="flex justify-end gap-3">
+            <div class="flex justify-end gap-4 border-t border-slate-200 bg-slate-50/70 px-8 py-5">
                 <button type="button" onclick="closeModal()"
-                        class="px-6 py-2 bg-slate-200 text-slate-700 rounded font-bold hover:bg-slate-300">Cancel</button>
-                <button type="submit"
-                        class="px-6 py-2 bg-blue-600 text-white rounded font-bold hover:bg-blue-700">Send Now</button>
+                        class="min-w-44 rounded-[10px] bg-slate-200 px-6 py-3 text-[15px] font-bold text-slate-700 transition hover:bg-slate-300">Cancel</button>
+                <button type="submit" id="submitNotifButton"
+                        class="min-w-44 rounded-[10px] bg-blue-600 px-6 py-3 text-[15px] font-bold text-white transition hover:bg-blue-700">Send Now</button>
             </div>
         </form>
     </div>
@@ -118,6 +151,9 @@ function openAddModal() {
     document.getElementById('notifMessage').value = '';
     document.getElementById('methodField').innerHTML = '';
     document.getElementById('notifForm').action = '{{ route("dashboard.notifications.store") }}';
+    document.getElementById('submitNotifButton').innerText = 'Send Now';
+    document.getElementById('userSelectSection').classList.remove('hidden');
+    clearUserSelection();
     showModal();
 }
 function openEditModal(id, subject, message) {
@@ -125,7 +161,9 @@ function openEditModal(id, subject, message) {
     document.getElementById('notifTitle').value = subject;
     document.getElementById('notifMessage').value = message;
     document.getElementById('methodField').innerHTML = '<input type="hidden" name="_method" value="PUT">';
-    document.getElementById('notifForm').action = '/notifications/' + id;
+    document.getElementById('notifForm').action = '{{ url("/notifications") }}/' + id;
+    document.getElementById('submitNotifButton').innerText = 'Update Now';
+    document.getElementById('userSelectSection').classList.add('hidden');
     showModal();
 }
 function openViewModal(subject, message) {
@@ -146,5 +184,46 @@ function closeModal() {
     document.getElementById('notifModal').classList.add('hidden');
     document.getElementById('notifModal').classList.remove('flex');
 }
+
+function clearUserSelection() {
+    const selectAll = document.getElementById('selectAllUsers');
+    const searchInput = document.getElementById('userSearchInput');
+    const checkboxes = document.querySelectorAll('.user-checkbox');
+
+    if (selectAll) {
+        selectAll.checked = false;
+    }
+
+    if (searchInput) {
+        searchInput.value = '';
+    }
+
+    checkboxes.forEach((checkbox) => {
+        checkbox.checked = false;
+    });
+
+    filterUsers('');
+}
+
+function filterUsers(searchTerm) {
+    const normalizedTerm = searchTerm.trim().toLowerCase();
+
+    document.querySelectorAll('.user-option').forEach((option) => {
+        const haystack = option.dataset.search || '';
+        option.classList.toggle('hidden', normalizedTerm !== '' && !haystack.includes(normalizedTerm));
+    });
+}
+
+document.getElementById('userSearchInput')?.addEventListener('input', function (event) {
+    filterUsers(event.target.value);
+});
+
+document.getElementById('selectAllUsers')?.addEventListener('change', function (event) {
+    document.querySelectorAll('.user-checkbox').forEach((checkbox) => {
+        if (!checkbox.closest('.user-option')?.classList.contains('hidden')) {
+            checkbox.checked = event.target.checked;
+        }
+    });
+});
 </script>
 @endsection

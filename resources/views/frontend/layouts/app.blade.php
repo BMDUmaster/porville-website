@@ -135,10 +135,10 @@ html, body { overflow-x: hidden; max-width: 100vw; }
             <i class="fa-solid fa-bars"></i>
         </button>
         <a href="{{ route('frontend.home') }}" class="flex-shrink-0 md:-ml-2">
-            @if(file_exists(public_path('images/farmsea-logo.png')))
-                <img src="{{ asset('images/farmsea-logo.png') }}" alt="FarmSea" class="h-10 w-auto object-contain">
+            @if(file_exists(public_path('images/Farmsea.webp')))
+                <img src="{{ asset('images/Farmsea.webp') }}" alt="FarmSea" class="h-10 w-auto object-contain">
             @else
-                <span class="text-xl font-extrabold text-green-700"><img src="{{ asset('images/farmsea.png') }}"
+                <span class="text-xl font-extrabold text-green-700"><img src="{{ asset('images/Farmsea.webp') }}"
                      alt="FarmSea"
                      class="h-14 w-auto object-contain"
                      onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex'"></span>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Support\WebpImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -29,10 +30,10 @@ class CategoryController extends Controller
             'image'       => 'nullable|image|max:2048',
         ]);
 
-        $data['slug'] = Str::slug($data['name']);
+        $data['slug'] = $this->generateUniqueSlug($data['name']);
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('categories', 'public');
+            $data['image'] = WebpImage::store($request->file('image'), 'categories');
         }
 
         Category::create($data);
@@ -47,10 +48,10 @@ class CategoryController extends Controller
             'image'       => 'nullable|image|max:2048',
         ]);
 
-        $data['slug'] = Str::slug($data['name']);
+        $data['slug'] = $this->generateUniqueSlug($data['name'], $category->id);
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('categories', 'public');
+            $data['image'] = WebpImage::store($request->file('image'), 'categories');
         }
 
         $category->update($data);
@@ -61,5 +62,24 @@ class CategoryController extends Controller
     {
         $category->delete();
         return back()->with('success', 'Category deleted.');
+    }
+
+    private function generateUniqueSlug(string $name, ?int $ignoreId = null): string
+    {
+        $baseSlug = Str::slug($name);
+        $baseSlug = $baseSlug !== '' ? $baseSlug : 'category';
+        $slug = $baseSlug;
+        $counter = 2;
+
+        while (
+            Category::where('slug', $slug)
+                ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
+                ->exists()
+        ) {
+            $slug = $baseSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 }

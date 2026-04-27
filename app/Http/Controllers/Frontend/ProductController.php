@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Coupon;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -49,10 +51,39 @@ class ProductController extends Controller
             default      => $query->latest(),
         };
 
-        $products   = $query->paginate(16)->withQueryString();
-        $categories = Category::parents()->where('is_active', true)->get();
+        $products = $query->paginate(16)->withQueryString();
 
-        return view('frontend.products', compact('products', 'categories'));
+        $categories = Category::parents()
+            ->where('is_active', true)
+            ->withCount([
+                'products as active_products_count' => fn($productQuery) => $productQuery->where('is_active', true),
+            ])
+            ->get();
+
+        $sidebarBestDeals = Product::with('category')
+            ->active()
+            ->whereNotNull('mrp')
+            ->whereColumn('mrp', '>', 'price')
+            ->orderByRaw('(mrp - price) DESC')
+            ->take(2)
+            ->get();
+
+        $sidebarNewArrivals = Product::with('category')
+            ->active()
+            ->latest()
+            ->take(3)
+            ->get();
+
+        $sidebarMaxPrice = (int) ceil((Product::active()->max('price') ?? 500) / 50) * 50;
+        $sidebarMaxPrice = max($sidebarMaxPrice, 500);
+
+        return view('frontend.products', compact(
+            'products',
+            'categories',
+            'sidebarBestDeals',
+            'sidebarNewArrivals',
+            'sidebarMaxPrice'
+        ));
     }
 
     public function show($slug)
@@ -62,13 +93,41 @@ class ProductController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
 
-        $similar = Product::with('category')
+        $similar = Product::with(['category', 'subcategory'])
             ->active()
             ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
-            ->take(5)
+            ->take(4)
             ->get();
 
-        return view('frontend.product-detail', compact('product', 'similar'));
+        $palette = [
+            ['icon' => 'fa-tag', 'icon_bg' => 'bg-[#e9f7ec]', 'icon_color' => 'text-[#2f8c43]', 'code_bg' => 'bg-[#edf8ef]', 'code_text' => 'text-[#2f8c43]'],
+            ['icon' => 'fa-truck-fast', 'icon_bg' => 'bg-[#ebf4ff]', 'icon_color' => 'text-[#2d72d3]', 'code_bg' => 'bg-[#ebf4ff]', 'code_text' => 'text-[#2d72d3]'],
+            ['icon' => 'fa-credit-card', 'icon_bg' => 'bg-[#fff3e6]', 'icon_color' => 'text-[#d97706]', 'code_bg' => 'bg-[#fff6ea]', 'code_text' => 'text-[#d97706]'],
+            ['icon' => 'fa-gift', 'icon_bg' => 'bg-[#f3ebff]', 'icon_color' => 'text-[#9333ea]', 'code_bg' => 'bg-[#f3ebff]', 'code_text' => 'text-[#9333ea]'],
+        ];
+
+        $frontendOfferCards = Coupon::offers()
+            ->activeEntries()
+            ->latest()
+            ->take(6)
+            ->get()
+            ->values()
+            ->map(function ($offer, $index) use ($palette) {
+                $style = $palette[$index % count($palette)];
+                $code = Str::startsWith($offer->code, 'AUTO-OFFER-') ? null : $offer->code;
+
+                return array_merge($style, [
+                    'badge' => $index === 0 ? 'Top Offer' : 'Live Offer',
+                    'title' => $offer->title ?: 'Special Offer',
+                    'text' => $offer->description ?: 'Exclusive savings available for a limited time.',
+                    'code' => $code,
+                    'min_order_amount' => $offer->min_order_amount,
+                    'expires_at' => optional($offer->expires_at)->format('d M Y, h:i A'),
+                ]);
+            })
+            ->all();
+
+        return view('frontend.product-detail', compact('product', 'similar', 'frontendOfferCards'));
     }
 }

@@ -28,8 +28,8 @@
                class="flex-1 min-w-[200px] px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-500">
         <select name="status" onchange="this.form.submit()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none">
             <option value="">All Orders</option>
-            @foreach(['pending','confirmed','processing','shipped','delivered','cancelled'] as $s)
-                <option value="{{ $s }}" {{ request('status') == $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
+            @foreach(['pending','confirmed','processing','out_for_delivery','delivered','cancelled'] as $s)
+                <option value="{{ $s }}" {{ request('status') == $s ? 'selected' : '' }}>{{ ucwords(str_replace('_', ' ', $s)) }}</option>
             @endforeach
         </select>
         <button type="submit" class="bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold">Search</button>
@@ -60,12 +60,12 @@
                     <td class="px-6 py-4 text-sm text-gray-600">{{ $order->items->count() }} item(s)</td>
                     <td class="px-6 py-4">
                         <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $order->status_badge_class }}">
-                            {{ ucfirst($order->status) }}
+                            {{ $order->status_label }}
                         </span>
                     </td>
                     <td class="px-6 py-4 text-right font-bold text-blue-700">₹{{ number_format($order->total, 2) }}</td>
                     <td class="px-6 py-4 text-center">
-                        <a href="{{ route('frontend.order.show', $order->id) }}"
+                        <a href="{{ route('frontend.track', ['order_number' => $order->order_number]) }}"
                            class="px-3 py-1.5 bg-blue-700 text-white text-xs font-bold rounded-lg hover:bg-blue-800 transition">
                             <i class="fa-solid fa-eye"></i> View
                         </a>

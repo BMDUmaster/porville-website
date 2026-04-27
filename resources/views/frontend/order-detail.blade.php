@@ -16,7 +16,7 @@
                 <p class="text-xs text-gray-400 mt-1">{{ $order->created_at->format('d M Y, h:i A') }}</p>
             </div>
             <span class="text-xs font-bold px-3 py-1.5 rounded-full {{ $order->status_badge_class }}">
-                {{ ucfirst($order->status) }}
+                {{ $order->status_label }}
             </span>
         </div>
 

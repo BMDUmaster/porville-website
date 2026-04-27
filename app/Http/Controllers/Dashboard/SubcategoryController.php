@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Support\WebpImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class SubcategoryController extends Controller
 {
@@ -39,17 +41,17 @@ class SubcategoryController extends Controller
     {
         $data = $request->validate([
             'name'        => 'required|string|max:100',
-            'parent_id'   => 'required|exists:categories,id',
+            'parent_id'   => ['required', Rule::exists('categories', 'id')->whereNull('parent_id')],
             'description' => 'nullable|string',
             'is_active'   => 'boolean',
             'image'       => 'nullable|image|max:2048',
         ]);
 
-        $data['slug']      = Str::slug($data['name']);
+        $data['slug']      = $this->generateUniqueSlug($data['name']);
         $data['is_active'] = $request->boolean('is_active', true);
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('subcategories', 'public');
+            $data['image'] = WebpImage::store($request->file('image'), 'subcategories');
         }
 
         Category::create($data);
@@ -60,17 +62,17 @@ class SubcategoryController extends Controller
     {
         $data = $request->validate([
             'name'        => 'required|string|max:100',
-            'parent_id'   => 'required|exists:categories,id',
+            'parent_id'   => ['required', Rule::exists('categories', 'id')->whereNull('parent_id')],
             'description' => 'nullable|string',
             'is_active'   => 'boolean',
             'image'       => 'nullable|image|max:2048',
         ]);
 
-        $data['slug']      = Str::slug($data['name']);
+        $data['slug']      = $this->generateUniqueSlug($data['name'], $subcategory->id);
         $data['is_active'] = $request->boolean('is_active', true);
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('subcategories', 'public');
+            $data['image'] = WebpImage::store($request->file('image'), 'subcategories');
         }
 
         $subcategory->update($data);
@@ -81,5 +83,24 @@ class SubcategoryController extends Controller
     {
         $subcategory->delete();
         return back()->with('success', 'Sub-category deleted.');
+    }
+
+    private function generateUniqueSlug(string $name, ?int $ignoreId = null): string
+    {
+        $baseSlug = Str::slug($name);
+        $baseSlug = $baseSlug !== '' ? $baseSlug : 'subcategory';
+        $slug = $baseSlug;
+        $counter = 2;
+
+        while (
+            Category::where('slug', $slug)
+                ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
+                ->exists()
+        ) {
+            $slug = $baseSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 }

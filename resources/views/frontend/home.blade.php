@@ -49,16 +49,6 @@
         transition: transform .3s ease, box-shadow .3s ease;
     }
 
-    .favorite-card::before {
-        content: "";
-        position: absolute;
-        inset: -1px;
-        border-radius: 28px;
-        background: conic-gradient(from 0deg, rgba(34, 197, 94, 0) 0deg, rgba(34, 197, 94, 0) 220deg, rgba(34, 197, 94, 0.95) 270deg, rgba(163, 230, 53, 0.8) 320deg, rgba(34, 197, 94, 0) 360deg);
-        opacity: 0;
-        z-index: -2;
-    }
-
     .favorite-card::after {
         content: "";
         position: absolute;
@@ -71,11 +61,6 @@
     .favorite-card:hover {
         transform: translateY(-6px);
         box-shadow: 0 26px 48px rgba(15, 23, 42, 0.12);
-    }
-
-    .favorite-card:hover::before {
-        opacity: 1;
-        animation: favoriteGlowSpin 2.8s linear infinite;
     }
 
     .favorite-hero-banner {
@@ -273,7 +258,7 @@
 </div>
 
 {{-- Shop By Category --}}
-<section class="bg-white py-12 md:py-14">
+<section class="bg-white py-5 md:py-6">
     <div class="mx-auto max-w-7xl px-4">
         @php
             $categoryLabels = ['Best Seller', 'Lean Protein', 'Juicy Cuts', 'Ready to Cook', 'Fresh Choice', 'Chef Pick', 'Daily Fresh', 'Top Rated'];
@@ -306,27 +291,6 @@
                     Shop by <span class="text-blue-600">Category</span>
                 </h2>
                 <p class="mt-2 text-sm text-slate-500">Farm-to-table freshness across every cut and kind.</p>
-            </div>
-            <div class="hidden items-center gap-3 md:flex">
-                <button
-                    type="button"
-                    aria-label="Scroll categories left"
-                    onclick="document.getElementById('home-category-scroller').scrollBy({ left: -360, behavior: 'smooth' })"
-                    class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
-                >
-                    <i class="fa-solid fa-arrow-left"></i>
-                </button>
-                <button
-                    type="button"
-                    aria-label="Scroll categories right"
-                    onclick="document.getElementById('home-category-scroller').scrollBy({ left: 360, behavior: 'smooth' })"
-                    class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
-                >
-                    <i class="fa-solid fa-arrow-right"></i>
-                </button>
-                <a href="{{ route('frontend.categories') }}" class="ml-2 text-xs font-extrabold uppercase tracking-[0.18em] text-blue-600 transition hover:text-blue-800">
-                    See All Categories <i class="fa-solid fa-arrow-right ml-1"></i>
-                </a>
             </div>
         </div>
 
@@ -381,17 +345,30 @@
             @endforelse
         </div>
 
-        <div class="mt-5 flex justify-center md:hidden">
-            <a href="{{ route('frontend.categories') }}" class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-xs font-extrabold uppercase tracking-[0.18em] text-white transition hover:bg-blue-700">
-                See More Categories
+        <div class="mt-5 flex items-center justify-center gap-3">
+            <button
+                type="button"
+                aria-label="Scroll categories left"
+                onclick="document.getElementById('home-category-scroller').scrollBy({ left: -360, behavior: 'smooth' })"
+                class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <button
+                type="button"
+                aria-label="Scroll categories right"
+                onclick="document.getElementById('home-category-scroller').scrollBy({ left: 360, behavior: 'smooth' })"
+                class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+            >
                 <i class="fa-solid fa-arrow-right"></i>
-            </a>
+            </button>
         </div>
+
     </div>
 </section>
 
 {{-- New Arrivals --}}
-<section class="bg-gray-50 py-12">
+<section class="bg-gray-50 py-5 md:py-6">
     <div class="mx-auto max-w-7xl px-4">
         <div class="mb-6 flex items-end justify-between">
             <div>
@@ -400,9 +377,9 @@
             </div>
             <a href="{{ route('frontend.products') }}" class="text-xs font-bold uppercase tracking-wider text-blue-600 hover:underline">See All</a>
         </div>
-        <div class="grid grid-cols-2 gap-5 md:grid-cols-4">
+        <div id="home-new-arrivals-scroller" class="scrollbar-hide flex gap-5 overflow-x-auto scroll-smooth pb-3">
             @forelse($newArrivals as $product)
-                <div class="flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition hover:border-green-300 hover:shadow-lg">
+                <div class="flex min-w-[260px] max-w-[260px] flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition hover:border-green-300 hover:shadow-lg">
                     <a href="{{ route('frontend.product.show', $product->slug) }}" class="block aspect-square overflow-hidden bg-gray-50">
                         @if($product->images && count($product->images))
                             <img src="{{ asset('storage/'.$product->images[0]) }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition-transform duration-500 hover:scale-105">
@@ -428,14 +405,14 @@
                     </div>
                 </div>
             @empty
-                <p class="col-span-4 py-8 text-center text-gray-400">No products yet.</p>
+                <p class="w-full py-8 text-center text-gray-400">No products yet.</p>
             @endforelse
         </div>
     </div>
 </section>
 
 {{-- Shop By Type --}}
-<section class="bg-white py-14 md:py-16">
+<section class="bg-white py-6 md:py-7">
     <div class="mx-auto max-w-7xl px-4">
         <div class="relative mb-6 flex items-center justify-center gap-4">
             <div class="text-center">
@@ -578,10 +555,10 @@
         </div>
 
         @if($typeShowcaseLead)
-            <div class="mt-8 grid gap-4 lg:grid-cols-[1.08fr_1fr] lg:gap-5">
+            <div class="mt-8 grid gap-4 lg:grid-cols-[1.12fr_0.96fr] lg:gap-5">
                 <article class="type-showcase-card overflow-hidden rounded-[26px] border border-[#d8ead5] bg-[#f7fbf5]">
                     <div class="flex h-full flex-col">
-                        <div class="p-5 md:p-6">
+                        <div class="p-5 pb-4 md:p-6 md:pb-5">
                             <span class="inline-flex rounded-full bg-green-700 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
                                 Chef's Selection
                             </span>
@@ -610,10 +587,10 @@
                                 <img
                                     src="{{ asset('storage/' . $typeShowcaseLead->images[0]) }}"
                                     alt="{{ $typeShowcaseLead->name }}"
-                                    class="type-showcase-image h-[250px] w-full object-cover md:h-[280px]"
+                                    class="type-showcase-image h-[320px] w-full object-cover object-center md:h-[390px]"
                                 >
                             @else
-                                <div class="flex h-[250px] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-6xl text-slate-400 md:h-[280px]">
+                                <div class="flex h-[320px] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-6xl text-slate-400 md:h-[390px]">
                                     <i class="fa-solid fa-drumstick-bite"></i>
                                 </div>
                             @endif
@@ -812,7 +789,7 @@
             $favoriteLabels = ['Most Ordered', 'Top Rated', 'Chef Pick', 'Best For Fry', 'Family Pack', 'Daily Fresh', 'Quick Cook', 'Popular Choice'];
         @endphp
 
-        <div id="home-favorites-scroller" class="scrollbar-hide flex gap-5 overflow-x-auto scroll-smooth pb-3">
+        <div id="home-favorites-scroller" class="scrollbar-hide flex gap-4 overflow-x-auto scroll-smooth pb-3">
             @forelse($bestSellers as $index => $product)
                 @php
                     $favoriteImage = $product->images && count($product->images) ? asset('storage/' . $product->images[0]) : null;
@@ -820,18 +797,18 @@
                     $favoriteUnit = $product->unit ?: ($product->weight ? $product->weight . ' g' : 'Fresh Cut');
                 @endphp
 
-                <article class="favorite-card group min-w-[290px] max-w-[290px] rounded-[28px] p-4">
-                    <div class="rounded-[24px] border border-[#e5efe4] bg-white p-4">
+                <article class="favorite-card group min-w-[255px] max-w-[255px] rounded-[28px] p-3">
+                    <div class="rounded-[22px] border border-[#e5efe4] bg-white p-3">
                         <a href="{{ route('frontend.product.show', $product->slug) }}" class="block">
                             <div class="relative overflow-hidden rounded-[20px] bg-slate-100">
                                 @if($favoriteImage)
                                     <img
                                         src="{{ $favoriteImage }}"
                                         alt="{{ $product->name }}"
-                                        class="aspect-[1.05] w-full object-cover transition duration-500 group-hover:scale-105"
+                                        class="aspect-[0.95] w-full object-cover transition duration-500 group-hover:scale-105"
                                     >
                                 @else
-                                    <div class="flex aspect-[1.05] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-5xl text-slate-400">
+                                    <div class="flex aspect-[0.95] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-5xl text-slate-400">
                                         <i class="fa-solid fa-drumstick-bite"></i>
                                     </div>
                                 @endif
@@ -842,7 +819,7 @@
                             </div>
                         </a>
 
-                        <div class="mt-4 flex min-h-[118px] flex-col">
+                        <div class="mt-3 flex min-h-[100px] flex-col">
                             <a href="{{ route('frontend.product.show', $product->slug) }}" class="text-slate-900 transition hover:text-green-700">
                                 <span class="block text-[18px] font-extrabold leading-[1.15]">{{ $product->name }}</span>
                             </a>

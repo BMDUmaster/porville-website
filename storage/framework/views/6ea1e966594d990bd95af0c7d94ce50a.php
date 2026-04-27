@@ -16,7 +16,7 @@
                 <p class="text-xs text-gray-400 mt-1"><?php echo e($order->created_at->format('d M Y, h:i A')); ?></p>
             </div>
             <span class="text-xs font-bold px-3 py-1.5 rounded-full <?php echo e($order->status_badge_class); ?>">
-                <?php echo e(ucfirst($order->status)); ?>
+                <?php echo e($order->status_label); ?>
 
             </span>
         </div>

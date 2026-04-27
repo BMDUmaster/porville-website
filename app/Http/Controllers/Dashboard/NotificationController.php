@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
@@ -18,7 +19,13 @@ class NotificationController extends Controller
         }
 
         $notifications = $query->paginate(20);
-        return view('dashboard.notifications.index', compact('notifications'));
+        $users = User::query()
+            ->where('role', 'customer')
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get(['id', 'name', 'email']);
+
+        return view('dashboard.notifications.index', compact('notifications', 'users'));
     }
 
     public function store(Request $request)

@@ -1,4 +1,4 @@
-
+﻿
 <?php $__env->startSection('title', 'Products'); ?>
 <?php $__env->startSection('page_title', 'Product Management'); ?>
 
@@ -45,12 +45,13 @@
 
     
     <div class="bg-white rounded-2xl shadow-sm border overflow-x-auto">
-        <table class="w-full text-left min-w-[700px]">
+        <table class="w-full text-left min-w-[820px]">
             <thead class="bg-slate-50 border-b">
                 <tr class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                     <th class="px-6 py-4">Sr.No.</th>
                     <th class="px-6 py-4">Product</th>
                     <th class="px-6 py-4">Category</th>
+                    <th class="px-6 py-4">Sub Category</th>
                     <th class="px-6 py-4">Price</th>
                     <th class="px-6 py-4">Stock</th>
                     <th class="px-6 py-4">Status</th>
@@ -75,6 +76,7 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 text-xs font-semibold text-slate-600"><?php echo e($product->category->name ?? '—'); ?></td>
+                    <td class="px-6 py-4 text-xs font-semibold text-slate-600"><?php echo e($product->subcategory->name ?? '�'); ?></td>
                     <td class="px-6 py-4 text-xs font-semibold text-slate-700">₹<?php echo e(number_format($product->price, 2)); ?></td>
                     <td class="px-6 py-4 text-xs <?php echo e($product->stock < 10 ? 'text-red-600 font-bold' : 'text-slate-600'); ?>"><?php echo e($product->stock); ?></td>
                     <td class="px-6 py-4">
@@ -85,7 +87,26 @@
                     </td>
                     <td class="px-6 py-4 text-right">
                         <div class="flex justify-end gap-2">
-                            <button onclick="openEditModal(<?php echo e($product->id); ?>, '<?php echo e(addslashes($product->name)); ?>', <?php echo e($product->category_id); ?>, <?php echo e($product->price); ?>, <?php echo e($product->stock); ?>, <?php echo e($product->is_active ? 1 : 0); ?>)"
+                            <a href="<?php echo e(route('dashboard.products.show', $product)); ?>"
+                               class="p-2 hover:bg-blue-100 text-blue-600 rounded-lg text-xs">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                            <?php
+                                $editProductPayload = [
+                                    'id' => $product->id,
+                                    'name' => $product->name,
+                                    'category_id' => $product->category_id,
+                                    'subcategory_id' => $product->subcategory_id,
+                                    'description' => $product->description,
+                                    'price' => $product->price,
+                                    'stock' => $product->stock,
+                                    'is_active' => $product->is_active ? 1 : 0,
+                                    'images_count' => is_array($product->images) ? count($product->images) : 0,
+                                    'images' => is_array($product->images) ? array_values($product->images) : [],
+                                    'variants' => is_array($product->variants) ? array_values($product->variants) : [],
+                                ];
+                            ?>
+                            <button onclick='openEditModal(<?php echo json_encode($editProductPayload, 15, 512) ?>)'
                                     class="p-2 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
@@ -100,7 +121,7 @@
                     </td>
                 </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                <tr><td colspan="7" class="px-6 py-8 text-center text-gray-400">No products found.</td></tr>
+                <tr><td colspan="8" class="px-6 py-8 text-center text-gray-400">No products found.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>
@@ -155,15 +176,17 @@
 
             
             <div>
-                <label class="block text-sm text-gray-700 mb-1">Product Image</label>
-                <div class="flex items-center border border-gray-300 rounded overflow-hidden">
-                    <label class="bg-gray-100 border-r border-gray-300 px-3 py-2 text-sm text-gray-600 cursor-pointer whitespace-nowrap hover:bg-gray-200">
-                        Choose Files
-                        <input type="file" name="images[]" multiple accept="image/*" class="hidden"
-                               onchange="updateFileLabel(this, 'addImageLabel')">
-                    </label>
-                    <span id="addImageLabel" class="px-3 text-sm text-gray-400">No file chosen</span>
+                <label class="block text-sm text-gray-700 mb-2">Product Images</label>
+                <div class="flex items-start gap-2">
+                    <div id="addImagePickerRow" class="flex-1"></div>
+                    <button type="button" onclick="addSelectedImage()"
+                            class="px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded whitespace-nowrap">
+                        Add
+                    </button>
                 </div>
+                <input type="file" id="finalAddImagesInput" name="images[]" multiple class="hidden">
+                <p class="mt-1 text-[11px] text-gray-400">Gallery se ek saath multiple images choose karo, phir Add dabao. Sab images neeche preview mein aa jayengi.</p>
+                <div id="addProductImagePreviews" class="mt-3 flex flex-wrap gap-3"></div>
             </div>
 
             
@@ -218,7 +241,7 @@
                                 <p class="text-xs text-gray-500 mb-1">MRP</p>
                                 <div class="relative">
                                     <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
-                                    <input type="number" name="variants[0][mrp]" min="0" step="0.01"
+                                    <input type="number" name="variants[0][mrp]" min="0" step="0.01" data-variant-mrp
                                            class="w-full border border-gray-300 rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
                                 </div>
                             </div>
@@ -226,32 +249,20 @@
                                 <p class="text-xs text-gray-500 mb-1">Selling Price</p>
                                 <div class="relative">
                                     <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
-                                    <input type="number" name="variants[0][selling_price]" min="0" step="0.01"
+                                    <input type="number" name="variants[0][selling_price]" min="0" step="0.01" data-variant-selling-price
                                            class="w-full border border-gray-300 rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
                                 </div>
                             </div>
                             <div class="flex-1">
-                                <p class="text-xs text-gray-500 mb-1">Save Offer (%)</p>
+                                <p class="text-xs text-gray-500 mb-1">Save Offer</p>
                                 <div class="relative">
-                                    <input type="number" name="variants[0][save_offer]" min="0" max="100" step="0.1"
-                                           class="w-full border border-gray-300 rounded px-2 pr-5 py-2 text-sm outline-none focus:border-blue-400">
+                                    <input type="number" name="variants[0][save_offer]" min="0" max="100" step="0.1" data-variant-save-offer readonly
+                                           class="w-full border border-gray-300 rounded bg-slate-50 px-2 pr-5 py-2 text-sm outline-none focus:border-blue-400">
                                     <span class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">%</span>
                                 </div>
                             </div>
                             <button type="button" onclick="removeVariant(this)"
                                     class="mt-5 text-gray-400 hover:text-red-500 text-lg leading-none">&times;</button>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <p class="text-xs text-gray-500 mb-1">Admin Amount(Rs)</p>
-                                <input type="number" name="variants[0][admin_amount]" min="0" step="0.01"
-                                       class="w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-500 mb-1">Vendor Amount(Rs)</p>
-                                <input type="number" name="variants[0][vendor_amount]" min="0" step="0.01"
-                                       class="w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -275,13 +286,25 @@
             <h2 class="font-bold text-slate-700">Edit Product</h2>
             <button onclick="closeModal('editProductModal')" class="text-slate-400 hover:text-red-500 text-2xl">&times;</button>
         </div>
-        <form id="editProductForm" method="POST" class="overflow-y-auto p-6 space-y-4">
+        <form id="editProductForm" method="POST" enctype="multipart/form-data" class="overflow-y-auto p-6 space-y-4">
             <?php echo csrf_field(); ?> <?php echo method_field('PUT'); ?>
             <div>
                 <label class="text-xs font-bold text-slate-600 block mb-1">Category</label>
-                <select name="category_id" id="editCatId" class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
+                <select name="category_id" id="editCatId" onchange="loadSubcategories(this.value, 'editSubcategoryId')"
+                        class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
+                    <option value="">Select category</option>
                     <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <option value="<?php echo e($cat->id); ?>"><?php echo e($cat->name); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </select>
+            </div>
+            <div>
+                <label class="text-xs font-bold text-slate-600 block mb-1">Sub Category</label>
+                <select name="subcategory_id" id="editSubcategoryId"
+                        class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
+                    <option value="">Select sub category</option>
+                    <?php $__currentLoopData = $subcategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sub): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($sub->id); ?>" data-parent="<?php echo e($sub->parent_id); ?>"><?php echo e($sub->name); ?></option>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
             </div>
@@ -289,6 +312,33 @@
                 <label class="text-xs font-bold text-slate-600 block mb-1">Product Name</label>
                 <input type="text" name="name" id="editProductName" required
                        class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
+            </div>
+            <div>
+                <label class="text-xs font-bold text-slate-600 block mb-1">Description</label>
+                <textarea name="description" id="editDescription" rows="4"
+                          class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none resize-none"></textarea>
+            </div>
+            <div>
+                <label class="text-xs font-bold text-slate-600 block mb-1">Product Images</label>
+                <div class="flex items-start gap-2">
+                    <div id="editImagePickerRow" class="flex-1"></div>
+                    <button type="button" onclick="addSelectedEditImage()"
+                            class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded whitespace-nowrap">
+                        Add
+                    </button>
+                </div>
+                <input type="hidden" name="existing_images_present" value="1">
+                <input type="file" id="finalEditImagesInput" name="images[]" multiple class="hidden">
+                <div id="editExistingImagesInputs" class="hidden"></div>
+                <p id="editImageHint" class="mt-1 text-[11px] text-slate-400">Current images neeche dikhengi. Delete icon se hata sakte ho, aur new images add karne ke liye image choose karke Add dabao.</p>
+                <div class="mt-4">
+                    <p class="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Current Images</p>
+                    <div id="editCurrentImagePreviews" class="flex flex-wrap gap-3"></div>
+                </div>
+                <div class="mt-4">
+                    <p class="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">New Images</p>
+                    <div id="editNewImagePreviews" class="flex flex-wrap gap-3"></div>
+                </div>
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div>
@@ -301,6 +351,17 @@
                     <input type="number" name="stock" id="editStock" min="0"
                            class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
                 </div>
+            </div>
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-sm font-semibold text-slate-800">Product Variants</span>
+                    <button type="button" onclick="addEditVariant()"
+                            class="px-3 py-1.5 bg-amber-400 hover:bg-amber-500 text-white text-xs font-semibold rounded">
+                        Add Variant
+                    </button>
+                </div>
+
+                <div id="editVariantsContainer" class="space-y-3"></div>
             </div>
             <div>
                 <label class="text-xs font-bold text-slate-600 block mb-1">Status</label>
@@ -322,17 +383,164 @@
 <?php $__env->startSection('scripts'); ?>
 <script>
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
-function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
+function closeModal(id) {
+    document.getElementById(id).classList.add('hidden');
+    document.getElementById(id).classList.remove('flex');
 
-function openEditModal(id, name, catId, price, stock, isActive) {
-    document.getElementById('editProductName').value  = name;
-    document.getElementById('editCatId').value        = catId;
-    document.getElementById('editPrice').value        = price;
-    document.getElementById('editStock').value        = stock;
-    document.getElementById('editIsActive').value     = isActive;
-    document.getElementById('editProductForm').action = '/products/' + id;
+    if (id === 'addProductModal') {
+        resetAddProductImages();
+    }
+
+    if (id === 'editProductModal') {
+        resetEditProductImages();
+    }
+}
+
+let addProductImages = [];
+let editProductImages = [];
+let currentEditImages = [];
+
+function renderAddImagePickerRow() {
+    const pickerRow = document.getElementById('addImagePickerRow');
+
+    if (!pickerRow) return;
+
+    pickerRow.innerHTML = `
+        <label class="flex items-center border border-gray-300 rounded overflow-hidden flex-1 cursor-pointer">
+            <span class="bg-gray-100 border-r border-gray-300 px-3 py-2 text-sm text-gray-600 whitespace-nowrap hover:bg-gray-200">Choose Image</span>
+            <span class="add-image-label px-3 text-sm text-gray-400 truncate">No file chosen</span>
+            <input type="file" accept="image/*" multiple class="hidden" onchange="handleAddImageSelection(this)">
+        </label>
+    `;
+}
+
+function handleAddImageSelection(input) {
+    const row = input.closest('label');
+    const label = row ? row.querySelector('.add-image-label') : null;
+
+    if (label) {
+        if (input.files.length > 1) {
+            label.textContent = input.files.length + ' images selected';
+        } else if (input.files.length === 1) {
+            label.textContent = input.files[0].name;
+        } else {
+            label.textContent = 'No file chosen';
+        }
+    }
+}
+
+function addSelectedImage() {
+    const pickerRow = document.getElementById('addImagePickerRow');
+
+    if (!pickerRow) return;
+
+    const input = pickerRow.querySelector('input[type="file"]');
+
+    if (!input || !input.files || !input.files.length) return;
+
+    Array.from(input.files).forEach((file) => {
+        addProductImages.push({
+            id: 'preview-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+            file,
+        });
+    });
+
+    syncAddProductImagesInput();
+    renderAddImagePickerRow();
+    syncAddImagePreviews();
+}
+
+function syncAddImagePreviews() {
+    const previewContainer = document.getElementById('addProductImagePreviews');
+
+    if (!previewContainer) return;
+
+    previewContainer.innerHTML = '';
+
+    addProductImages.forEach((imageItem, index) => {
+        const previewUrl = URL.createObjectURL(imageItem.file);
+        const previewCard = document.createElement('div');
+        previewCard.className = 'w-24';
+        previewCard.dataset.previewId = imageItem.id;
+        previewCard.innerHTML = `
+            <div class="relative w-24 h-24 rounded-xl border border-gray-200 overflow-hidden bg-gray-50 shadow-sm">
+                <button type="button"
+                        onclick="removeSelectedImage('${imageItem.id}')"
+                        class="absolute right-1 top-1 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-black/70 text-white text-[10px] hover:bg-red-500">
+                    &times;
+                </button>
+                <img src="${previewUrl}" alt="Preview ${index + 1}" class="w-full h-full object-cover">
+            </div>
+            <p class="mt-1 text-[11px] text-gray-500 truncate">${imageItem.file.name}</p>
+        `;
+
+        const img = previewCard.querySelector('img');
+        if (img) {
+            img.onload = () => URL.revokeObjectURL(previewUrl);
+        }
+
+        previewContainer.appendChild(previewCard);
+    });
+}
+
+function removeSelectedImage(previewId) {
+    addProductImages = addProductImages.filter((imageItem) => imageItem.id !== previewId);
+    syncAddProductImagesInput();
+    syncAddImagePreviews();
+}
+
+function resetAddProductImages() {
+    const previewContainer = document.getElementById('addProductImagePreviews');
+    const finalInput = document.getElementById('finalAddImagesInput');
+
+    addProductImages = [];
+
+    if (previewContainer) {
+        previewContainer.innerHTML = '';
+    }
+
+    if (finalInput) {
+        finalInput.value = '';
+    }
+
+    renderAddImagePickerRow();
+}
+
+function syncAddProductImagesInput() {
+    const finalInput = document.getElementById('finalAddImagesInput');
+
+    if (!finalInput) return;
+
+    const transfer = new DataTransfer();
+
+    addProductImages.forEach((imageItem) => {
+        transfer.items.add(imageItem.file);
+    });
+
+    finalInput.files = transfer.files;
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    renderAddImagePickerRow();
+    renderEditImagePickerRow();
+});
+
+function openEditModal(product) {
+    document.getElementById('editProductName').value  = product.name ?? '';
+    document.getElementById('editCatId').value        = product.category_id ?? '';
+    document.getElementById('editDescription').value  = product.description ?? '';
+    document.getElementById('editPrice').value        = product.price ?? '';
+    document.getElementById('editStock').value        = product.stock ?? '';
+    document.getElementById('editIsActive').value     = product.is_active ?? 1;
+    document.getElementById('editImageHint').textContent = 'Current images neeche dikhengi. Delete icon se hata sakte ho, aur new images add karne ke liye image choose karke Add dabao.';
+    resetEditProductImages(false);
+    renderEditCurrentImages(product.images ?? []);
+    renderEditVariants(product.variants ?? []);
+    loadSubcategories(product.category_id, 'editSubcategoryId', product.subcategory_id);
+    document.getElementById('editProductForm').action = '/products/' + product.id;
     openModal('editProductModal');
 }
+
 
 // File label updater
 function updateFileLabel(input, labelId) {
@@ -346,87 +554,318 @@ function updateFileLabel(input, labelId) {
     }
 }
 
+function renderEditImagePickerRow() {
+    const pickerRow = document.getElementById('editImagePickerRow');
+
+    if (!pickerRow) return;
+
+    pickerRow.innerHTML = `
+        <label class="flex items-center border border-slate-200 rounded-lg overflow-hidden flex-1 cursor-pointer">
+            <span class="bg-slate-50 border-r border-slate-200 px-3 py-2 text-sm text-slate-600 whitespace-nowrap hover:bg-slate-100">Choose Image</span>
+            <span class="edit-image-label px-3 text-sm text-slate-400 truncate">No file chosen</span>
+            <input type="file" accept="image/*" multiple class="hidden" onchange="handleEditImageSelection(this)">
+        </label>
+    `;
+}
+
+function handleEditImageSelection(input) {
+    const row = input.closest('label');
+    const label = row ? row.querySelector('.edit-image-label') : null;
+
+    if (label) {
+        if (input.files.length > 1) {
+            label.textContent = input.files.length + ' images selected';
+        } else if (input.files.length === 1) {
+            label.textContent = input.files[0].name;
+        } else {
+            label.textContent = 'No file chosen';
+        }
+    }
+}
+
+function addSelectedEditImage() {
+    const pickerRow = document.getElementById('editImagePickerRow');
+
+    if (!pickerRow) return;
+
+    const input = pickerRow.querySelector('input[type="file"]');
+
+    if (!input || !input.files || !input.files.length) return;
+
+    Array.from(input.files).forEach((file) => {
+        editProductImages.push({
+            id: 'edit-preview-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+            file,
+        });
+    });
+
+    syncEditProductImagesInput();
+    renderEditImagePickerRow();
+    syncEditImagePreviews();
+}
+
+function syncEditImagePreviews() {
+    const previewContainer = document.getElementById('editNewImagePreviews');
+
+    if (!previewContainer) return;
+
+    previewContainer.innerHTML = '';
+
+    editProductImages.forEach((imageItem, index) => {
+        const previewUrl = URL.createObjectURL(imageItem.file);
+        const previewCard = document.createElement('div');
+        previewCard.className = 'w-24';
+        previewCard.dataset.previewId = imageItem.id;
+        previewCard.innerHTML = `
+            <div class="relative w-24 h-24 rounded-xl border border-slate-200 overflow-hidden bg-slate-50 shadow-sm">
+                <button type="button"
+                        onclick="removeSelectedEditImage('${imageItem.id}')"
+                        class="absolute right-1 top-1 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-black/70 text-white text-[10px] hover:bg-red-500">
+                    &times;
+                </button>
+                <img src="${previewUrl}" alt="New preview ${index + 1}" class="w-full h-full object-cover">
+            </div>
+            <p class="mt-1 text-[11px] text-slate-500 truncate">${imageItem.file.name}</p>
+        `;
+
+        const img = previewCard.querySelector('img');
+        if (img) {
+            img.onload = () => URL.revokeObjectURL(previewUrl);
+        }
+
+        previewContainer.appendChild(previewCard);
+    });
+}
+
+function removeSelectedEditImage(previewId) {
+    editProductImages = editProductImages.filter((imageItem) => imageItem.id !== previewId);
+    syncEditProductImagesInput();
+    syncEditImagePreviews();
+}
+
+function syncEditProductImagesInput() {
+    const finalInput = document.getElementById('finalEditImagesInput');
+
+    if (!finalInput) return;
+
+    const transfer = new DataTransfer();
+
+    editProductImages.forEach((imageItem) => {
+        transfer.items.add(imageItem.file);
+    });
+
+    finalInput.files = transfer.files;
+}
+
+function resetEditProductImages(shouldClearCurrent = true) {
+    const previewContainer = document.getElementById('editNewImagePreviews');
+    const currentContainer = document.getElementById('editCurrentImagePreviews');
+    const finalInput = document.getElementById('finalEditImagesInput');
+    const existingInputs = document.getElementById('editExistingImagesInputs');
+
+    editProductImages = [];
+
+    if (previewContainer) {
+        previewContainer.innerHTML = '';
+    }
+
+    if (shouldClearCurrent && currentContainer) {
+        currentContainer.innerHTML = '';
+    }
+
+    if (shouldClearCurrent) {
+        currentEditImages = [];
+    }
+
+    if (shouldClearCurrent && existingInputs) {
+        existingInputs.innerHTML = '';
+    }
+
+    if (finalInput) {
+        finalInput.value = '';
+    }
+
+    renderEditImagePickerRow();
+}
+
+function renderEditCurrentImages(images) {
+    const currentContainer = document.getElementById('editCurrentImagePreviews');
+
+    if (!currentContainer) return;
+
+    currentEditImages = Array.isArray(images) ? [...images] : [];
+    currentContainer.innerHTML = '';
+    syncEditExistingImagesInputs();
+
+    if (!currentEditImages.length) {
+        currentContainer.innerHTML = `<div class="rounded-xl bg-slate-50 px-4 py-8 text-sm font-semibold text-slate-400">No current images uploaded.</div>`;
+        return;
+    }
+
+    currentEditImages.forEach((imagePath, index) => {
+        const previewCard = document.createElement('div');
+        previewCard.className = 'w-24';
+        previewCard.innerHTML = `
+            <div class="relative w-24 h-24 rounded-xl border border-slate-200 overflow-hidden bg-slate-50 shadow-sm">
+                <button type="button"
+                        onclick="removeCurrentEditImage('${imagePath.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}')"
+                        class="absolute right-1 top-1 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-black/70 text-white text-[10px] hover:bg-red-500">
+                    &times;
+                </button>
+                <img src="/storage/${imagePath}" alt="Current image ${index + 1}" class="w-full h-full object-cover">
+            </div>
+        `;
+
+        currentContainer.appendChild(previewCard);
+    });
+}
+
+function syncEditExistingImagesInputs() {
+    const existingInputs = document.getElementById('editExistingImagesInputs');
+
+    if (!existingInputs) return;
+
+    existingInputs.innerHTML = '';
+
+    currentEditImages.forEach((imagePath) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'existing_images[]';
+        input.value = imagePath;
+        existingInputs.appendChild(input);
+    });
+}
+
+function removeCurrentEditImage(imagePath) {
+    currentEditImages = currentEditImages.filter((item) => item !== imagePath);
+    renderEditCurrentImages(currentEditImages);
+}
+
+
 // Subcategory filter by category
-function loadSubcategories(categoryId) {
-    const select = document.getElementById('addSubcategorySelect');
+function loadSubcategories(categoryId, selectId = 'addSubcategorySelect', selectedValue = '') {
+    const select = document.getElementById(selectId);
+
+    if (!select) return;
+
     const options = select.querySelectorAll('option');
+    let hasSelectedOption = false;
+
     options.forEach(opt => {
         if (opt.value === '') return;
-        opt.style.display = (!categoryId || opt.dataset.parent == categoryId) ? '' : 'none';
+
+        const isVisible = !categoryId || opt.dataset.parent == categoryId;
+        opt.style.display = isVisible ? '' : 'none';
+
+        if (isVisible && selectedValue !== '' && opt.value == selectedValue) {
+            hasSelectedOption = true;
+        }
     });
-    select.value = '';
+
+    select.value = hasSelectedOption ? selectedValue : '';
 }
 
 // Variant management
 let variantIndex = 1;
+let editVariantIndex = 0;
 
-function addVariant() {
-    const idx = variantIndex++;
-    const container = document.getElementById('variantsContainer');
-    const div = document.createElement('div');
-    div.className = 'variant-row border border-gray-200 rounded p-3';
-    div.innerHTML = `
+function getVariantRowTemplate(idx, tone = 'gray', values = {}) {
+    const borderClass = tone === 'slate' ? 'border-slate-200' : 'border-gray-200';
+    const inputBorderClass = tone === 'slate' ? 'border-slate-200' : 'border-gray-300';
+    const inputBgClass = tone === 'slate' ? 'bg-slate-50' : 'bg-slate-50';
+    const removeClass = tone === 'slate' ? 'text-slate-400' : 'text-gray-400';
+    const quantity = values.quantity ?? '';
+    const unit = values.unit ?? 'Gram';
+    const piece = values.piece ?? '';
+    const mrp = values.mrp ?? '';
+    const sellingPrice = values.selling_price ?? '';
+    const saveOffer = values.save_offer ?? '';
+
+    return `
         <div class="flex items-start gap-2 mb-2">
             <div class="flex-1">
                 <p class="text-xs text-gray-500 mb-1">Quantity</p>
-                <input type="text" name="variants[${idx}][quantity]" placeholder="e.g. 500-600"
-                       class="w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
+                <input type="text" name="variants[${idx}][quantity]" value="${quantity}" placeholder="e.g. 500-600"
+                       class="w-full border ${inputBorderClass} rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
             </div>
             <div class="w-32">
                 <p class="text-xs text-gray-500 mb-1">Unit</p>
                 <div class="relative">
                     <select name="variants[${idx}][unit]"
-                            class="w-full appearance-none border border-gray-300 rounded px-2 py-2 text-sm bg-white outline-none pr-6">
-                        <option>Gram</option><option>Kg</option><option>Pc</option><option>Litre</option>
+                            class="w-full appearance-none border ${inputBorderClass} rounded px-2 py-2 text-sm bg-white outline-none pr-6">
+                        <option ${unit === 'Gram' ? 'selected' : ''}>Gram</option>
+                        <option ${unit === 'Kg' ? 'selected' : ''}>Kg</option>
+                        <option ${unit === 'Pc' ? 'selected' : ''}>Pc</option>
+                        <option ${unit === 'Litre' ? 'selected' : ''}>Litre</option>
                     </select>
                     <span class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">&#9660;</span>
                 </div>
             </div>
             <div class="flex-1">
                 <p class="text-xs text-gray-500 mb-1">Piece</p>
-                <input type="text" name="variants[${idx}][piece]" placeholder="e.g. 6-8 pieces"
-                       class="w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
+                <input type="text" name="variants[${idx}][piece]" value="${piece}" placeholder="e.g. 6-8 pieces"
+                       class="w-full border ${inputBorderClass} rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
             </div>
             <div class="flex-1">
                 <p class="text-xs text-gray-500 mb-1">MRP</p>
                 <div class="relative">
                     <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
-                    <input type="number" name="variants[${idx}][mrp]" min="0" step="0.01"
-                           class="w-full border border-gray-300 rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
+                    <input type="number" name="variants[${idx}][mrp]" value="${mrp}" min="0" step="0.01" data-variant-mrp
+                           class="w-full border ${inputBorderClass} rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
                 </div>
             </div>
             <div class="flex-1">
                 <p class="text-xs text-gray-500 mb-1">Selling Price</p>
                 <div class="relative">
                     <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
-                    <input type="number" name="variants[${idx}][selling_price]" min="0" step="0.01"
-                           class="w-full border border-gray-300 rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
+                    <input type="number" name="variants[${idx}][selling_price]" value="${sellingPrice}" min="0" step="0.01" data-variant-selling-price
+                           class="w-full border ${inputBorderClass} rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
                 </div>
             </div>
             <div class="flex-1">
-                <p class="text-xs text-gray-500 mb-1">Save Offer (%)</p>
+                <p class="text-xs text-gray-500 mb-1">Save Offer</p>
                 <div class="relative">
-                    <input type="number" name="variants[${idx}][save_offer]" min="0" max="100" step="0.1"
-                           class="w-full border border-gray-300 rounded px-2 pr-5 py-2 text-sm outline-none focus:border-blue-400">
+                    <input type="number" name="variants[${idx}][save_offer]" value="${saveOffer}" min="0" max="100" step="0.1" data-variant-save-offer readonly
+                           class="w-full border ${inputBorderClass} rounded ${inputBgClass} px-2 pr-5 py-2 text-sm outline-none focus:border-blue-400">
                     <span class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">%</span>
                 </div>
             </div>
             <button type="button" onclick="removeVariant(this)"
-                    class="mt-5 text-gray-400 hover:text-red-500 text-lg leading-none">&times;</button>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-            <div>
-                <p class="text-xs text-gray-500 mb-1">Admin Amount(Rs)</p>
-                <input type="number" name="variants[${idx}][admin_amount]" min="0" step="0.01"
-                       class="w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
-            </div>
-            <div>
-                <p class="text-xs text-gray-500 mb-1">Vendor Amount(Rs)</p>
-                <input type="number" name="variants[${idx}][vendor_amount]" min="0" step="0.01"
-                       class="w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
-            </div>
+                    class="mt-5 ${removeClass} hover:text-red-500 text-lg leading-none">&times;</button>
         </div>`;
+}
+
+function addVariant() {
+    const idx = variantIndex++;
+    const container = document.getElementById('variantsContainer');
+    const div = document.createElement('div');
+    div.className = 'variant-row border border-gray-200 rounded p-3';
+    div.innerHTML = getVariantRowTemplate(idx, 'gray');
     container.appendChild(div);
+}
+
+function addEditVariant(values = {}) {
+    const idx = editVariantIndex++;
+    const container = document.getElementById('editVariantsContainer');
+    const div = document.createElement('div');
+    div.className = 'variant-row border border-slate-200 rounded-lg p-3';
+    div.innerHTML = getVariantRowTemplate(idx, 'slate', values);
+    container.appendChild(div);
+    updateVariantSaveOffer(div);
+}
+
+function renderEditVariants(variants) {
+    const container = document.getElementById('editVariantsContainer');
+    if (!container) return;
+
+    container.innerHTML = '';
+    editVariantIndex = 0;
+
+    if (Array.isArray(variants) && variants.length) {
+        variants.forEach((variant) => addEditVariant(variant));
+    } else {
+        addEditVariant();
+    }
 }
 
 function removeVariant(btn) {
@@ -435,6 +874,34 @@ function removeVariant(btn) {
         btn.closest('.variant-row').remove();
     }
 }
+
+function updateVariantSaveOffer(row) {
+    const mrpInput = row.querySelector('[data-variant-mrp]');
+    const sellingPriceInput = row.querySelector('[data-variant-selling-price]');
+    const saveOfferInput = row.querySelector('[data-variant-save-offer]');
+
+    if (!mrpInput || !sellingPriceInput || !saveOfferInput) return;
+
+    const mrp = parseFloat(mrpInput.value);
+    const sellingPrice = parseFloat(sellingPriceInput.value);
+
+    if (!mrp || !sellingPrice || mrp <= 0 || sellingPrice >= mrp) {
+        saveOfferInput.value = '';
+        return;
+    }
+
+    const saveOffer = ((mrp - sellingPrice) / mrp) * 100;
+    saveOfferInput.value = saveOffer.toFixed(1);
+}
+
+document.addEventListener('input', (event) => {
+    if (!event.target.matches('[data-variant-mrp], [data-variant-selling-price]')) return;
+
+    const row = event.target.closest('.variant-row');
+    if (row) {
+        updateVariantSaveOffer(row);
+    }
+});
 </script>
 <?php $__env->stopSection(); ?>
 

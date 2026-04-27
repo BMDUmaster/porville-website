@@ -10,14 +10,21 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::where('role', 'customer');
+        $query = User::where('role', 'customer')->withCount('orders');
 
         if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%')
-                  ->orWhere('phone', 'like', '%' . $request->search . '%');
-            });
+            $search = trim($request->search);
+            $searchId = ltrim($search, '#');
+
+            if (ctype_digit($searchId) && User::where('role', 'customer')->where('id', (int) $searchId)->exists()) {
+                $query->where('id', (int) $searchId);
+            } else {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('email', 'like', '%' . $search . '%')
+                      ->orWhere('phone', 'like', '%' . $search . '%');
+                });
+            }
         }
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -36,8 +43,23 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        $user->load('orders');
-        return view('dashboard.users.show', compact('user'));
+        $orders = $user->orders()
+            ->with(['deliveryBoy', 'items.product'])
+            ->latest()
+            ->get();
+
+        $user->setRelation('orders', $orders);
+
+        $stats = [
+            'total_orders' => $orders->count(),
+            'delivered_orders' => $orders->where('status', 'delivered')->count(),
+            'active_orders' => $orders->whereIn('status', ['pending', 'confirmed', 'processing', 'out_for_delivery'])->count(),
+            'total_spent' => (float) $orders->sum('total'),
+        ];
+
+        $latestOrder = $orders->first();
+
+        return view('dashboard.users.show', compact('user', 'stats', 'latestOrder'));
     }
 
     public function toggleStatus(User $user)

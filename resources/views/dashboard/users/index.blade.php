@@ -22,7 +22,7 @@
 
     {{-- Filters --}}
     <form method="GET" class="bg-white p-4 rounded-2xl shadow mb-6 flex flex-wrap gap-3">
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search user..."
+        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by user ID, name, email, phone..."
                class="px-4 py-2 rounded-full border text-sm w-full md:w-auto outline-none">
         <select name="status" class="px-4 py-2 rounded-full border text-sm outline-none">
             <option value="">All Status</option>
@@ -48,13 +48,13 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-                @forelse($users as $i => $user)
+                @forelse($users as $user)
                 <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-3">{{ $users->firstItem() + $i }}</td>
+                    <td class="px-4 py-3 font-semibold text-slate-700">#{{ $user->id }}</td>
                     <td class="px-4 py-3 font-medium">{{ $user->name }}</td>
                     <td class="px-4 py-3 text-gray-600">{{ $user->email }}</td>
                     <td class="px-4 py-3 text-gray-600">{{ $user->phone ?? '—' }}</td>
-                    <td class="px-4 py-3 text-center font-bold text-indigo-600">{{ $user->orders->count() }}</td>
+                    <td class="px-4 py-3 text-center font-bold text-indigo-600">{{ $user->orders_count }}</td>
                     <td class="px-4 py-3">
                         <span class="px-3 py-1 rounded-full text-xs font-bold {{ $user->status === 'active' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600' }}">
                             {{ ucfirst($user->status ?? 'active') }}

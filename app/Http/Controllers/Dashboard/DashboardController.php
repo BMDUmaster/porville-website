@@ -38,7 +38,7 @@ class DashboardController extends Controller
         $orders_by_status = [
             'pending'    => Order::whereIn('status', ['pending', 'confirmed'])->count(),
             'processing' => Order::where('status', 'processing')->count(),
-            'shipped'    => Order::where('status', 'shipped')->count(),
+            'out_for_delivery' => Order::where('status', 'out_for_delivery')->count(),
             'delivered'  => Order::where('status', 'delivered')->count(),
             'cancelled'  => Order::where('status', 'cancelled')->count(),
         ];

@@ -2,233 +2,371 @@
 @section('title', 'Coupons & Offers')
 @section('page_title', 'Coupons & Offers')
 
-@section('content')
-<div class="p-4 md:p-8 space-y-6">
+@section('styles')
+.coupon-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.coupon-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.28);
+    border-radius: 999px;
+}
+@endsection
 
-    {{-- Stats --}}
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <div class="bg-white p-5 rounded-2xl shadow-sm border flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center"><i class="fas fa-tags text-indigo-600 text-xl"></i></div>
-            <div>
-                <p class="text-xs font-medium text-gray-500 uppercase">Active Coupons</p>
-                <h2 class="text-2xl font-bold text-gray-800">{{ $stats['active'] }}</h2>
+@section('content')
+@php
+    $activeSegment = request('segment', 'my_coupons');
+
+    $statCards = [
+        [
+            'label' => 'Active Coupons',
+            'value' => number_format($stats['active_coupons']),
+            'hint' => $stats['new_coupons_this_month'] . ' new this month',
+            'color' => 'indigo',
+            'icon' => 'fa-tags',
+        ],
+        [
+            'label' => 'Flash Sales',
+            'value' => number_format($stats['flash_sales']),
+            'hint' => $stats['active_flash_sales'] . ' active now',
+            'color' => 'amber',
+            'icon' => 'fa-bolt',
+        ],
+        [
+            'label' => 'Referrals',
+            'value' => number_format($stats['referrals']),
+            'hint' => $stats['referrals_this_week'] . ' this week',
+            'color' => 'violet',
+            'icon' => 'fa-gift',
+        ],
+        [
+            'label' => 'Total Redeemed',
+            'value' => number_format($stats['total_redeemed']),
+            'hint' => $stats['redeemed_growth_text'],
+            'color' => 'blue',
+            'icon' => 'fa-chart-simple',
+        ],
+    ];
+
+    $quickActions = [
+        ['title' => 'New Coupon', 'subtitle' => 'Create product coupon', 'icon' => 'fa-tags', 'color' => 'indigo', 'payload' => null],
+        ['title' => 'Flash Sale', 'subtitle' => 'Limited time offer', 'icon' => 'fa-bolt', 'color' => 'amber', 'payload' => ['entry_type' => 'offer']],
+        ['title' => 'Bulk Discount', 'subtitle' => 'Volume based pricing', 'icon' => 'fa-cubes-stacked', 'color' => 'emerald', 'payload' => ['entry_type' => 'coupon', 'type' => 'flat']],
+        ['title' => 'Referral Offer', 'subtitle' => 'Refer & earn', 'icon' => 'fa-user-plus', 'color' => 'violet', 'payload' => ['entry_type' => 'coupon', 'type' => 'percent']],
+    ];
+
+    $tabs = [
+        'my_coupons' => ['label' => 'My Coupons', 'icon' => 'fa-tags'],
+        'flash_sales' => ['label' => 'Flash Sales', 'icon' => 'fa-bolt'],
+        'bulk_discounts' => ['label' => 'Bulk Discounts', 'icon' => 'fa-cubes-stacked'],
+        'referral_offers' => ['label' => 'Referral Offers', 'icon' => 'fa-user-plus'],
+    ];
+
+    $titleBySegment = [
+        'my_coupons' => 'My Active Coupons',
+        'flash_sales' => 'Flash Sale Entries',
+        'bulk_discounts' => 'Bulk Discount Entries',
+        'referral_offers' => 'Referral Offer Entries',
+    ];
+
+    $rangeBase = collect(request()->except('segment', 'page'))->filter(fn ($value) => $value !== null && $value !== '');
+    $tableTitle = $titleBySegment[$activeSegment] ?? 'My Active Coupons';
+@endphp
+
+<div class="space-y-6 p-4 md:p-8">
+    <div class="grid gap-4 xl:grid-cols-4 md:grid-cols-2">
+        @foreach($statCards as $card)
+            <div class="rounded-[22px] border border-slate-200 bg-white p-5 shadow-sm">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-{{ $card['color'] }}-100 text-{{ $card['color'] }}-600">
+                        <i class="fa-solid {{ $card['icon'] }} text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{{ $card['label'] }}</p>
+                        <h2 class="mt-1 text-[38px] font-black leading-none text-slate-900">{{ $card['value'] }}</h2>
+                        <p class="mt-1 text-sm font-medium text-{{ $card['color'] }}-600">{{ $card['hint'] }}</p>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="bg-white p-5 rounded-2xl shadow-sm border flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center"><i class="fas fa-clock text-red-600 text-xl"></i></div>
-            <div>
-                <p class="text-xs font-medium text-gray-500 uppercase">Expired</p>
-                <h2 class="text-2xl font-bold text-gray-800">{{ $stats['expired'] }}</h2>
-            </div>
-        </div>
-        <div class="bg-white p-5 rounded-2xl shadow-sm border flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center"><i class="fas fa-chart-simple text-blue-600 text-xl"></i></div>
-            <div>
-                <p class="text-xs font-medium text-gray-500 uppercase">Total Redeemed</p>
-                <h2 class="text-2xl font-bold text-gray-800">{{ number_format($stats['total_redeemed']) }}</h2>
-            </div>
-        </div>
+        @endforeach
     </div>
 
-    {{-- Filters + Add --}}
-    <div class="bg-white p-4 rounded-2xl shadow-sm border flex flex-wrap gap-3 items-center justify-between">
-        <form method="GET" class="flex flex-wrap gap-3 items-center">
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by code..."
-                   class="px-4 py-2 rounded-xl bg-gray-50 border text-sm outline-none focus:ring-2 focus:ring-indigo-500">
-            <select name="status" class="px-4 py-2 rounded-xl bg-gray-50 border text-sm outline-none">
+    <div class="grid gap-4 xl:grid-cols-4 md:grid-cols-2">
+        @foreach($quickActions as $action)
+            <button type="button"
+                    onclick='openCouponModal(@json($action["payload"]))'
+                    class="flex items-center gap-4 rounded-[20px] border border-slate-200 bg-white px-5 py-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md">
+                <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-{{ $action['color'] }}-100 text-{{ $action['color'] }}-600">
+                    <i class="fa-solid {{ $action['icon'] }} text-lg"></i>
+                </span>
+                <span>
+                    <span class="block text-2xl font-black leading-none text-slate-900">{{ $action['title'] }}</span>
+                    <span class="mt-1 block text-sm text-slate-400">{{ $action['subtitle'] }}</span>
+                </span>
+            </button>
+        @endforeach
+    </div>
+
+    <div class="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm">
+        <form method="GET" class="grid gap-3 xl:grid-cols-[1.3fr_1fr_1fr_1.1fr_1.1fr_1.05fr_1.15fr]">
+            <input type="hidden" name="segment" value="{{ $activeSegment }}">
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by code/name"
+                   class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500">
+            <select name="entry_type" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500">
+                <option value="">All Types</option>
+                <option value="coupon" {{ request('entry_type') === 'coupon' ? 'selected' : '' }}>Coupons</option>
+                <option value="offer" {{ request('entry_type') === 'offer' ? 'selected' : '' }}>Offers</option>
+            </select>
+            <select name="status" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500">
                 <option value="">All Status</option>
                 <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
                 <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
             </select>
-            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium">Filter</button>
-            <a href="{{ route('dashboard.coupons') }}" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-sm font-medium">Reset</a>
+            <input type="date" name="date_from" value="{{ request('date_from') }}"
+                   class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500">
+            <input type="date" name="date_to" value="{{ request('date_to') }}"
+                   class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500">
+            <a href="{{ route('dashboard.coupons') }}"
+               class="inline-flex items-center justify-center rounded-2xl bg-slate-100 px-4 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-200">
+                Reset Filters
+            </a>
+            <button type="submit"
+                    class="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-indigo-700">
+                Apply Filters
+            </button>
         </form>
-        <button onclick="openModal('addModal')"
-                class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm flex items-center gap-2 font-medium">
-            <i class="fas fa-plus-circle"></i> Create Coupon
-        </button>
     </div>
 
-    {{-- Table --}}
-    <div class="bg-white rounded-2xl shadow-sm border overflow-x-auto">
-        <table class="w-full text-sm text-left min-w-[900px]">
-            <thead class="bg-gray-50 text-gray-600">
-                <tr>
-                    <th class="px-6 py-4 font-semibold">Code</th>
-                    <th class="px-6 py-4 font-semibold">Type</th>
-                    <th class="px-6 py-4 font-semibold">Discount</th>
-                    <th class="px-6 py-4 font-semibold">Min Order</th>
-                    <th class="px-6 py-4 font-semibold">Expires</th>
-                    <th class="px-6 py-4 font-semibold">Usage</th>
-                    <th class="px-6 py-4 font-semibold">Status</th>
-                    <th class="px-6 py-4 font-semibold">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-                @forelse($coupons as $coupon)
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="px-6 py-4 font-bold text-indigo-600">{{ $coupon->code }}</td>
-                    <td class="px-6 py-4 capitalize">{{ $coupon->type }}</td>
-                    <td class="px-6 py-4 font-medium">
-                        {{ $coupon->type === 'percent' ? $coupon->value.'% OFF' : '₹'.number_format($coupon->value).' OFF' }}
-                    </td>
-                    <td class="px-6 py-4">{{ $coupon->min_order_amount ? '₹'.number_format($coupon->min_order_amount) : '—' }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-600">{{ $coupon->expires_at?->format('d M Y') ?? '—' }}</td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-2">
-                            <span class="font-medium">{{ $coupon->used_count }}/{{ $coupon->max_uses ?? '∞' }}</span>
-                            @if($coupon->max_uses)
-                            <div class="w-16 h-1.5 bg-gray-200 rounded-full">
-                                <div class="h-1.5 bg-green-500 rounded-full"
-                                     style="width: {{ min(100, ($coupon->used_count / $coupon->max_uses) * 100) }}%"></div>
-                            </div>
-                            @endif
-                        </div>
-                    </td>
-                    <td class="px-6 py-4">
-                        <span class="px-3 py-1 text-xs font-bold rounded-full {{ $coupon->is_active ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600' }}">
-                            {{ $coupon->is_active ? 'Active' : 'Inactive' }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4">
-                        <div class="flex gap-2">
-                            <button onclick="openEditModal({{ $coupon->id }}, '{{ $coupon->code }}', '{{ $coupon->type }}', {{ $coupon->value }}, {{ $coupon->min_order_amount ?? 0 }}, {{ $coupon->max_uses ?? 0 }}, '{{ $coupon->expires_at?->format('Y-m-d') }}', {{ $coupon->is_active ? 1 : 0 }})"
-                                    class="p-1.5 hover:bg-indigo-100 text-indigo-600 rounded-lg">
-                                <i class="fas fa-pencil-alt"></i>
-                            </button>
-                            <form method="POST" action="{{ route('dashboard.coupons.destroy', $coupon) }}"
-                                  onsubmit="return confirm('Delete this coupon?')">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="p-1.5 hover:bg-red-100 text-red-600 rounded-lg">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                @empty
-                <tr><td colspan="8" class="px-6 py-8 text-center text-gray-400">No coupons found.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+    <div class="flex flex-wrap gap-3">
+        @foreach($tabs as $segment => $tab)
+            @php
+                $tabUrl = route('dashboard.coupons', $rangeBase->merge(['segment' => $segment])->all());
+                $isActive = $activeSegment === $segment;
+            @endphp
+            <a href="{{ $tabUrl }}"
+               class="inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-sm font-bold transition {{ $isActive ? 'border-indigo-600 bg-indigo-600 text-white shadow-md' : 'border-slate-200 bg-white text-slate-600 hover:border-indigo-200 hover:text-indigo-600' }}">
+                <i class="fa-solid {{ $tab['icon'] }}"></i>
+                {{ $tab['label'] }}
+            </a>
+        @endforeach
     </div>
 
-    <div>{{ $coupons->withQueryString()->links() }}</div>
+    <div class="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
+        <div class="flex flex-col gap-4 border-b border-slate-200 px-5 py-5 md:flex-row md:items-center md:justify-between">
+            <h2 class="text-[28px] font-black tracking-tight text-slate-900">{{ $tableTitle }}</h2>
+            <button type="button" onclick="openCouponModal()"
+                    class="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-indigo-700">
+                <i class="fa-solid fa-circle-plus"></i>
+                Create Coupon
+            </button>
+        </div>
+
+        <div class="overflow-x-auto coupon-scrollbar">
+            <table class="w-full min-w-[1220px] text-left">
+                <thead class="bg-slate-50/80 text-sm font-bold text-slate-500">
+                    <tr>
+                        <th class="px-6 py-5">Code</th>
+                        <th class="px-6 py-5">Discount</th>
+                        <th class="px-6 py-5">Min Order</th>
+                        <th class="px-6 py-5">Valid From</th>
+                        <th class="px-6 py-5">Valid Till</th>
+                        <th class="px-6 py-5">Usage</th>
+                        <th class="px-6 py-5">Status</th>
+                        <th class="px-6 py-5 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-[15px] text-slate-700">
+                    @forelse($coupons as $coupon)
+                        @php
+                            $payload = [
+                                'id' => $coupon->id,
+                                'entry_type' => $coupon->entry_type ?? 'coupon',
+                                'title' => $coupon->title,
+                                'description' => $coupon->description,
+                                'code' => $coupon->code,
+                                'type' => $coupon->type,
+                                'value' => $coupon->value,
+                                'min_order_amount' => $coupon->min_order_amount,
+                                'max_uses' => $coupon->max_uses,
+                                'expires_at' => optional($coupon->expires_at)->format('Y-m-d\TH:i'),
+                                'is_active' => $coupon->is_active ? 1 : 0,
+                            ];
+
+                            $displayCode = ($coupon->entry_type ?? 'coupon') === 'offer'
+                                ? ($coupon->title ?: 'Special Offer')
+                                : $coupon->code;
+
+                            $displaySubtext = ($coupon->entry_type ?? 'coupon') === 'offer'
+                                ? ($coupon->description ?: 'No description added.')
+                                : ('Code: ' . $coupon->code);
+
+                            $maxUses = (int) ($coupon->max_uses ?? 0);
+                            $usagePercentage = $maxUses > 0 ? min(100, (int) round(($coupon->used_count / max(1, $maxUses)) * 100)) : 100;
+                            $usageLabel = $maxUses > 0 ? $coupon->used_count . '/' . $maxUses : 'Unlimited';
+                            $validFrom = optional($coupon->created_at)->format('d M Y');
+                            $validTill = $coupon->expires_at?->format('d M Y') ?? '-';
+                        @endphp
+                        <tr class="transition hover:bg-slate-50/60">
+                            <td class="px-6 py-5 align-top">
+                                <div class="max-w-[220px]">
+                                    <p class="break-all text-[15px] font-black text-indigo-600">{{ $displayCode }}</p>
+                                    <p class="mt-1 max-h-14 overflow-y-auto break-all pr-2 text-xs leading-5 text-slate-400 coupon-scrollbar">{{ $displaySubtext }}</p>
+                                </div>
+                            </td>
+                            <td class="px-6 py-5 font-semibold text-slate-900">
+                                @if(($coupon->entry_type ?? 'coupon') === 'offer')
+                                    Custom Offer
+                                @elseif($coupon->type === 'percent')
+                                    {{ rtrim(rtrim(number_format((float) $coupon->value, 2, '.', ''), '0'), '.') }}% OFF
+                                @else
+                                    &#8377;{{ number_format((float) $coupon->value, 0) }} OFF
+                                @endif
+                            </td>
+                            <td class="px-6 py-5 font-medium text-slate-900">
+                                {{ $coupon->min_order_amount ? 'Rs' . number_format((float) $coupon->min_order_amount, 0) : '-' }}
+                            </td>
+                            <td class="px-6 py-5 text-slate-900">{{ $validFrom }}</td>
+                            <td class="px-6 py-5 text-slate-900">{{ $validTill }}</td>
+                            <td class="px-6 py-5">
+                                @if($maxUses > 0)
+                                    <div class="flex items-center gap-3">
+                                        <span class="font-semibold text-slate-900">{{ $usageLabel }}</span>
+                                        <div class="h-1.5 w-16 overflow-hidden rounded-full bg-slate-200">
+                                            <div class="h-full rounded-full bg-emerald-500" style="width: {{ $usagePercentage }}%"></div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <span class="text-slate-400">Unlimited</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-5">
+                                <span class="inline-flex rounded-full px-3 py-1 text-sm font-medium {{ $coupon->is_active ? 'text-slate-900' : 'text-slate-400' }}">
+                                    {{ $coupon->is_active ? 'Active' : 'Inactive' }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-5">
+                                <div class="flex items-center justify-center gap-4 text-lg">
+                                    <button type="button" onclick='openCouponModal(@json($payload))'
+                                            class="text-indigo-500 transition hover:text-indigo-700">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+                                    <button type="button"
+                                            onclick='copyCouponCode(@json($coupon->code))'
+                                            class="text-blue-500 transition hover:text-blue-700">
+                                        <i class="fa-regular fa-copy"></i>
+                                    </button>
+                                    <form method="POST" action="{{ route('dashboard.coupons.destroy', $coupon) }}"
+                                          onsubmit="return confirm('Delete this entry?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-500 transition hover:text-red-700">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
+                                    <button type="button" class="text-slate-400 transition hover:text-slate-600">
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="px-6 py-16 text-center text-sm font-semibold text-slate-400">No coupons or offers found.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <p class="text-sm text-slate-500">
+            Page {{ $coupons->currentPage() }} of {{ max(1, $coupons->lastPage()) }} —
+            Showing <span class="font-bold text-slate-700">{{ $coupons->firstItem() ?? 0 }}-{{ $coupons->lastItem() ?? 0 }}</span>
+            of <span class="font-bold text-slate-700">{{ $coupons->total() }}</span> entries
+        </p>
+        <div>{{ $coupons->withQueryString()->links() }}</div>
+    </div>
 </div>
 
-{{-- Add Modal --}}
-<div id="addModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div class="p-5 border-b flex justify-between items-center">
-            <h2 class="text-lg font-bold">Create Coupon</h2>
-            <button onclick="closeModal('addModal')" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+<div id="couponModal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+    <div class="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+        <div class="flex items-center justify-between border-b px-5 py-4">
+            <h2 id="couponModalTitle" class="text-lg font-black text-slate-800">Create Coupon</h2>
+            <button type="button" onclick="closeCouponModal()" class="text-2xl leading-none text-slate-400 hover:text-slate-700">&times;</button>
         </div>
-        <form method="POST" action="{{ route('dashboard.coupons.store') }}" class="p-5 space-y-4">
+
+        <form id="couponForm" method="POST" action="{{ route('dashboard.coupons.store') }}" class="space-y-4 p-5">
             @csrf
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1">Coupon Code <span class="text-red-500">*</span></label>
-                    <input type="text" name="code" required placeholder="e.g. FARM20"
-                           class="w-full border rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-500 uppercase">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1">Type</label>
-                    <select name="type" class="w-full border rounded-xl px-4 py-2.5 text-sm outline-none">
-                        <option value="percent">Percentage (%)</option>
-                        <option value="flat">Flat (₹)</option>
-                    </select>
-                </div>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1">Value <span class="text-red-500">*</span></label>
-                    <input type="number" name="value" required min="0" step="0.01" placeholder="e.g. 20"
-                           class="w-full border rounded-xl px-4 py-2.5 text-sm outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1">Min Order (₹)</label>
-                    <input type="number" name="min_order_amount" min="0" placeholder="e.g. 500"
-                           class="w-full border rounded-xl px-4 py-2.5 text-sm outline-none">
-                </div>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1">Max Uses</label>
-                    <input type="number" name="max_uses" min="1" placeholder="Unlimited"
-                           class="w-full border rounded-xl px-4 py-2.5 text-sm outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1">Expires At <span class="text-red-500">*</span></label>
-                    <input type="date" name="expires_at" required
-                           class="w-full border rounded-xl px-4 py-2.5 text-sm outline-none">
-                </div>
-            </div>
-            <div class="flex items-center gap-2">
-                <input type="checkbox" name="is_active" value="1" checked class="w-4 h-4 accent-indigo-600">
-                <label class="text-sm font-medium">Active</label>
-            </div>
-            <div class="flex gap-3 pt-2">
-                <button type="submit" class="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold text-sm">Create Coupon</button>
-                <button type="button" onclick="closeModal('addModal')" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold text-sm">Cancel</button>
-            </div>
-        </form>
-    </div>
-</div>
+            <input type="hidden" name="_method" id="couponMethod" value="POST">
 
-{{-- Edit Modal --}}
-<div id="editModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div class="p-5 border-b flex justify-between items-center">
-            <h2 class="text-lg font-bold">Edit Coupon</h2>
-            <button onclick="closeModal('editModal')" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
-        </div>
-        <form id="editForm" method="POST" class="p-5 space-y-4">
-            @csrf @method('PUT')
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1">Coupon Code</label>
-                    <input type="text" name="code" id="editCode" required
-                           class="w-full border rounded-xl px-4 py-2.5 text-sm outline-none uppercase">
+            <div>
+                <label class="mb-1 block text-sm font-bold text-slate-700">Entry Type</label>
+                <select name="entry_type" id="couponEntryType" onchange="toggleCouponFields()"
+                        class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
+                    <option value="coupon">Coupon</option>
+                    <option value="offer">Offer</option>
+                </select>
+            </div>
+
+            <div id="offerFields" class="grid gap-4 md:grid-cols-2">
+                <div class="md:col-span-2">
+                    <label class="mb-1 block text-sm font-bold text-slate-700">Offer Title</label>
+                    <input type="text" name="title" id="couponTitle" maxlength="120"
+                           class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
                 </div>
+                <div class="md:col-span-2">
+                    <label class="mb-1 block text-sm font-bold text-slate-700">Description</label>
+                    <textarea name="description" id="couponDescription" rows="3" maxlength="500"
+                              class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500"></textarea>
+                </div>
+            </div>
+
+            <div class="grid gap-4 md:grid-cols-2">
                 <div>
-                    <label class="block text-sm font-medium mb-1">Type</label>
-                    <select name="type" id="editType" class="w-full border rounded-xl px-4 py-2.5 text-sm outline-none">
+                    <label class="mb-1 block text-sm font-bold text-slate-700">Code</label>
+                    <input type="text" name="code" id="couponCode" maxlength="50"
+                           class="w-full rounded-xl border px-4 py-2.5 text-sm uppercase outline-none focus:border-indigo-500">
+                    <p class="mt-1 text-xs text-slate-400">Offer ke liye blank chhodoge to auto code ban jayega.</p>
+                </div>
+                <div id="couponTypeWrap">
+                    <label class="mb-1 block text-sm font-bold text-slate-700">Discount Type</label>
+                    <select name="type" id="couponType"
+                            class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
                         <option value="percent">Percentage (%)</option>
-                        <option value="flat">Flat (₹)</option>
+                        <option value="flat">Flat (Rs)</option>
                     </select>
                 </div>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1">Value</label>
-                    <input type="number" name="value" id="editValue" min="0" step="0.01"
-                           class="w-full border rounded-xl px-4 py-2.5 text-sm outline-none">
+                <div id="couponValueWrap">
+                    <label class="mb-1 block text-sm font-bold text-slate-700">Value</label>
+                    <input type="number" name="value" id="couponValue" min="0" step="0.01"
+                           class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1">Min Order (₹)</label>
-                    <input type="number" name="min_order_amount" id="editMinOrder" min="0"
-                           class="w-full border rounded-xl px-4 py-2.5 text-sm outline-none">
-                </div>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1">Max Uses</label>
-                    <input type="number" name="max_uses" id="editMaxUses" min="1"
-                           class="w-full border rounded-xl px-4 py-2.5 text-sm outline-none">
+                    <label class="mb-1 block text-sm font-bold text-slate-700">Min Order Amount</label>
+                    <input type="number" name="min_order_amount" id="couponMinOrder" min="0" step="0.01"
+                           class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1">Expires At</label>
-                    <input type="date" name="expires_at" id="editExpires"
-                           class="w-full border rounded-xl px-4 py-2.5 text-sm outline-none">
+                    <label class="mb-1 block text-sm font-bold text-slate-700">Max Uses</label>
+                    <input type="number" name="max_uses" id="couponMaxUses" min="1"
+                           class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="mb-1 block text-sm font-bold text-slate-700">Expires At</label>
+                    <input type="datetime-local" name="expires_at" id="couponExpiresAt"
+                           class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <input type="checkbox" name="is_active" id="editIsActive" value="1" class="w-4 h-4 accent-indigo-600">
-                <label class="text-sm font-medium">Active</label>
-            </div>
+
+            <label class="flex items-center gap-2 text-sm font-bold text-slate-700">
+                <input type="checkbox" name="is_active" id="couponIsActive" value="1" class="h-4 w-4 accent-indigo-600" checked>
+                Active
+            </label>
+
             <div class="flex gap-3 pt-2">
-                <button type="submit" class="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold text-sm">Update</button>
-                <button type="button" onclick="closeModal('editModal')" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold text-sm">Cancel</button>
+                <button type="submit" class="flex-1 rounded-xl bg-indigo-600 py-3 text-sm font-bold text-white">Save Entry</button>
+                <button type="button" onclick="closeCouponModal()" class="flex-1 rounded-xl bg-slate-100 py-3 text-sm font-bold text-slate-600">Cancel</button>
             </div>
         </form>
     </div>
@@ -237,18 +375,57 @@
 
 @section('scripts')
 <script>
-function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
-function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
-function openEditModal(id, code, type, value, minOrder, maxUses, expires, isActive) {
-    document.getElementById('editCode').value     = code;
-    document.getElementById('editType').value     = type;
-    document.getElementById('editValue').value    = value;
-    document.getElementById('editMinOrder').value = minOrder || '';
-    document.getElementById('editMaxUses').value  = maxUses || '';
-    document.getElementById('editExpires').value  = expires;
-    document.getElementById('editIsActive').checked = isActive == 1;
-    document.getElementById('editForm').action    = '/coupons/' + id;
-    openModal('editModal');
+const couponStoreUrl = @json(route('dashboard.coupons.store'));
+const couponUpdateBaseUrl = @json(url('/coupons'));
+
+function openCouponModal(entry = null) {
+    const modal = document.getElementById('couponModal');
+    const form = document.getElementById('couponForm');
+
+    document.getElementById('couponModalTitle').textContent = entry?.id ? 'Edit Entry' : 'Create Coupon';
+    document.getElementById('couponMethod').value = entry?.id ? 'PUT' : 'POST';
+    form.action = entry?.id ? `${couponUpdateBaseUrl}/${entry.id}` : couponStoreUrl;
+
+    document.getElementById('couponEntryType').value = entry?.entry_type ?? 'coupon';
+    document.getElementById('couponTitle').value = entry?.title ?? '';
+    document.getElementById('couponDescription').value = entry?.description ?? '';
+    document.getElementById('couponCode').value = entry?.code ?? '';
+    document.getElementById('couponType').value = entry?.type ?? 'percent';
+    document.getElementById('couponValue').value = entry?.value ?? '';
+    document.getElementById('couponMinOrder').value = entry?.min_order_amount ?? '';
+    document.getElementById('couponMaxUses').value = entry?.max_uses ?? '';
+    document.getElementById('couponExpiresAt').value = entry?.expires_at ?? '';
+    document.getElementById('couponIsActive').checked = Number(entry?.is_active ?? 1) === 1;
+
+    toggleCouponFields();
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeCouponModal() {
+    const modal = document.getElementById('couponModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+function toggleCouponFields() {
+    const entryType = document.getElementById('couponEntryType').value;
+    const isCoupon = entryType === 'coupon';
+
+    document.getElementById('couponTypeWrap').classList.toggle('hidden', !isCoupon);
+    document.getElementById('couponValueWrap').classList.toggle('hidden', !isCoupon);
+
+    document.getElementById('couponType').required = isCoupon;
+    document.getElementById('couponValue').required = isCoupon;
+    document.getElementById('couponCode').required = false;
+}
+
+function copyCouponCode(code) {
+    if (!code) {
+        return;
+    }
+
+    navigator.clipboard?.writeText(code);
 }
 </script>
 @endsection

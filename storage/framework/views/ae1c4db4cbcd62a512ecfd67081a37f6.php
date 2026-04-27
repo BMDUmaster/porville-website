@@ -26,22 +26,22 @@
                     <div class="px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-gray-600 mb-1">First Name *</label>
-                            <input type="text" name="first_name" value="<?php echo e(old('first_name')); ?>" required
+                            <input type="text" name="first_name" value="<?php echo e(old('first_name', $checkoutDefaults['first_name'] ?? '')); ?>" required
                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-gray-600 mb-1">Last Name *</label>
-                            <input type="text" name="last_name" value="<?php echo e(old('last_name')); ?>" required
+                            <input type="text" name="last_name" value="<?php echo e(old('last_name', $checkoutDefaults['last_name'] ?? '')); ?>" required
                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500">
                         </div>
                         <div class="sm:col-span-2">
                             <label class="block text-xs font-semibold text-gray-600 mb-1">Email *</label>
-                            <input type="email" name="email" value="<?php echo e(old('email', auth('web_frontend')->user()->email ?? '')); ?>" required
+                            <input type="email" name="email" value="<?php echo e(old('email', $checkoutDefaults['email'] ?? '')); ?>" required
                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500">
                         </div>
                         <div class="sm:col-span-2">
                             <label class="block text-xs font-semibold text-gray-600 mb-1">Phone *</label>
-                            <input type="tel" name="phone" value="<?php echo e(old('phone', auth('web_frontend')->user()->phone ?? '')); ?>" required
+                            <input type="tel" name="phone" value="<?php echo e(old('phone', $checkoutDefaults['phone'] ?? '')); ?>" required
                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500">
                         </div>
                     </div>
@@ -56,24 +56,24 @@
                     <div class="px-6 py-5 space-y-4">
                         <div>
                             <label class="block text-xs font-semibold text-gray-600 mb-1">Street Address *</label>
-                            <input type="text" name="address" value="<?php echo e(old('address')); ?>" required
+                            <input type="text" name="address" value="<?php echo e(old('address', $checkoutDefaults['address'] ?? '')); ?>" required
                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500">
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 mb-1">City *</label>
-                                <input type="text" name="city" value="<?php echo e(old('city')); ?>" required
+                                <input type="text" name="city" value="<?php echo e(old('city', $checkoutDefaults['city'] ?? '')); ?>" required
                                        class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 mb-1">State *</label>
-                                <input type="text" name="state" value="<?php echo e(old('state')); ?>" required
+                                <input type="text" name="state" value="<?php echo e(old('state', $checkoutDefaults['state'] ?? '')); ?>" required
                                        class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500">
                             </div>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-gray-600 mb-1">PIN Code *</label>
-                            <input type="text" name="pincode" value="<?php echo e(old('pincode')); ?>" required
+                            <input type="text" name="pincode" value="<?php echo e(old('pincode', $checkoutDefaults['pincode'] ?? '')); ?>" required
                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500">
                         </div>
                     </div>

@@ -94,7 +94,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
     <div class="flex items-center justify-between px-5 py-4 border-b">
         <div class="flex items-center gap-2">
             <i class="fa-solid fa-cart-shopping text-blue-700"></i>
-            <span class="nunito font-extrabold text-lg">Your Cart</span>
+            <span class="nunito font-extrabold text-base">Your Cart</span>
             <span id="cart-badge-drawer" class="bg-blue-700 text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
         </div>
         <button onclick="closeCart()" class="text-gray-400 hover:text-gray-700 text-xl">&times;</button>
@@ -122,12 +122,12 @@ html, body { overflow-x: hidden; max-width: 100vw; }
 <header class="fixed inset-x-0 top-0 z-[9997] bg-white shadow-sm">
     <div class="hidden md:flex bg-blue-900 text-white text-xs py-2 px-8 items-center justify-between font-medium h-8">
         <div class="flex items-center gap-3">
-            <span class="font-extrabold uppercase tracking-[0.22em] text-white/85">BMDU</span>
-            <span>Support Desk</span>
+           
+            <span>FarmSea Premium Meat & Seafood</span>
         </div>
         <div class="flex gap-6 text-white/90">
             <a href="<?php echo e(route('frontend.track')); ?>" class="hover:text-blue-300 transition">Track Orders</a>
-            <a href="https://bmdu.net/" target="_blank" rel="noopener noreferrer" class="hover:text-blue-300 transition">BMDU Support Desk</a>
+           
         </div>
     </div>
     <div class="w-full px-2 sm:px-3 md:px-4 py-3 flex items-center justify-between gap-4">
@@ -135,10 +135,10 @@ html, body { overflow-x: hidden; max-width: 100vw; }
             <i class="fa-solid fa-bars"></i>
         </button>
         <a href="<?php echo e(route('frontend.home')); ?>" class="flex-shrink-0 md:-ml-2">
-            <?php if(file_exists(public_path('images/farmsea-logo.png'))): ?>
-                <img src="<?php echo e(asset('images/farmsea-logo.png')); ?>" alt="FarmSea" class="h-10 w-auto object-contain">
+            <?php if(file_exists(public_path('images/Farmsea.webp'))): ?>
+                <img src="<?php echo e(asset('images/Farmsea.webp')); ?>" alt="FarmSea" class="h-10 w-auto object-contain">
             <?php else: ?>
-                <span class="text-xl font-extrabold text-green-700"><img src="<?php echo e(asset('images/farmsea.png')); ?>"
+                <span class="text-xl font-extrabold text-green-700"><img src="<?php echo e(asset('images/Farmsea.webp')); ?>"
                      alt="FarmSea"
                      class="h-14 w-auto object-contain"
                      onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex'"></span>
@@ -418,6 +418,93 @@ function addToCart(productId, variantIndex) {
         }
     });
 }
+function formatCartCurrency(amount) {
+    return 'Rs' + Number(amount || 0).toFixed(2);
+}
+function renderCartDrawerItems(items) {
+    const container = document.getElementById('cart-items-drawer');
+
+    if (!items || !items.length) {
+        container.innerHTML = '<p class="text-center text-gray-400 py-8">Your cart is empty</p>';
+        return;
+    }
+
+    container.innerHTML = items.map((item) => `
+        <div class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
+            <div class="flex gap-3">
+                <a href="${item.product_url}" class="h-20 w-20 overflow-hidden rounded-xl bg-gray-100 flex-shrink-0">
+                    ${item.image_url
+                        ? `<img src="${item.image_url}" alt="${item.name}" class="h-full w-full object-cover">`
+                        : '<div class="flex h-full w-full items-center justify-center text-2xl text-gray-300"><i class="fa-solid fa-drumstick-bite"></i></div>'}
+                </a>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <a href="${item.product_url}" class="line-clamp-2 text-sm font-bold leading-5 text-slate-900 hover:text-blue-700">
+                            ${item.name}
+                        </a>
+                        <button onclick="removeCartDrawerItem('${item.key}')" class="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 transition hover:bg-red-50 hover:text-red-500">
+                            <i class="fa-solid fa-xmark text-xs"></i>
+                        </button>
+                    </div>
+                    <p class="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+                        ${item.variant_label || item.unit || 'Fresh Cut'}
+                    </p>
+                    <div class="mt-3 flex items-end justify-between gap-3">
+                        <div>
+                            <p class="text-sm font-black text-slate-900">${formatCartCurrency(item.price)}</p>
+                            <div class="mt-2 inline-flex items-center overflow-hidden rounded-lg border border-gray-200 bg-white">
+                                <button onclick="updateCartDrawerQty('${item.key}', ${item.quantity - 1})" class="flex h-8 w-8 items-center justify-center text-gray-500 transition hover:bg-gray-50 hover:text-red-500">
+                                    <i class="fa-solid fa-minus text-[10px]"></i>
+                                </button>
+                                <span class="flex h-8 min-w-[34px] items-center justify-center border-x border-gray-200 px-2 text-xs font-bold text-slate-700">
+                                    ${item.quantity}
+                                </span>
+                                <button onclick="updateCartDrawerQty('${item.key}', ${item.quantity + 1})" class="flex h-8 w-8 items-center justify-center text-gray-500 transition hover:bg-gray-50 hover:text-green-600">
+                                    <i class="fa-solid fa-plus text-[10px]"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-sm font-extrabold text-blue-700">${formatCartCurrency(item.subtotal)}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+function removeCartDrawerItem(key) {
+    fetch('<?php echo e(route("frontend.cart.remove")); ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({ key })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            refreshCartDrawer();
+        }
+    });
+}
+function updateCartDrawerQty(key, quantity) {
+    fetch('<?php echo e(route("frontend.cart.update")); ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({ key, quantity })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            refreshCartDrawer();
+        }
+    });
+}
 // Refresh cart drawer
 function refreshCartDrawer() {
     fetch('<?php echo e(route("frontend.cart.count")); ?>')
@@ -425,6 +512,8 @@ function refreshCartDrawer() {
         .then(data => {
             document.getElementById('header-cart-badge').textContent = data.count;
             document.getElementById('cart-badge-drawer').textContent = data.count + ' item' + (data.count !== 1 ? 's' : '');
+            document.getElementById('cart-subtotal-drawer').textContent = formatCartCurrency(data.subtotal);
+            renderCartDrawerItems(data.items || []);
         });
 }
 // Init badge

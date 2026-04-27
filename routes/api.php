@@ -15,8 +15,8 @@ use App\Http\Controllers\Api\CouponApiController;
 */
 
 // ── Auth (public) 
-Route::post('/register', [AuthApiController::class, 'register']);
-Route::post('/login',    [AuthApiController::class, 'login']);
+Route::post('/register', [AuthApiController::class, 'register'])->middleware('throttle:3,1');
+Route::post('/login',    [AuthApiController::class, 'login'])->middleware('throttle:5,1');
 
 // ── Products (public)
 Route::get('/products',              [ProductApiController::class, 'index']);

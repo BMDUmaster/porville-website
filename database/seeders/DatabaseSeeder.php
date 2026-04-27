@@ -115,7 +115,7 @@ class DatabaseSeeder extends Seeder
         }
 
         // ── Sample Orders ─────────────────────────────────────
-        $statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+        $statuses = ['pending', 'processing', 'out_for_delivery', 'delivered', 'cancelled'];
         foreach ($customers as $customer) {
             $order = Order::create([
                 'user_id'        => $customer->id,

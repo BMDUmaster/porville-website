@@ -120,7 +120,7 @@
                         <div class="text-right">
                             <p class="text-sm font-bold text-emerald-600">&#8377;{{ number_format($order->total, 2) }}</p>
                             <span class="mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-medium {{ $order->status_badge_class }}">
-                                {{ ucfirst($order->status) }}
+                                {{ $order->status_label }}
                             </span>
                         </div>
                     </div>
@@ -143,7 +143,7 @@
                 <a href="{{ route('dashboard.orders') }}"
                    class="group flex min-h-[92px] flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-5 text-center transition hover:border-orange-300 hover:bg-orange-50">
                     <i class="fa-solid fa-truck-fast text-2xl text-admin-orange transition group-hover:scale-110"></i>
-                    <span class="mt-3 text-sm font-medium text-slate-700">Ship Orders</span>
+                    <span class="mt-3 text-sm font-medium text-slate-700">Dispatch Orders</span>
                 </a>
 
                 <a href="{{ route('dashboard.coupons') }}"
@@ -272,12 +272,12 @@ const ordersContext = document.getElementById('ordersChart').getContext('2d');
 new Chart(ordersContext, {
     type: 'doughnut',
     data: {
-        labels: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
+        labels: ['Pending', 'Processing', 'Out for Delivery', 'Delivered', 'Cancelled'],
         datasets: [{
             data: [
                 {{ $orders_by_status['pending'] }},
                 {{ $orders_by_status['processing'] }},
-                {{ $orders_by_status['shipped'] }},
+                {{ $orders_by_status['out_for_delivery'] }},
                 {{ $orders_by_status['delivered'] }},
                 {{ $orders_by_status['cancelled'] }}
             ],

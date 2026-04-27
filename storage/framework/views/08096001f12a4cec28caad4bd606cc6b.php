@@ -49,16 +49,6 @@
         transition: transform .3s ease, box-shadow .3s ease;
     }
 
-    .favorite-card::before {
-        content: "";
-        position: absolute;
-        inset: -1px;
-        border-radius: 28px;
-        background: conic-gradient(from 0deg, rgba(34, 197, 94, 0) 0deg, rgba(34, 197, 94, 0) 220deg, rgba(34, 197, 94, 0.95) 270deg, rgba(163, 230, 53, 0.8) 320deg, rgba(34, 197, 94, 0) 360deg);
-        opacity: 0;
-        z-index: -2;
-    }
-
     .favorite-card::after {
         content: "";
         position: absolute;
@@ -71,11 +61,6 @@
     .favorite-card:hover {
         transform: translateY(-6px);
         box-shadow: 0 26px 48px rgba(15, 23, 42, 0.12);
-    }
-
-    .favorite-card:hover::before {
-        opacity: 1;
-        animation: favoriteGlowSpin 2.8s linear infinite;
     }
 
     .favorite-hero-banner {
@@ -277,7 +262,7 @@
 </div>
 
 
-<section class="bg-white py-12 md:py-14">
+<section class="bg-white py-5 md:py-6">
     <div class="mx-auto max-w-7xl px-4">
         <?php
             $categoryLabels = ['Best Seller', 'Lean Protein', 'Juicy Cuts', 'Ready to Cook', 'Fresh Choice', 'Chef Pick', 'Daily Fresh', 'Top Rated'];
@@ -310,27 +295,6 @@
                     Shop by <span class="text-blue-600">Category</span>
                 </h2>
                 <p class="mt-2 text-sm text-slate-500">Farm-to-table freshness across every cut and kind.</p>
-            </div>
-            <div class="hidden items-center gap-3 md:flex">
-                <button
-                    type="button"
-                    aria-label="Scroll categories left"
-                    onclick="document.getElementById('home-category-scroller').scrollBy({ left: -360, behavior: 'smooth' })"
-                    class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
-                >
-                    <i class="fa-solid fa-arrow-left"></i>
-                </button>
-                <button
-                    type="button"
-                    aria-label="Scroll categories right"
-                    onclick="document.getElementById('home-category-scroller').scrollBy({ left: 360, behavior: 'smooth' })"
-                    class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
-                >
-                    <i class="fa-solid fa-arrow-right"></i>
-                </button>
-                <a href="<?php echo e(route('frontend.categories')); ?>" class="ml-2 text-xs font-extrabold uppercase tracking-[0.18em] text-blue-600 transition hover:text-blue-800">
-                    See All Categories <i class="fa-solid fa-arrow-right ml-1"></i>
-                </a>
             </div>
         </div>
 
@@ -387,26 +351,83 @@
             <?php endif; ?>
         </div>
 
-        <div class="mt-5 flex justify-center md:hidden">
-            <a href="<?php echo e(route('frontend.categories')); ?>" class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-xs font-extrabold uppercase tracking-[0.18em] text-white transition hover:bg-blue-700">
-                See More Categories
+        <div class="mt-5 flex items-center justify-center gap-3">
+            <button
+                type="button"
+                aria-label="Scroll categories left"
+                onclick="document.getElementById('home-category-scroller').scrollBy({ left: -360, behavior: 'smooth' })"
+                class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <button
+                type="button"
+                aria-label="Scroll categories right"
+                onclick="document.getElementById('home-category-scroller').scrollBy({ left: 360, behavior: 'smooth' })"
+                class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+            >
                 <i class="fa-solid fa-arrow-right"></i>
-            </a>
+            </button>
+        </div>
+
+    </div>
+</section>
+
+
+<section class="bg-gray-50 py-5 md:py-6">
+    <div class="mx-auto max-w-7xl px-4">
+        <div class="mb-6 flex items-end justify-between">
+            <div>
+                <h2 class="text-2xl font-extrabold text-gray-800">New <span class="text-blue-600">Arrivals</span></h2>
+                <p class="mt-1 text-xs text-gray-500">The freshest additions to our selection.</p>
+            </div>
+            <a href="<?php echo e(route('frontend.products')); ?>" class="text-xs font-bold uppercase tracking-wider text-blue-600 hover:underline">See All</a>
+        </div>
+        <div id="home-new-arrivals-scroller" class="scrollbar-hide flex gap-5 overflow-x-auto scroll-smooth pb-3">
+            <?php $__empty_1 = true; $__currentLoopData = $newArrivals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                <div class="flex min-w-[260px] max-w-[260px] flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition hover:border-green-300 hover:shadow-lg">
+                    <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="block aspect-square overflow-hidden bg-gray-50">
+                        <?php if($product->images && count($product->images)): ?>
+                            <img src="<?php echo e(asset('storage/'.$product->images[0])); ?>" alt="<?php echo e($product->name); ?>" class="h-full w-full object-cover transition-transform duration-500 hover:scale-105">
+                        <?php else: ?>
+                            <div class="flex h-full w-full items-center justify-center text-5xl">M</div>
+                        <?php endif; ?>
+                    </a>
+                <div class="flex flex-1 flex-col p-3">
+                        <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="line-clamp-2 text-sm font-bold leading-snug text-gray-800 transition hover:text-green-700">
+                            <?php echo e($product->name); ?>
+
+                        </a>
+                        <div class="mt-auto flex items-center justify-between pt-3">
+                            <div>
+                                <p class="text-lg font-extrabold text-gray-800">Rs<?php echo e(number_format($product->price, 0)); ?><span class="ml-1 text-xs font-semibold text-gray-400">/<?php echo e($product->unit ?: 'unit'); ?></span></p>
+                                <?php if($product->mrp && $product->mrp > $product->price): ?>
+                                    <p class="text-xs text-gray-400 line-through">Rs<?php echo e(number_format($product->mrp, 0)); ?></p>
+                                <?php endif; ?>
+                            </div>
+                            <button onclick="addToCart(<?php echo e($product->id); ?>)" class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-sm text-white transition hover:bg-blue-700">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                <p class="w-full py-8 text-center text-gray-400">No products yet.</p>
+            <?php endif; ?>
         </div>
     </div>
 </section>
 
 
-<section class="bg-white py-14 md:py-16">
+<section class="bg-white py-6 md:py-7">
     <div class="mx-auto max-w-7xl px-4">
-        <div class="mb-6 flex items-end justify-between gap-4">
-            <div>
+        <div class="relative mb-6 flex items-center justify-center gap-4">
+            <div class="text-center">
                 <h2 class="text-3xl font-extrabold text-slate-900 md:text-4xl">
                     Shop By <span class="text-blue-600">Type</span>
                 </h2>
-                <p class="mt-2 text-sm text-slate-500">Browse fresh selections by meat and seafood type.</p>
             </div>
-            <div class="hidden items-center gap-3 md:flex">
+            <div class="hidden items-center gap-3 md:absolute md:right-0 md:top-1/2 md:flex md:-translate-y-1/2">
                 <button
                     type="button"
                     aria-label="Scroll types left"
@@ -423,9 +444,6 @@
                 >
                     <i class="fa-solid fa-arrow-right"></i>
                 </button>
-                <a href="<?php echo e(route('frontend.categories')); ?>" class="ml-2 text-xs font-extrabold uppercase tracking-[0.18em] text-blue-600 transition hover:text-blue-800">
-                    Browse Types <i class="fa-solid fa-arrow-right ml-1"></i>
-                </a>
             </div>
         </div>
 
@@ -440,8 +458,22 @@
                 'dairy' => ['icon' => 'fa-egg', 'accent' => 'text-amber-600', 'tint' => 'bg-amber-50', 'subtitle' => 'Farm Grade'],
             ];
 
-            $typeShowcaseLead = $featuredProducts->first();
-            $typeShowcaseGrid = $featuredProducts->slice(1, 4);
+            $typeShowcaseLead = $featuredProducts->first() ?? $newArrivals->first();
+            $typeShowcaseGrid = $featuredProducts
+                ->slice(1)
+                ->merge(
+                    $newArrivals->reject(
+                        fn($product) => $typeShowcaseLead && $product->id === $typeShowcaseLead->id
+                    )
+                )
+                ->merge(
+                    $bestSellers->reject(
+                        fn($product) => $typeShowcaseLead && $product->id === $typeShowcaseLead->id
+                    )
+                )
+                ->unique('id')
+                ->take(4)
+                ->values();
             $typeShowcaseCategories = $categories->take(5)->values();
             $typeShowcaseLeadCategory = $typeShowcaseCategories->first();
             $typeShowcaseGridCategories = $typeShowcaseCategories->slice(1, 4);
@@ -533,10 +565,10 @@
         </div>
 
         <?php if($typeShowcaseLead): ?>
-            <div class="mt-8 grid gap-4 lg:grid-cols-[1.08fr_1fr] lg:gap-5">
+            <div class="mt-8 grid gap-4 lg:grid-cols-[1.12fr_0.96fr] lg:gap-5">
                 <article class="type-showcase-card overflow-hidden rounded-[26px] border border-[#d8ead5] bg-[#f7fbf5]">
                     <div class="flex h-full flex-col">
-                        <div class="p-5 md:p-6">
+                        <div class="p-5 pb-4 md:p-6 md:pb-5">
                             <span class="inline-flex rounded-full bg-green-700 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
                                 Chef's Selection
                             </span>
@@ -550,7 +582,7 @@
                             </p>
                             <div class="mt-5 flex items-end justify-between gap-4">
                                 <div>
-                                    <p class="text-[20px] font-black text-slate-950">Rs<?php echo e(number_format($typeShowcaseLead->price, 0)); ?></p>
+                                    <p class="text-[20px] font-black text-slate-950">Rs<?php echo e(number_format($typeShowcaseLead->price, 0)); ?><span class="ml-1 text-xs font-semibold text-slate-400">/<?php echo e($typeShowcaseLead->unit ?: 'unit'); ?></span></p>
                                     <?php if($typeShowcaseLead->mrp && $typeShowcaseLead->mrp > $typeShowcaseLead->price): ?>
                                         <p class="text-xs text-slate-400 line-through">Rs<?php echo e(number_format($typeShowcaseLead->mrp, 0)); ?></p>
                                     <?php endif; ?>
@@ -567,10 +599,10 @@
                                 <img
                                     src="<?php echo e(asset('storage/' . $typeShowcaseLead->images[0])); ?>"
                                     alt="<?php echo e($typeShowcaseLead->name); ?>"
-                                    class="type-showcase-image h-[250px] w-full object-cover md:h-[280px]"
+                                    class="type-showcase-image h-[320px] w-full object-cover object-center md:h-[390px]"
                                 >
                             <?php else: ?>
-                                <div class="flex h-[250px] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-6xl text-slate-400 md:h-[280px]">
+                                <div class="flex h-[320px] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-6xl text-slate-400 md:h-[390px]">
                                     <i class="fa-solid fa-drumstick-bite"></i>
                                 </div>
                             <?php endif; ?>
@@ -580,7 +612,7 @@
 
                 <div class="grid gap-4 sm:grid-cols-2">
                     <?php $__currentLoopData = $typeShowcaseGrid; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <article class="type-showcase-card overflow-hidden rounded-[22px] border border-slate-200 bg-white p-3">
+                        <article class="type-showcase-card group overflow-hidden rounded-[22px] border border-slate-200 bg-white p-3 shadow-[0_10px_30px_rgba(15,23,43,0.05)]">
                             <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="block overflow-hidden rounded-[16px]">
                                 <?php if($product->images && count($product->images)): ?>
                                     <img
@@ -596,14 +628,13 @@
                             </a>
 
                             <div class="pt-3">
-                                <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400"><?php echo e($product->unit ?: 'Fresh Cut'); ?></p>
-                                <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="mt-1 block text-[14px] font-extrabold leading-[1.3] text-slate-900 transition hover:text-green-700">
+                                <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="block text-[14px] font-extrabold leading-[1.3] text-slate-900 transition hover:text-green-700">
                                     <?php echo e($product->name); ?>
 
                                 </a>
                                 <div class="mt-3 flex items-end justify-between gap-3">
-                                    <p class="text-[17px] font-black text-slate-950">Rs<?php echo e(number_format($product->price, 0)); ?></p>
-                                    <button onclick="addToCart(<?php echo e($product->id); ?>)" class="rounded-lg border border-[#dbe8d7] bg-[#f8fbf6] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-green-700 transition hover:border-green-300 hover:bg-green-50">
+                                    <p class="text-[17px] font-black text-slate-950">Rs<?php echo e(number_format($product->price, 0)); ?><span class="ml-1 text-[11px] font-semibold text-slate-400">/<?php echo e($product->unit ?: 'unit'); ?></span></p>
+                                    <button onclick="addToCart(<?php echo e($product->id); ?>)" class="rounded-lg border border-[#dbe8d7] bg-[#f8fbf6] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-green-700 transition duration-300 hover:border-green-300 hover:bg-green-50 group-hover:-translate-y-0.5 group-hover:shadow-sm">
                                         + Add
                                     </button>
                                 </div>
@@ -742,7 +773,7 @@
 
         <div class="mb-7 flex items-end justify-between gap-4">
             <div>
-                <p class="mb-2 text-[11px] font-extrabold uppercase tracking-[0.34em] text-green-600">Customer Favorites</p>
+                <p class="mb-2 text-[11px] font-extrabold uppercase tracking-[0.34em] text-green-600">Best Sellers</p>
                 <h2 class="text-3xl font-extrabold text-slate-900 md:text-4xl">
                     Best <span class="text-slate-300">Sellers</span>
                 </h2>
@@ -772,7 +803,7 @@
             $favoriteLabels = ['Most Ordered', 'Top Rated', 'Chef Pick', 'Best For Fry', 'Family Pack', 'Daily Fresh', 'Quick Cook', 'Popular Choice'];
         ?>
 
-        <div id="home-favorites-scroller" class="scrollbar-hide flex gap-5 overflow-x-auto scroll-smooth pb-3">
+        <div id="home-favorites-scroller" class="scrollbar-hide flex gap-4 overflow-x-auto scroll-smooth pb-3">
             <?php $__empty_1 = true; $__currentLoopData = $bestSellers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <?php
                     $favoriteImage = $product->images && count($product->images) ? asset('storage/' . $product->images[0]) : null;
@@ -780,18 +811,18 @@
                     $favoriteUnit = $product->unit ?: ($product->weight ? $product->weight . ' g' : 'Fresh Cut');
                 ?>
 
-                <article class="favorite-card group min-w-[290px] max-w-[290px] rounded-[28px] p-4">
-                    <div class="rounded-[24px] border border-[#e5efe4] bg-white p-4">
+                <article class="favorite-card group min-w-[255px] max-w-[255px] rounded-[28px] p-3">
+                    <div class="rounded-[22px] border border-[#e5efe4] bg-white p-3">
                         <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="block">
                             <div class="relative overflow-hidden rounded-[20px] bg-slate-100">
                                 <?php if($favoriteImage): ?>
                                     <img
                                         src="<?php echo e($favoriteImage); ?>"
                                         alt="<?php echo e($product->name); ?>"
-                                        class="aspect-[1.05] w-full object-cover transition duration-500 group-hover:scale-105"
+                                        class="aspect-[0.95] w-full object-cover transition duration-500 group-hover:scale-105"
                                     >
                                 <?php else: ?>
-                                    <div class="flex aspect-[1.05] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-5xl text-slate-400">
+                                    <div class="flex aspect-[0.95] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-5xl text-slate-400">
                                         <i class="fa-solid fa-drumstick-bite"></i>
                                     </div>
                                 <?php endif; ?>
@@ -803,9 +834,8 @@
                             </div>
                         </a>
 
-                        <div class="mt-4 flex min-h-[118px] flex-col">
-                            <p class="text-[12px] font-bold uppercase tracking-[0.18em] text-slate-400"><?php echo e($favoriteUnit); ?></p>
-                            <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="mt-2 text-slate-900 transition hover:text-green-700">
+                        <div class="mt-3 flex min-h-[100px] flex-col">
+                            <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="text-slate-900 transition hover:text-green-700">
                                 <span class="block text-[18px] font-extrabold leading-[1.15]"><?php echo e($product->name); ?></span>
                             </a>
                             <p class="mt-2 text-[13px] text-slate-500">
@@ -819,7 +849,7 @@
 
                         <div class="mt-6 flex items-end justify-between gap-3">
                             <div>
-                                <p class="text-[18px] font-black text-slate-950">Rs<?php echo e(number_format($product->price, 0)); ?></p>
+                                <p class="text-[18px] font-black text-slate-950">Rs<?php echo e(number_format($product->price, 0)); ?><span class="ml-1 text-[11px] font-semibold text-slate-400">/<?php echo e($favoriteUnit); ?></span></p>
                                 <?php if($product->mrp && $product->mrp > $product->price): ?>
                                     <p class="text-xs text-slate-400 line-through">Rs<?php echo e(number_format($product->mrp, 0)); ?></p>
                                 <?php endif; ?>
@@ -834,55 +864,9 @@
                 <div class="flex min-h-[250px] w-full items-center justify-center rounded-[28px] border border-dashed border-slate-200 bg-white px-6 py-12 text-center text-slate-400">
                     <div>
                         <i class="fa-solid fa-fire-flame-curved mb-3 block text-4xl opacity-40"></i>
-                        <p class="text-sm font-medium">Customer favorites will appear here once orders start coming in.</p>
+                        <p class="text-sm font-medium">Best sellers yahan tab dikhेंगे jab products par orders aane lagenge.</p>
                     </div>
                 </div>
-            <?php endif; ?>
-        </div>
-    </div>
-</section>
-
-
-<section class="bg-gray-50 py-12">
-    <div class="mx-auto max-w-6xl px-4">
-        <div class="mb-6 flex items-end justify-between">
-            <div>
-                <h2 class="text-2xl font-extrabold text-gray-800">New <span class="text-blue-600">Arrivals</span></h2>
-                <p class="mt-1 text-xs text-gray-500">The freshest additions to our selection.</p>
-            </div>
-            <a href="<?php echo e(route('frontend.products')); ?>" class="text-xs font-bold uppercase tracking-wider text-blue-600 hover:underline">See All</a>
-        </div>
-        <div class="grid grid-cols-2 gap-5 md:grid-cols-4">
-            <?php $__empty_1 = true; $__currentLoopData = $newArrivals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                <div class="flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition hover:border-green-300 hover:shadow-lg">
-                    <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="block aspect-square overflow-hidden bg-gray-50">
-                        <?php if($product->images && count($product->images)): ?>
-                            <img src="<?php echo e(asset('storage/'.$product->images[0])); ?>" alt="<?php echo e($product->name); ?>" class="h-full w-full object-cover transition-transform duration-500 hover:scale-105">
-                        <?php else: ?>
-                            <div class="flex h-full w-full items-center justify-center text-5xl">M</div>
-                        <?php endif; ?>
-                    </a>
-                    <div class="flex flex-1 flex-col p-3">
-                        <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400"><?php echo e($product->unit); ?></p>
-                        <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="mt-1 line-clamp-2 text-sm font-bold leading-snug text-gray-800 transition hover:text-green-700">
-                            <?php echo e($product->name); ?>
-
-                        </a>
-                        <div class="mt-auto flex items-center justify-between pt-3">
-                            <div>
-                                <p class="text-lg font-extrabold text-gray-800">Rs<?php echo e(number_format($product->price, 0)); ?></p>
-                                <?php if($product->mrp && $product->mrp > $product->price): ?>
-                                    <p class="text-xs text-gray-400 line-through">Rs<?php echo e(number_format($product->mrp, 0)); ?></p>
-                                <?php endif; ?>
-                            </div>
-                            <button onclick="addToCart(<?php echo e($product->id); ?>)" class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-sm text-white transition hover:bg-blue-700">
-                                <i class="fa-solid fa-cart-shopping"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                <p class="col-span-4 py-8 text-center text-gray-400">No products yet.</p>
             <?php endif; ?>
         </div>
     </div>

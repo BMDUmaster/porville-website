@@ -65,10 +65,10 @@ class AuthApiController extends Controller
             ], 401);
         }
 
-        if ($user->status === 'inactive') {
+        if (in_array($user->status, ['blocked', 'inactive'], true)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Your account has been deactivated.',
+                'message' => 'Your account has been blocked.',
             ], 403);
         }
 

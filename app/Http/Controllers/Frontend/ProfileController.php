@@ -12,9 +12,43 @@ class ProfileController extends Controller
     /** GET /account/profile */
     public function index()
     {
-        $user   = Auth::guard('web_frontend')->user();
-        $orders = $user->orders()->with('items.product')->latest()->take(5)->get();
-        return view('frontend.profile', compact('user', 'orders'));
+        $user = Auth::guard('web_frontend')->user();
+
+        $ordersQuery = $user->orders();
+        $orders = $user->orders()->with('items.product')->latest()->take(4)->get();
+        $latestAddressOrder = $user->orders()
+            ->whereNotNull('shipping_address')
+            ->latest()
+            ->first();
+        $latestAddress = $latestAddressOrder?->shipping_address ?? [];
+
+        $totalSpent = (float) $ordersQuery->sum('total');
+        $totalOrders = (clone $ordersQuery)->count();
+        $deliveredOrders = (clone $ordersQuery)->where('status', 'delivered')->count();
+        $activeOrders = (clone $ordersQuery)->whereIn('status', ['pending', 'confirmed', 'processing', 'out_for_delivery'])->count();
+        $loyaltyPoints = (int) floor($totalSpent / 10);
+
+        $profileChecks = collect([
+            filled($user->name),
+            filled($user->email),
+            filled($user->phone),
+            ! empty($latestAddress['address'] ?? null),
+            ! in_array($user->status, ['blocked', 'inactive'], true),
+        ]);
+
+        $profileCompletion = (int) round(($profileChecks->filter()->count() / max(1, $profileChecks->count())) * 100);
+
+        $stats = [
+            'total_orders' => $totalOrders,
+            'total_spent' => $totalSpent,
+            'loyalty_points' => $loyaltyPoints,
+            'member_since' => optional($user->created_at)->format('M y'),
+            'delivered_orders' => $deliveredOrders,
+            'active_orders' => $activeOrders,
+            'profile_completion' => $profileCompletion,
+        ];
+
+        return view('frontend.profile', compact('user', 'orders', 'stats', 'latestAddress'));
     }
 
     /** PUT /account/profile */

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Support\WebpImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -24,7 +25,7 @@ class ProfileController extends Controller
         ]);
 
         if ($request->hasFile('photo')) {
-            $data['photo'] = $request->file('photo')->store('profiles', 'public');
+            $data['photo'] = WebpImage::store($request->file('photo'), 'profiles');
         }
 
         $user->update($data);

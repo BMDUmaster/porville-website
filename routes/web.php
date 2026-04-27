@@ -10,6 +10,7 @@ use App\Http\Controllers\Dashboard\SubcategoryController;
 use App\Http\Controllers\Dashboard\ProductController;
 use App\Http\Controllers\Dashboard\OrderController;
 use App\Http\Controllers\Dashboard\UserController;
+use App\Http\Controllers\Dashboard\DeliveryBoyController;
 use App\Http\Controllers\Dashboard\NotificationController;
 use App\Http\Controllers\Dashboard\CouponController;
 use App\Http\Controllers\Dashboard\ProfileController;
@@ -33,7 +34,7 @@ Route::get('/', fn() => redirect()->route('frontend.home'));
 // ADMIN DASHBOARD AUTH
 
 Route::get('/login',   [AuthController::class, 'showLogin'])->name('dashboard.login')->middleware('guest');
-Route::post('/login',  [AuthController::class, 'login'])->name('dashboard.login.post');
+Route::post('/login',  [AuthController::class, 'login'])->middleware('throttle:5,1')->name('dashboard.login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('dashboard.logout');
 
 
@@ -57,6 +58,7 @@ Route::middleware('admin')->group(function () {
 
     // Products
     Route::get('/products',              [ProductController::class, 'index'])->name('dashboard.products');
+    Route::get('/products/{product}',    [ProductController::class, 'show'])->name('dashboard.products.show');
     Route::post('/products',             [ProductController::class, 'store'])->name('dashboard.products.store');
     Route::put('/products/{product}',    [ProductController::class, 'update'])->name('dashboard.products.update');
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('dashboard.products.destroy');
@@ -75,6 +77,12 @@ Route::middleware('admin')->group(function () {
     Route::get('/users/{user}',          [UserController::class, 'show'])->name('dashboard.users.show');
     Route::patch('/users/{user}/toggle', [UserController::class, 'toggleStatus'])->name('dashboard.users.toggle');
     Route::delete('/users/{user}',       [UserController::class, 'destroy'])->name('dashboard.users.destroy');
+
+    // Delivery Boys
+    Route::get('/delivery-boys',                         [DeliveryBoyController::class, 'index'])->name('dashboard.delivery-boys');
+    Route::post('/delivery-boys',                        [DeliveryBoyController::class, 'store'])->name('dashboard.delivery-boys.store');
+    Route::patch('/delivery-boys/{deliveryBoy}/toggle',  [DeliveryBoyController::class, 'toggleStatus'])->name('dashboard.delivery-boys.toggle');
+    Route::delete('/delivery-boys/{deliveryBoy}',        [DeliveryBoyController::class, 'destroy'])->name('dashboard.delivery-boys.destroy');
 
     // Notifications
     Route::get('/notifications',                   [NotificationController::class, 'index'])->name('dashboard.notifications');
@@ -114,9 +122,9 @@ Route::get('/shop/{slug}',     [FrontProductController::class, 'show'])->name('f
 // ── Frontend Auth (guest only)
 Route::middleware('guest:web_frontend')->group(function () {
     Route::get('/account/login',     [FrontAuthController::class, 'showLogin'])->name('frontend.login');
-    Route::post('/account/login',    [FrontAuthController::class, 'login'])->name('frontend.login.post');
+    Route::post('/account/login',    [FrontAuthController::class, 'login'])->middleware('throttle:5,1')->name('frontend.login.post');
     Route::get('/account/register',  [FrontAuthController::class, 'showRegister'])->name('frontend.register');
-    Route::post('/account/register', [FrontAuthController::class, 'register'])->name('frontend.register.post');
+    Route::post('/account/register', [FrontAuthController::class, 'register'])->middleware('throttle:3,1')->name('frontend.register.post');
 });
 Route::post('/account/logout', [FrontAuthController::class, 'logout'])->name('frontend.logout');
 

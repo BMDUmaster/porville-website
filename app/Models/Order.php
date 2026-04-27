@@ -9,8 +9,17 @@ class Order extends Model
 {
     use HasFactory;
 
+    public const STATUSES = [
+        'pending',
+        'confirmed',
+        'processing',
+        'out_for_delivery',
+        'delivered',
+        'cancelled',
+    ];
+
     protected $fillable = [
-        'user_id', 'order_number', 'status', 'subtotal', 'discount',
+        'user_id', 'delivery_boy_id', 'order_number', 'status', 'subtotal', 'discount',
         'shipping_cost', 'delivery_charge', 'platform_fee',
         'vendor_total', 'admin_commission', 'tax', 'total',
         'shipping_address', 'payment_method', 'payment_status',
@@ -25,9 +34,19 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function deliveryBoy()
+    {
+        return $this->belongsTo(DeliveryBoy::class);
+    }
+
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return ucwords(str_replace('_', ' ', $this->status));
     }
 
     public function getStatusBadgeClassAttribute(): string
@@ -36,7 +55,7 @@ class Order extends Model
             'pending'    => 'bg-amber-100 text-amber-700',
             'confirmed'  => 'bg-blue-100 text-blue-700',
             'processing' => 'bg-yellow-100 text-yellow-700',
-            'shipped'    => 'bg-indigo-100 text-indigo-700',
+            'out_for_delivery' => 'bg-indigo-100 text-indigo-700',
             'delivered'  => 'bg-emerald-100 text-emerald-700',
             'cancelled'  => 'bg-red-100 text-red-700',
             default      => 'bg-gray-100 text-gray-700',

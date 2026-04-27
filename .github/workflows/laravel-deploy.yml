@@ -1,6 +1,5 @@
-name: Laravel CI/CD Pipeline
+name: Laravel CI Pipeline
 
-# Trigger workflow on push to main branch
 on:
   push:
     branches:
@@ -8,51 +7,66 @@ on:
       - ManojDevs
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
-    steps:
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: farmsea_dashboard
+          MYSQL_ROOT_PASSWORD: ""
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
-      # Step 1: Checkout code
+    steps:
+      # 1. Checkout code
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Setup PHP environment
+      # 2. Setup PHP
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.2
 
-      # Step 3: Install Composer dependencies
-      - name: Install Dependencies
-        run: composer install --no-dev --optimize-autoloader
+      # 3. Install dependencies
+      - name: Install Composer Dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      # Step 4: Copy environment file
-      - name: Setup ENV
-        run: cp .env.example .env
+      # 4. Create .env manually (no secrets)
+      - name: Setup Environment
+        run: |
+          cp .env.example .env
+          echo "APP_ENV=local" >> .env
+          echo "APP_DEBUG=false" >> .env
+          echo "APP_URL=http://localhost" >> .env
 
-      # Step 5: Generate App Key
-      - name: Generate Key
+          echo "DB_CONNECTION=mysql" >> .env
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_PORT=3306" >> .env
+          echo "DB_DATABASE=farmsea_dashboard" >> .env
+          echo "DB_USERNAME=root" >> .env
+          echo "DB_PASSWORD=" >> .env
+
+          echo "CACHE_STORE=file" >> .env
+          echo "SESSION_DRIVER=file" >> .env
+          echo "QUEUE_CONNECTION=sync" >> .env
+
+      # 5. Generate key
+      - name: Generate App Key
         run: php artisan key:generate
 
-      # Step 6: Run Migrations
+      # 6. Run migrations
       - name: Run Migrations
         run: php artisan migrate --force
 
-      # Step 7: Clear Cache
+      # 7. Clear cache
       - name: Clear Cache
         run: php artisan optimize:clear
-
-      # Step 8: Deploy to Server via SSH
-      - name: Deploy to Server
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd /var/www/laravel-app
-            git pull origin main
-            composer install --no-dev --optimize-autoloader
-            php artisan migrate --force
-            php artisan optimize:clear

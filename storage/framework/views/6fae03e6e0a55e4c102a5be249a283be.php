@@ -28,8 +28,8 @@
                class="flex-1 min-w-[200px] px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-500">
         <select name="status" onchange="this.form.submit()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none">
             <option value="">All Orders</option>
-            <?php $__currentLoopData = ['pending','confirmed','processing','shipped','delivered','cancelled']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $s): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <option value="<?php echo e($s); ?>" <?php echo e(request('status') == $s ? 'selected' : ''); ?>><?php echo e(ucfirst($s)); ?></option>
+            <?php $__currentLoopData = ['pending','confirmed','processing','out_for_delivery','delivered','cancelled']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $s): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <option value="<?php echo e($s); ?>" <?php echo e(request('status') == $s ? 'selected' : ''); ?>><?php echo e(ucwords(str_replace('_', ' ', $s))); ?></option>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </select>
         <button type="submit" class="bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold">Search</button>
@@ -61,13 +61,13 @@
                     <td class="px-6 py-4 text-sm text-gray-600"><?php echo e($order->items->count()); ?> item(s)</td>
                     <td class="px-6 py-4">
                         <span class="text-xs font-bold px-2.5 py-1 rounded-full <?php echo e($order->status_badge_class); ?>">
-                            <?php echo e(ucfirst($order->status)); ?>
+                            <?php echo e($order->status_label); ?>
 
                         </span>
                     </td>
                     <td class="px-6 py-4 text-right font-bold text-blue-700">₹<?php echo e(number_format($order->total, 2)); ?></td>
                     <td class="px-6 py-4 text-center">
-                        <a href="<?php echo e(route('frontend.order.show', $order->id)); ?>"
+                        <a href="<?php echo e(route('frontend.track', ['order_number' => $order->order_number])); ?>"
                            class="px-3 py-1.5 bg-blue-700 text-white text-xs font-bold rounded-lg hover:bg-blue-800 transition">
                             <i class="fa-solid fa-eye"></i> View
                         </a>
