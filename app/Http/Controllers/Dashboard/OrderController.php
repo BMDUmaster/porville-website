@@ -119,7 +119,7 @@ class OrderController extends Controller
 
     public function totalOrders()
     {
-        $orders = Order::with('items.product.category')->get();
+        $orders = Order::with('user', 'items.product.category')->get();
 
         $byCategory = [];
         foreach ($orders as $order) {

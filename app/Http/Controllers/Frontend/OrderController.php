@@ -46,6 +46,20 @@ class OrderController extends Controller
         return view('frontend.order-detail', compact('order'));
     }
 
+    /** GET /account/orders/{id}/invoice */
+    public function invoice(Request $request, $id)
+    {
+        $user  = Auth::guard('web_frontend')->user();
+        $order = Order::with('items.product')
+            ->where('user_id', $user->id)
+            ->findOrFail($id);
+
+        return view('frontend.invoice', [
+            'order' => $order,
+            'autoPrint' => $request->boolean('download'),
+        ]);
+    }
+
     /** GET /track-order */
     public function track(Request $request)
     {

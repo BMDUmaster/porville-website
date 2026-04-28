@@ -57,10 +57,17 @@
                 </div>
             </div>
 
-            <a href="{{ route('frontend.track', ['order_number' => $order->order_number]) }}"
-               class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-700 px-3 py-2.5 text-xs font-bold text-white transition hover:bg-blue-800">
-                <i class="fa-solid fa-eye"></i> View
-            </a>
+            <div class="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <a href="{{ route('frontend.track', ['order_number' => $order->order_number]) }}"
+                   class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-700 px-3 py-2.5 text-xs font-bold text-white transition hover:bg-blue-800">
+                    <i class="fa-solid fa-eye"></i> View
+                </a>
+                <a href="{{ route('frontend.order.invoice', ['id' => $order->id, 'download' => 1]) }}"
+                   target="_blank"
+                   class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#0f766e] px-3 py-2.5 text-xs font-bold text-white transition hover:bg-[#0d665f]">
+                    <i class="fa-solid fa-file-arrow-down"></i> Invoice
+                </a>
+            </div>
         </article>
         @empty
         <div class="rounded-2xl border bg-white px-6 py-12 text-center text-gray-400">No orders found.</div>
@@ -96,10 +103,17 @@
                     </td>
                     <td class="px-6 py-4 text-right font-bold text-blue-700">Rs{{ number_format($order->total, 2) }}</td>
                     <td class="px-6 py-4 text-center">
-                        <a href="{{ route('frontend.track', ['order_number' => $order->order_number]) }}"
-                           class="rounded-lg bg-blue-700 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-blue-800">
-                            <i class="fa-solid fa-eye"></i> View
-                        </a>
+                        <div class="flex items-center justify-center gap-2">
+                            <a href="{{ route('frontend.track', ['order_number' => $order->order_number]) }}"
+                               class="rounded-lg bg-blue-700 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-blue-800">
+                                <i class="fa-solid fa-eye"></i> View
+                            </a>
+                            <a href="{{ route('frontend.order.invoice', ['id' => $order->id, 'download' => 1]) }}"
+                               target="_blank"
+                               class="rounded-lg bg-[#0f766e] px-3 py-1.5 text-xs font-bold text-white transition hover:bg-[#0d665f]">
+                                <i class="fa-solid fa-file-arrow-down"></i> Invoice
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 @empty

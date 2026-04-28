@@ -13,6 +13,13 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
+        $newArrivalProductIds = Product::query()
+            ->latest('created_at')
+            ->latest('id')
+            ->take(5)
+            ->pluck('id')
+            ->all();
+
         $query = Product::with(['category', 'subcategory']);
 
         if ($request->filled('search')) {
@@ -82,12 +89,20 @@ class ProductController extends Controller
             'categories',
             'sidebarBestDeals',
             'sidebarNewArrivals',
-            'sidebarMaxPrice'
+            'sidebarMaxPrice',
+            'newArrivalProductIds'
         ));
     }
 
     public function show($slug)
     {
+        $newArrivalProductIds = Product::query()
+            ->latest('created_at')
+            ->latest('id')
+            ->take(5)
+            ->pluck('id')
+            ->all();
+
         $product = Product::with(['category', 'subcategory'])
             ->where('slug', $slug)
             ->firstOrFail();
@@ -127,6 +142,6 @@ class ProductController extends Controller
             })
             ->all();
 
-        return view('frontend.product-detail', compact('product', 'similar', 'frontendOfferCards'));
+        return view('frontend.product-detail', compact('product', 'similar', 'frontendOfferCards', 'newArrivalProductIds'));
     }
 }

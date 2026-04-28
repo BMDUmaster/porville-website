@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
 
@@ -49,7 +50,35 @@ class DashboardController extends Controller
             '1y'  => $this->buildMonthlySalesTrend(),
         ];
 
-        return view('dashboard.index', compact('stats', 'recent_orders', 'orders_by_status', 'sales_trends'));
+        $today_product_orders = OrderItem::query()
+            ->leftJoin('orders', 'orders.id', '=', 'order_items.order_id')
+            ->leftJoin('products', 'products.id', '=', 'order_items.product_id')
+            ->whereDate('orders.created_at', $today)
+            ->where('orders.status', '!=', 'cancelled')
+            ->selectRaw('
+                order_items.product_id,
+                products.name as product_name,
+                products.unit as product_unit,
+                SUM(
+                    CASE
+                        WHEN order_items.pack_quantity IS NOT NULL AND order_items.pack_quantity > 0
+                            THEN order_items.pack_quantity * order_items.quantity
+                        ELSE order_items.quantity
+                    END
+                ) as total_quantity,
+                MAX(order_items.unit) as order_item_unit
+            ')
+            ->groupBy('order_items.product_id', 'products.name', 'products.unit')
+            ->orderByDesc('total_quantity')
+            ->get();
+
+        return view('dashboard.index', compact(
+            'stats',
+            'recent_orders',
+            'orders_by_status',
+            'sales_trends',
+            'today_product_orders'
+        ));
     }
 
     private function calculateSalesChange(float $todaySales, float $yesterdaySales): float

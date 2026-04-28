@@ -136,6 +136,7 @@ Route::middleware('auth:web_frontend')->group(function () {
 
     Route::get('/account/orders',       [FrontOrderController::class, 'index'])->name('frontend.orders');
     Route::get('/account/orders/{id}',  [FrontOrderController::class, 'show'])->name('frontend.order.show');
+    Route::get('/account/orders/{id}/invoice',  [FrontOrderController::class, 'invoice'])->name('frontend.order.invoice');
 
     Route::get('/checkout',             [CheckoutController::class, 'index'])->name('frontend.checkout');
     Route::post('/checkout',            [CheckoutController::class, 'store'])->name('frontend.checkout.store');
@@ -149,7 +150,6 @@ Route::get('/track-order', [FrontOrderController::class, 'track'])->name('fronte
 Route::get('/about-us',             [PageController::class, 'about'])->name('frontend.about');
 Route::get('/our-farms',            [PageController::class, 'farms'])->name('frontend.farms');
 Route::get('/contact-us',           [PageController::class, 'contact'])->name('frontend.contact');
-Route::get('/blog',                 [PageController::class, 'blog'])->name('frontend.blog');
 Route::get('/privacy-policy',       [PageController::class, 'privacy'])->name('frontend.privacy');
 Route::get('/terms-of-service',     [PageController::class, 'terms'])->name('frontend.terms');
 Route::get('/shipping-policy',      [PageController::class, 'shipping'])->name('frontend.shipping');

@@ -97,13 +97,15 @@ class CheckoutController extends Controller
 
             foreach ($items as $item) {
                 OrderItem::create([
-                    'order_id'   => $order->id,
-                    'product_id' => $item['product_id'],
-                    'quantity'   => $item['quantity'],
-                    'unit_price' => $item['price'],
-                    'mrp'        => $item['mrp'],
-                    'unit'       => $item['unit'],
-                    'subtotal'   => $item['subtotal'],
+                    'order_id'      => $order->id,
+                    'product_id'    => $item['product_id'],
+                    'quantity'      => $item['quantity'],
+                    'pack_quantity' => $item['pack_quantity'],
+                    'unit_price'    => $item['price'],
+                    'mrp'           => $item['mrp'],
+                    'unit'          => $item['unit'],
+                    'variant_label' => $item['variant_label'],
+                    'subtotal'      => $item['subtotal'],
                 ]);
             }
 
@@ -176,6 +178,7 @@ class CheckoutController extends Controller
                 : (float) ($product->mrp ?? $price);
 
             $quantity = max(1, (int) ($item['quantity'] ?? 1));
+            $packQuantity = $variant ? $this->extractPackQuantity($variant['quantity'] ?? null) : null;
 
             $items[] = [
                 'key'           => $key,
@@ -187,6 +190,7 @@ class CheckoutController extends Controller
                 'mrp'           => $mrp,
                 'unit'          => $variant['unit'] ?? $product->unit,
                 'quantity'      => $quantity,
+                'pack_quantity' => $packQuantity,
                 'variant_index' => $variantIndex,
                 'variant_label' => $variant ? trim(($variant['quantity'] ?? '') . ' ' . ($variant['unit'] ?? '')) : null,
                 'subtotal'      => $price * $quantity,
@@ -267,5 +271,22 @@ class CheckoutController extends Controller
         return $coupon->type === 'percent'
             ? round($subtotal * $coupon->value / 100, 2)
             : min((float) $coupon->value, $subtotal);
+    }
+
+    private function extractPackQuantity(mixed $value): ?float
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if (is_numeric($value)) {
+            return (float) $value;
+        }
+
+        if (preg_match('/\d+(?:\.\d+)?/', (string) $value, $matches)) {
+            return (float) $matches[0];
+        }
+
+        return null;
     }
 }

@@ -7,6 +7,11 @@
         <a href="{{ route('frontend.orders') }}" class="text-blue-600 hover:underline text-sm flex items-center gap-1">
             <i class="fa-solid fa-arrow-left text-xs"></i> Back to Orders
         </a>
+        <a href="{{ route('frontend.order.invoice', ['id' => $order->id, 'download' => 1]) }}"
+           target="_blank"
+           class="inline-flex items-center gap-2 rounded-lg bg-[#0f766e] px-3 py-2 text-xs font-bold text-white transition hover:bg-[#0d665f]">
+            <i class="fa-solid fa-file-arrow-down text-xs"></i> Download Invoice
+        </a>
     </div>
 
     <div class="bg-white rounded-2xl border overflow-hidden">
@@ -38,7 +43,12 @@
                     @foreach($order->items as $item)
                     <tr>
                         <td class="py-3 font-medium text-gray-800">{{ $item->product->name ?? 'Deleted Product' }}</td>
-                        <td class="py-3 text-gray-600">{{ $item->quantity }}</td>
+                        <td class="py-3 text-gray-600">
+                            {{ $item->quantity }}
+                            @if($item->variant_label)
+                                <span class="text-xs text-gray-400">({{ $item->variant_label }})</span>
+                            @endif
+                        </td>
                         <td class="py-3 text-gray-600">₹{{ number_format($item->unit_price, 2) }}</td>
                         <td class="py-3 text-right font-bold text-gray-800">₹{{ number_format($item->subtotal, 2) }}</td>
                     </tr>

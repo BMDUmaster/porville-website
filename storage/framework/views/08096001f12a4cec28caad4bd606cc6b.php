@@ -385,8 +385,13 @@
         </div>
         <div id="home-new-arrivals-scroller" class="scrollbar-hide flex gap-5 overflow-x-auto scroll-smooth pb-3">
             <?php $__empty_1 = true; $__currentLoopData = $newArrivals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                <div class="flex min-w-[260px] max-w-[260px] flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition hover:border-green-300 hover:shadow-lg">
-                    <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="block aspect-square overflow-hidden bg-gray-50">
+            <div class="flex min-w-[260px] max-w-[260px] flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition hover:border-green-300 hover:shadow-lg">
+                    <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="relative block aspect-square overflow-hidden bg-gray-50">
+                        <?php if(in_array($product->id, $newArrivalProductIds ?? [], true)): ?>
+                            <span class="absolute left-3 top-3 z-10 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-white shadow-sm">
+                                New Arrival
+                            </span>
+                        <?php endif; ?>
                         <?php if($product->images && count($product->images)): ?>
                             <img src="<?php echo e(asset('storage/'.$product->images[0])); ?>" alt="<?php echo e($product->name); ?>" class="h-full w-full object-cover transition-transform duration-500 hover:scale-105">
                         <?php else: ?>
@@ -411,7 +416,7 @@
                                 </button>
                             <?php else: ?>
                                 <span class="inline-flex h-9 items-center justify-center rounded-lg bg-red-50 px-3 text-[10px] font-extrabold uppercase tracking-[0.14em] text-red-600">
-                                    Out
+                                    Sold Out
                                 </span>
                             <?php endif; ?>
                         </div>
@@ -606,7 +611,12 @@
                             </div>
                         </div>
 
-                        <a href="<?php echo e(route('frontend.product.show', $typeShowcaseLead->slug)); ?>" class="mt-auto block overflow-hidden">
+                        <a href="<?php echo e(route('frontend.product.show', $typeShowcaseLead->slug)); ?>" class="relative mt-auto block overflow-hidden">
+                            <?php if(in_array($typeShowcaseLead->id, $newArrivalProductIds ?? [], true)): ?>
+                                <span class="absolute left-5 top-5 z-10 inline-flex rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
+                                    New Arrival
+                                </span>
+                            <?php endif; ?>
                             <?php if($typeShowcaseLead->images && count($typeShowcaseLead->images)): ?>
                                 <img
                                     src="<?php echo e(asset('storage/' . $typeShowcaseLead->images[0])); ?>"
@@ -625,7 +635,12 @@
                 <div class="grid gap-4 sm:grid-cols-2">
                     <?php $__currentLoopData = $typeShowcaseGrid; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <article class="type-showcase-card group overflow-hidden rounded-[22px] border border-slate-200 bg-white p-3 shadow-[0_10px_30px_rgba(15,23,43,0.05)]">
-                            <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="block overflow-hidden rounded-[16px]">
+                            <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="relative block overflow-hidden rounded-[16px]">
+                                <?php if(in_array($product->id, $newArrivalProductIds ?? [], true)): ?>
+                                    <span class="absolute left-3 top-3 z-10 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
+                                        New Arrival
+                                    </span>
+                                <?php endif; ?>
                                 <?php if($product->images && count($product->images)): ?>
                                     <img
                                         src="<?php echo e(asset('storage/' . $product->images[0])); ?>"
@@ -652,7 +667,7 @@
                                         </button>
                                     <?php else: ?>
                                         <span class="rounded-lg bg-red-50 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-red-600">
-                                            Out
+                                            Sold Out
                                         </span>
                                     <?php endif; ?>
                                 </div>
@@ -833,6 +848,11 @@
                     <div class="rounded-[22px] border border-[#e5efe4] bg-white p-3">
                         <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="block">
                             <div class="relative overflow-hidden rounded-[20px] bg-slate-100">
+                                <?php if(in_array($product->id, $newArrivalProductIds ?? [], true)): ?>
+                                    <span class="absolute right-3 top-3 z-10 rounded-lg bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
+                                        New Arrival
+                                    </span>
+                                <?php endif; ?>
                                 <?php if($favoriteImage): ?>
                                     <img
                                         src="<?php echo e($favoriteImage); ?>"

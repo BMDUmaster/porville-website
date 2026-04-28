@@ -34,6 +34,11 @@
                class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl text-sm transition">
                 View Order Details
             </a>
+            <a href="<?php echo e(route('frontend.order.invoice', ['id' => $order->id, 'download' => 1])); ?>"
+               target="_blank"
+               class="w-full bg-[#0f766e] hover:bg-[#0d665f] text-white font-bold py-3 rounded-xl text-sm transition">
+                Download Invoice
+            </a>
             <a href="<?php echo e(route('frontend.products')); ?>"
                class="w-full border border-gray-200 text-gray-700 font-semibold py-3 rounded-xl text-sm hover:bg-gray-50 transition">
                 Continue Shopping

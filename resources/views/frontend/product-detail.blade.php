@@ -243,6 +243,11 @@
         <div>
             <div class="overflow-hidden rounded-[28px] border border-[#dce5d9] bg-white shadow-[0_22px_60px_rgba(15,23,42,0.08)]">
                 <div class="relative aspect-[1/0.94] overflow-hidden bg-[#f4f5ef]">
+                    @if(in_array($product->id, $newArrivalProductIds ?? [], true))
+                        <span class="absolute right-4 top-4 z-20 inline-flex items-center rounded-full bg-blue-600 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white shadow-lg">
+                            New Arrival
+                        </span>
+                    @endif
                     @if(count($galleryImages))
                         <img
                             src="{{ asset('storage/' . $galleryImages[0]) }}"
@@ -257,17 +262,6 @@
                     @endif
 
                     <div class="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-black/5"></div>
-
-                    <div class="absolute left-4 top-4 flex flex-col gap-2">
-                        <span class="inline-flex items-center rounded-full bg-[#2f8c43] px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white shadow-lg">
-                            Farm Fresh
-                        </span>
-                        @if(($defaultVariant['save_offer'] ?? 0) > 0)
-                            <span class="inline-flex items-center rounded-full bg-[#ff5b4d] px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white shadow-lg">
-                                Hot Deal
-                            </span>
-                        @endif
-                    </div>
 
                     @if(count($galleryImages) > 1)
                         <button type="button" onclick="moveGallery(-1)"
@@ -664,7 +658,12 @@
                 @foreach($similar as $item)
                     <a href="{{ route('frontend.product.show', $item->slug) }}"
                        class="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-green-200 hover:shadow-[0_18px_35px_rgba(15,23,42,0.1)]">
-                        <div class="aspect-[1/0.9] overflow-hidden bg-[#f4f5ef]">
+                        <div class="relative aspect-[1/0.9] overflow-hidden bg-[#f4f5ef]">
+                            @if(in_array($item->id, $newArrivalProductIds ?? [], true))
+                                <span class="absolute left-3 top-3 z-10 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
+                                    New Arrival
+                                </span>
+                            @endif
                             @if($item->images && count($item->images))
                                 <img src="{{ asset('storage/' . $item->images[0]) }}" alt="{{ $item->name }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                             @else
@@ -857,9 +856,9 @@ function sendCartRequest(productId, redirectToCheckout = false) {
         }
 
         if (typeof showCartAddedAlert === 'function') {
-            showCartAddedAlert('Product cart me add ho gaya.');
+            showCartAddedAlert('Add to Cart');
         } else {
-            alert('Product cart me add ho gaya.');
+            alert('Add to Cart');
         }
     });
 }

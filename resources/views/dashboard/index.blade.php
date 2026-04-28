@@ -166,6 +166,71 @@
             </div>
         </section>
     </div>
+
+    <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex flex-col gap-4 border-b border-slate-200 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <h2 class="text-lg font-semibold text-slate-900">Today's Product Order Summary</h2>
+                <p class="mt-1 text-sm text-slate-500">Aaj kis product ka total kitna order aaya hai, yahan ek saath dekh sakte ho.</p>
+            </div>
+        </div>
+
+        <div class="lg:hidden divide-y divide-slate-100">
+            @forelse($today_product_orders as $row)
+                @php
+                    $unitLabel = $row->product_unit ?: ($row->order_item_unit ?: 'unit');
+                @endphp
+                <div class="space-y-3 px-5 py-4">
+                    <div class="grid grid-cols-3 gap-3 text-sm">
+                        <div class="rounded-lg bg-slate-50 px-3 py-2">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">ID</p>
+                            <p class="mt-1 font-semibold text-slate-800">{{ $row->product_id }}</p>
+                        </div>
+                        <div class="rounded-lg bg-slate-50 px-3 py-2">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">Product</p>
+                            <p class="mt-1 font-semibold text-slate-800">{{ $row->product_name ?: 'Product #' . $row->product_id }}</p>
+                        </div>
+                        <div class="rounded-lg bg-slate-50 px-3 py-2">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">Total Qty</p>
+                            <p class="mt-1 font-semibold text-slate-800">{{ rtrim(rtrim(number_format($row->total_quantity, 2), '0'), '.') }} {{ $unitLabel }}</p>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="px-5 py-10 text-center text-sm text-slate-400">Aaj abhi tak kisi product ka confirmed order summary available nahi hai.</div>
+            @endforelse
+        </div>
+
+        <div class="hidden overflow-x-auto lg:block">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-[0.16em] text-slate-500">ID</th>
+                        <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Product</th>
+                        <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Total Quantity</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white">
+                    @forelse($today_product_orders as $row)
+                        @php
+                            $unitLabel = $row->product_unit ?: ($row->order_item_unit ?: 'unit');
+                        @endphp
+                        <tr class="transition hover:bg-slate-50">
+                            <td class="px-5 py-4 text-sm font-bold text-slate-400">{{ $row->product_id }}</td>
+                            <td class="px-5 py-4">
+                                <p class="text-sm font-bold text-slate-900">{{ $row->product_name ?: 'Product #' . $row->product_id }}</p>
+                            </td>
+                            <td class="px-5 py-4 text-sm font-semibold text-slate-700">{{ rtrim(rtrim(number_format($row->total_quantity, 2), '0'), '.') }} {{ $unitLabel }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="px-5 py-10 text-center text-sm text-slate-400">Aaj abhi tak kisi product ka confirmed order summary available nahi hai.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </section>
 </div>
 @endsection
 

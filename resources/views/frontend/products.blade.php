@@ -86,6 +86,7 @@
                     <div class="space-y-6 px-5 py-5">
                         <div>
                             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search cuts, packs, combos..."
+                                   data-filter-search
                                    class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-green-500 focus:bg-white">
                         </div>
 
@@ -97,6 +98,7 @@
                                         <span class="flex items-center gap-3">
                                             <input type="radio" name="category" value="{{ $cat->slug }}"
                                                    {{ request('category') == $cat->slug ? 'checked' : '' }}
+                                                   data-auto-submit
                                                    class="h-4 w-4 border-slate-300 text-green-600 focus:ring-green-500">
                                             <span class="text-[13px] font-semibold text-slate-700">{{ $cat->name }}</span>
                                         </span>
@@ -113,6 +115,7 @@
                                     <label class="flex cursor-pointer items-center gap-3 rounded-2xl px-3 py-2.5 transition hover:bg-slate-50">
                                         <input type="radio" name="sort" value="{{ $value }}"
                                                {{ request('sort', 'latest') === $value ? 'checked' : '' }}
+                                               data-auto-submit
                                                class="h-4 w-4 border-slate-300 text-green-600 focus:ring-green-500">
                                         <span class="text-[13px] font-semibold text-slate-700">{{ $label }}</span>
                                     </label>
@@ -250,6 +253,11 @@
             @forelse($products as $product)
             <div class="bg-white rounded-2xl border border-gray-100 hover:border-green-300 hover:shadow-lg transition overflow-hidden flex flex-col">
                 <a href="{{ route('frontend.product.show', $product->slug) }}" class="block aspect-square overflow-hidden bg-gray-50 relative">
+                    @if(in_array($product->id, $newArrivalProductIds ?? [], true))
+                        <span class="absolute left-2 top-2 z-10 rounded-full bg-blue-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white shadow">
+                            New Arrival
+                        </span>
+                    @endif
                     @if($product->images && count($product->images))
                         <img src="{{ asset('storage/'.$product->images[0]) }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
                     @else
@@ -284,7 +292,7 @@
                             </button>
                         @else
                             <span class="inline-flex rounded-lg bg-red-50 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-red-600">
-                                Out
+                                Sold Out
                             </span>
                         @endif
                     </div>
@@ -394,9 +402,29 @@
 @section('scripts')
 <script>
 (() => {
+    const filterForm = document.getElementById('filterForm');
     const range = document.getElementById('sidebarPriceRange');
     const rangeInput = document.getElementById('sidebarPriceRangeInput');
     const rangeValue = document.getElementById('priceRangeValue');
+    const autoSubmitInputs = document.querySelectorAll('#filterForm [data-auto-submit]');
+    const searchInput = document.querySelector('#filterForm [data-filter-search]');
+
+    if (filterForm) {
+        autoSubmitInputs.forEach((input) => {
+            input.addEventListener('change', () => filterForm.submit());
+        });
+    }
+
+    if (filterForm && searchInput) {
+        let searchTimer;
+
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                filterForm.submit();
+            }, 450);
+        });
+    }
 
     if (!range || !rangeInput || !rangeValue) return;
 

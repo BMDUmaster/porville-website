@@ -114,8 +114,6 @@
                                 <th class="pb-2 pr-4 text-left text-xs font-bold uppercase text-gray-600">MRP</th>
                                 <th class="pb-2 pr-4 text-left text-xs font-bold uppercase text-gray-600">Selling</th>
                                 <th class="pb-2 pr-4 text-left text-xs font-bold uppercase text-gray-600">Save Offer</th>
-                                <th class="pb-2 pr-4 text-left text-xs font-bold uppercase text-gray-600">Vendor</th>
-                                <th class="pb-2 text-left text-xs font-bold uppercase text-gray-600">Admin</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -143,8 +141,6 @@
                                             <span class="text-sm text-gray-400">-</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="py-3 pr-4 text-sm text-gray-700">Rs<?php echo e(number_format($item->vendor_amount ?? 0, 2)); ?></td>
-                                    <td class="py-3 text-sm text-gray-700">Rs<?php echo e(number_format($item->admin_amount ?? 0, 2)); ?></td>
                                 </tr>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>

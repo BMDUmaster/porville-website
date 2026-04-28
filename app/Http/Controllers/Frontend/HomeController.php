@@ -10,6 +10,13 @@ class HomeController extends Controller
 {
     public function index()
     {
+        $newArrivalProductIds = Product::query()
+            ->latest('created_at')
+            ->latest('id')
+            ->take(5)
+            ->pluck('id')
+            ->all();
+
         $categories = Category::parents()
             ->where('is_active', true)
             ->with(['children' => fn($query) => $query
@@ -59,6 +66,6 @@ class HomeController extends Controller
             ->take(8)
             ->get();
 
-        return view('frontend.home', compact('categories', 'newArrivals', 'featuredProducts', 'bestSellers'));
+        return view('frontend.home', compact('categories', 'newArrivals', 'featuredProducts', 'bestSellers', 'newArrivalProductIds'));
     }
 }

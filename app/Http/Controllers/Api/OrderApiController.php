@@ -173,13 +173,16 @@ class OrderApiController extends Controller
                 : (float) ($product->mrp ?? $unitPrice);
 
             $quantity = max(1, (int) $item['quantity']);
+            $packQuantity = $variant ? $this->extractPackQuantity($variant['quantity'] ?? null) : null;
 
             $orderItems[] = [
                 'product_id'    => $product->id,
                 'quantity'      => $quantity,
+                'pack_quantity' => $packQuantity,
                 'unit_price'    => $unitPrice,
                 'mrp'           => $mrp,
                 'unit'          => $variant['unit'] ?? $product->unit,
+                'variant_label' => $variant ? trim(($variant['quantity'] ?? '') . ' ' . ($variant['unit'] ?? '')) : null,
                 'save_offer'    => $variant['save_offer'] ?? null,
                 'vendor_amount' => (float) ($variant['vendor_amount'] ?? 0),
                 'admin_amount'  => (float) ($variant['admin_amount'] ?? 0),
@@ -251,12 +254,31 @@ class OrderApiController extends Controller
                     ? url('storage/' . ($item->product->images[0] ?? ''))
                     : null,
                 'quantity'   => $item->quantity,
+                'pack_quantity' => $item->pack_quantity,
                 'unit'       => $item->unit,
+                'variant_label' => $item->variant_label,
                 'unit_price' => (float) $item->unit_price,
                 'mrp'        => (float) ($item->mrp ?? $item->unit_price),
                 'save_offer' => $item->save_offer,
                 'subtotal'   => (float) $item->subtotal,
             ])->values()->all(),
         ];
+    }
+
+    private function extractPackQuantity(mixed $value): ?float
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if (is_numeric($value)) {
+            return (float) $value;
+        }
+
+        if (preg_match('/\d+(?:\.\d+)?/', (string) $value, $matches)) {
+            return (float) $matches[0];
+        }
+
+        return null;
     }
 }

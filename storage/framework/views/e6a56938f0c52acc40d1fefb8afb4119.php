@@ -120,21 +120,14 @@ html, body { overflow-x: hidden; max-width: 100vw; }
 
 <!-- Header -->
 <header class="fixed inset-x-0 top-0 z-[9997] bg-white shadow-sm">
-    <div class="hidden md:flex bg-blue-900 text-white text-xs py-2 px-8 items-center justify-between font-medium h-8">
-        <div class="flex items-center gap-3">
-           
-            <span>FarmSea Premium Meat & Seafood</span>
-        </div>
-        <div class="flex gap-6 text-white/90">
-            <a href="<?php echo e(route('frontend.track')); ?>" class="hover:text-blue-300 transition">Track Orders</a>
-           
-        </div>
+    <div class="hidden md:flex bg-blue-900 text-white text-xs py-2 px-8 items-center justify-center font-medium h-8 text-center">
+        <span>FarmSea Premium Meat & Seafood</span>
     </div>
     <div class="w-full px-2 sm:px-3 md:px-4 py-3 flex items-center justify-between gap-4">
         <button onclick="toggleSidebar()" class="text-gray-700 text-xl lg:hidden">
             <i class="fa-solid fa-bars"></i>
         </button>
-        <a href="<?php echo e(route('frontend.home')); ?>" class="flex-shrink-0 md:-ml-2">
+        <a href="<?php echo e(route('frontend.home')); ?>" class="flex-shrink-0 md:ml-[100px]">
             <?php if(file_exists(public_path('images/Farmsea.webp'))): ?>
                 <img src="<?php echo e(asset('images/Farmsea.webp')); ?>" alt="FarmSea" class="h-10 w-auto object-contain">
             <?php else: ?>
@@ -152,16 +145,12 @@ html, body { overflow-x: hidden; max-width: 100vw; }
             </button>
         </form>
         <div class="flex items-center gap-4">
-            <a href="<?php echo e(route('frontend.orders')); ?>" class="hidden md:flex flex-col items-center text-center text-gray-700 transition hover:text-blue-700">
-                <span class="text-[10px] font-extrabold uppercase tracking-[0.18em] text-gray-400">Returns</span>
-                <span class="text-[12px] font-extrabold leading-none mt-1">&amp; Orders</span>
-            </a>
             <!-- Account -->
             <div class="relative">
                 <button onclick="toggleAccountMenu()" class="text-gray-700 flex flex-col items-center group">
                     <i class="fa-regular fa-user text-xl group-hover:text-blue-600"></i>
                     <span class="text-[10px] font-bold mt-0.5 hidden md:block">
-                        <?php if(auth()->guard('web_frontend')->check()): ?> <?php echo e(Str::limit(auth('web_frontend')->user()->name, 12)); ?> <?php else: ?> Sign in/Account <?php endif; ?>
+                        <?php if(auth()->guard('web_frontend')->check()): ?> Hello, <?php echo e(Str::limit(auth('web_frontend')->user()->name, 12)); ?> <?php else: ?> Sign in/Account <?php endif; ?>
                     </span>
                 </button>
                 <div id="accountMenu" class="hidden absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-3 z-50">
@@ -281,38 +270,13 @@ html, body { overflow-x: hidden; max-width: 100vw; }
 <!-- Footer -->
 <footer class="relative overflow-hidden bg-[#0f172b] pt-10 md:pt-12 lg:pt-14 pb-5 md:pb-6 lg:pb-7 text-white" style="font-family:'Poppins',sans-serif;">
     <div class="relative z-10 mx-auto max-w-[1220px] px-5 sm:px-6 lg:px-8">
-        <div class="grid items-start gap-5 border-b border-white/6 pb-5 lg:grid-cols-[1.03fr_1.37fr] lg:gap-10 lg:pb-7">
-            <div class="lg:max-w-[430px]">
+        <div class="border-b border-white/6 pb-5 lg:pb-7">
+            <div class="max-w-[430px]">
                 <h4 class="mb-3 text-[14px] font-semibold text-white">About FarmSea</h4>
                 <p class="text-[13px] leading-[1.5] text-[#94a7c6]">
                     FarmSea brings farm-fresh chicken, premium mutton, and fresh seafood directly to your doorstep.
                     We ensure hygienic processing, quality cuts, and same-day delivery for the freshest experience.
                 </p>
-            </div>
-
-            <div class="rounded-[26px] border border-white/6 bg-[#151f33] px-5 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] md:px-6">
-                <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                    <div class="min-w-0">
-                        <h3 class="mb-1 text-[18px] font-semibold leading-none text-white">Fresh Deals in Your Inbox</h3>
-                        <p class="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#9ba8bb]">
-                            Get offers on chicken, mutton &amp; seafood
-                        </p>
-                    </div>
-                    <div class="flex w-full flex-col gap-2.5 sm:flex-row lg:max-w-[400px]">
-                        <input
-                            type="email"
-                            placeholder="Enter your email"
-                            class="h-[46px] w-full rounded-[14px] border border-[#33425f] bg-[#151f33] px-5 text-[13px] text-white placeholder:text-[#8d98ac] focus:border-[#22c55e] focus:outline-none"
-                        >
-                        <button
-                            type="button"
-                            aria-label="Subscribe"
-                            class="flex h-[46px] w-full items-center justify-center rounded-[14px] bg-[#19b34a] px-5 text-base text-white transition hover:bg-[#24c256] sm:w-[54px] sm:min-w-[54px]"
-                        >
-                            <i class="fa-solid fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -323,7 +287,6 @@ html, body { overflow-x: hidden; max-width: 100vw; }
                     <li><a href="<?php echo e(route('frontend.about')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">About Us</a></li>
                     <li><a href="<?php echo e(route('frontend.contact')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Contact Us</a></li>
                     <li><a href="<?php echo e(route('frontend.farms')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Our Farms</a></li>
-                    <li><a href="<?php echo e(route('frontend.blog')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Blog</a></li>
                 </ul>
             </div>
 
@@ -331,8 +294,6 @@ html, body { overflow-x: hidden; max-width: 100vw; }
                 <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Support</h4>
                 <ul class="space-y-3.5">
                     <li><a href="<?php echo e(route('frontend.contact')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Help Center</a></li>
-                    <li><a href="<?php echo e(route('frontend.track')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Track Order</a></li>
-                    <li><a href="<?php echo e(route('frontend.returns')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Returns &amp; Refunds</a></li>
                     <li><a href="<?php echo e(route('frontend.shipping')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Shipping Info</a></li>
                 </ul>
             </div>
@@ -409,8 +370,45 @@ function closeCart() {
     document.body.style.overflow = '';
 }
 
-function showCartAddedAlert(message = 'Product added to cart successfully.') {
-    alert(message);
+let cartToastTimeout;
+
+function showCartAddedAlert(message = 'Add to Cart') {
+    let toast = document.getElementById('cart-added-toast');
+
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'cart-added-toast';
+        toast.className = 'pointer-events-none fixed right-4 top-[88px] z-[10050] opacity-0 transition-all duration-300';
+        toast.style.transform = 'translateY(-14px) scale(0.96)';
+        toast.innerHTML = `
+            <div class="flex min-w-[240px] items-center gap-3 rounded-2xl border border-emerald-200 bg-white px-4 py-3.5 shadow-[0_24px_50px_rgba(15,23,42,0.22)] ring-1 ring-emerald-50">
+                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-sm">
+                    <i class="fa-solid fa-check text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-600">Success</p>
+                    <p id="cart-added-toast-message" class="mt-0.5 text-sm font-bold text-slate-900">Add to Cart</p>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+    }
+
+    const messageNode = document.getElementById('cart-added-toast-message');
+    if (messageNode) {
+        messageNode.textContent = message;
+    }
+
+    clearTimeout(cartToastTimeout);
+    toast.classList.remove('opacity-0');
+    toast.classList.add('opacity-100');
+    toast.style.transform = 'translateY(0) scale(1)';
+
+    cartToastTimeout = setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+        toast.style.transform = 'translateY(-14px) scale(0.96)';
+    }, 1800);
 }
 // Add to cart (AJAX)
 function addToCart(productId, variantIndex) {
@@ -431,7 +429,7 @@ function addToCart(productId, variantIndex) {
         }
 
         document.getElementById('header-cart-badge').textContent = data.cart_count;
-        showCartAddedAlert('Product cart me add ho gaya.');
+        showCartAddedAlert('Add to Cart');
     });
 }
 function formatCartCurrency(amount) {
