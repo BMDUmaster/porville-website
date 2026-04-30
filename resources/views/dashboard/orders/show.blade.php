@@ -55,6 +55,12 @@
                     <i class="fa-regular fa-calendar mr-1"></i>
                     {{ $order->created_at->format('d M Y, h:i A') }}
                 </span>
+                @if($order->delivery_slot_label)
+                    <span class="ml-4 text-xs font-semibold text-amber-700">
+                        <i class="fa-regular fa-clock mr-1"></i>
+                        {{ $order->delivery_slot_label }}
+                    </span>
+                @endif
             </div>
 
             <div class="border-b">
@@ -150,8 +156,13 @@
                             <span class="text-gray-700">Rs{{ number_format($order->delivery_charge ?? $order->shipping_cost ?? 0, 2) }}</span>
                         </div>
                         <div class="flex justify-between border-b border-gray-100 py-2 text-sm">
-                            <span class="font-semibold text-gray-700">Platform</span>
-                            <span class="text-gray-700">Rs{{ number_format($order->platform_fee ?? 0, 2) }}</span>
+                            <span class="font-semibold text-gray-700">
+                                Service Charge
+                                @if($order->service_charge_percent)
+                                    ({{ rtrim(rtrim(number_format($order->service_charge_percent, 2), '0'), '.') }}%)
+                                @endif
+                            </span>
+                            <span class="text-gray-700">Rs{{ number_format($order->service_charge, 2) }}</span>
                         </div>
                         <div class="flex justify-between border-b border-gray-100 py-2 text-sm">
                             <span class="font-semibold text-gray-700">Admin Commission</span>

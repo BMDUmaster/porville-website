@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\Product;
+use App\Support\DeliverySlotManager;
+use App\Support\OrderPricing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class OrderApiController extends Controller
@@ -61,6 +64,7 @@ class OrderApiController extends Controller
      *   "shipping_address": {
      *     "name": "...", "phone": "...", "address": "...", "city": "...", "pincode": "..."
      *   },
+     *   "delivery_slot": "10:00-12:00",
      *   "payment_method": "COD",
      *   "coupon_code": "SAVE10"   // optional
      * }
@@ -76,16 +80,16 @@ class OrderApiController extends Controller
             'shipping_address.name'    => 'required|string',
             'shipping_address.phone'   => 'required|string',
             'shipping_address.address' => 'required|string',
+            'delivery_slot'            => ['required', 'string', Rule::in(DeliverySlotManager::values())],
             'payment_method'           => 'nullable|string|in:COD,online,wallet',
             'coupon_code'              => 'nullable|string',
         ]);
 
         $orderItems = $this->buildOrderItems($data['items']);
         $subtotal = collect($orderItems)->sum('subtotal');
-        $deliveryCharge = 25.00;
-        $platformFee = 12.00;
+        $pricing = OrderPricing::summary($subtotal);
 
-        $order = DB::transaction(function () use ($request, $data, $orderItems, $subtotal, $deliveryCharge, $platformFee) {
+        $order = DB::transaction(function () use ($request, $data, $orderItems, $subtotal, $pricing) {
             $discount = 0;
             $coupon = $this->resolveCoupon($data['coupon_code'] ?? null, $subtotal, true);
 
@@ -93,7 +97,7 @@ class OrderApiController extends Controller
                 $discount = $this->calculateDiscount($coupon, $subtotal);
             }
 
-            $total = $subtotal - $discount + $deliveryCharge + $platformFee;
+            $total = round(($pricing['subtotal'] - $discount) + $pricing['delivery_charge'] + $pricing['service_charge'], 2);
 
             $order = Order::create([
                 'user_id'          => $request->user()->id,
@@ -101,14 +105,15 @@ class OrderApiController extends Controller
                 'status'           => 'pending',
                 'subtotal'         => $subtotal,
                 'discount'         => $discount,
-                'shipping_cost'    => $deliveryCharge,
-                'delivery_charge'  => $deliveryCharge,
-                'platform_fee'     => $platformFee,
+                'shipping_cost'    => $pricing['delivery_charge'],
+                'delivery_charge'  => $pricing['delivery_charge'],
+                'platform_fee'     => $pricing['service_charge'],
                 'vendor_total'     => collect($orderItems)->sum('vendor_amount'),
                 'admin_commission' => collect($orderItems)->sum('admin_amount'),
                 'tax'              => 0,
                 'total'            => $total,
                 'shipping_address' => $data['shipping_address'],
+                'delivery_slot'    => $data['delivery_slot'],
                 'payment_method'   => $data['payment_method'] ?? 'COD',
                 'payment_status'   => 'pending',
             ]);
@@ -243,8 +248,12 @@ class OrderApiController extends Controller
             'discount'         => (float) $order->discount,
             'delivery_charge'  => (float) $order->delivery_charge,
             'platform_fee'     => (float) $order->platform_fee,
+            'service_charge'   => (float) $order->service_charge,
+            'service_charge_percent' => $order->service_charge_percent,
             'total'            => (float) $order->total,
             'shipping_address' => $order->shipping_address,
+            'delivery_slot'    => $order->delivery_slot,
+            'delivery_slot_label' => $order->delivery_slot_label,
             'created_at'       => $order->created_at->format('d M Y, h:i A'),
             'items'            => $order->items->map(fn ($item) => [
                 'id'         => $item->id,

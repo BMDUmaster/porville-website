@@ -14,6 +14,8 @@ use App\Http\Controllers\Dashboard\DeliveryBoyController;
 use App\Http\Controllers\Dashboard\NotificationController;
 use App\Http\Controllers\Dashboard\CouponController;
 use App\Http\Controllers\Dashboard\ProfileController;
+use App\Http\Controllers\Dashboard\ServiceChargeController;
+use App\Http\Controllers\Dashboard\DeliverySlotController;
 
 // ── Frontend Controllers 
 use App\Http\Controllers\Frontend\HomeController;
@@ -100,6 +102,12 @@ Route::middleware('admin')->group(function () {
     Route::get('/profile',           [ProfileController::class, 'index'])->name('dashboard.profile');
     Route::put('/profile',           [ProfileController::class, 'update'])->name('dashboard.profile.update');
     Route::put('/profile/password',  [ProfileController::class, 'updatePassword'])->name('dashboard.profile.password');
+
+    // Settings
+    Route::get('/settings/service-charge', [ServiceChargeController::class, 'index'])->name('dashboard.settings.service-charge');
+    Route::put('/settings/service-charge', [ServiceChargeController::class, 'update'])->name('dashboard.settings.service-charge.update');
+    Route::get('/settings/delivery-slots', [DeliverySlotController::class, 'index'])->name('dashboard.settings.delivery-slots');
+    Route::put('/settings/delivery-slots', [DeliverySlotController::class, 'update'])->name('dashboard.settings.delivery-slots.update');
 });
 
 

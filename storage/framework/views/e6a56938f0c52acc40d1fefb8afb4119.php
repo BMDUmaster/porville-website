@@ -103,9 +103,21 @@ html, body { overflow-x: hidden; max-width: 100vw; }
         <p class="text-center text-gray-400 py-8">Your cart is empty</p>
     </div>
     <div class="px-5 py-4 border-t bg-white">
-        <div class="flex justify-between text-sm font-semibold mb-3">
+        <div class="flex justify-between text-sm font-semibold mb-2">
             <span>Subtotal</span>
             <span id="cart-subtotal-drawer">₹0.00</span>
+        </div>
+        <div class="mb-2 flex justify-between text-xs text-slate-500">
+            <span>Delivery</span>
+            <span id="cart-delivery-charge-drawer">Rs0.00</span>
+        </div>
+        <div class="mb-2 flex justify-between text-xs text-slate-500">
+            <span id="cart-service-charge-label">Service Charge (0%)</span>
+            <span id="cart-service-charge-drawer">Rs0.00</span>
+        </div>
+        <div class="mb-3 flex justify-between text-sm font-bold text-slate-900">
+            <span>Total</span>
+            <span id="cart-total-drawer">Rs0.00</span>
         </div>
         <a href="<?php echo e(route('frontend.checkout')); ?>"
            class="flex items-center justify-center gap-2 w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl text-sm mb-2">
@@ -527,6 +539,12 @@ function refreshCartDrawer() {
             document.getElementById('header-cart-badge').textContent = data.count;
             document.getElementById('cart-badge-drawer').textContent = data.count + ' item' + (data.count !== 1 ? 's' : '');
             document.getElementById('cart-subtotal-drawer').textContent = formatCartCurrency(data.subtotal);
+            const chargePercent = Number(data.service_charge_percent || 0);
+            const chargePercentText = chargePercent.toFixed(chargePercent % 1 === 0 ? 0 : 2).replace(/\.?0+$/, '');
+            document.getElementById('cart-delivery-charge-drawer').textContent = formatCartCurrency(data.delivery_charge);
+            document.getElementById('cart-service-charge-label').textContent = 'Service Charge (' + chargePercentText + '%)';
+            document.getElementById('cart-service-charge-drawer').textContent = formatCartCurrency(data.service_charge);
+            document.getElementById('cart-total-drawer').textContent = formatCartCurrency(data.total);
             renderCartDrawerItems(data.items || []);
         });
 }

@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Support\DeliverySlotManager;
+use App\Support\OrderPricing;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class CartController extends Controller
 {
@@ -13,7 +16,10 @@ class CartController extends Controller
     {
         $cart  = session('cart', []);
         $items = $this->buildCartItems($cart);
-        return view('frontend.cart', compact('items'));
+        $subtotal = collect($items)->sum('subtotal');
+        $pricing = OrderPricing::summary($subtotal);
+
+        return view('frontend.cart', compact('items', 'pricing'));
     }
 
     /** POST /cart/add */
@@ -23,6 +29,7 @@ class CartController extends Controller
             'product_id'    => 'required|exists:products,id',
             'quantity'      => 'integer|min:1',
             'variant_index' => 'nullable|integer|min:0',
+            'delivery_slot' => ['nullable', 'string', Rule::in(DeliverySlotManager::values())],
         ]);
 
         $product      = Product::findOrFail($request->product_id);
@@ -68,6 +75,10 @@ class CartController extends Controller
 
         session(['cart' => $cart]);
 
+        if ($request->filled('delivery_slot')) {
+            session(['selected_delivery_slot' => $request->string('delivery_slot')->toString()]);
+        }
+
         if ($request->expectsJson()) {
             return response()->json([
                 'success'    => true,
@@ -98,10 +109,14 @@ class CartController extends Controller
         if ($request->expectsJson()) {
             $items    = $this->buildCartItems($cart);
             $subtotal = collect($items)->sum(fn($i) => $i['subtotal']);
+            $pricing = OrderPricing::summary($subtotal);
             return response()->json([
                 'success'    => true,
                 'cart_count' => array_sum(array_column($cart, 'quantity')),
                 'subtotal'   => $subtotal,
+                'service_charge' => $pricing['service_charge'],
+                'service_charge_percent' => $pricing['service_charge_percent'],
+                'total' => $pricing['total'],
             ]);
         }
 
@@ -130,11 +145,17 @@ class CartController extends Controller
     {
         $cart = session('cart', []);
         $items = $this->buildCartItems($cart);
+        $subtotal = collect($items)->sum('subtotal');
+        $pricing = OrderPricing::summary($subtotal);
 
         return response()->json([
             'count' => array_sum(array_column($cart, 'quantity')),
             'items' => $items,
-            'subtotal' => collect($items)->sum('subtotal'),
+            'subtotal' => $subtotal,
+            'service_charge' => $pricing['service_charge'],
+            'service_charge_percent' => $pricing['service_charge_percent'],
+            'delivery_charge' => $pricing['delivery_charge'],
+            'total' => $pricing['total'],
         ]);
     }
 

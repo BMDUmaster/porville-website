@@ -403,9 +403,9 @@
 
             <div>
                 <div class="mb-2 flex items-center justify-between gap-3">
-                    <div class="text-[12px] font-black uppercase tracking-[0.16em] text-slate-500">Delivery Slot</div>
+                    <div class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-500">Delivery Slot</div>
                     <?php if($selectedDeliverySlotLabel): ?>
-                        <div id="detailDeliverySlotLabel" class="text-[11px] font-bold text-[#2f8c43]"><?php echo e($selectedDeliverySlotLabel); ?></div>
+                        <div id="detailDeliverySlotLabel" class="text-[10px] font-bold text-[#2f8c43]"><?php echo e($selectedDeliverySlotLabel); ?></div>
                     <?php endif; ?>
                 </div>
                 <div class="flex flex-wrap gap-2">
@@ -414,7 +414,7 @@
                             type="button"
                             onclick="selectDeliverySlot('<?php echo e($slot['value']); ?>', '<?php echo e($slot['label']); ?>')"
                             data-delivery-slot="<?php echo e($slot['value']); ?>"
-                            class="delivery-slot-chip <?php echo e($selectedDeliverySlot === $slot['value'] ? 'is-active border-[#2f8c43] bg-[#f2fbf3] text-[#215f31] shadow-[0_8px_18px_rgba(47,140,67,0.10)]' : 'border-slate-200 bg-white text-slate-600'); ?> rounded-full border px-4 py-2.5 text-[11px] font-bold leading-none transition hover:border-[#94d3a2] hover:text-[#2f8c43]"
+                            class="delivery-slot-chip <?php echo e($selectedDeliverySlot === $slot['value'] ? 'is-active border-[#2f8c43] bg-[#f2fbf3] text-[#215f31] shadow-[0_8px_18px_rgba(47,140,67,0.10)]' : 'border-slate-200 bg-white text-slate-600'); ?> rounded-full border px-3 py-2 text-[10px] font-bold leading-none transition hover:border-[#94d3a2] hover:text-[#2f8c43]"
                         >
                             <?php echo e($slot['label']); ?>
 
@@ -941,4 +941,4 @@ applyProductImageZoom();
 
 
 
-<?php echo $__env->make('frontend.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\FarmSea-dashboard\resources\views\frontend\product-detail.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('frontend.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\FarmSea-dashboard\resources\views/frontend/product-detail.blade.php ENDPATH**/ ?>

@@ -3,8 +3,8 @@
 
 @section('content')
 <div class="max-w-3xl mx-auto px-4 py-8">
-    <div class="flex items-center gap-3 mb-6">
-        <a href="{{ route('frontend.orders') }}" class="text-blue-600 hover:underline text-sm flex items-center gap-1">
+    <div class="mb-6 flex items-center gap-3">
+        <a href="{{ route('frontend.orders') }}" class="flex items-center gap-1 text-sm text-blue-600 hover:underline">
             <i class="fa-solid fa-arrow-left text-xs"></i> Back to Orders
         </a>
         <a href="{{ route('frontend.order.invoice', ['id' => $order->id, 'download' => 1]) }}"
@@ -14,28 +14,33 @@
         </a>
     </div>
 
-    <div class="bg-white rounded-2xl border overflow-hidden">
-        <div class="px-6 py-4 border-b flex items-center justify-between">
+    <div class="overflow-hidden rounded-2xl border bg-white">
+        <div class="flex items-center justify-between border-b px-6 py-4">
             <div>
                 <h1 class="font-bold text-gray-800">{{ $order->order_number ?? '#'.$order->id }}</h1>
-                <p class="text-xs text-gray-400 mt-1">{{ $order->created_at->format('d M Y, h:i A') }}</p>
+                <p class="mt-1 text-xs text-gray-400">{{ $order->created_at->format('d M Y, h:i A') }}</p>
+                @if($order->delivery_slot_label)
+                <p class="mt-2 inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-[11px] font-semibold text-amber-700">
+                    <i class="fa-regular fa-clock"></i>
+                    Delivery slot: {{ $order->delivery_slot_label }}
+                </p>
+                @endif
             </div>
-            <span class="text-xs font-bold px-3 py-1.5 rounded-full {{ $order->status_badge_class }}">
+            <span class="rounded-full px-3 py-1.5 text-xs font-bold {{ $order->status_badge_class }}">
                 {{ $order->status_label }}
             </span>
         </div>
 
-        {{-- Items --}}
-        <div class="px-6 py-4 border-b">
-            <h2 class="font-semibold text-gray-700 mb-3 text-sm flex items-center gap-2">
+        <div class="border-b px-6 py-4">
+            <h2 class="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-700">
                 <i class="fa-solid fa-cart-shopping text-teal-600"></i> Products
             </h2>
             <table class="w-full text-sm">
                 <thead class="border-b">
-                    <tr class="text-xs font-bold text-gray-500 uppercase">
-                        <th class="pb-2 text-left">Product</th>
-                        <th class="pb-2 text-left">QTY</th>
-                        <th class="pb-2 text-left">Unit Price</th>
+                    <tr class="text-left text-xs font-bold uppercase text-gray-500">
+                        <th class="pb-2">Product</th>
+                        <th class="pb-2">QTY</th>
+                        <th class="pb-2">Unit Price</th>
                         <th class="pb-2 text-right">Subtotal</th>
                     </tr>
                 </thead>
@@ -49,38 +54,45 @@
                                 <span class="text-xs text-gray-400">({{ $item->variant_label }})</span>
                             @endif
                         </td>
-                        <td class="py-3 text-gray-600">₹{{ number_format($item->unit_price, 2) }}</td>
-                        <td class="py-3 text-right font-bold text-gray-800">₹{{ number_format($item->subtotal, 2) }}</td>
+                        <td class="py-3 text-gray-600">&#8377;{{ number_format($item->unit_price, 2) }}</td>
+                        <td class="py-3 text-right font-bold text-gray-800">&#8377;{{ number_format($item->subtotal, 2) }}</td>
                     </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
 
-        {{-- Totals --}}
-        <div class="px-6 py-4 flex justify-end">
+        <div class="flex justify-end px-6 py-4">
             <div class="w-64 space-y-2 text-sm">
-                <div class="flex justify-between"><span class="text-gray-500">Subtotal</span><span>₹{{ number_format($order->subtotal, 2) }}</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Subtotal</span><span>&#8377;{{ number_format($order->subtotal, 2) }}</span></div>
                 @if($order->discount > 0)
-                <div class="flex justify-between text-green-600"><span>Discount</span><span>-₹{{ number_format($order->discount, 2) }}</span></div>
+                <div class="flex justify-between text-green-600"><span>Discount</span><span>-&#8377;{{ number_format($order->discount, 2) }}</span></div>
                 @endif
-                <div class="flex justify-between"><span class="text-gray-500">Delivery</span><span>₹{{ number_format($order->delivery_charge ?? $order->shipping_cost ?? 0, 2) }}</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Delivery</span><span>&#8377;{{ number_format($order->delivery_charge ?? $order->shipping_cost ?? 0, 2) }}</span></div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">
+                        Service Charge
+                        @if($order->service_charge_percent)
+                            ({{ rtrim(rtrim(number_format($order->service_charge_percent, 2), '0'), '.') }}%)
+                        @endif
+                    </span>
+                    <span>&#8377;{{ number_format($order->service_charge, 2) }}</span>
+                </div>
                 <hr class="border-gray-100">
-                <div class="flex justify-between font-bold text-gray-800 text-base">
+                <div class="flex justify-between text-base font-bold text-gray-800">
                     <span>Grand Total</span>
-                    <span>₹{{ number_format($order->total, 2) }}</span>
+                    <span>&#8377;{{ number_format($order->total, 2) }}</span>
                 </div>
             </div>
         </div>
 
-        {{-- Shipping Address --}}
         @if($order->shipping_address)
-        <div class="px-6 py-4 border-t bg-gray-50">
-            <h2 class="font-semibold text-gray-700 mb-2 text-sm">Shipping Address</h2>
+        <div class="border-t bg-gray-50 px-6 py-4">
+            <h2 class="mb-2 text-sm font-semibold text-gray-700">Shipping Address</h2>
             @if(is_array($order->shipping_address))
                 <p class="text-sm text-gray-600">{{ $order->shipping_address['name'] ?? '' }}</p>
                 <p class="text-sm text-gray-600">{{ $order->shipping_address['address'] ?? '' }}, {{ $order->shipping_address['city'] ?? '' }}</p>
-                <p class="text-sm text-gray-600">{{ $order->shipping_address['state'] ?? '' }} — {{ $order->shipping_address['pincode'] ?? '' }}</p>
+                <p class="text-sm text-gray-600">{{ $order->shipping_address['state'] ?? '' }} - {{ $order->shipping_address['pincode'] ?? '' }}</p>
             @else
                 <p class="text-sm text-gray-600">{{ $order->shipping_address }}</p>
             @endif

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\DeliverySlotManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -22,7 +23,7 @@ class Order extends Model
         'user_id', 'delivery_boy_id', 'order_number', 'status', 'subtotal', 'discount',
         'shipping_cost', 'delivery_charge', 'platform_fee',
         'vendor_total', 'admin_commission', 'tax', 'total',
-        'shipping_address', 'payment_method', 'payment_status',
+        'shipping_address', 'payment_method', 'payment_status', 'delivery_slot',
     ];
 
     protected $casts = [
@@ -60,5 +61,26 @@ class Order extends Model
             'cancelled'  => 'bg-red-100 text-red-700',
             default      => 'bg-gray-100 text-gray-700',
         };
+    }
+
+    public function getDeliverySlotLabelAttribute(): ?string
+    {
+        return DeliverySlotManager::label($this->delivery_slot);
+    }
+
+    public function getServiceChargeAttribute(): float
+    {
+        return round((float) ($this->platform_fee ?? 0), 2);
+    }
+
+    public function getServiceChargePercentAttribute(): ?float
+    {
+        $subtotal = (float) ($this->subtotal ?? 0);
+
+        if ($subtotal <= 0) {
+            return null;
+        }
+
+        return round(($this->service_charge / $subtotal) * 100, 2);
     }
 }

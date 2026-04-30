@@ -15,7 +15,8 @@
     ])->filter()->implode(', ')) ?: '0';
     $placeOfSupply = $shipping['state'] ?? '0';
     $deliveryCharge = (float) ($order->delivery_charge ?? $order->shipping_cost ?? 0);
-    $platformFee = (float) ($order->platform_fee ?? 0);
+    $serviceCharge = (float) ($order->service_charge ?? 0);
+    $serviceChargePercent = $order->service_charge_percent;
     $taxAmount = (float) ($order->tax ?? 0);
     $discount = (float) ($order->discount ?? 0);
 @endphp
@@ -96,6 +97,7 @@
                 <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Other Details</p>
                 <p class="mt-2 text-xs leading-5 text-slate-600">Customer ID: {{ $order->user_id ?: '0' }}</p>
                 <p class="text-xs leading-5 text-slate-600">Place of Supply: {{ $placeOfSupply }}</p>
+                <p class="text-xs leading-5 text-slate-600">Delivery Slot: {{ $order->delivery_slot_label ?: '0' }}</p>
                 <p class="text-xs leading-5 text-slate-600">Reference No: 0</p>
                 <p class="text-xs leading-5 text-slate-600">HSN/SAC: 0</p>
             </div>
@@ -157,8 +159,13 @@
                             <span class="font-semibold text-slate-800">&#8377;{{ number_format($deliveryCharge, 2) }}</span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span class="text-slate-500">Platform Fee</span>
-                            <span class="font-semibold text-slate-800">&#8377;{{ number_format($platformFee, 2) }}</span>
+                            <span class="text-slate-500">
+                                Service Charge
+                                @if($serviceChargePercent)
+                                    ({{ rtrim(rtrim(number_format($serviceChargePercent, 2), '0'), '.') }}%)
+                                @endif
+                            </span>
+                            <span class="font-semibold text-slate-800">&#8377;{{ number_format($serviceCharge, 2) }}</span>
                         </div>
                         <div class="flex items-center justify-between">
                             <span class="text-slate-500">Tax</span>

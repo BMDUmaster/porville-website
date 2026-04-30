@@ -7,9 +7,12 @@ use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Support\DeliverySlotManager;
+use App\Support\OrderPricing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class CheckoutController extends Controller
@@ -30,8 +33,15 @@ class CheckoutController extends Controller
 
         $subtotal = collect($items)->sum('subtotal');
         $checkoutDefaults = $this->checkoutDefaults();
+        $selectedDeliverySlot = old('delivery_slot', session('selected_delivery_slot'));
 
-        return view('frontend.checkout', compact('items', 'subtotal', 'checkoutDefaults'));
+        if (! in_array($selectedDeliverySlot, DeliverySlotManager::values(), true)) {
+            $selectedDeliverySlot = DeliverySlotManager::defaultValue();
+        }
+
+        $pricing = OrderPricing::summary($subtotal);
+
+        return view('frontend.checkout', compact('items', 'subtotal', 'checkoutDefaults', 'selectedDeliverySlot', 'pricing'));
     }
 
     /** POST /checkout */
@@ -46,9 +56,12 @@ class CheckoutController extends Controller
             'city'             => 'required|string',
             'state'            => 'required|string',
             'pincode'          => 'required|string',
+            'delivery_slot'    => ['required', 'string', Rule::in(DeliverySlotManager::values())],
             'payment_method'   => 'required|in:COD,online,upi',
             'coupon_code'      => 'nullable|string',
         ]);
+
+        session(['selected_delivery_slot' => $data['delivery_slot']]);
 
         $cart = session('cart', []);
         if (empty($cart)) {
@@ -57,10 +70,9 @@ class CheckoutController extends Controller
 
         $items = $this->buildCartItems($cart);
         $subtotal = collect($items)->sum('subtotal');
-        $deliveryCharge = 25.00;
-        $platformFee = 12.00;
+        $pricing = OrderPricing::summary($subtotal);
 
-        $order = DB::transaction(function () use ($data, $items, $subtotal, $deliveryCharge, $platformFee) {
+        $order = DB::transaction(function () use ($data, $items, $subtotal, $pricing) {
             $discount = 0;
             $coupon = $this->resolveCoupon($data['coupon_code'] ?? null, $subtotal, true);
 
@@ -68,7 +80,7 @@ class CheckoutController extends Controller
                 $discount = $this->calculateDiscount($coupon, $subtotal);
             }
 
-            $total = $subtotal - $discount + $deliveryCharge + $platformFee;
+            $total = round(($pricing['subtotal'] - $discount) + $pricing['delivery_charge'] + $pricing['service_charge'], 2);
 
             $order = Order::create([
                 'user_id'          => auth('web_frontend')->id(),
@@ -76,9 +88,9 @@ class CheckoutController extends Controller
                 'status'           => 'pending',
                 'subtotal'         => $subtotal,
                 'discount'         => $discount,
-                'shipping_cost'    => $deliveryCharge,
-                'delivery_charge'  => $deliveryCharge,
-                'platform_fee'     => $platformFee,
+                'shipping_cost'    => $pricing['delivery_charge'],
+                'delivery_charge'  => $pricing['delivery_charge'],
+                'platform_fee'     => $pricing['service_charge'],
                 'vendor_total'     => 0,
                 'admin_commission' => 0,
                 'tax'              => 0,
@@ -93,6 +105,7 @@ class CheckoutController extends Controller
                 ],
                 'payment_method'   => $data['payment_method'],
                 'payment_status'   => 'pending',
+                'delivery_slot'    => $data['delivery_slot'],
             ]);
 
             foreach ($items as $item) {

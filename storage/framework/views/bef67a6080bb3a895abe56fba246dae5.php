@@ -184,6 +184,22 @@
                 <span>Coupons & Offers</span>
             </a>
 
+            <a href="<?php echo e(route('dashboard.settings.service-charge')); ?>"
+               class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
+                      hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
+                      <?php echo e(request()->routeIs('dashboard.settings.service-charge') ? 'active-link' : 'text-slate-700'); ?>">
+                <i class="fa-solid fa-percent w-5 text-green-700"></i>
+                <span>Service Charge</span>
+            </a>
+
+            <a href="<?php echo e(route('dashboard.settings.delivery-slots')); ?>"
+               class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
+                      hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
+                      <?php echo e(request()->routeIs('dashboard.settings.delivery-slots') ? 'active-link' : 'text-slate-700'); ?>">
+                <i class="fa-regular fa-clock w-5 text-green-700"></i>
+                <span>Delivery Slots</span>
+            </a>
+
             <a href="<?php echo e(route('dashboard.profile')); ?>"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white

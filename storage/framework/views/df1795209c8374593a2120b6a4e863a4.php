@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>@yield('title', 'Dashboard') | FarmSea</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title><?php echo $__env->yieldContent('title', 'Dashboard'); ?> | FarmSea</title>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 
     <!--Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -53,7 +53,7 @@
         /* Prevent icon overflow in cards */
         .stat-card { overflow: hidden; }
         .stat-card .icon-box { flex-shrink: 0; }
-        @yield('styles')
+        <?php echo $__env->yieldContent('styles'); ?>
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 antialiased">
@@ -69,8 +69,8 @@
 
         <!-- Logo -->
         <div class="p-4 border-b border-green-200 bg-green-400 flex items-center justify-between">
-            <a href="{{ route('dashboard.home') }}" class="flex items-center">
-                <img src="{{ asset('images/Farmsea.webp') }}"
+            <a href="<?php echo e(route('dashboard.home')); ?>" class="flex items-center">
+                <img src="<?php echo e(asset('images/Farmsea.webp')); ?>"
                      alt="FarmSea"
                      class="h-14 w-auto object-contain"
                      onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex'">
@@ -86,10 +86,10 @@
         <!-- Nav -->
         <nav class="px-4 py-3 space-y-1">
 
-            <a href="{{ route('dashboard.home') }}"
+            <a href="<?php echo e(route('dashboard.home')); ?>"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl
                       hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white transition
-                      {{ request()->routeIs('dashboard.home') ? 'active-link' : 'text-slate-700' }}">
+                      <?php echo e(request()->routeIs('dashboard.home') ? 'active-link' : 'text-slate-700'); ?>">
                 <i class="fa-solid fa-gauge w-5 text-green-700"></i>
                 <span>Dashboard</span>
             </a>
@@ -99,110 +99,111 @@
                 <button onclick="toggleProductMenu()"
                         class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-xl
                                hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white transition
-                               {{ request()->routeIs('dashboard.categories','dashboard.subcategories','dashboard.products') ? 'active-link' : 'text-slate-700' }}">
+                               <?php echo e(request()->routeIs('dashboard.categories','dashboard.subcategories','dashboard.products') ? 'active-link' : 'text-slate-700'); ?>">
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-boxes-stacked w-5 text-green-700"></i>
                         <span>Products</span>
                     </div>
                     <i id="productArrow" class="fa-solid fa-chevron-down text-xs transition-transform duration-300
-                       {{ request()->routeIs('dashboard.categories','dashboard.subcategories','dashboard.products') ? 'rotate-180' : '' }}"></i>
+                       <?php echo e(request()->routeIs('dashboard.categories','dashboard.subcategories','dashboard.products') ? 'rotate-180' : ''); ?>"></i>
                 </button>
 
                 <div id="productDropdown"
-                     class="{{ request()->routeIs('dashboard.categories','dashboard.subcategories','dashboard.products') ? 'flex' : 'hidden' }}
+                     class="<?php echo e(request()->routeIs('dashboard.categories','dashboard.subcategories','dashboard.products') ? 'flex' : 'hidden'); ?>
+
                             flex-col pl-9 pr-2 py-2 space-y-1 bg-green-50/50 rounded-xl mt-1 mx-2 border-l-2 border-green-200">
 
-                    <a href="{{ route('dashboard.categories') }}"
+                    <a href="<?php echo e(route('dashboard.categories')); ?>"
                        class="flex items-center gap-3 px-4 py-2 text-xs font-semibold rounded-lg transition
                               hover:bg-blue-500 hover:text-white
-                              {{ request()->routeIs('dashboard.categories') ? 'bg-blue-500 text-white' : 'text-slate-700' }}">
+                              <?php echo e(request()->routeIs('dashboard.categories') ? 'bg-blue-500 text-white' : 'text-slate-700'); ?>">
                         <i class="fa-solid fa-sitemap w-4 text-green-600"></i> Categories
                     </a>
 
-                    <a href="{{ route('dashboard.subcategories') }}"
+                    <a href="<?php echo e(route('dashboard.subcategories')); ?>"
                        class="flex items-center gap-3 px-4 py-2 text-xs font-semibold rounded-lg transition
                               hover:bg-blue-500 hover:text-white
-                              {{ request()->routeIs('dashboard.subcategories') ? 'bg-blue-500 text-white' : 'text-slate-700' }}">
+                              <?php echo e(request()->routeIs('dashboard.subcategories') ? 'bg-blue-500 text-white' : 'text-slate-700'); ?>">
                         <i class="fa-solid fa-layer-group w-4 text-green-600"></i> Sub-Categories
                     </a>
 
-                    <a href="{{ route('dashboard.products') }}"
+                    <a href="<?php echo e(route('dashboard.products')); ?>"
                        class="flex items-center gap-3 px-4 py-2 text-xs font-semibold rounded-lg transition
                               hover:bg-blue-500 hover:text-white
-                              {{ request()->routeIs('dashboard.products') ? 'bg-blue-500 text-white' : 'text-slate-700' }}">
+                              <?php echo e(request()->routeIs('dashboard.products') ? 'bg-blue-500 text-white' : 'text-slate-700'); ?>">
                         <i class="fa-solid fa-circle-plus w-4 text-green-600"></i> Products
                     </a>
                 </div>
             </div>
 
-            <a href="{{ route('dashboard.orders') }}"
+            <a href="<?php echo e(route('dashboard.orders')); ?>"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
-                      {{ request()->routeIs('dashboard.orders') ? 'active-link' : 'text-slate-700' }}">
+                      <?php echo e(request()->routeIs('dashboard.orders') ? 'active-link' : 'text-slate-700'); ?>">
                 <i class="fa-solid fa-bag-shopping w-5 text-green-700"></i>
                 <span>Orders</span>
             </a>
 
-            <a href="{{ route('dashboard.orders.history') }}"
+            <a href="<?php echo e(route('dashboard.orders.history')); ?>"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
-                      {{ request()->routeIs('dashboard.orders.history') ? 'active-link' : 'text-slate-700' }}">
+                      <?php echo e(request()->routeIs('dashboard.orders.history') ? 'active-link' : 'text-slate-700'); ?>">
                 <i class="fa-solid fa-clock-rotate-left w-5 text-green-700"></i>
                 <span>Order History</span>
             </a>
 
-            <a href="{{ route('dashboard.users') }}"
+            <a href="<?php echo e(route('dashboard.users')); ?>"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
-                      {{ request()->routeIs('dashboard.users*') ? 'active-link' : 'text-slate-700' }}">
+                      <?php echo e(request()->routeIs('dashboard.users*') ? 'active-link' : 'text-slate-700'); ?>">
                 <i class="fa-solid fa-user w-5 text-green-700"></i>
                 <span>Users</span>
             </a>
 
-            <a href="{{ route('dashboard.delivery-boys') }}"
+            <a href="<?php echo e(route('dashboard.delivery-boys')); ?>"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
-                      {{ request()->routeIs('dashboard.delivery-boys*') ? 'active-link' : 'text-slate-700' }}">
+                      <?php echo e(request()->routeIs('dashboard.delivery-boys*') ? 'active-link' : 'text-slate-700'); ?>">
                 <i class="fa-solid fa-motorcycle w-5 text-green-700"></i>
                 <span>Delivery Boys</span>
             </a>
 
-            <a href="{{ route('dashboard.notifications') }}"
+            <a href="<?php echo e(route('dashboard.notifications')); ?>"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
-                      {{ request()->routeIs('dashboard.notifications') ? 'active-link' : 'text-slate-700' }}">
+                      <?php echo e(request()->routeIs('dashboard.notifications') ? 'active-link' : 'text-slate-700'); ?>">
                 <i class="fa-regular fa-bell w-5 text-green-700"></i>
                 <span>Notifications</span>
             </a>
 
-            <a href="{{ route('dashboard.coupons') }}"
+            <a href="<?php echo e(route('dashboard.coupons')); ?>"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
-                      {{ request()->routeIs('dashboard.coupons') ? 'active-link' : 'text-slate-700' }}">
+                      <?php echo e(request()->routeIs('dashboard.coupons') ? 'active-link' : 'text-slate-700'); ?>">
                 <i class="fa-solid fa-tags w-5 text-green-700"></i>
                 <span>Coupons & Offers</span>
             </a>
 
-            <a href="{{ route('dashboard.settings.service-charge') }}"
+            <a href="<?php echo e(route('dashboard.settings.service-charge')); ?>"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
-                      {{ request()->routeIs('dashboard.settings.service-charge') ? 'active-link' : 'text-slate-700' }}">
+                      <?php echo e(request()->routeIs('dashboard.settings.service-charge') ? 'active-link' : 'text-slate-700'); ?>">
                 <i class="fa-solid fa-percent w-5 text-green-700"></i>
                 <span>Service Charge</span>
             </a>
 
-            <a href="{{ route('dashboard.settings.delivery-slots') }}"
+            <a href="<?php echo e(route('dashboard.settings.delivery-slots')); ?>"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
-                      {{ request()->routeIs('dashboard.settings.delivery-slots') ? 'active-link' : 'text-slate-700' }}">
+                      <?php echo e(request()->routeIs('dashboard.settings.delivery-slots') ? 'active-link' : 'text-slate-700'); ?>">
                 <i class="fa-regular fa-clock w-5 text-green-700"></i>
                 <span>Delivery Slots</span>
             </a>
 
-            <a href="{{ route('dashboard.profile') }}"
+            <a href="<?php echo e(route('dashboard.profile')); ?>"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
-                      {{ request()->routeIs('dashboard.profile') ? 'active-link' : 'text-slate-700' }}">
+                      <?php echo e(request()->routeIs('dashboard.profile') ? 'active-link' : 'text-slate-700'); ?>">
                 <i class="fa-solid fa-circle-user w-5 text-green-700"></i>
                 <span>Profile</span>
             </a>
@@ -220,11 +221,11 @@
                             class="lg:hidden w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-mayview-blue hover:text-white rounded-xl transition">
                         <i class="fa-solid fa-bars text-lg"></i>
                     </button>
-                    <h1 class="text-xl font-bold text-slate-800">@yield('page_title', 'Dashboard')</h1>
+                    <h1 class="text-xl font-bold text-slate-800"><?php echo $__env->yieldContent('page_title', 'Dashboard'); ?></h1>
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <a href="{{ route('dashboard.notifications') }}"
+                    <a href="<?php echo e(route('dashboard.notifications')); ?>"
                        class="relative w-10 h-10 flex items-center justify-center bg-slate-100 rounded-xl hover:bg-mayview-blue hover:text-white transition">
                         <i class="fa-regular fa-bell text-lg"></i>
                         <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full"></span>
@@ -233,11 +234,12 @@
                     <div class="relative">
                         <button onclick="toggleProfile()" class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-sm">
-                                {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+                                <?php echo e(strtoupper(substr(auth()->user()->name ?? 'A', 0, 1))); ?>
+
                             </div>
                             <div class="hidden sm:block text-left">
-                                <p class="text-sm font-semibold text-slate-800">{{ auth()->user()->name ?? 'Admin' }}</p>
-                                <p class="text-xs text-slate-500 capitalize">{{ auth()->user()->role ?? 'admin' }}</p>
+                                <p class="text-sm font-semibold text-slate-800"><?php echo e(auth()->user()->name ?? 'Admin'); ?></p>
+                                <p class="text-xs text-slate-500 capitalize"><?php echo e(auth()->user()->role ?? 'admin'); ?></p>
                             </div>
                         </button>
                         <!-- userprofile -->
@@ -247,15 +249,15 @@
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                             <div class="pb-3 border-b mb-3">
-                                <p class="font-semibold text-slate-800">{{ auth()->user()->name ?? 'Admin' }}</p>
-                                <p class="text-xs text-slate-500">{{ auth()->user()->email ?? '' }}</p>
+                                <p class="font-semibold text-slate-800"><?php echo e(auth()->user()->name ?? 'Admin'); ?></p>
+                                <p class="text-xs text-slate-500"><?php echo e(auth()->user()->email ?? ''); ?></p>
                             </div>
-                            <a href="{{ route('dashboard.profile') }}"
+                            <a href="<?php echo e(route('dashboard.profile')); ?>"
                                class="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-lg">
                                 <i class="fa-solid fa-user-gear"></i> Profile Settings
                             </a>
-                            <form method="POST" action="{{ route('dashboard.logout') }}">
-                                @csrf
+                            <form method="POST" action="<?php echo e(route('dashboard.logout')); ?>">
+                                <?php echo csrf_field(); ?>
                                 <button type="submit"
                                         class="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg">
                                     <i class="fa-solid fa-right-from-bracket"></i> Logout
@@ -269,33 +271,35 @@
 
         <!-- MAIN CONTENT  -->
         <main class="lg:mt-[4.5rem] min-h-screen">
-            @if(session('success'))
+            <?php if(session('success')): ?>
                 <div class="mx-6 mt-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
+                    <i class="fa-solid fa-circle-check"></i> <?php echo e(session('success')); ?>
+
                 </div>
-            @endif
-            @if(session('error'))
+            <?php endif; ?>
+            <?php if(session('error')): ?>
                 <div class="mx-6 mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-circle-xmark"></i> {{ session('error') }}
+                    <i class="fa-solid fa-circle-xmark"></i> <?php echo e(session('error')); ?>
+
                 </div>
-            @endif
-            @if($errors->any())
+            <?php endif; ?>
+            <?php if($errors->any()): ?>
                 <div class="mx-6 mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-circle-xmark"></i>
-                        <span>{{ $errors->first() }}</span>
+                        <span><?php echo e($errors->first()); ?></span>
                     </div>
                 </div>
-            @endif
+            <?php endif; ?>
 
-            @yield('content')
+            <?php echo $__env->yieldContent('content'); ?>
         </main>
 
         <!-- Footer -->
         <footer class="bg-white border-t border-slate-100 px-8 py-3">
             <div class="flex flex-col md:flex-row justify-between items-center gap-2">
                 <p class="text-sm text-slate-500">
-                    &copy; {{ date('Y') }} <span class="text-farmsea-green font-bold">FarmSea</span>. All rights reserved.
+                    &copy; <?php echo e(date('Y')); ?> <span class="text-farmsea-green font-bold">FarmSea</span>. All rights reserved.
                 </p>
                 <div class="flex items-center gap-2 px-4 py-1.5 bg-slate-50 rounded-full border border-slate-100">
                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Design & Developed by</span>
@@ -341,6 +345,7 @@
         });
     </script>
 
-    @yield('scripts')
+    <?php echo $__env->yieldContent('scripts'); ?>
 </body>
 </html>
+<?php /**PATH C:\FarmSea-dashboard\resources\views/layouts/dashboard.blade.php ENDPATH**/ ?>

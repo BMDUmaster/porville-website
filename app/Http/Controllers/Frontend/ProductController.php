@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\Product;
+use App\Support\DeliverySlotManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -114,6 +115,13 @@ class ProductController extends Controller
             ->take(4)
             ->get();
 
+        $deliverySlotOptions = DeliverySlotManager::options();
+        $selectedDeliverySlot = session('selected_delivery_slot');
+
+        if (! in_array($selectedDeliverySlot, DeliverySlotManager::values(), true)) {
+            $selectedDeliverySlot = DeliverySlotManager::defaultValue();
+        }
+
         $palette = [
             ['icon' => 'fa-tag', 'icon_bg' => 'bg-[#e9f7ec]', 'icon_color' => 'text-[#2f8c43]', 'code_bg' => 'bg-[#edf8ef]', 'code_text' => 'text-[#2f8c43]'],
             ['icon' => 'fa-truck-fast', 'icon_bg' => 'bg-[#ebf4ff]', 'icon_color' => 'text-[#2d72d3]', 'code_bg' => 'bg-[#ebf4ff]', 'code_text' => 'text-[#2d72d3]'],
@@ -142,6 +150,6 @@ class ProductController extends Controller
             })
             ->all();
 
-        return view('frontend.product-detail', compact('product', 'similar', 'frontendOfferCards', 'newArrivalProductIds'));
+        return view('frontend.product-detail', compact('product', 'similar', 'frontendOfferCards', 'newArrivalProductIds', 'deliverySlotOptions', 'selectedDeliverySlot'));
     }
 }

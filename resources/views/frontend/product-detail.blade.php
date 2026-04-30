@@ -46,6 +46,7 @@
     $defaultVariant = $variantPayload->first();
     $selectedPackLabel = $defaultVariant['label'] ?: (($product->weight ?: '1') . ' ' . ($product->unit ?: 'unit'));
     $selectedSaveAmount = max(($defaultVariant['mrp'] ?? 0) - ($defaultVariant['selling_price'] ?? 0), 0);
+    $selectedDeliverySlotLabel = collect($deliverySlotOptions ?? [])->firstWhere('value', $selectedDeliverySlot)['label'] ?? null;
     $productShortDescription = 'Pasture-raised, grain-fed whole chicken. Cleaned & ready to cook. Our whole farm chicken is sourced fresh daily and never frozen. Every batch is quality-checked before dispatch.';
     $productOrigin = $product->subcategory->name ?? $product->category->name ?? 'FarmSea Farms';
     $productCategory = $product->category->name ?? 'Fresh Cuts';
@@ -396,6 +397,27 @@
             </div>
 
             <div>
+                <div class="mb-2 flex items-center justify-between gap-3">
+                    <div class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-500">Delivery Slot</div>
+                    @if($selectedDeliverySlotLabel)
+                        <div id="detailDeliverySlotLabel" class="text-[10px] font-bold text-[#2f8c43]">{{ $selectedDeliverySlotLabel }}</div>
+                    @endif
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    @foreach($deliverySlotOptions as $index => $slot)
+                        <button
+                            type="button"
+                            onclick="selectDeliverySlot('{{ $slot['value'] }}', '{{ $slot['label'] }}')"
+                            data-delivery-slot="{{ $slot['value'] }}"
+                            class="delivery-slot-chip {{ $selectedDeliverySlot === $slot['value'] ? 'is-active border-[#2f8c43] bg-[#f2fbf3] text-[#215f31] shadow-[0_8px_18px_rgba(47,140,67,0.10)]' : 'border-slate-200 bg-white text-slate-600' }} rounded-full border px-3 py-2 text-[10px] font-bold leading-none transition hover:border-[#94d3a2] hover:text-[#2f8c43]"
+                        >
+                            {{ $slot['label'] }}
+                        </button>
+                    @endforeach
+                </div>
+            </div>
+
+            <div>
                 <div class="mb-3 text-[12px] font-black uppercase tracking-[0.18em] text-slate-500">Pack Size</div>
                 <div class="flex flex-wrap gap-3">
                     @foreach($variantPayload as $index => $variant)
@@ -695,6 +717,7 @@
 <script>
 const detailGalleryImages = @json(collect($galleryImages)->map(fn($image) => asset('storage/' . $image))->values());
 const detailVariants = @json($variantPayload);
+let selectedDeliverySlot = @json($selectedDeliverySlot);
 
 let currentQty = 1;
 let selectedVariant = 0;
@@ -828,6 +851,27 @@ function selectVariant(index) {
     if (saveRow) saveRow.classList.toggle('hidden', !canShowDiscount);
 }
 
+function selectDeliverySlot(value, label) {
+    selectedDeliverySlot = value;
+
+    document.querySelectorAll('.delivery-slot-chip').forEach((chip) => {
+        const isActive = chip.dataset.deliverySlot === value;
+        chip.classList.toggle('is-active', isActive);
+        chip.classList.toggle('border-[#2f8c43]', isActive);
+        chip.classList.toggle('bg-[#f2fbf3]', isActive);
+        chip.classList.toggle('text-[#215f31]', isActive);
+        chip.classList.toggle('shadow-[0_8px_18px_rgba(47,140,67,0.10)]', isActive);
+        chip.classList.toggle('border-slate-200', !isActive);
+        chip.classList.toggle('bg-white', !isActive);
+        chip.classList.toggle('text-slate-600', !isActive);
+    });
+
+    const labelNode = document.getElementById('detailDeliverySlotLabel');
+    if (labelNode) {
+        labelNode.textContent = label;
+    }
+}
+
 function sendCartRequest(productId, redirectToCheckout = false) {
     fetch('{{ route("frontend.cart.add") }}', {
         method: 'POST',
@@ -836,7 +880,7 @@ function sendCartRequest(productId, redirectToCheckout = false) {
             'X-CSRF-TOKEN': '{{ csrf_token() }}',
             'Accept': 'application/json',
         },
-        body: JSON.stringify({ product_id: productId, quantity: currentQty, variant_index: selectedVariant })
+        body: JSON.stringify({ product_id: productId, quantity: currentQty, variant_index: selectedVariant, delivery_slot: selectedDeliverySlot })
     })
     .then(response => response.json())
     .then(data => {
