@@ -76,13 +76,13 @@
             <span id="methodField"></span>
             <div class="space-y-7 px-5 py-5 sm:space-y-9 sm:px-8 sm:py-8">
                 <div id="userSelectSection" class="space-y-4">
-                    <label class="block text-[15px] font-bold text-slate-700">Select Users</label>
-                    <input type="text" id="userSearchInput" placeholder="Search user by name or ID..."
+                    <label class="block text-[15px] font-bold text-slate-700">Select Customers</label>
+                    <input type="text" id="userSearchInput" placeholder="Search customer by name or ID..."
                            class="w-full rounded-[10px] border border-slate-300 px-5 py-3 text-base text-slate-700 outline-none transition focus:border-blue-500">
                     <label class="flex items-center gap-3 text-[15px] font-medium text-slate-600">
                         <input type="checkbox" id="selectAllUsers"
                                class="h-6 w-6 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                        <span>Select All Users</span>
+                        <span>Select All Customers</span>
                     </label>
                     <div id="userListBox" class="max-h-56 overflow-y-auto rounded-[12px] border border-slate-200 bg-slate-50/70 p-3">
                         <div class="grid gap-2">
@@ -98,7 +98,7 @@
                                 </label>
                             @empty
                                 <div class="rounded-xl border border-dashed border-slate-200 bg-white px-4 py-6 text-center text-sm text-slate-400">
-                                    No active users available right now.
+                                    No active customers available right now.
                                 </div>
                             @endforelse
                         </div>

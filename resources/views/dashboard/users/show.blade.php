@@ -1,12 +1,12 @@
 @extends('layouts.dashboard')
-@section('title', 'User Details')
-@section('page_title', 'User Details')
+@section('title', 'Customer Details')
+@section('page_title', 'Customer Details')
 
 @section('content')
 <div class="p-4 md:p-8 space-y-6">
 
     <a href="{{ route('dashboard.users') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:underline">
-        <i class="fa-solid fa-arrow-left text-xs"></i> Back to Users
+        <i class="fa-solid fa-arrow-left text-xs"></i> Back to Customers
     </a>
 
     <section class="overflow-hidden rounded-[28px] border border-slate-200 bg-[linear-gradient(135deg,#eff6ff_0%,#ffffff_50%,#ecfdf5_100%)] shadow-sm">
@@ -72,7 +72,7 @@
                             @method('PATCH')
                             <button type="submit"
                                     class="w-full rounded-xl px-5 py-3 text-sm font-black {{ $user->status === 'active' ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-green-100 text-green-600 hover:bg-green-200' }}">
-                                {{ $user->status === 'active' ? 'Block User' : 'Unblock User' }}
+                                {{ $user->status === 'active' ? 'Block Customer' : 'Unblock Customer' }}
                             </button>
                         </form>
                         <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
@@ -128,7 +128,7 @@
         <div class="rounded-[24px] border bg-white shadow-sm">
             <div class="border-b px-6 py-5">
                 <h2 class="text-lg font-black text-slate-900">Full Order History</h2>
-                <p class="mt-1 text-sm text-slate-500">User ke saare orders, payment aur delivery assignment details.</p>
+                <p class="mt-1 text-sm text-slate-500">Customer ke saare orders, payment aur delivery assignment details.</p>
             </div>
             <div class="space-y-4 p-4 md:hidden">
                 @forelse($user->orders as $order)

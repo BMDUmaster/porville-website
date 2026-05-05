@@ -71,7 +71,7 @@
                 <div class="flex justify-between"><span class="text-gray-500">Delivery</span><span>&#8377;{{ number_format($order->delivery_charge ?? $order->shipping_cost ?? 0, 2) }}</span></div>
                 <div class="flex justify-between">
                     <span class="text-gray-500">
-                        Service Charge
+                        &#8505;&#65039; Service Charge
                         @if($order->service_charge_percent)
                             ({{ rtrim(rtrim(number_format($order->service_charge_percent, 2), '0'), '.') }}%)
                         @endif

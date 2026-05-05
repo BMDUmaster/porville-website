@@ -137,7 +137,7 @@
                     <div class="flex justify-between"><span class="text-gray-500">Subtotal</span><span>&#8377;<?php echo e(number_format($pricing['subtotal'], 2)); ?></span></div>
                     <div class="flex justify-between"><span class="text-gray-500">Delivery</span><span>&#8377;<?php echo e(number_format($pricing['delivery_charge'], 2)); ?></span></div>
                     <div class="flex justify-between">
-                        <span class="text-gray-500">Service Charge (<?php echo e(rtrim(rtrim(number_format($pricing['service_charge_percent'], 2), '0'), '.')); ?>%)</span>
+                        <span class="text-gray-500">&#8505;&#65039; Service Charge (<?php echo e(rtrim(rtrim(number_format($pricing['service_charge_percent'], 2), '0'), '.')); ?>%)</span>
                         <span>&#8377;<?php echo e(number_format($pricing['service_charge'], 2)); ?></span>
                     </div>
                     <hr class="border-gray-100">

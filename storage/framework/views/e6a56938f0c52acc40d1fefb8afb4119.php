@@ -88,6 +88,14 @@ html, body { overflow-x: hidden; max-width: 100vw; }
     </div>
 </div>
 
+<?php
+    $drawerDeliverySlotOptions = \App\Support\DeliverySlotManager::options();
+    $drawerSelectedDeliverySlot = session('selected_delivery_slot');
+
+    if (! in_array($drawerSelectedDeliverySlot, \App\Support\DeliverySlotManager::values(), true)) {
+        $drawerSelectedDeliverySlot = \App\Support\DeliverySlotManager::defaultValue();
+    }
+?>
 <!-- Cart Drawer -->
 <div id="cart-overlay" class="hidden fixed inset-0 bg-black/40 z-[9998]" onclick="closeCart()"></div>
 <div id="cart-drawer" class="fixed top-0 right-0 h-full w-[420px] max-w-[95vw] bg-white shadow-2xl z-[9999] flex flex-col">
@@ -103,6 +111,28 @@ html, body { overflow-x: hidden; max-width: 100vw; }
         <p class="text-center text-gray-400 py-8">Your cart is empty</p>
     </div>
     <div class="px-5 py-4 border-t bg-white">
+        <div class="mb-4 rounded-2xl border border-green-100 bg-green-50/60 p-3">
+            <div class="mb-2 flex items-center justify-between gap-3">
+                <span class="text-xs font-black uppercase tracking-[0.16em] text-slate-600">Delivery Slot</span>
+                <span id="drawer-delivery-slot-label" class="text-[10px] font-bold text-green-700">
+                    <?php echo e(\App\Support\DeliverySlotManager::label($drawerSelectedDeliverySlot)); ?>
+
+                </span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <?php $__currentLoopData = $drawerDeliverySlotOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $slot): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <button
+                        type="button"
+                        onclick="updateCartDrawerDeliverySlot('<?php echo e($slot['value']); ?>')"
+                        data-drawer-delivery-slot="<?php echo e($slot['value']); ?>"
+                        class="drawer-delivery-slot-chip <?php echo e($drawerSelectedDeliverySlot === $slot['value'] ? 'border-green-600 bg-white text-green-700 shadow-sm' : 'border-green-100 bg-white/80 text-slate-600'); ?> rounded-full border px-2.5 py-2 text-[10px] font-bold leading-none transition hover:border-green-400 hover:text-green-700"
+                    >
+                        <?php echo e($slot['label']); ?>
+
+                    </button>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </div>
+        </div>
         <div class="flex justify-between text-sm font-semibold mb-2">
             <span>Subtotal</span>
             <span id="cart-subtotal-drawer">₹0.00</span>
@@ -112,7 +142,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
             <span id="cart-delivery-charge-drawer">Rs0.00</span>
         </div>
         <div class="mb-2 flex justify-between text-xs text-slate-500">
-            <span id="cart-service-charge-label">Service Charge (0%)</span>
+            <span id="cart-service-charge-label">&#8505;&#65039; Service Charge (0%)</span>
             <span id="cart-service-charge-drawer">Rs0.00</span>
         </div>
         <div class="mb-3 flex justify-between text-sm font-bold text-slate-900">
@@ -531,6 +561,23 @@ function updateCartDrawerQty(key, quantity) {
         }
     });
 }
+function updateCartDrawerDeliverySlot(value) {
+    fetch('<?php echo e(route("frontend.cart.delivery-slot")); ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({ delivery_slot: value })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            refreshCartDrawer();
+        }
+    });
+}
 // Refresh cart drawer
 function refreshCartDrawer() {
     fetch('<?php echo e(route("frontend.cart.count")); ?>')
@@ -542,9 +589,23 @@ function refreshCartDrawer() {
             const chargePercent = Number(data.service_charge_percent || 0);
             const chargePercentText = chargePercent.toFixed(chargePercent % 1 === 0 ? 0 : 2).replace(/\.?0+$/, '');
             document.getElementById('cart-delivery-charge-drawer').textContent = formatCartCurrency(data.delivery_charge);
-            document.getElementById('cart-service-charge-label').textContent = 'Service Charge (' + chargePercentText + '%)';
+            document.getElementById('cart-service-charge-label').textContent = '\u2139\uFE0F Service Charge (' + chargePercentText + '%)';
             document.getElementById('cart-service-charge-drawer').textContent = formatCartCurrency(data.service_charge);
             document.getElementById('cart-total-drawer').textContent = formatCartCurrency(data.total);
+            const drawerSlotLabel = document.getElementById('drawer-delivery-slot-label');
+            if (drawerSlotLabel) {
+                drawerSlotLabel.textContent = data.selected_delivery_slot_label || '';
+            }
+            document.querySelectorAll('[data-drawer-delivery-slot]').forEach((chip) => {
+                const isActive = chip.dataset.drawerDeliverySlot === data.selected_delivery_slot;
+                chip.classList.toggle('border-green-600', isActive);
+                chip.classList.toggle('bg-white', isActive);
+                chip.classList.toggle('text-green-700', isActive);
+                chip.classList.toggle('shadow-sm', isActive);
+                chip.classList.toggle('border-green-100', !isActive);
+                chip.classList.toggle('bg-white/80', !isActive);
+                chip.classList.toggle('text-slate-600', !isActive);
+            });
             renderCartDrawerItems(data.items || []);
         });
 }

@@ -78,7 +78,7 @@ class ProductController extends Controller
 
         if (empty($data['variants'])) {
             throw ValidationException::withMessages([
-                'variants' => 'Add at least one product variant with quantity and selling price.',
+                'variants' => 'Add at least one product variant with selling price.',
             ]);
         }
 
@@ -218,12 +218,9 @@ class ProductController extends Controller
                 continue;
             }
 
-            if (
-                blank($variant['quantity'] ?? null)
-                || blank($variant['selling_price'] ?? null)
-            ) {
+            if (blank($variant['selling_price'] ?? null)) {
                 throw ValidationException::withMessages([
-                    'variants' => 'Each product variant must include quantity and selling price.',
+                    'variants' => 'Each product variant must include selling price.',
                 ]);
             }
 

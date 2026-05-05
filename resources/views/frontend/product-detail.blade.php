@@ -27,7 +27,19 @@
         ]);
     }
 
-    $variantPayload = $variantCollection->map(function ($variant) {
+    $formatPriceUnit = static function (?string $quantity, ?string $unit): string {
+        $cleanQuantity = trim((string) $quantity);
+        $cleanUnit = trim((string) $unit);
+        $displayUnit = $cleanUnit !== '' ? ($cleanUnit === 'Pc' ? 'Pcs' : $cleanUnit) : 'unit';
+
+        if ($cleanQuantity !== '') {
+            return $cleanQuantity . ' /' . $displayUnit;
+        }
+
+        return '/' . $displayUnit;
+    };
+
+    $variantPayload = $variantCollection->map(function ($variant) use ($formatPriceUnit) {
         $sellingPrice = (float) ($variant['selling_price'] ?? 0);
         $mrp = (float) ($variant['mrp'] ?? $sellingPrice);
         $saveOffer = (float) ($variant['save_offer'] ?? ($mrp > $sellingPrice && $mrp > 0
@@ -37,6 +49,9 @@
         return [
             'label' => trim(($variant['quantity'] ?? '') . ' ' . ($variant['unit'] ?? '')),
             'sub_label' => $variant['piece'] ?? null,
+            'quantity' => trim((string) ($variant['quantity'] ?? '')),
+            'unit' => trim((string) ($variant['unit'] ?? '')),
+            'price_unit_label' => $formatPriceUnit($variant['quantity'] ?? null, $variant['unit'] ?? null),
             'selling_price' => $sellingPrice,
             'mrp' => $mrp,
             'save_offer' => round($saveOffer),
@@ -46,8 +61,8 @@
     $defaultVariant = $variantPayload->first();
     $selectedPackLabel = $defaultVariant['label'] ?: (($product->weight ?: '1') . ' ' . ($product->unit ?: 'unit'));
     $selectedSaveAmount = max(($defaultVariant['mrp'] ?? 0) - ($defaultVariant['selling_price'] ?? 0), 0);
-    $selectedDeliverySlotLabel = collect($deliverySlotOptions ?? [])->firstWhere('value', $selectedDeliverySlot)['label'] ?? null;
-    $productShortDescription = 'Pasture-raised, grain-fed whole chicken. Cleaned & ready to cook. Our whole farm chicken is sourced fresh daily and never frozen. Every batch is quality-checked before dispatch.';
+    $hasProductDescription = filled(trim(strip_tags((string) ($product->description ?? ''))));
+    $initialDetailTab = $hasProductDescription ? 'description' : 'offers';
     $productOrigin = $product->subcategory->name ?? $product->category->name ?? 'FarmSea Farms';
     $productCategory = $product->category->name ?? 'Fresh Cuts';
     $productTagline = 'Pasture-Raised • Grain-Fed • Air-Chilled';
@@ -164,7 +179,7 @@
             'icon_bg' => 'bg-[#e9f7ec]',
             'icon_color' => 'text-[#2f8c43]',
             'title' => '20% Off on First Order',
-            'text' => 'New users get flat 20% off on their first FarmSea order. No minimum order value.',
+            'text' => 'New customers get flat 20% off on their first FarmSea order. No minimum order value.',
             'code' => 'FARMNEW20',
             'code_bg' => 'bg-[#edf8ef]',
             'code_text' => 'text-[#2f8c43]',
@@ -335,9 +350,11 @@
                     <p class="mt-2 text-[12px] font-semibold tracking-[0.01em] text-slate-400">
                         {{ $productTagline }}
                     </p>
-                    <p class="mt-3 max-w-[650px] text-[14px] leading-7 text-slate-500 md:text-[15px]">
-                        {{ Str::limit($productShortDescription, 118) }}
-                    </p>
+                    @if($hasProductDescription)
+                        <p class="mt-3 max-w-[650px] text-[14px] leading-7 text-slate-500 md:text-[15px]">
+                            {{ \Illuminate\Support\Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags((string) $product->description))), 118) }}
+                        </p>
+                    @endif
                 </div>
 
                 <div class="hidden items-center gap-2 sm:flex">
@@ -350,19 +367,11 @@
                 </div>
             </div>
 
-            <div class="flex flex-wrap items-center gap-3 text-[12px] font-semibold text-slate-500">
-                <span class="inline-flex items-center gap-1 rounded-lg bg-[#fff0c8] px-3 py-1 text-[#8c6300] shadow-sm">
-                    <i class="fa-solid fa-star text-[11px]"></i>
-                    4.8
-                </span>
-                <span>2,400+ sold</span>
-            </div>
-
             <div class="rounded-[24px] border border-[#bce8c3] bg-[#f2fbf3] p-5 shadow-[0_18px_45px_rgba(47,140,67,0.08)]">
                 <div class="flex flex-wrap items-end gap-3">
                     <span class="text-[40px] font-black leading-none text-slate-900 md:text-[46px]">
                         Rs<span id="detailCurrentPrice">{{ number_format($defaultVariant['selling_price'] ?? $product->price, 0) }}</span>
-                        <span id="detailCurrentPriceUnit" class="ml-1 text-[14px] font-bold text-slate-400 md:text-[16px]">/{{ $product->unit ?: 'unit' }}</span>
+                        <span id="detailCurrentPriceUnit" class="ml-1 text-[14px] font-bold text-slate-400 md:text-[16px]">{{ $defaultVariant['price_unit_label'] ?? $formatPriceUnit($product->weight ?? null, $product->unit ?? null) }}</span>
                     </span>
                     <span id="detailMrpWrap" class="{{ ($defaultVariant['mrp'] ?? 0) > ($defaultVariant['selling_price'] ?? 0) ? '' : 'hidden' }} flex items-center gap-2">
                         <span id="detailMrp" class="text-[16px] font-bold text-slate-400 line-through">
@@ -373,11 +382,10 @@
                         </span>
                     </span>
                 </div>
-                <div id="detailPackMeta" class="mt-2 text-[12px] font-semibold text-slate-500">
-                    <span id="detailPackLabel">{{ $selectedPackLabel }}</span> | Inclusive of all taxes
-                </div>
-                <div id="detailSaveRow" class="{{ $selectedSaveAmount > 0 ? '' : 'hidden' }} mt-3 inline-flex rounded-xl border border-[#8bd39a] bg-[#dff6e3] px-3 py-1.5 text-[11px] font-black text-[#2f8c43]">
-                    You save Rs <span id="detailSaveAmount" class="ml-1">{{ number_format($selectedSaveAmount, 0) }}</span> on this order
+                <div id="detailSaveRow" class="{{ $selectedSaveAmount > 0 ? '' : 'hidden' }} mt-3 inline-flex items-center gap-1 rounded-xl border border-[#8bd39a] bg-[#dff6e3] px-3 py-1.5 text-[11px] font-black text-[#2f8c43]">
+                    <span>You save Rs</span>
+                    <span id="detailSaveAmount">{{ number_format($selectedSaveAmount, 0) }}</span>
+                    <span>on this order</span>
                 </div>
             </div>
 
@@ -386,35 +394,10 @@
                     <i class="fa-solid {{ $isProductAvailable ? 'fa-circle-check' : 'fa-ban' }} text-[10px]"></i>
                     {{ $isProductAvailable ? 'In Stock' : 'Out of Stock' }}
                 </span>
-                <span class="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-[11px] font-black text-blue-700">
-                    <i class="fa-solid fa-truck-fast text-[10px]"></i>
-                    Same Day Delivery
-                </span>
                 <span class="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] font-black text-amber-700">
                     <i class="fa-solid fa-snowflake text-[10px]"></i>
                     Fresh Guaranteed
                 </span>
-            </div>
-
-            <div>
-                <div class="mb-2 flex items-center justify-between gap-3">
-                    <div class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-500">Delivery Slot</div>
-                    @if($selectedDeliverySlotLabel)
-                        <div id="detailDeliverySlotLabel" class="text-[10px] font-bold text-[#2f8c43]">{{ $selectedDeliverySlotLabel }}</div>
-                    @endif
-                </div>
-                <div class="flex flex-wrap gap-2">
-                    @foreach($deliverySlotOptions as $index => $slot)
-                        <button
-                            type="button"
-                            onclick="selectDeliverySlot('{{ $slot['value'] }}', '{{ $slot['label'] }}')"
-                            data-delivery-slot="{{ $slot['value'] }}"
-                            class="delivery-slot-chip {{ $selectedDeliverySlot === $slot['value'] ? 'is-active border-[#2f8c43] bg-[#f2fbf3] text-[#215f31] shadow-[0_8px_18px_rgba(47,140,67,0.10)]' : 'border-slate-200 bg-white text-slate-600' }} rounded-full border px-3 py-2 text-[10px] font-bold leading-none transition hover:border-[#94d3a2] hover:text-[#2f8c43]"
-                        >
-                            {{ $slot['label'] }}
-                        </button>
-                    @endforeach
-                </div>
             </div>
 
             <div>
@@ -493,68 +476,32 @@
 
     <div class="mt-10 overflow-x-auto">
         <div class="inline-flex min-w-full gap-1.5 rounded-[18px] border border-slate-200/90 bg-[#f7f9f7] p-2 shadow-[0_10px_25px_rgba(15,23,42,0.05)]">
-            <button type="button" data-detail-tab="description" class="detail-tab-button is-active inline-flex items-center gap-2 rounded-[12px] border border-transparent px-4 py-2.5 text-[12px] font-black text-[#2f8c43] transition">
-                <i class="fa-solid fa-bars-staggered text-[11px]"></i>
-                Description
-            </button>
-            <button type="button" data-detail-tab="offers" class="detail-tab-button inline-flex items-center gap-2 rounded-[12px] border border-transparent px-4 py-2.5 text-[12px] font-black text-slate-500 transition hover:bg-white hover:text-slate-800">
+            @if($hasProductDescription)
+                <button type="button" data-detail-tab="description" class="detail-tab-button {{ $initialDetailTab === 'description' ? 'is-active bg-white border-slate-200 shadow-sm text-[#2f8c43]' : 'border-transparent text-slate-500' }} inline-flex items-center gap-2 rounded-[12px] border px-4 py-2.5 text-[12px] font-black transition hover:bg-white hover:text-slate-800">
+                    <i class="fa-solid fa-bars-staggered text-[11px]"></i>
+                    Description
+                </button>
+            @endif
+            <button type="button" data-detail-tab="offers" class="detail-tab-button {{ $initialDetailTab === 'offers' ? 'is-active bg-white border-slate-200 shadow-sm text-[#2f8c43]' : 'border-transparent text-slate-500' }} inline-flex items-center gap-2 rounded-[12px] border px-4 py-2.5 text-[12px] font-black transition hover:bg-white hover:text-slate-800">
                 <i class="fa-solid fa-tag text-[11px]"></i>
                 Offers
-            </button>
-            <button type="button" data-detail-tab="delivery" class="detail-tab-button inline-flex items-center gap-2 rounded-[12px] border border-transparent px-4 py-2.5 text-[12px] font-black text-slate-500 transition hover:bg-white hover:text-slate-800">
-                <i class="fa-solid fa-truck-fast text-[11px]"></i>
-                Delivery
             </button>
         </div>
     </div>
 
     <div class="mt-6 overflow-hidden rounded-[28px] border border-slate-200 bg-[#fbfcfa] shadow-[0_22px_55px_rgba(15,23,42,0.06)]">
-        <div id="detail-tab-description" data-detail-panel="description" class="detail-tab-panel">
-            <section id="about-product" class="border-b border-slate-100 px-5 py-6 md:px-7">
-                <h2 class="text-[18px] font-black text-slate-900">About This Product</h2>
-                <p class="mt-3 max-w-[980px] text-[14px] leading-8 text-slate-600">
-                    {{ $productShortDescription }}
-                </p>
-            </section>
+        @if($hasProductDescription)
+            <div id="detail-tab-description" data-detail-panel="description" class="detail-tab-panel {{ $initialDetailTab !== 'description' ? 'hidden' : '' }}">
+                <section id="about-product" class="px-5 py-6 md:px-7">
+                    <h2 class="text-[18px] font-black text-slate-900">About This Product</h2>
+                    <div class="mt-3 max-w-[980px] text-[14px] leading-8 text-slate-600">
+                        {!! nl2br(e($product->description)) !!}
+                    </div>
+                </section>
+            </div>
+        @endif
 
-            <section id="why-choose" class="border-b border-slate-100 px-5 py-6 md:px-7">
-                <h3 class="text-[16px] font-black text-slate-900">Why Choose FarmSea?</h3>
-                <div class="mt-4 grid gap-3">
-                    @foreach($featureBullets as $bullet)
-                        <div class="flex items-start gap-3 rounded-2xl bg-[#fafbf8] px-4 py-3">
-                            <span class="mt-1 text-[#2f8c43]"><i class="fa-solid fa-check text-[12px]"></i></span>
-                            <p class="text-[13px] font-semibold leading-6 text-slate-600">{{ $bullet }}</p>
-                        </div>
-                    @endforeach
-                </div>
-            </section>
-
-            <section id="cooking-guide" class="border-b border-slate-100 px-5 py-6 md:px-7">
-                <h3 class="text-[16px] font-black text-slate-900">Suggested Cooking Methods</h3>
-                <div class="mt-4 grid gap-3">
-                    @foreach($cookingBullets as $bullet)
-                        <div class="flex items-start gap-3 rounded-2xl bg-[#fafbf8] px-4 py-3">
-                            <span class="mt-1 text-[#2f8c43]"><i class="fa-solid fa-fire text-[12px]"></i></span>
-                            <p class="text-[13px] font-semibold leading-6 text-slate-600">{{ $bullet }}</p>
-                        </div>
-                    @endforeach
-                </div>
-            </section>
-
-            <section id="packaging-storage" class="px-5 py-6 md:px-7">
-                <h3 class="text-[16px] font-black text-slate-900">Packaging &amp; Storage</h3>
-                <div class="mt-4 grid gap-3">
-                    @foreach($storageBullets as $bullet)
-                        <div class="flex items-start gap-3 rounded-2xl bg-[#fafbf8] px-4 py-3">
-                            <span class="mt-1 text-[#2f8c43]"><i class="fa-solid fa-box text-[12px]"></i></span>
-                            <p class="text-[13px] font-semibold leading-6 text-slate-600">{{ $bullet }}</p>
-                        </div>
-                    @endforeach
-                </div>
-            </section>
-        </div>
-
-        <section data-detail-panel="offers" class="detail-tab-panel hidden px-5 py-6 md:px-7">
+        <section data-detail-panel="offers" class="detail-tab-panel {{ $initialDetailTab !== 'offers' ? 'hidden' : '' }} px-5 py-6 md:px-7">
             <div class="overflow-hidden rounded-[26px] border border-[#d7e6d7] bg-[radial-gradient(circle_at_top_left,_rgba(229,245,232,0.9),_rgba(255,255,255,1)_55%)]">
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#e3ece3] px-5 py-5 md:px-6">
                     <div>
@@ -628,6 +575,7 @@
             </div>
         </section>
 
+        @if(false)
         <section data-detail-panel="delivery" class="detail-tab-panel hidden px-5 py-6 md:px-7">
             <div class="grid gap-4 lg:grid-cols-2">
                 <div class="overflow-hidden rounded-[20px] border border-slate-200 bg-white shadow-[0_14px_30px_rgba(15,23,42,0.05)]">
@@ -663,6 +611,7 @@
                 </div>
             </div>
         </section>
+        @endif
     </div>
 
     @if($similar->count())
@@ -717,7 +666,6 @@
 <script>
 const detailGalleryImages = @json(collect($galleryImages)->map(fn($image) => asset('storage/' . $image))->values());
 const detailVariants = @json($variantPayload);
-let selectedDeliverySlot = @json($selectedDeliverySlot);
 
 let currentQty = 1;
 let selectedVariant = 0;
@@ -832,13 +780,11 @@ function selectVariant(index) {
     const mrpWrap = document.getElementById('detailMrpWrap');
     const mrp = document.getElementById('detailMrp');
     const offer = document.getElementById('detailOffer');
-    const packMeta = document.getElementById('detailPackMeta');
     const saveRow = document.getElementById('detailSaveRow');
     const saveAmount = document.getElementById('detailSaveAmount');
 
     if (currentPrice) currentPrice.textContent = Math.round(variant.selling_price || 0);
-    if (currentPriceUnit) currentPriceUnit.textContent = '/{{ $product->unit ?: 'unit' }}';
-    if (packMeta) packMeta.textContent = (variant.label || 'Standard Pack') + ' | Inclusive of all taxes';
+    if (currentPriceUnit) currentPriceUnit.textContent = variant.price_unit_label || '/{{ $product->unit ?: 'unit' }}';
 
     const canShowDiscount = Number(variant.mrp || 0) > Number(variant.selling_price || 0);
     const saveValue = Math.max(Number(variant.mrp || 0) - Number(variant.selling_price || 0), 0);
@@ -851,27 +797,6 @@ function selectVariant(index) {
     if (saveRow) saveRow.classList.toggle('hidden', !canShowDiscount);
 }
 
-function selectDeliverySlot(value, label) {
-    selectedDeliverySlot = value;
-
-    document.querySelectorAll('.delivery-slot-chip').forEach((chip) => {
-        const isActive = chip.dataset.deliverySlot === value;
-        chip.classList.toggle('is-active', isActive);
-        chip.classList.toggle('border-[#2f8c43]', isActive);
-        chip.classList.toggle('bg-[#f2fbf3]', isActive);
-        chip.classList.toggle('text-[#215f31]', isActive);
-        chip.classList.toggle('shadow-[0_8px_18px_rgba(47,140,67,0.10)]', isActive);
-        chip.classList.toggle('border-slate-200', !isActive);
-        chip.classList.toggle('bg-white', !isActive);
-        chip.classList.toggle('text-slate-600', !isActive);
-    });
-
-    const labelNode = document.getElementById('detailDeliverySlotLabel');
-    if (labelNode) {
-        labelNode.textContent = label;
-    }
-}
-
 function sendCartRequest(productId, redirectToCheckout = false) {
     fetch('{{ route("frontend.cart.add") }}', {
         method: 'POST',
@@ -880,7 +805,7 @@ function sendCartRequest(productId, redirectToCheckout = false) {
             'X-CSRF-TOKEN': '{{ csrf_token() }}',
             'Accept': 'application/json',
         },
-        body: JSON.stringify({ product_id: productId, quantity: currentQty, variant_index: selectedVariant, delivery_slot: selectedDeliverySlot })
+        body: JSON.stringify({ product_id: productId, quantity: currentQty, variant_index: selectedVariant })
     })
     .then(response => response.json())
     .then(data => {
@@ -921,7 +846,7 @@ document.querySelectorAll('[data-detail-tab]').forEach((button) => {
 
 updateQtyDisplay();
 selectVariant(0);
-activateDetailTab('description');
+activateDetailTab('{{ $initialDetailTab }}');
 applyProductImageZoom();
 </script>
 @endsection

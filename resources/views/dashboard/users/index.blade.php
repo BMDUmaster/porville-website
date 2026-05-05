@@ -1,16 +1,16 @@
 @extends('layouts.dashboard')
-@section('title', 'Users')
-@section('page_title', 'User Management')
+@section('title', 'Customers')
+@section('page_title', 'Customer Management')
 
 @section('content')
 <div class="p-4 lg:p-6">
 
     {{-- Stats --}}
     <div class="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-        @foreach([['Total Users',$stats['total'],'blue-500'],['Active Users',$stats['active'],'green-500'],['Blocked Users',$stats['blocked'],'red-500']] as [$label,$val,$color])
+        @foreach([['Total Customers',$stats['total'],'blue-500'],['Active Customers',$stats['active'],'green-500'],['Blocked Customers',$stats['blocked'],'red-500']] as [$label,$val,$color])
         <div class="bg-white p-5 rounded-2xl shadow flex items-center gap-4">
             <div class="w-12 h-12 bg-{{ $color }} text-white flex items-center justify-center rounded-xl text-xl">
-                {{ $label === 'Total Users' ? '👤' : ($label === 'Active Users' ? '✔' : '✖') }}
+                {{ $label === 'Total Customers' ? '👤' : ($label === 'Active Customers' ? '✔' : '✖') }}
             </div>
             <div>
                 <p class="text-sm text-gray-500">{{ $label }}</p>
@@ -22,7 +22,7 @@
 
     {{-- Filters --}}
     <form method="GET" class="mb-6 flex flex-col gap-3 rounded-2xl bg-white p-4 shadow sm:flex-row sm:flex-wrap">
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by user ID, name, email, phone..."
+        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by customer ID, name, email, phone..."
                class="w-full rounded-full border px-4 py-2 text-sm outline-none sm:w-auto sm:flex-1">
         <select name="status" class="px-4 py-2 rounded-full border text-sm outline-none">
             <option value="">All Status</option>
@@ -74,7 +74,7 @@
                 </div>
             </article>
         @empty
-            <div class="rounded-2xl bg-white px-4 py-10 text-center text-gray-400 shadow">No users found.</div>
+            <div class="rounded-2xl bg-white px-4 py-10 text-center text-gray-400 shadow">No customers found.</div>
         @endforelse
     </div>
 
@@ -82,7 +82,7 @@
         <table class="w-full text-sm min-w-[700px]">
             <thead class="bg-blue-600 text-white">
                 <tr>
-                    <th class="px-4 py-3">user_id</th>
+                    <th class="px-4 py-3">customer_id</th>
                     <th class="px-4 py-3">Name</th>
                     <th class="px-4 py-3">Email</th>
                     <th class="px-4 py-3">Phone</th>
@@ -119,7 +119,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="7" class="px-4 py-8 text-center text-gray-400">No users found.</td></tr>
+                <tr><td colspan="7" class="px-4 py-8 text-center text-gray-400">No customers found.</td></tr>
                 @endforelse
             </tbody>
         </table>

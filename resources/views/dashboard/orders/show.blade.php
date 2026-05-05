@@ -66,7 +66,7 @@
             <div class="border-b">
                 <div class="px-5 py-4">
                     <p class="mb-2 flex items-center gap-1 text-xs font-bold text-teal-600">
-                        <i class="fa-regular fa-user"></i> User
+                        <i class="fa-regular fa-user"></i> Customer
                     </p>
                     <p class="text-sm font-bold text-gray-800">{{ $order->user->name ?? 'Guest' }}</p>
                     @if($order->user->phone ?? null)
@@ -157,7 +157,7 @@
                         </div>
                         <div class="flex justify-between border-b border-gray-100 py-2 text-sm">
                             <span class="font-semibold text-gray-700">
-                                Service Charge
+                                &#8505;&#65039; Service Charge
                                 @if($order->service_charge_percent)
                                     ({{ rtrim(rtrim(number_format($order->service_charge_percent, 2), '0'), '.') }}%)
                                 @endif

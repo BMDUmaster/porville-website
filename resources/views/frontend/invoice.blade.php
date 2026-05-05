@@ -160,7 +160,7 @@
                         </div>
                         <div class="flex items-center justify-between">
                             <span class="text-slate-500">
-                                Service Charge
+                                &#8505;&#65039; Service Charge
                                 @if($serviceChargePercent)
                                     ({{ rtrim(rtrim(number_format($serviceChargePercent, 2), '0'), '.') }}%)
                                 @endif

@@ -16,6 +16,33 @@
             </a>
         </div>
     @else
+    <div class="mb-6 overflow-hidden rounded-2xl border bg-white">
+        <div class="h-1 bg-gradient-to-r from-green-600 to-emerald-400"></div>
+        <div class="border-b px-6 py-5">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <h2 class="nunito text-lg font-extrabold text-gray-800">Delivery Slot</h2>
+                <span id="cartDeliverySlotLabel" class="text-[11px] font-bold text-green-700">
+                    {{ \App\Support\DeliverySlotManager::label($selectedDeliverySlot) }}
+                </span>
+            </div>
+            <p class="mt-2 text-xs text-gray-400"></p>
+        </div>
+        <div class="px-6 py-5">
+            <div class="flex flex-wrap gap-2">
+                @foreach($deliverySlotOptions as $slot)
+                    <button
+                        type="button"
+                        onclick="updateCartDeliverySlot('{{ $slot['value'] }}')"
+                        data-cart-delivery-slot="{{ $slot['value'] }}"
+                        class="cart-delivery-slot-chip {{ $selectedDeliverySlot === $slot['value'] ? 'border-green-600 bg-green-50 text-green-700 shadow-sm' : 'border-gray-200 bg-white text-gray-600' }} rounded-full border px-3 py-2 text-[11px] font-bold leading-none transition hover:border-green-400 hover:text-green-700"
+                    >
+                        {{ $slot['label'] }}
+                    </button>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
     <div class="flex flex-col gap-6 lg:flex-row">
         <div class="flex-1 space-y-4">
             <div class="rounded-2xl border bg-white p-5">
@@ -84,29 +111,31 @@
         </div>
 
         <div class="w-full flex-shrink-0 lg:w-80">
-            <div class="sticky top-24 overflow-hidden rounded-2xl border bg-white">
-                <div class="h-1 bg-gradient-to-r from-blue-700 to-orange-400"></div>
-                <div class="border-b px-6 py-5">
-                    <h2 class="nunito text-lg font-extrabold text-gray-800">Order Summary</h2>
-                </div>
-                <div class="space-y-3 px-6 py-5">
-                    <div class="flex justify-between text-sm"><span class="text-gray-500">Subtotal</span><span class="font-semibold">&#8377;{{ number_format($pricing['subtotal'], 2) }}</span></div>
-                    <div class="flex justify-between text-sm"><span class="text-gray-500">Delivery</span><span class="font-semibold text-gray-800">&#8377;{{ number_format($pricing['delivery_charge'], 2) }}</span></div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-500">Service Charge ({{ rtrim(rtrim(number_format($pricing['service_charge_percent'], 2), '0'), '.') }}%)</span>
-                        <span class="font-semibold text-gray-800">&#8377;{{ number_format($pricing['service_charge'], 2) }}</span>
+            <div class="sticky top-24 space-y-4">
+                <div class="overflow-hidden rounded-2xl border bg-white">
+                    <div class="h-1 bg-gradient-to-r from-blue-700 to-orange-400"></div>
+                    <div class="border-b px-6 py-5">
+                        <h2 class="nunito text-lg font-extrabold text-gray-800">Order Summary</h2>
                     </div>
-                    <hr class="border-gray-100">
-                    <div class="flex justify-between">
-                        <span class="font-bold text-gray-800">Total</span>
-                        <span class="nunito text-xl font-extrabold text-blue-700">&#8377;{{ number_format($pricing['total'], 2) }}</span>
+                    <div class="space-y-3 px-6 py-5">
+                        <div class="flex justify-between text-sm"><span class="text-gray-500">Subtotal</span><span class="font-semibold">&#8377;{{ number_format($pricing['subtotal'], 2) }}</span></div>
+                        <div class="flex justify-between text-sm"><span class="text-gray-500">Delivery</span><span class="font-semibold text-gray-800">&#8377;{{ number_format($pricing['delivery_charge'], 2) }}</span></div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">&#8505;&#65039; Service Charge ({{ rtrim(rtrim(number_format($pricing['service_charge_percent'], 2), '0'), '.') }}%)</span>
+                            <span class="font-semibold text-gray-800">&#8377;{{ number_format($pricing['service_charge'], 2) }}</span>
+                        </div>
+                        <hr class="border-gray-100">
+                        <div class="flex justify-between">
+                            <span class="font-bold text-gray-800">Total</span>
+                            <span class="nunito text-xl font-extrabold text-blue-700">&#8377;{{ number_format($pricing['total'], 2) }}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="px-6 pb-6">
-                    <a href="{{ route('frontend.checkout') }}"
-                       class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-700 py-3.5 text-sm font-bold text-white transition hover:bg-blue-800">
-                        <i class="fa-solid fa-lock text-xs"></i> Proceed to Checkout
-                    </a>
+                    <div class="px-6 pb-6">
+                        <a href="{{ route('frontend.checkout') }}"
+                           class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-700 py-3.5 text-sm font-bold text-white transition hover:bg-blue-800">
+                            <i class="fa-solid fa-lock text-xs"></i> Proceed to Checkout
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -130,6 +159,32 @@ function updateCartQty(key, qty) {
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
         body: JSON.stringify({ key, quantity: qty })
     }).then(r => r.json()).then(d => { if (d.success) location.reload(); });
+}
+
+function updateCartDeliverySlot(value) {
+    fetch('{{ route("frontend.cart.delivery-slot") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+        body: JSON.stringify({ delivery_slot: value })
+    }).then(r => r.json()).then(d => {
+        if (!d.success) return;
+
+        document.querySelectorAll('[data-cart-delivery-slot]').forEach((chip) => {
+            const isActive = chip.dataset.cartDeliverySlot === value;
+            chip.classList.toggle('border-green-600', isActive);
+            chip.classList.toggle('bg-green-50', isActive);
+            chip.classList.toggle('text-green-700', isActive);
+            chip.classList.toggle('shadow-sm', isActive);
+            chip.classList.toggle('border-gray-200', !isActive);
+            chip.classList.toggle('bg-white', !isActive);
+            chip.classList.toggle('text-gray-600', !isActive);
+        });
+
+        const label = document.getElementById('cartDeliverySlotLabel');
+        if (label) {
+            label.textContent = d.delivery_slot_label || '';
+        }
+    });
 }
 </script>
 @endsection

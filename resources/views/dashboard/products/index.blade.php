@@ -850,7 +850,7 @@ function getVariantRowTemplate(idx, tone = 'gray', values = {}) {
     return `
         <div class="flex items-start gap-2 mb-2">
             <div class="flex-1">
-                <p class="text-xs text-gray-500 mb-1">Quantity</p>
+                <p class="text-xs text-gray-500 mb-1">Quantity (Optional)</p>
                 <input type="text" name="variants[${idx}][quantity]" value="${quantity}" placeholder="e.g. 500-600"
                        class="w-full border ${inputBorderClass} rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
             </div>

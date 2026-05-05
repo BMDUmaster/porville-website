@@ -18,8 +18,14 @@ class CartController extends Controller
         $items = $this->buildCartItems($cart);
         $subtotal = collect($items)->sum('subtotal');
         $pricing = OrderPricing::summary($subtotal);
+        $deliverySlotOptions = DeliverySlotManager::options();
+        $selectedDeliverySlot = session('selected_delivery_slot');
 
-        return view('frontend.cart', compact('items', 'pricing'));
+        if (! in_array($selectedDeliverySlot, DeliverySlotManager::values(), true)) {
+            $selectedDeliverySlot = DeliverySlotManager::defaultValue();
+        }
+
+        return view('frontend.cart', compact('items', 'pricing', 'deliverySlotOptions', 'selectedDeliverySlot'));
     }
 
     /** POST /cart/add */
@@ -123,6 +129,26 @@ class CartController extends Controller
         return back();
     }
 
+    /** POST /cart/delivery-slot */
+    public function updateDeliverySlot(Request $request)
+    {
+        $data = $request->validate([
+            'delivery_slot' => ['required', 'string', Rule::in(DeliverySlotManager::values())],
+        ]);
+
+        session(['selected_delivery_slot' => $data['delivery_slot']]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'delivery_slot' => $data['delivery_slot'],
+                'delivery_slot_label' => DeliverySlotManager::label($data['delivery_slot']),
+            ]);
+        }
+
+        return back()->with('success', 'Delivery slot updated.');
+    }
+
     /** POST /cart/remove */
     public function remove(Request $request)
     {
@@ -147,6 +173,11 @@ class CartController extends Controller
         $items = $this->buildCartItems($cart);
         $subtotal = collect($items)->sum('subtotal');
         $pricing = OrderPricing::summary($subtotal);
+        $selectedDeliverySlot = session('selected_delivery_slot');
+
+        if (! in_array($selectedDeliverySlot, DeliverySlotManager::values(), true)) {
+            $selectedDeliverySlot = DeliverySlotManager::defaultValue();
+        }
 
         return response()->json([
             'count' => array_sum(array_column($cart, 'quantity')),
@@ -156,6 +187,8 @@ class CartController extends Controller
             'service_charge_percent' => $pricing['service_charge_percent'],
             'delivery_charge' => $pricing['delivery_charge'],
             'total' => $pricing['total'],
+            'selected_delivery_slot' => $selectedDeliverySlot,
+            'selected_delivery_slot_label' => DeliverySlotManager::label($selectedDeliverySlot),
         ]);
     }
 

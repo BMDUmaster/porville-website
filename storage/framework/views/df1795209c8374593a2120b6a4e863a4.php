@@ -157,7 +157,7 @@
                       hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
                       <?php echo e(request()->routeIs('dashboard.users*') ? 'active-link' : 'text-slate-700'); ?>">
                 <i class="fa-solid fa-user w-5 text-green-700"></i>
-                <span>Users</span>
+                <span>Customers</span>
             </a>
 
             <a href="<?php echo e(route('dashboard.delivery-boys')); ?>"
@@ -189,7 +189,7 @@
                       hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
                       <?php echo e(request()->routeIs('dashboard.settings.service-charge') ? 'active-link' : 'text-slate-700'); ?>">
                 <i class="fa-solid fa-percent w-5 text-green-700"></i>
-                <span>Service Charge</span>
+                <span>&#8505;&#65039; Service Charge</span>
             </a>
 
             <a href="<?php echo e(route('dashboard.settings.delivery-slots')); ?>"
