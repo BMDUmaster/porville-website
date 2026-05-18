@@ -75,7 +75,7 @@ class CartController extends Controller
                 'unit'          => $variant ? ($variant['unit'] ?? $product->unit) : $product->unit,
                 'quantity'      => $qty,
                 'variant_index' => $variantIndex,
-                'variant_label' => $variant ? ($variant['quantity'] . ' ' . ($variant['unit'] ?? '')) : null,
+                'variant_label' => $variant ? $this->formatVariantLabel($variant, $product->unit) : null,
             ];
         }
 
@@ -201,5 +201,24 @@ class CartController extends Controller
             $item['product_url'] = route('frontend.product.show', $item['slug']);
             return $item;
         }, array_values($cart), array_keys($cart));
+    }
+
+    private function formatVariantLabel(array $variant, ?string $fallbackUnit = null): string
+    {
+        $quantity = trim((string) ($variant['quantity'] ?? ''));
+        $unit = trim((string) ($variant['unit'] ?? $fallbackUnit ?? ''));
+        $piece = trim((string) ($variant['piece'] ?? ''));
+
+        if ($quantity !== '') {
+            return trim($quantity . ' ' . $unit);
+        }
+
+        if ($piece !== '') {
+            return preg_match('/[A-Za-z]/', $piece)
+                ? $piece
+                : trim($piece . ' ' . $unit);
+        }
+
+        return $unit;
     }
 }

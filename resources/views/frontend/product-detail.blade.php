@@ -27,19 +27,42 @@
         ]);
     }
 
-    $formatPriceUnit = static function (?string $quantity, ?string $unit): string {
+    $formatVariantLabel = static function (?string $quantity, ?string $unit, ?string $piece = null): string {
         $cleanQuantity = trim((string) $quantity);
         $cleanUnit = trim((string) $unit);
+        $cleanPiece = trim((string) $piece);
+
+        if ($cleanQuantity !== '') {
+            return trim($cleanQuantity . ' ' . $cleanUnit);
+        }
+
+        if ($cleanPiece !== '') {
+            return preg_match('/[A-Za-z]/', $cleanPiece)
+                ? $cleanPiece
+                : trim($cleanPiece . ' ' . $cleanUnit);
+        }
+
+        return $cleanUnit !== '' ? $cleanUnit : 'Standard Pack';
+    };
+
+    $formatPriceUnit = static function (?string $quantity, ?string $unit, ?string $piece = null): string {
+        $cleanQuantity = trim((string) $quantity);
+        $cleanUnit = trim((string) $unit);
+        $cleanPiece = trim((string) $piece);
         $displayUnit = $cleanUnit !== '' ? ($cleanUnit === 'Pc' ? 'Pcs' : $cleanUnit) : 'unit';
 
         if ($cleanQuantity !== '') {
             return $cleanQuantity . ' /' . $displayUnit;
         }
 
+        if ($cleanPiece !== '' && ! preg_match('/[A-Za-z]/', $cleanPiece)) {
+            return $cleanPiece . ' /' . $displayUnit;
+        }
+
         return '/' . $displayUnit;
     };
 
-    $variantPayload = $variantCollection->map(function ($variant) use ($formatPriceUnit) {
+    $variantPayload = $variantCollection->map(function ($variant) use ($formatPriceUnit, $formatVariantLabel) {
         $sellingPrice = (float) ($variant['selling_price'] ?? 0);
         $mrp = (float) ($variant['mrp'] ?? $sellingPrice);
         $saveOffer = (float) ($variant['save_offer'] ?? ($mrp > $sellingPrice && $mrp > 0
@@ -47,11 +70,11 @@
             : 0));
 
         return [
-            'label' => trim(($variant['quantity'] ?? '') . ' ' . ($variant['unit'] ?? '')),
+            'label' => $formatVariantLabel($variant['quantity'] ?? null, $variant['unit'] ?? null, $variant['piece'] ?? null),
             'sub_label' => $variant['piece'] ?? null,
             'quantity' => trim((string) ($variant['quantity'] ?? '')),
             'unit' => trim((string) ($variant['unit'] ?? '')),
-            'price_unit_label' => $formatPriceUnit($variant['quantity'] ?? null, $variant['unit'] ?? null),
+            'price_unit_label' => $formatPriceUnit($variant['quantity'] ?? null, $variant['unit'] ?? null, $variant['piece'] ?? null),
             'selling_price' => $sellingPrice,
             'mrp' => $mrp,
             'save_offer' => round($saveOffer),

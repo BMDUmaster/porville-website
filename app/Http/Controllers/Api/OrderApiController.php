@@ -187,7 +187,7 @@ class OrderApiController extends Controller
                 'unit_price'    => $unitPrice,
                 'mrp'           => $mrp,
                 'unit'          => $variant['unit'] ?? $product->unit,
-                'variant_label' => $variant ? trim(($variant['quantity'] ?? '') . ' ' . ($variant['unit'] ?? '')) : null,
+                'variant_label' => $variant ? $this->formatVariantLabel($variant, $product->unit) : null,
                 'save_offer'    => $variant['save_offer'] ?? null,
                 'vendor_amount' => (float) ($variant['vendor_amount'] ?? 0),
                 'admin_amount'  => (float) ($variant['admin_amount'] ?? 0),
@@ -289,5 +289,24 @@ class OrderApiController extends Controller
         }
 
         return null;
+    }
+
+    private function formatVariantLabel(array $variant, ?string $fallbackUnit = null): string
+    {
+        $quantity = trim((string) ($variant['quantity'] ?? ''));
+        $unit = trim((string) ($variant['unit'] ?? $fallbackUnit ?? ''));
+        $piece = trim((string) ($variant['piece'] ?? ''));
+
+        if ($quantity !== '') {
+            return trim($quantity . ' ' . $unit);
+        }
+
+        if ($piece !== '') {
+            return preg_match('/[A-Za-z]/', $piece)
+                ? $piece
+                : trim($piece . ' ' . $unit);
+        }
+
+        return $unit;
     }
 }

@@ -205,7 +205,7 @@ class CheckoutController extends Controller
                 'quantity'      => $quantity,
                 'pack_quantity' => $packQuantity,
                 'variant_index' => $variantIndex,
-                'variant_label' => $variant ? trim(($variant['quantity'] ?? '') . ' ' . ($variant['unit'] ?? '')) : null,
+                'variant_label' => $variant ? $this->formatVariantLabel($variant, $product->unit) : null,
                 'subtotal'      => $price * $quantity,
             ];
         }
@@ -301,5 +301,24 @@ class CheckoutController extends Controller
         }
 
         return null;
+    }
+
+    private function formatVariantLabel(array $variant, ?string $fallbackUnit = null): string
+    {
+        $quantity = trim((string) ($variant['quantity'] ?? ''));
+        $unit = trim((string) ($variant['unit'] ?? $fallbackUnit ?? ''));
+        $piece = trim((string) ($variant['piece'] ?? ''));
+
+        if ($quantity !== '') {
+            return trim($quantity . ' ' . $unit);
+        }
+
+        if ($piece !== '') {
+            return preg_match('/[A-Za-z]/', $piece)
+                ? $piece
+                : trim($piece . ' ' . $unit);
+        }
+
+        return $unit;
     }
 }
