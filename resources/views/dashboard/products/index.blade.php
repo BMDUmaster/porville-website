@@ -93,7 +93,9 @@
                         'variants' => is_array($product->variants) ? array_values($product->variants) : [],
                     ];
                 @endphp
-                <button onclick='openEditModal(@json($editProductPayload))'
+                <button type="button"
+                        data-product='@json($editProductPayload, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG)'
+                        onclick="openEditModal(this)"
                         class="inline-flex items-center rounded-lg bg-indigo-50 p-2 text-xs text-indigo-600 hover:bg-indigo-100">
                     <i class="fa-solid fa-pen-to-square"></i>
                 </button>
@@ -169,7 +171,9 @@
                                     'variants' => is_array($product->variants) ? array_values($product->variants) : [],
                                 ];
                             @endphp
-                            <button onclick='openEditModal(@json($editProductPayload))'
+                            <button type="button"
+                                    data-product='@json($editProductPayload, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG)'
+                                    onclick="openEditModal(this)"
                                     class="p-2 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
@@ -195,7 +199,7 @@
 
 {{-- Add Product Modal --}}
 <div id="addProductModal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/60 p-4">
-    <div class="bg-white w-full max-w-3xl rounded-xl shadow-2xl flex flex-col max-h-[95vh]">
+    <div class="bg-white w-full max-w-5xl rounded-xl shadow-2xl flex flex-col max-h-[95vh]">
 
         {{-- Header --}}
         <div class="flex items-center justify-between px-6 py-4 border-b">
@@ -285,17 +289,17 @@
                     </button>
                 </div>
 
-                <div id="variantsContainer" class="space-y-3">
+                <div id="variantsContainer" class="space-y-3 overflow-x-auto pb-1">
                     {{-- Initial variant row --}}
                     <div class="variant-row border border-gray-200 rounded p-3">
-                        <div class="flex items-start gap-2 mb-2">
-                            <div class="flex-1">
-                                <p class="text-xs text-gray-500 mb-1">Quantity</p>
+                        <div class="mb-2 grid min-w-[960px] grid-cols-[0.9fr_1.05fr_0.75fr_0.75fr_0.85fr_0.85fr_0.85fr_0.72fr_22px] items-end gap-2">
+                            <div class="min-w-0">
+                                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Quantity</p>
                                 <input type="text" name="variants[0][quantity]" placeholder="e.g. 500-600"
                                        class="w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
                             </div>
-                            <div class="w-32">
-                                <p class="text-xs text-gray-500 mb-1">Unit</p>
+                            <div class="min-w-0">
+                                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Unit</p>
                                 <div class="relative">
                                     <select name="variants[0][unit]"
                                             class="w-full appearance-none border border-gray-300 rounded px-2 py-2 text-sm bg-white outline-none pr-6">
@@ -304,29 +308,45 @@
                                     <span class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">&#9660;</span>
                                 </div>
                             </div>
-                            <div class="flex-1">
-                                <p class="text-xs text-gray-500 mb-1">Piece</p>
+                            <div class="min-w-0">
+                                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Piece</p>
                                 <input type="text" name="variants[0][piece]" placeholder="e.g. 6-8 pieces"
                                        class="w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
                             </div>
-                            <div class="flex-1">
-                                <p class="text-xs text-gray-500 mb-1">MRP</p>
+                            <div class="min-w-0">
+                                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">MRP</p>
                                 <div class="relative">
                                     <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
                                     <input type="number" name="variants[0][mrp]" min="0" step="0.01" data-variant-mrp
                                            class="w-full border border-gray-300 rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
                                 </div>
                             </div>
-                            <div class="flex-1">
-                                <p class="text-xs text-gray-500 mb-1">Selling Price</p>
+                            <div class="min-w-0">
+                                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Selling Price</p>
                                 <div class="relative">
                                     <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
                                     <input type="number" name="variants[0][selling_price]" min="0" step="0.01" data-variant-selling-price
                                            class="w-full border border-gray-300 rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
                                 </div>
                             </div>
-                            <div class="flex-1">
-                                <p class="text-xs text-gray-500 mb-1">Save Offer</p>
+                            <div class="min-w-0">
+                                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Today Price</p>
+                                <div class="relative">
+                                    <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
+                                    <input type="number" name="variants[0][today_price]" min="0" step="0.01"
+                                           class="w-full border border-gray-300 rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
+                                </div>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Tomorrow Price</p>
+                                <div class="relative">
+                                    <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
+                                    <input type="number" name="variants[0][tomorrow_price]" min="0" step="0.01"
+                                           class="w-full border border-gray-300 rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
+                                </div>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Save Offer</p>
                                 <div class="relative">
                                     <input type="number" name="variants[0][save_offer]" min="0" max="100" step="0.1" data-variant-save-offer readonly
                                            class="w-full border border-gray-300 rounded bg-slate-50 px-2 pr-5 py-2 text-sm outline-none focus:border-blue-400">
@@ -334,7 +354,7 @@
                                 </div>
                             </div>
                             <button type="button" onclick="removeVariant(this)"
-                                    class="mt-5 text-gray-400 hover:text-red-500 text-lg leading-none">&times;</button>
+                                    class="mb-3 text-center text-lg leading-none text-gray-400 hover:text-red-500">&times;</button>
                         </div>
                     </div>
                 </div>
@@ -353,7 +373,7 @@
 
 {{-- Edit Product Modal --}}
 <div id="editProductModal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[95vh]">
+    <div class="bg-white w-full max-w-5xl rounded-2xl shadow-2xl flex flex-col max-h-[95vh]">
         <div class="p-5 border-b flex justify-between items-center bg-slate-50 rounded-t-2xl">
             <h2 class="font-bold text-slate-700">Edit Product</h2>
             <button onclick="closeModal('editProductModal')" class="text-slate-400 hover:text-red-500 text-2xl">&times;</button>
@@ -403,11 +423,11 @@
                 <input type="file" id="finalEditImagesInput" name="images[]" multiple class="hidden">
                 <div id="editExistingImagesInputs" class="hidden"></div>
                 <p id="editImageHint" class="mt-1 text-[11px] text-slate-400">Current images neeche dikhengi. Delete icon se hata sakte ho, aur new images add karne ke liye image choose karke Add dabao.</p>
-                <div class="mt-4">
+                <div id="editCurrentImagesSection" class="mt-4 hidden">
                     <p class="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Current Images</p>
                     <div id="editCurrentImagePreviews" class="flex flex-wrap gap-3"></div>
                 </div>
-                <div class="mt-4">
+                <div id="editNewImagesSection" class="mt-4 hidden">
                     <p class="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">New Images</p>
                     <div id="editNewImagePreviews" class="flex flex-wrap gap-3"></div>
                 </div>
@@ -435,7 +455,7 @@
                     </button>
                 </div>
 
-                <div id="editVariantsContainer" class="space-y-3"></div>
+                <div id="editVariantsContainer" class="space-y-3 overflow-x-auto pb-1"></div>
             </div>
             <div class="flex justify-end gap-3 pt-4">
                 <button type="submit" class="bg-indigo-600 text-white px-8 py-2.5 rounded-lg font-bold text-sm">Update</button>
@@ -592,7 +612,26 @@ document.addEventListener('DOMContentLoaded', function () {
     renderEditImagePickerRow();
 });
 
-function openEditModal(product) {
+function openEditModal(source) {
+    const rawProduct = source?.dataset?.product ? JSON.parse(source.dataset.product) : source;
+    const product = {
+        ...rawProduct,
+        variants: Array.isArray(rawProduct?.variants)
+            ? rawProduct.variants.map((variant) => ({
+                quantity: variant?.quantity ?? '',
+                unit: variant?.unit ?? 'Gram',
+                piece: variant?.piece ?? '',
+                mrp: variant?.mrp ?? '',
+                selling_price: variant?.selling_price ?? '',
+                today_price: variant?.today_price ?? '',
+                tomorrow_price: variant?.tomorrow_price ?? '',
+                save_offer: variant?.save_offer ?? '',
+                admin_amount: variant?.admin_amount ?? '',
+                vendor_amount: variant?.vendor_amount ?? '',
+            }))
+            : [],
+    };
+
     document.getElementById('editProductName').value  = product.name ?? '';
     document.getElementById('editCatId').value        = product.category_id ?? '';
     document.getElementById('editDescription').value  = product.description ?? '';
@@ -701,6 +740,8 @@ function syncEditImagePreviews() {
 
         previewContainer.appendChild(previewCard);
     });
+
+    toggleEditImageSection('editNewImagesSection', editProductImages.length > 0);
 }
 
 function removeSelectedEditImage(previewId) {
@@ -751,6 +792,12 @@ function resetEditProductImages(shouldClearCurrent = true) {
         finalInput.value = '';
     }
 
+    toggleEditImageSection('editNewImagesSection', false);
+
+    if (shouldClearCurrent) {
+        toggleEditImageSection('editCurrentImagesSection', false);
+    }
+
     renderEditImagePickerRow();
 }
 
@@ -764,9 +811,11 @@ function renderEditCurrentImages(images) {
     syncEditExistingImagesInputs();
 
     if (!currentEditImages.length) {
-        currentContainer.innerHTML = `<div class="rounded-xl bg-slate-50 px-4 py-8 text-sm font-semibold text-slate-400">No current images uploaded.</div>`;
+        toggleEditImageSection('editCurrentImagesSection', false);
         return;
     }
+
+    toggleEditImageSection('editCurrentImagesSection', true);
 
     currentEditImages.forEach((imagePath, index) => {
         const previewCard = document.createElement('div');
@@ -807,6 +856,14 @@ function removeCurrentEditImage(imagePath) {
     renderEditCurrentImages(currentEditImages);
 }
 
+function toggleEditImageSection(sectionId, shouldShow) {
+    const section = document.getElementById(sectionId);
+
+    if (!section) return;
+
+    section.classList.toggle('hidden', !shouldShow);
+}
+
 
 // Subcategory filter by category
 function loadSubcategories(categoryId, selectId = 'addSubcategorySelect', selectedValue = '') {
@@ -845,17 +902,19 @@ function getVariantRowTemplate(idx, tone = 'gray', values = {}) {
     const piece = values.piece ?? '';
     const mrp = values.mrp ?? '';
     const sellingPrice = values.selling_price ?? '';
+    const todayPrice = values.today_price ?? '';
+    const tomorrowPrice = values.tomorrow_price ?? '';
     const saveOffer = values.save_offer ?? '';
 
     return `
-        <div class="flex items-start gap-2 mb-2">
-            <div class="flex-1">
-                <p class="text-xs text-gray-500 mb-1">Quantity (Optional)</p>
+        <div class="grid min-w-[960px] grid-cols-[0.9fr_1.05fr_0.75fr_0.75fr_0.85fr_0.85fr_0.85fr_0.72fr_22px] items-end gap-2 mb-2">
+            <div class="min-w-0">
+                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Quantity (Optional)</p>
                 <input type="text" name="variants[${idx}][quantity]" value="${quantity}" placeholder="e.g. 500-600"
                        class="w-full border ${inputBorderClass} rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
             </div>
-            <div class="w-32">
-                <p class="text-xs text-gray-500 mb-1">Unit</p>
+            <div class="min-w-0">
+                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Unit</p>
                 <div class="relative">
                     <select name="variants[${idx}][unit]"
                             class="w-full appearance-none border ${inputBorderClass} rounded px-2 py-2 text-sm bg-white outline-none pr-6">
@@ -867,29 +926,45 @@ function getVariantRowTemplate(idx, tone = 'gray', values = {}) {
                     <span class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">&#9660;</span>
                 </div>
             </div>
-            <div class="flex-1">
-                <p class="text-xs text-gray-500 mb-1">Piece</p>
+            <div class="min-w-0">
+                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Piece</p>
                 <input type="text" name="variants[${idx}][piece]" value="${piece}" placeholder="e.g. 6-8 pieces"
                        class="w-full border ${inputBorderClass} rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
             </div>
-            <div class="flex-1">
-                <p class="text-xs text-gray-500 mb-1">MRP</p>
+            <div class="min-w-0">
+                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">MRP</p>
                 <div class="relative">
                     <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
                     <input type="number" name="variants[${idx}][mrp]" value="${mrp}" min="0" step="0.01" data-variant-mrp
                            class="w-full border ${inputBorderClass} rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
                 </div>
             </div>
-            <div class="flex-1">
-                <p class="text-xs text-gray-500 mb-1">Selling Price</p>
+            <div class="min-w-0">
+                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Selling Price</p>
                 <div class="relative">
                     <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
                     <input type="number" name="variants[${idx}][selling_price]" value="${sellingPrice}" min="0" step="0.01" data-variant-selling-price
                            class="w-full border ${inputBorderClass} rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
                 </div>
             </div>
-            <div class="flex-1">
-                <p class="text-xs text-gray-500 mb-1">Save Offer</p>
+            <div class="min-w-0">
+                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Today Price</p>
+                <div class="relative">
+                    <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
+                    <input type="number" name="variants[${idx}][today_price]" value="${todayPrice}" min="0" step="0.01"
+                           class="w-full border ${inputBorderClass} rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
+                </div>
+            </div>
+            <div class="min-w-0">
+                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Tomorrow Price</p>
+                <div class="relative">
+                    <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
+                    <input type="number" name="variants[${idx}][tomorrow_price]" value="${tomorrowPrice}" min="0" step="0.01"
+                           class="w-full border ${inputBorderClass} rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
+                </div>
+            </div>
+            <div class="min-w-0">
+                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Save Offer</p>
                 <div class="relative">
                     <input type="number" name="variants[${idx}][save_offer]" value="${saveOffer}" min="0" max="100" step="0.1" data-variant-save-offer readonly
                            class="w-full border ${inputBorderClass} rounded ${inputBgClass} px-2 pr-5 py-2 text-sm outline-none focus:border-blue-400">
@@ -897,7 +972,7 @@ function getVariantRowTemplate(idx, tone = 'gray', values = {}) {
                 </div>
             </div>
             <button type="button" onclick="removeVariant(this)"
-                    class="mt-5 ${removeClass} hover:text-red-500 text-lg leading-none">&times;</button>
+                    class="mb-3 text-center text-lg leading-none ${removeClass} hover:text-red-500">&times;</button>
         </div>`;
 }
 

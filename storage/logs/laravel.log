@@ -12590,3 +12590,53 @@
 [stacktrace]
 #0 {main}
 "} 
+[2026-05-20 11:42:44] local.ERROR: Maximum execution time of 30 seconds exceeded {"userId":1,"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Maximum execution time of 30 seconds exceeded at C:/FarmSea-dashboard/vendor/symfony/http-foundation/Response.php:15)
+[stacktrace]
+#0 {main}
+"} 
+[2026-05-20 11:42:49] local.ERROR: Class "Symfony\Component\HttpFoundation\Response" not found {"userId":1,"exception":"[object] (Error(code: 0): Class \"Symfony\\Component\\HttpFoundation\\Response\" not found at C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Http/Response.php:15)
+[stacktrace]
+#0 C:/FarmSea-dashboard/vendor/composer/ClassLoader.php(576): include()
+#1 C:/FarmSea-dashboard/vendor/composer/ClassLoader.php(427): Composer/Autoload/{closure}()
+#2 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Routing/ResponseFactory.php(60): Composer/Autoload/ClassLoader->loadClass()
+#3 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Routing/ResponseFactory.php(90): Illuminate/Routing/ResponseFactory->make()
+#4 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(894): Illuminate/Routing/ResponseFactory->view()
+#5 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(815): Illuminate/Foundation/Exceptions/Handler->renderHttpException()
+#6 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(706): Illuminate/Foundation/Exceptions/Handler->prepareResponse()
+#7 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(594): Illuminate/Foundation/Exceptions/Handler->renderExceptionResponse()
+#8 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate/Foundation/Exceptions/Handler->render()
+#9 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate/Foundation/Bootstrap/HandleExceptions->renderHttpResponse()
+#10 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(234): Illuminate/Foundation/Bootstrap/HandleExceptions->handleException()
+#11 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate/Foundation/Bootstrap/HandleExceptions->handleShutdown()
+#12 [internal function]: Illuminate/Foundation/Bootstrap/HandleExceptions->Illuminate/Foundation/Bootstrap/{closure}()
+#13 {main}
+"} 
+[2026-05-20 11:42:49] local.ERROR: Class "Symfony\Component\HttpFoundation\Response" not found {"userId":1,"exception":"[object] (Error(code: 0): Class \"Symfony\\Component\\HttpFoundation\\Response\" not found at C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php:827)
+[stacktrace]
+#0 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(905): Illuminate/Foundation/Exceptions/Handler->convertExceptionToResponse()
+#1 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(815): Illuminate/Foundation/Exceptions/Handler->renderHttpException()
+#2 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(706): Illuminate/Foundation/Exceptions/Handler->prepareResponse()
+#3 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(594): Illuminate/Foundation/Exceptions/Handler->renderExceptionResponse()
+#4 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate/Foundation/Exceptions/Handler->render()
+#5 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate/Foundation/Bootstrap/HandleExceptions->renderHttpResponse()
+#6 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(234): Illuminate/Foundation/Bootstrap/HandleExceptions->handleException()
+#7 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate/Foundation/Bootstrap/HandleExceptions->handleShutdown()
+#8 [internal function]: Illuminate/Foundation/Bootstrap/HandleExceptions->Illuminate/Foundation/Bootstrap/{closure}()
+#9 {main}
+"} 
+[2026-05-20 11:42:49] local.ERROR: Class "Symfony\Component\HttpFoundation\Response" not found {"userId":1,"exception":"[object] (Error(code: 0): Class \"Symfony\\Component\\HttpFoundation\\Response\" not found at C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Http/Response.php:15)
+[stacktrace]
+#0 C:/FarmSea-dashboard/vendor/composer/ClassLoader.php(576): include()
+#1 C:/FarmSea-dashboard/vendor/composer/ClassLoader.php(427): Composer/Autoload/{closure}()
+#2 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Routing/ResponseFactory.php(60): Composer/Autoload/ClassLoader->loadClass()
+#3 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Routing/ResponseFactory.php(90): Illuminate/Routing/ResponseFactory->make()
+#4 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(894): Illuminate/Routing/ResponseFactory->view()
+#5 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(815): Illuminate/Foundation/Exceptions/Handler->renderHttpException()
+#6 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(706): Illuminate/Foundation/Exceptions/Handler->prepareResponse()
+#7 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(594): Illuminate/Foundation/Exceptions/Handler->renderExceptionResponse()
+#8 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(221): Illuminate/Foundation/Exceptions/Handler->render()
+#9 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(198): Illuminate/Foundation/Bootstrap/HandleExceptions->renderHttpResponse()
+#10 C:/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(258): Illuminate/Foundation/Bootstrap/HandleExceptions->handleException()
+#11 [internal function]: Illuminate/Foundation/Bootstrap/HandleExceptions->Illuminate/Foundation/Bootstrap/{closure}()
+#12 {main}
+"} 

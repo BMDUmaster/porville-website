@@ -1,7 +1,7 @@
-@extends('frontend.layouts.app')
-@section('title', 'Create Account')
 
-@section('styles')
+<?php $__env->startSection('title', 'Create Account'); ?>
+
+<?php $__env->startSection('styles'); ?>
 <style>
 .field-label { display:block; font-size:13px; font-weight:600; color:#1f2937; margin-bottom:6px; }
 .field-label .req { color:#ef4444; margin-left:2px; }
@@ -44,59 +44,60 @@
 }
 .country-select:focus { border-color:#2B5BA8; box-shadow:0 0 0 3px rgba(43,91,168,.1); background:#fff; }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <main class="flex-1 py-10" style="background:#f0f2f5;">
 <div class="max-w-[680px] mx-auto px-4">
 
-    @if($errors->any())
-    <div data-auto-dismiss="3000" class="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600 transition-all duration-500">
-        @foreach($errors->all() as $error)<p class="flex items-center gap-2"><i class="fa-solid fa-circle-exclamation text-xs"></i>{{ $error }}</p>@endforeach
+    <?php if($errors->any()): ?>
+    <div class="mb-5 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><p class="flex items-center gap-2"><i class="fa-solid fa-circle-exclamation text-xs"></i><?php echo e($error); ?></p><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
-    @endif
+    <?php endif; ?>
 
-    @if(session('success'))
-    <div data-auto-dismiss="3000" class="mb-5 flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700 transition-all duration-500">
-        <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
+    <?php if(session('success')): ?>
+    <div class="mb-5 p-4 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700 flex items-center gap-2">
+        <i class="fa-solid fa-circle-check"></i> <?php echo e(session('success')); ?>
+
     </div>
-    @endif
+    <?php endif; ?>
 
     <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
         <div class="px-8 py-8">
 
-            {{-- Header --}}
+            
             <div class="mb-7">
                 <h1 class="text-2xl font-extrabold text-gray-900 tracking-tight uppercase">CREATE ACCOUNT</h1>
                 <p class="text-sm text-gray-400 mt-1">Join FarmSea for exclusive benefits</p>
             </div>
 
-            <form method="POST" action="{{ route('frontend.register.post') }}" id="signupForm" novalidate>
-                @csrf
+            <form method="POST" action="<?php echo e(route('frontend.register.post')); ?>" id="signupForm" novalidate>
+                <?php echo csrf_field(); ?>
 
-                {{-- Full Name --}}
+                
                 <div class="mb-5">
                     <label class="field-label">Full Name <span class="req">*</span></label>
                     <div class="relative">
                         <i class="fa-regular fa-user field-icon"></i>
-                        <input type="text" name="name" id="name" value="{{ old('name') }}"
+                        <input type="text" name="name" id="name" value="<?php echo e(old('name')); ?>"
                                placeholder="John Doe" class="field-input" required>
                     </div>
                     <div class="error-msg" id="nameErr"><i class="fa-solid fa-circle-exclamation text-xs"></i><span>Full name is required</span></div>
                 </div>
 
-                {{-- Email --}}
+                
                 <div class="mb-5">
                     <label class="field-label">Email Address <span class="req">*</span></label>
                     <div class="relative">
                         <i class="fa-regular fa-envelope field-icon"></i>
-                        <input type="email" name="email" id="email" value="{{ old('email') }}"
+                        <input type="email" name="email" id="email" value="<?php echo e(old('email')); ?>"
                                placeholder="john@example.com" class="field-input" required>
                     </div>
                     <div class="error-msg" id="emailErr"><i class="fa-solid fa-circle-exclamation text-xs"></i><span>Enter a valid email address</span></div>
                 </div>
 
-                {{-- Mobile Number --}}
+                
                 <div class="mb-5">
                     <label class="field-label">Mobile Number <span class="req">*</span></label>
                     <div class="relative flex items-center border-[1.5px] border-gray-200 rounded-[10px] bg-[#f9fafb] focus-within:border-[#2B5BA8] focus-within:shadow-[0_0_0_3px_rgba(43,91,168,.1)] focus-within:bg-white transition-all overflow-hidden">
@@ -105,25 +106,25 @@
                             <span id="dial-display" class="text-xs font-bold text-gray-600">+91</span>
                             <i class="fa-solid fa-angle-down text-[10px] text-gray-400"></i>
                         </div>
-                        <input type="tel" name="phone" id="phone" value="{{ old('phone') }}"
+                        <input type="tel" name="phone" id="phone" value="<?php echo e(old('phone')); ?>"
                                placeholder="Enter mobile number"
                                class="flex-1 px-3 py-3 text-sm outline-none bg-transparent font-[Poppins] text-gray-800">
                     </div>
-                    {{-- Dial code dropdown --}}
+                    
                     <div id="dialDropdown" class="hidden absolute z-50 bg-white border border-gray-200 rounded-xl shadow-xl mt-1 w-64 max-h-52 overflow-y-auto">
-                        @foreach([['🇮🇳','India','+91'],['🇺🇸','United States','+1'],['🇬🇧','United Kingdom','+44'],['🇦🇺','Australia','+61'],['🇨🇦','Canada','+1'],['🇦🇪','UAE','+971'],['🇸🇬','Singapore','+65'],['🇩🇪','Germany','+49'],['🇫🇷','France','+33'],['🇯🇵','Japan','+81']] as [$flag,$country,$code])
-                        <button type="button" onclick="selectDial('{{ $flag }}','{{ $code }}')"
+                        <?php $__currentLoopData = [['🇮🇳','India','+91'],['🇺🇸','United States','+1'],['🇬🇧','United Kingdom','+44'],['🇦🇺','Australia','+61'],['🇨🇦','Canada','+1'],['🇦🇪','UAE','+971'],['🇸🇬','Singapore','+65'],['🇩🇪','Germany','+49'],['🇫🇷','France','+33'],['🇯🇵','Japan','+81']]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as [$flag,$country,$code]): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <button type="button" onclick="selectDial('<?php echo e($flag); ?>','<?php echo e($code); ?>')"
                                 class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-blue-50 text-sm text-left">
-                            <span class="text-base">{{ $flag }}</span>
-                            <span class="flex-1 text-gray-700">{{ $country }}</span>
-                            <span class="text-gray-400 text-xs font-bold">{{ $code }}</span>
+                            <span class="text-base"><?php echo e($flag); ?></span>
+                            <span class="flex-1 text-gray-700"><?php echo e($country); ?></span>
+                            <span class="text-gray-400 text-xs font-bold"><?php echo e($code); ?></span>
                         </button>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                     <div class="error-msg" id="phoneErr"><i class="fa-solid fa-circle-exclamation text-xs"></i><span>Mobile number is required</span></div>
                 </div>
 
-                {{-- Password + Confirm --}}
+                
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
                     <div>
                         <label class="field-label">Password <span class="req">*</span></label>
@@ -136,7 +137,7 @@
                                 <i id="ei1" class="fa-regular fa-eye"></i>
                             </button>
                         </div>
-                        {{-- Strength bar --}}
+                        
                         <div class="flex gap-1 mt-2">
                             <div class="str-bar" id="sb1"></div>
                             <div class="str-bar" id="sb2"></div>
@@ -159,7 +160,7 @@
                     </div>
                 </div>
 
-                {{-- Shipping Address divider --}}
+                
                 <div class="flex items-center gap-3 my-6">
                     <div class="flex-1 h-px bg-gray-200"></div>
                     <div class="flex items-center gap-2">
@@ -174,38 +175,38 @@
                     <div class="flex-1 h-px bg-gray-200"></div>
                 </div>
 
-                {{-- Street Address --}}
+                
                 <div class="mb-4">
                     <label class="field-label">Street Address <span class="req">*</span></label>
                     <div class="relative">
                         <i class="fa-solid fa-house field-icon"></i>
-                        <input type="text" name="address" id="address" value="{{ old('address') }}"
+                        <input type="text" name="address" id="address" value="<?php echo e(old('address')); ?>"
                                placeholder="123 Main Street" class="field-input">
                     </div>
                     <div class="error-msg" id="addrErr"><i class="fa-solid fa-circle-exclamation text-xs"></i><span>Street address is required</span></div>
                 </div>
 
-                {{-- City + State --}}
+                
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="field-label">City <span class="req">*</span></label>
-                        <input type="text" name="city" id="city" value="{{ old('city') }}"
+                        <input type="text" name="city" id="city" value="<?php echo e(old('city')); ?>"
                                placeholder="New York" class="field-input-no-icon">
                         <div class="error-msg" id="cityErr"><i class="fa-solid fa-circle-exclamation text-xs"></i><span>City is required</span></div>
                     </div>
                     <div>
                         <label class="field-label">State <span class="req">*</span></label>
-                        <input type="text" name="state" id="state" value="{{ old('state') }}"
+                        <input type="text" name="state" id="state" value="<?php echo e(old('state')); ?>"
                                placeholder="NY" class="field-input-no-icon">
                         <div class="error-msg" id="stateErr"><i class="fa-solid fa-circle-exclamation text-xs"></i><span>State is required</span></div>
                     </div>
                 </div>
 
-                {{-- ZIP + Country --}}
+                
                 <div class="grid grid-cols-2 gap-4 mb-5">
                     <div>
                         <label class="field-label">ZIP Code <span class="req">*</span></label>
-                        <input type="text" name="pincode" id="pincode" value="{{ old('pincode') }}"
+                        <input type="text" name="pincode" id="pincode" value="<?php echo e(old('pincode')); ?>"
                                placeholder="10001" class="field-input-no-icon">
                         <div class="error-msg" id="zipErr"><i class="fa-solid fa-circle-exclamation text-xs"></i><span>ZIP code is required</span></div>
                     </div>
@@ -215,9 +216,9 @@
                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-base pointer-events-none">🌍</span>
                             <select name="country" id="country" class="country-select">
                                 <option value="">Select country</option>
-                                @foreach(['India','United States','United Kingdom','Australia','Canada','UAE','Singapore','Germany','France','Japan','Other'] as $c)
-                                    <option value="{{ $c }}" {{ old('country') == $c ? 'selected' : '' }}>{{ $c }}</option>
-                                @endforeach
+                                <?php $__currentLoopData = ['India','United States','United Kingdom','Australia','Canada','UAE','Singapore','Germany','France','Japan','Other']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $c): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($c); ?>" <?php echo e(old('country') == $c ? 'selected' : ''); ?>><?php echo e($c); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
                             <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
                         </div>
@@ -225,7 +226,7 @@
                     </div>
                 </div>
 
-                {{-- Billing same as shipping --}}
+                
                 <label class="flex items-center gap-4 bg-gray-50 border border-gray-200 hover:border-green-400 rounded-xl px-4 py-3.5 cursor-pointer select-none transition mb-5">
                     <i class="fa-solid fa-truck text-green-600 text-base flex-shrink-0"></i>
                     <div class="flex-1">
@@ -238,22 +239,22 @@
                     </button>
                 </label>
 
-                {{-- Terms --}}
+                
                 <div class="mb-6">
                     <label class="flex items-start gap-3 cursor-pointer">
                         <input type="checkbox" id="terms" name="terms"
                                class="mt-0.5 w-4 h-4 rounded border-gray-300 accent-[#2B5BA8] cursor-pointer flex-shrink-0">
                         <span class="text-xs text-gray-500 leading-relaxed">
                             I agree to FarmSea's
-                            <a href="{{ route('frontend.terms') }}" class="text-[#2B5BA8] font-semibold hover:underline">Terms of Service</a>
+                            <a href="<?php echo e(route('frontend.terms')); ?>" class="text-[#2B5BA8] font-semibold hover:underline">Terms of Service</a>
                             and
-                            <a href="{{ route('frontend.privacy') }}" class="text-[#2B5BA8] font-semibold hover:underline">Privacy Policy</a>
+                            <a href="<?php echo e(route('frontend.privacy')); ?>" class="text-[#2B5BA8] font-semibold hover:underline">Privacy Policy</a>
                         </span>
                     </label>
                     <div class="error-msg" id="termsErr"><i class="fa-solid fa-circle-exclamation text-xs"></i><span>Please agree to continue</span></div>
                 </div>
 
-                {{-- Submit --}}
+                
                 <button type="submit" onclick="return validateForm()"
                         class="flex items-center justify-center gap-2 bg-[#2B5BA8] hover:bg-[#1e4080] active:scale-[.99] text-white font-bold text-sm px-8 py-3.5 rounded-xl transition-all shadow-sm hover:shadow-lg hover:shadow-blue-200/50 mb-4">
                     <i class="fa-solid fa-user-plus text-sm"></i>
@@ -262,7 +263,7 @@
 
                 <p class="text-sm text-gray-500">
                     Already have an account?
-                    <a href="{{ route('frontend.login') }}" class="text-green-600 font-bold hover:underline">Sign in here</a>
+                    <a href="<?php echo e(route('frontend.login')); ?>" class="text-green-600 font-bold hover:underline">Sign in here</a>
                 </p>
 
             </form>
@@ -270,9 +271,9 @@
     </div>
 </div>
 </main>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
 <script>
 // ── Password toggle ──────────────────────────────────────────
 function togglePw(inputId, iconId) {
@@ -401,4 +402,6 @@ function validateForm() {
     return valid;
 }
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('frontend.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\FarmSea-dashboard\resources\views/frontend/signup.blade.php ENDPATH**/ ?>

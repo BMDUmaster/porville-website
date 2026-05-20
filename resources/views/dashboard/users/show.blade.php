@@ -82,6 +82,37 @@
                 </div>
 
                 <div class="rounded-[24px] border bg-white p-5 shadow-sm">
+                    <h2 class="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Delivery Charge Override</h2>
+                    <p class="mt-3 text-sm text-slate-600">
+                        @if($user->delivery_charge !== null)
+                            This customer currently uses a custom delivery charge of <span class="font-black text-slate-900">Rs{{ number_format($user->delivery_charge, 2) }}</span>.
+                        @else
+                            This customer is using the global delivery charge of <span class="font-black text-slate-900">Rs{{ number_format($globalDeliveryCharge, 2) }}</span>.
+                        @endif
+                    </p>
+
+                    <form method="POST" action="{{ route('dashboard.users.delivery-charge', $user) }}" class="mt-4 space-y-3">
+                        @csrf
+                        @method('PATCH')
+                        <div>
+                            <label for="customerDeliveryCharge" class="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-slate-400">Customer Delivery Charge</label>
+                            <input type="number" id="customerDeliveryCharge" name="delivery_charge" min="0" step="0.01"
+                                   value="{{ $user->delivery_charge !== null ? number_format($user->delivery_charge, 2, '.', '') : '' }}"
+                                   placeholder="{{ number_format($globalDeliveryCharge, 2, '.', '') }}"
+                                   class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 outline-none transition focus:border-blue-500">
+                        </div>
+                        <div class="grid gap-3 sm:grid-cols-2">
+                            <button type="submit" class="rounded-xl bg-blue-600 px-4 py-3 text-sm font-black text-white hover:bg-blue-700">
+                                Save Custom Charge
+                            </button>
+                            <button type="submit" name="clear_delivery_charge" value="1" class="rounded-xl bg-slate-200 px-4 py-3 text-sm font-black text-slate-700 hover:bg-slate-300">
+                                Use Global Charge
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="rounded-[24px] border bg-white p-5 shadow-sm">
                     <h2 class="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Latest Order Snapshot</h2>
                     @if($latestOrder)
                         <div class="mt-4 space-y-3 text-sm">

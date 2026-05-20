@@ -270,17 +270,17 @@
         <!-- MAIN CONTENT  -->
         <main class="lg:mt-[4.5rem] min-h-screen">
             @if(session('success'))
-                <div class="mx-6 mt-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm flex items-center gap-2">
+                <div data-auto-dismiss="3000" class="mx-6 mt-4 flex items-center gap-2 rounded-lg bg-green-100 p-3 text-sm text-green-700 transition-all duration-500">
                     <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
                 </div>
             @endif
             @if(session('error'))
-                <div class="mx-6 mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm flex items-center gap-2">
+                <div data-auto-dismiss="3000" class="mx-6 mt-4 flex items-center gap-2 rounded-lg bg-red-100 p-3 text-sm text-red-700 transition-all duration-500">
                     <i class="fa-solid fa-circle-xmark"></i> {{ session('error') }}
                 </div>
             @endif
             @if($errors->any())
-                <div class="mx-6 mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+                <div data-auto-dismiss="3000" class="mx-6 mt-4 rounded-lg bg-red-100 p-3 text-sm text-red-700 transition-all duration-500">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-circle-xmark"></i>
                         <span>{{ $errors->first() }}</span>
@@ -307,6 +307,18 @@
     </div>
 
     <script>
+        document.querySelectorAll('[data-auto-dismiss]').forEach((notice) => {
+            const delay = Number(notice.dataset.autoDismiss || 3000);
+
+            window.setTimeout(() => {
+                notice.classList.add('opacity-0', '-translate-y-2');
+
+                window.setTimeout(() => {
+                    notice.remove();
+                }, 500);
+            }, delay);
+        });
+
         function toggleSidebar() {
             document.getElementById('main-sidebar').classList.toggle('-translate-x-full');
             document.getElementById('sidebar-overlay').classList.toggle('hidden');

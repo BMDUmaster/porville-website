@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Support\DeliveryChargeManager;
 use App\Support\DeliverySlotManager;
 use DateTimeImmutable;
 use Illuminate\Http\Request;
@@ -17,12 +18,15 @@ class DeliverySlotController extends Controller
         return view('dashboard.settings.delivery-slots', [
             'settings' => $settings,
             'previewSlots' => DeliverySlotManager::options(),
+            'deliveryCharge' => DeliveryChargeManager::amount(),
+            'defaultDeliveryCharge' => DeliveryChargeManager::defaultAmount(),
         ]);
     }
 
     public function update(Request $request)
     {
         $data = $request->validate([
+            'delivery_charge' => ['required', 'numeric', 'min:0'],
             'fixed_slots_text' => ['nullable', 'string'],
             'evening_start' => ['nullable', 'date_format:H:i'],
             'last_end' => ['nullable', 'date_format:H:i'],
@@ -51,6 +55,8 @@ class DeliverySlotController extends Controller
             ]);
         }
 
+        DeliveryChargeManager::updateAmount((float) $data['delivery_charge']);
+
         DeliverySlotManager::updateSettings([
             'fixed_slots' => $fixedSlots,
             'evening_start' => $eveningStart,
@@ -58,7 +64,7 @@ class DeliverySlotController extends Controller
             'slot_duration_hours' => (int) $data['slot_duration_hours'],
         ]);
 
-        return back()->with('success', 'Delivery slots updated successfully.');
+        return back()->with('success', 'Delivery slots and delivery charge updated successfully.');
     }
 
     private function parseFixedSlots(string $value): array

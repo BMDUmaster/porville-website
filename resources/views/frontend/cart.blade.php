@@ -82,6 +82,9 @@
                                 @if($item['variant_label'])
                                     <p class="mt-1 text-xs text-gray-400">{{ $item['variant_label'] }}</p>
                                 @endif
+                                @if(!empty($item['pricing_day_label']))
+                                    <p class="mt-1 text-xs font-semibold text-blue-600">{{ $item['pricing_day_label'] }} price</p>
+                                @endif
                                 <p class="mt-1 text-xs text-gray-400">{{ $item['unit'] }}</p>
                             </div>
                         </div>

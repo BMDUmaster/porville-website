@@ -9,6 +9,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Support\DeliverySlotManager;
 use App\Support\OrderPricing;
+use App\Support\ProductDayPricing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -39,7 +40,7 @@ class CheckoutController extends Controller
             $selectedDeliverySlot = DeliverySlotManager::defaultValue();
         }
 
-        $pricing = OrderPricing::summary($subtotal);
+        $pricing = OrderPricing::summary($subtotal, auth('web_frontend')->user());
 
         return view('frontend.checkout', compact('items', 'subtotal', 'checkoutDefaults', 'selectedDeliverySlot', 'pricing'));
     }
@@ -70,7 +71,7 @@ class CheckoutController extends Controller
 
         $items = $this->buildCartItems($cart);
         $subtotal = collect($items)->sum('subtotal');
-        $pricing = OrderPricing::summary($subtotal);
+        $pricing = OrderPricing::summary($subtotal, auth('web_frontend')->user());
 
         $order = DB::transaction(function () use ($data, $items, $subtotal, $pricing) {
             $discount = 0;
@@ -183,11 +184,11 @@ class CheckoutController extends Controller
             }
 
             $price = $variant
-                ? (float) ($variant['selling_price'] ?? $product->price)
+                ? ProductDayPricing::sellingPrice($variant, $item['pricing_day'] ?? 'today', (float) $product->price)
                 : (float) $product->price;
 
             $mrp = $variant
-                ? (float) ($variant['mrp'] ?? $product->mrp ?? $price)
+                ? ProductDayPricing::mrp($variant, (float) ($product->mrp ?? $price))
                 : (float) ($product->mrp ?? $price);
 
             $quantity = max(1, (int) ($item['quantity'] ?? 1));
@@ -206,6 +207,7 @@ class CheckoutController extends Controller
                 'pack_quantity' => $packQuantity,
                 'variant_index' => $variantIndex,
                 'variant_label' => $variant ? $this->formatVariantLabel($variant, $product->unit) : null,
+                'pricing_day'   => ProductDayPricing::normalizeDay($item['pricing_day'] ?? 'today'),
                 'subtotal'      => $price * $quantity,
             ];
         }

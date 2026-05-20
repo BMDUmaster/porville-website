@@ -19,12 +19,12 @@
                     <p class="mt-2 text-3xl font-black text-slate-900"><?php echo e(count($previewSlots)); ?></p>
                 </div>
                 <div class="rounded-2xl border border-slate-200 bg-white px-4 py-4">
-                    <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Evening Start</p>
-                    <p class="mt-2 text-3xl font-black text-slate-900"><?php echo e($settings['evening_start'] ?: '-'); ?></p>
+                    <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Delivery Charge</p>
+                    <p class="mt-2 text-3xl font-black text-slate-900">Rs<?php echo e(number_format($deliveryCharge, 2)); ?></p>
                 </div>
                 <div class="rounded-2xl border border-slate-200 bg-white px-4 py-4">
-                    <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Last Slot End</p>
-                    <p class="mt-2 text-3xl font-black text-slate-900"><?php echo e($settings['last_end'] ?: '-'); ?></p>
+                    <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Evening Window</p>
+                    <p class="mt-2 text-3xl font-black text-slate-900"><?php echo e($settings['evening_start'] ?: '-'); ?> - <?php echo e($settings['last_end'] ?: '-'); ?></p>
                 </div>
             </div>
 
@@ -34,6 +34,26 @@
                     <?php echo method_field('PUT'); ?>
 
                     <div class="space-y-6">
+                        <div class="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
+                            <div class="flex items-start gap-3">
+                                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
+                                    <i class="fa-solid fa-truck-fast text-lg"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h2 class="text-lg font-black text-slate-900">Delivery Charge</h2>
+                                    <p class="mt-1 text-sm text-slate-500">Set the base delivery fee charged during checkout. This updates cart and order pricing immediately.</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-6">
+                                <label for="deliveryCharge" class="mb-2 block text-sm font-bold text-slate-700">Delivery Charge (Rs)</label>
+                                <input type="number" id="deliveryCharge" name="delivery_charge" min="0" step="0.01"
+                                       value="<?php echo e(old('delivery_charge', number_format($deliveryCharge, 2, '.', ''))); ?>"
+                                       class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 outline-none transition focus:border-blue-500">
+                                <p class="mt-2 text-sm text-slate-500">Default config value: Rs<?php echo e(number_format($defaultDeliveryCharge, 2)); ?></p>
+                            </div>
+                        </div>
+
                         <div class="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
                             <div class="flex items-start gap-3">
                                 <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
@@ -102,7 +122,7 @@
 
                         <button type="submit" class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700">
                             <i class="fa-solid fa-floppy-disk text-xs"></i>
-                            Save Delivery Slots
+                            Save Settings
                         </button>
                     </div>
                 </form>

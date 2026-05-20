@@ -77,6 +77,7 @@ Route::middleware('admin')->group(function () {
     // Users
     Route::get('/users',                 [UserController::class, 'index'])->name('dashboard.users');
     Route::get('/users/{user}',          [UserController::class, 'show'])->name('dashboard.users.show');
+    Route::patch('/users/{user}/delivery-charge', [UserController::class, 'updateDeliveryCharge'])->name('dashboard.users.delivery-charge');
     Route::patch('/users/{user}/toggle', [UserController::class, 'toggleStatus'])->name('dashboard.users.toggle');
     Route::delete('/users/{user}',       [UserController::class, 'destroy'])->name('dashboard.users.destroy');
 

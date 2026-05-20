@@ -289,12 +289,12 @@ html, body { overflow-x: hidden; max-width: 100vw; }
 <div class="pt-[74px] md:pt-[138px]">
     <!-- Flash Messages -->
     @if(session('success'))
-        <div class="mx-4 mt-3 p-3 bg-green-100 text-green-700 rounded-lg text-sm flex items-center gap-2">
+        <div data-auto-dismiss="3000" class="mx-4 mt-3 flex items-center gap-2 rounded-lg bg-green-100 p-3 text-sm text-green-700 transition-all duration-500">
             <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
         </div>
     @endif
     @if(session('error'))
-        <div class="mx-4 mt-3 p-3 bg-red-100 text-red-700 rounded-lg text-sm flex items-center gap-2">
+        <div data-auto-dismiss="3000" class="mx-4 mt-3 flex items-center gap-2 rounded-lg bg-red-100 p-3 text-sm text-red-700 transition-all duration-500">
             <i class="fa-solid fa-circle-xmark"></i> {{ session('error') }}
         </div>
     @endif
@@ -389,6 +389,18 @@ function toggleSidebar() {
 function toggleAccountMenu() {
     document.getElementById('accountMenu').classList.toggle('hidden');
 }
+document.querySelectorAll('[data-auto-dismiss]').forEach((notice) => {
+    const delay = Number(notice.dataset.autoDismiss || 3000);
+
+    window.setTimeout(() => {
+        notice.classList.add('opacity-0', '-translate-y-2');
+
+        window.setTimeout(() => {
+            notice.remove();
+        }, 500);
+    }, delay);
+});
+
 document.addEventListener('click', function(e) {
     const menu = document.getElementById('accountMenu');
     if (menu && !menu.contains(e.target) && !e.target.closest('[onclick="toggleAccountMenu()"]')) {
@@ -449,7 +461,7 @@ function showCartAddedAlert(message = 'Add to Cart') {
     }, 1800);
 }
 // Add to cart (AJAX)
-function addToCart(productId, variantIndex) {
+function addToCart(productId, variantIndex, pricingDay = 'today') {
     fetch('{{ route("frontend.cart.add") }}', {
         method: 'POST',
         headers: {
@@ -457,7 +469,7 @@ function addToCart(productId, variantIndex) {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
             'Accept': 'application/json',
         },
-        body: JSON.stringify({ product_id: productId, quantity: 1, variant_index: variantIndex ?? null })
+        body: JSON.stringify({ product_id: productId, quantity: 1, variant_index: variantIndex ?? null, pricing_day: pricingDay })
     })
     .then(r => r.json())
     .then(data => {

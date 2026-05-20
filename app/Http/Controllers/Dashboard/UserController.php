@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Support\DeliveryChargeManager;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -38,7 +39,11 @@ class UserController extends Controller
             'blocked' => User::where('role', 'customer')->where('status', 'blocked')->count(),
         ];
 
-        return view('dashboard.users.index', compact('users', 'stats'));
+        return view('dashboard.users.index', [
+            'users' => $users,
+            'stats' => $stats,
+            'globalDeliveryCharge' => DeliveryChargeManager::amount(),
+        ]);
     }
 
     public function show(User $user)
@@ -59,7 +64,40 @@ class UserController extends Controller
 
         $latestOrder = $orders->first();
 
-        return view('dashboard.users.show', compact('user', 'stats', 'latestOrder'));
+        return view('dashboard.users.show', [
+            'user' => $user,
+            'stats' => $stats,
+            'latestOrder' => $latestOrder,
+            'globalDeliveryCharge' => DeliveryChargeManager::amount(),
+        ]);
+    }
+
+    public function updateDeliveryCharge(Request $request, User $user)
+    {
+        abort_if($user->role !== 'customer', 404);
+
+        if ($request->boolean('clear_delivery_charge')) {
+            $user->update(['delivery_charge' => null]);
+
+            return back()->with('success', 'Customer delivery charge reset to the global default.');
+        }
+
+        $data = $request->validate([
+            'delivery_charge' => ['nullable', 'numeric', 'min:0'],
+        ]);
+
+        $user->update([
+            'delivery_charge' => $request->filled('delivery_charge')
+                ? round((float) $data['delivery_charge'], 2)
+                : null,
+        ]);
+
+        return back()->with(
+            'success',
+            $request->filled('delivery_charge')
+                ? 'Customer delivery charge updated successfully.'
+                : 'Customer delivery charge reset to the global default.'
+        );
     }
 
     public function toggleStatus(User $user)

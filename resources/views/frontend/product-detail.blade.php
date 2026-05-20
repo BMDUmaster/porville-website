@@ -63,11 +63,10 @@
     };
 
     $variantPayload = $variantCollection->map(function ($variant) use ($formatPriceUnit, $formatVariantLabel) {
-        $sellingPrice = (float) ($variant['selling_price'] ?? 0);
-        $mrp = (float) ($variant['mrp'] ?? $sellingPrice);
-        $saveOffer = (float) ($variant['save_offer'] ?? ($mrp > $sellingPrice && $mrp > 0
-            ? (($mrp - $sellingPrice) / $mrp) * 100
-            : 0));
+        $baseSellingPrice = (float) ($variant['selling_price'] ?? 0);
+        $mrp = (float) ($variant['mrp'] ?? $baseSellingPrice);
+        $todayPrice = \App\Support\ProductDayPricing::sellingPrice($variant, 'today', $baseSellingPrice);
+        $tomorrowPrice = \App\Support\ProductDayPricing::sellingPrice($variant, 'tomorrow', $baseSellingPrice);
 
         return [
             'label' => $formatVariantLabel($variant['quantity'] ?? null, $variant['unit'] ?? null, $variant['piece'] ?? null),
@@ -75,15 +74,20 @@
             'quantity' => trim((string) ($variant['quantity'] ?? '')),
             'unit' => trim((string) ($variant['unit'] ?? '')),
             'price_unit_label' => $formatPriceUnit($variant['quantity'] ?? null, $variant['unit'] ?? null, $variant['piece'] ?? null),
-            'selling_price' => $sellingPrice,
+            'selling_price' => $baseSellingPrice,
             'mrp' => $mrp,
-            'save_offer' => round($saveOffer),
+            'today_price' => $todayPrice,
+            'tomorrow_price' => $tomorrowPrice,
+            'today_offer' => round(\App\Support\ProductDayPricing::saveOfferPercent($variant, 'today', $mrp)),
+            'tomorrow_offer' => round(\App\Support\ProductDayPricing::saveOfferPercent($variant, 'tomorrow', $mrp)),
         ];
     })->values();
 
     $defaultVariant = $variantPayload->first();
+    $defaultPricingDay = 'today';
     $selectedPackLabel = $defaultVariant['label'] ?: (($product->weight ?: '1') . ' ' . ($product->unit ?: 'unit'));
-    $selectedSaveAmount = max(($defaultVariant['mrp'] ?? 0) - ($defaultVariant['selling_price'] ?? 0), 0);
+    $defaultDisplayedPrice = (float) ($defaultVariant['today_price'] ?? $defaultVariant['selling_price'] ?? $product->price);
+    $selectedSaveAmount = max(($defaultVariant['mrp'] ?? 0) - $defaultDisplayedPrice, 0);
     $hasProductDescription = filled(trim(strip_tags((string) ($product->description ?? ''))));
     $initialDetailTab = $hasProductDescription ? 'description' : 'offers';
     $productOrigin = $product->subcategory->name ?? $product->category->name ?? 'FarmSea Farms';
@@ -391,17 +395,26 @@
             </div>
 
             <div class="rounded-[24px] border border-[#bce8c3] bg-[#f2fbf3] p-5 shadow-[0_18px_45px_rgba(47,140,67,0.08)]">
+                <div class="mb-4 flex flex-wrap items-center gap-2">
+                    <span class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Choose Day</span>
+                    <button type="button" data-pricing-day="today" class="pricing-day-button is-active rounded-full border border-green-500 bg-white px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-green-700 shadow-sm transition hover:border-green-400">
+                        Today
+                    </button>
+                    <button type="button" data-pricing-day="tomorrow" class="pricing-day-button rounded-full border border-transparent bg-white/70 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-slate-500 transition hover:border-green-200 hover:text-green-700">
+                        Tomorrow
+                    </button>
+                </div>
                 <div class="flex flex-wrap items-end gap-3">
                     <span class="text-[40px] font-black leading-none text-slate-900 md:text-[46px]">
-                        Rs<span id="detailCurrentPrice">{{ number_format($defaultVariant['selling_price'] ?? $product->price, 0) }}</span>
+                        Rs<span id="detailCurrentPrice">{{ number_format($defaultDisplayedPrice, 0) }}</span>
                         <span id="detailCurrentPriceUnit" class="ml-1 text-[14px] font-bold text-slate-400 md:text-[16px]">{{ $defaultVariant['price_unit_label'] ?? $formatPriceUnit($product->weight ?? null, $product->unit ?? null) }}</span>
                     </span>
-                    <span id="detailMrpWrap" class="{{ ($defaultVariant['mrp'] ?? 0) > ($defaultVariant['selling_price'] ?? 0) ? '' : 'hidden' }} flex items-center gap-2">
+                    <span id="detailMrpWrap" class="{{ ($defaultVariant['mrp'] ?? 0) > $defaultDisplayedPrice ? '' : 'hidden' }} flex items-center gap-2">
                         <span id="detailMrp" class="text-[16px] font-bold text-slate-400 line-through">
                             Rs{{ number_format($defaultVariant['mrp'] ?? $product->mrp, 0) }}
                         </span>
                         <span id="detailOffer" class="rounded-full bg-[#ff6d5e] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white">
-                            -{{ (int) ($defaultVariant['save_offer'] ?? 0) }}% off
+                            -{{ (int) ($defaultVariant['today_offer'] ?? 0) }}% off
                         </span>
                     </span>
                 </div>
@@ -434,7 +447,7 @@
                             class="variant-card {{ $index === 0 ? 'is-active' : '' }} min-w-[84px] rounded-[16px] border border-slate-200 bg-white px-3 py-3 text-left shadow-sm transition hover:border-green-200"
                         >
                             <div class="text-[11px] font-black text-slate-800">{{ $variant['label'] ?: 'Standard Pack' }}</div>
-                            <div class="mt-1 text-[10px] font-semibold text-slate-400">₹{{ number_format($variant['selling_price'], 0) }}</div>
+                            <div class="mt-1 text-[10px] font-semibold text-slate-400" data-variant-day-price="{{ $index }}">₹{{ number_format($variant['today_price'], 0) }}</div>
                         </button>
                     @endforeach
                 </div>
@@ -692,6 +705,7 @@ const detailVariants = @json($variantPayload);
 
 let currentQty = 1;
 let selectedVariant = 0;
+let selectedPricingDay = '{{ $defaultPricingDay }}';
 let galleryIndex = 0;
 let galleryZoomLevel = 1;
 
@@ -785,6 +799,47 @@ function activateDetailTab(tabName) {
     });
 }
 
+function getVariantDayPrice(variant, pricingDay) {
+    if (!variant) return 0;
+
+    return Number(pricingDay === 'tomorrow' ? variant.tomorrow_price : variant.today_price) || Number(variant.selling_price) || 0;
+}
+
+function getVariantDayOffer(variant, pricingDay) {
+    if (!variant) return 0;
+
+    return Number(pricingDay === 'tomorrow' ? variant.tomorrow_offer : variant.today_offer) || 0;
+}
+
+function refreshVariantDayPrices() {
+    detailVariants.forEach((variant, index) => {
+        const priceNode = document.querySelector(`[data-variant-day-price="${index}"]`);
+
+        if (priceNode) {
+            priceNode.textContent = '₹' + Math.round(getVariantDayPrice(variant, selectedPricingDay));
+        }
+    });
+}
+
+function selectPricingDay(pricingDay) {
+    selectedPricingDay = pricingDay === 'tomorrow' ? 'tomorrow' : 'today';
+
+    document.querySelectorAll('[data-pricing-day]').forEach((button) => {
+        const isActive = button.dataset.pricingDay === selectedPricingDay;
+        button.classList.toggle('is-active', isActive);
+        button.classList.toggle('border-green-500', isActive);
+        button.classList.toggle('bg-white', isActive);
+        button.classList.toggle('text-green-700', isActive);
+        button.classList.toggle('shadow-sm', isActive);
+        button.classList.toggle('border-transparent', !isActive);
+        button.classList.toggle('bg-white/70', !isActive);
+        button.classList.toggle('text-slate-500', !isActive);
+    });
+
+    refreshVariantDayPrices();
+    selectVariant(selectedVariant);
+}
+
 function selectVariant(index) {
     selectedVariant = index;
     const variant = detailVariants[index];
@@ -806,14 +861,17 @@ function selectVariant(index) {
     const saveRow = document.getElementById('detailSaveRow');
     const saveAmount = document.getElementById('detailSaveAmount');
 
-    if (currentPrice) currentPrice.textContent = Math.round(variant.selling_price || 0);
+    const activePrice = getVariantDayPrice(variant, selectedPricingDay);
+    const activeOffer = getVariantDayOffer(variant, selectedPricingDay);
+
+    if (currentPrice) currentPrice.textContent = Math.round(activePrice || 0);
     if (currentPriceUnit) currentPriceUnit.textContent = variant.price_unit_label || '/{{ $product->unit ?: 'unit' }}';
 
-    const canShowDiscount = Number(variant.mrp || 0) > Number(variant.selling_price || 0);
-    const saveValue = Math.max(Number(variant.mrp || 0) - Number(variant.selling_price || 0), 0);
+    const canShowDiscount = Number(variant.mrp || 0) > Number(activePrice || 0);
+    const saveValue = Math.max(Number(variant.mrp || 0) - Number(activePrice || 0), 0);
 
     if (mrp) mrp.textContent = 'Rs' + Math.round(variant.mrp || 0);
-    if (offer) offer.textContent = '-' + Math.round(variant.save_offer || 0) + '% off';
+    if (offer) offer.textContent = '-' + Math.round(activeOffer || 0) + '% off';
     if (saveAmount) saveAmount.textContent = Math.round(saveValue);
 
     if (mrpWrap) mrpWrap.classList.toggle('hidden', !canShowDiscount);
@@ -828,7 +886,7 @@ function sendCartRequest(productId, redirectToCheckout = false) {
             'X-CSRF-TOKEN': '{{ csrf_token() }}',
             'Accept': 'application/json',
         },
-        body: JSON.stringify({ product_id: productId, quantity: currentQty, variant_index: selectedVariant })
+        body: JSON.stringify({ product_id: productId, quantity: currentQty, variant_index: selectedVariant, pricing_day: selectedPricingDay })
     })
     .then(response => response.json())
     .then(data => {
@@ -867,8 +925,12 @@ document.querySelectorAll('[data-detail-tab]').forEach((button) => {
     button.addEventListener('click', () => activateDetailTab(button.dataset.detailTab));
 });
 
+document.querySelectorAll('[data-pricing-day]').forEach((button) => {
+    button.addEventListener('click', () => selectPricingDay(button.dataset.pricingDay));
+});
+
 updateQtyDisplay();
-selectVariant(0);
+selectPricingDay('{{ $defaultPricingDay }}');
 activateDetailTab('{{ $initialDetailTab }}');
 applyProductImageZoom();
 </script>

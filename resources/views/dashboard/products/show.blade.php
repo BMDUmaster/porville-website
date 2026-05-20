@@ -36,23 +36,22 @@
                     </div>
                 @endif
             </div>
-
         </div>
 
         <div class="space-y-6">
             <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div class="grid gap-0 md:grid-cols-2">
                     @foreach([
-                        'Category' => $product->category->name ?? '—',
-                        'Sub Category' => $product->subcategory->name ?? '—',
-                        'Price' => '₹' . number_format($product->price, 2),
-                        'MRP' => $product->mrp ? '₹' . number_format($product->mrp, 2) : '—',
+                        'Category' => $product->category->name ?? '-',
+                        'Sub Category' => $product->subcategory->name ?? '-',
+                        'Price' => 'Rs' . number_format($product->price, 2),
+                        'MRP' => $product->mrp ? 'Rs' . number_format($product->mrp, 2) : '-',
                         'Stock' => $product->is_active ? 'Active' : 'Deactive',
-                        'Slug' => $product->slug ?: '—',
+                        'Slug' => $product->slug ?: '-',
                     ] as $label => $value)
                         <div class="border-b border-slate-100 px-5 py-4 md:border-r even:md:border-r-0">
                             <p class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">{{ $label }}</p>
-                            <p class="mt-2 text-sm font-bold text-slate-800 break-all">{{ $value }}</p>
+                            <p class="mt-2 break-all text-sm font-bold text-slate-800">{{ $value }}</p>
                         </div>
                     @endforeach
                 </div>
@@ -75,26 +74,30 @@
 
                 @if($product->variants && count($product->variants))
                     <div class="mt-4 overflow-x-auto">
-                        <table class="w-full min-w-[680px] text-left text-sm">
+                        <table class="w-full min-w-[980px] text-left text-sm">
                             <thead class="border-b bg-slate-50 text-[11px] font-black uppercase tracking-[0.16em] text-slate-500">
                                 <tr>
                                     <th class="px-4 py-3">Quantity</th>
                                     <th class="px-4 py-3">Unit</th>
                                     <th class="px-4 py-3">Piece</th>
                                     <th class="px-4 py-3">MRP</th>
-                                    <th class="px-4 py-3">Selling Price</th>
+                                    <th class="px-4 py-3">Base Price</th>
+                                    <th class="px-4 py-3">Today Price</th>
+                                    <th class="px-4 py-3">Tomorrow Price</th>
                                     <th class="px-4 py-3">Save Offer</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
                                 @foreach($product->variants as $variant)
                                     <tr>
-                                        <td class="px-4 py-3 font-semibold text-slate-700">{{ $variant['quantity'] ?? '—' }}</td>
-                                        <td class="px-4 py-3 text-slate-600">{{ $variant['unit'] ?? '—' }}</td>
-                                        <td class="px-4 py-3 text-slate-600">{{ $variant['piece'] ?? '—' }}</td>
-                                        <td class="px-4 py-3 text-slate-600">{{ !empty($variant['mrp']) ? '₹' . $variant['mrp'] : '—' }}</td>
-                                        <td class="px-4 py-3 text-slate-600">{{ !empty($variant['selling_price']) ? '₹' . $variant['selling_price'] : '—' }}</td>
-                                        <td class="px-4 py-3 text-slate-600">{{ $variant['save_offer'] ?? '—' }}</td>
+                                        <td class="px-4 py-3 font-semibold text-slate-700">{{ $variant['quantity'] ?? '-' }}</td>
+                                        <td class="px-4 py-3 text-slate-600">{{ $variant['unit'] ?? '-' }}</td>
+                                        <td class="px-4 py-3 text-slate-600">{{ $variant['piece'] ?? '-' }}</td>
+                                        <td class="px-4 py-3 text-slate-600">{{ !empty($variant['mrp']) ? 'Rs' . $variant['mrp'] : '-' }}</td>
+                                        <td class="px-4 py-3 text-slate-600">{{ !empty($variant['selling_price']) ? 'Rs' . $variant['selling_price'] : '-' }}</td>
+                                        <td class="px-4 py-3 text-slate-600">{{ isset($variant['today_price']) && $variant['today_price'] !== null ? 'Rs' . $variant['today_price'] : '-' }}</td>
+                                        <td class="px-4 py-3 text-slate-600">{{ isset($variant['tomorrow_price']) && $variant['tomorrow_price'] !== null ? 'Rs' . $variant['tomorrow_price'] : '-' }}</td>
+                                        <td class="px-4 py-3 text-slate-600">{{ $variant['save_offer'] ?? '-' }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

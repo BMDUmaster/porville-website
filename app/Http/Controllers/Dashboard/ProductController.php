@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Support\ProductDayPricing;
 use App\Support\WebpImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -63,6 +64,8 @@ class ProductController extends Controller
             'variants.*.piece'      => 'nullable|string|max:50',
             'variants.*.mrp'        => 'nullable|numeric|min:0|max:99999999.99',
             'variants.*.selling_price' => 'nullable|numeric|min:0|max:99999999.99',
+            'variants.*.today_price' => 'nullable|numeric|min:0|max:99999999.99',
+            'variants.*.tomorrow_price' => 'nullable|numeric|min:0|max:99999999.99',
             'variants.*.save_offer' => 'nullable|string|max:100',
             'variants.*.admin_amount' => 'nullable|numeric|min:0|max:99999999.99',
             'variants.*.vendor_amount' => 'nullable|numeric|min:0|max:99999999.99',
@@ -83,7 +86,9 @@ class ProductController extends Controller
         }
 
         $data['unit'] = (string) ($data['variants'][0]['unit'] ?? 'Unit');
-        $data['price'] = ! empty($data['variants']) ? (float) ($data['variants'][0]['selling_price'] ?? 0) : 0;
+        $data['price'] = ! empty($data['variants'])
+            ? ProductDayPricing::sellingPrice($data['variants'][0], 'today')
+            : 0;
         $data['mrp'] = ! empty($data['variants']) ? (float) ($data['variants'][0]['mrp'] ?? 0) : 0;
         $data['stock'] = $data['is_active'] ? 1 : 0;
 
@@ -124,6 +129,8 @@ class ProductController extends Controller
             'variants.*.piece'      => 'nullable|string|max:50',
             'variants.*.mrp'        => 'nullable|numeric|min:0|max:99999999.99',
             'variants.*.selling_price' => 'nullable|numeric|min:0|max:99999999.99',
+            'variants.*.today_price' => 'nullable|numeric|min:0|max:99999999.99',
+            'variants.*.tomorrow_price' => 'nullable|numeric|min:0|max:99999999.99',
             'variants.*.save_offer' => 'nullable|string|max:100',
             'variants.*.admin_amount' => 'nullable|numeric|min:0|max:99999999.99',
             'variants.*.vendor_amount' => 'nullable|numeric|min:0|max:99999999.99',
@@ -142,7 +149,7 @@ class ProductController extends Controller
 
         if (! empty($data['variants'])) {
             $data['unit'] = (string) ($data['variants'][0]['unit'] ?? ($product->unit ?: 'Unit'));
-            $data['price'] = (float) ($data['variants'][0]['selling_price'] ?? $data['price'] ?? 0);
+            $data['price'] = ProductDayPricing::sellingPrice($data['variants'][0], 'today', (float) ($data['price'] ?? 0));
             $data['mrp'] = (float) ($data['variants'][0]['mrp'] ?? $data['mrp'] ?? 0);
         }
 
@@ -211,6 +218,8 @@ class ProductController extends Controller
                 $variant['selling_price'] ?? null,
                 $variant['mrp'] ?? null,
                 $variant['piece'] ?? null,
+                $variant['today_price'] ?? null,
+                $variant['tomorrow_price'] ?? null,
                 $variant['save_offer'] ?? null,
             ])->contains(fn ($value) => ! blank($value));
 
@@ -218,18 +227,27 @@ class ProductController extends Controller
                 continue;
             }
 
-            if (blank($variant['selling_price'] ?? null)) {
+            if (blank($variant['selling_price'] ?? null) && blank($variant['today_price'] ?? null) && blank($variant['tomorrow_price'] ?? null)) {
                 throw ValidationException::withMessages([
-                    'variants' => 'Each product variant must include selling price.',
+                    'variants' => 'Each product variant must include base, today, or tomorrow price.',
                 ]);
             }
+
+            $resolvedSellingPrice = (float) (
+                $variant['selling_price']
+                ?? $variant['today_price']
+                ?? $variant['tomorrow_price']
+                ?? 0
+            );
 
             $normalized[] = [
                 'quantity'      => (string) ($variant['quantity'] ?? ''),
                 'unit'          => (string) ($variant['unit'] ?? 'Gram'),
                 'piece'         => (string) ($variant['piece'] ?? ''),
                 'mrp'           => (float) ($variant['mrp'] ?? 0),
-                'selling_price' => (float) ($variant['selling_price'] ?? 0),
+                'selling_price' => $resolvedSellingPrice,
+                'today_price'   => blank($variant['today_price'] ?? null) ? null : (float) $variant['today_price'],
+                'tomorrow_price'=> blank($variant['tomorrow_price'] ?? null) ? null : (float) $variant['tomorrow_price'],
                 'save_offer'    => (string) ($variant['save_offer'] ?? ''),
                 'admin_amount'  => (float) ($variant['admin_amount'] ?? 0),
                 'vendor_amount' => (float) ($variant['vendor_amount'] ?? 0),

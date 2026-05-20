@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Support\DeliverySlotManager;
 use App\Support\OrderPricing;
+use App\Support\ProductDayPricing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -76,6 +77,7 @@ class OrderApiController extends Controller
             'items.*.product_id'       => 'required|exists:products,id',
             'items.*.quantity'         => 'required|integer|min:1',
             'items.*.variant_index'    => 'nullable|integer|min:0',
+            'items.*.pricing_day'      => 'nullable|string|in:today,tomorrow',
             'shipping_address'         => 'required|array',
             'shipping_address.name'    => 'required|string',
             'shipping_address.phone'   => 'required|string',
@@ -87,7 +89,7 @@ class OrderApiController extends Controller
 
         $orderItems = $this->buildOrderItems($data['items']);
         $subtotal = collect($orderItems)->sum('subtotal');
-        $pricing = OrderPricing::summary($subtotal);
+        $pricing = OrderPricing::summary($subtotal, $request->user());
 
         $order = DB::transaction(function () use ($request, $data, $orderItems, $subtotal, $pricing) {
             $discount = 0;
@@ -170,11 +172,11 @@ class OrderApiController extends Controller
             }
 
             $unitPrice = $variant
-                ? (float) ($variant['selling_price'] ?? $product->price)
+                ? ProductDayPricing::sellingPrice($variant, $item['pricing_day'] ?? 'today', (float) $product->price)
                 : (float) $product->price;
 
             $mrp = $variant
-                ? (float) ($variant['mrp'] ?? $product->mrp ?? $unitPrice)
+                ? ProductDayPricing::mrp($variant, (float) ($product->mrp ?? $unitPrice))
                 : (float) ($product->mrp ?? $unitPrice);
 
             $quantity = max(1, (int) $item['quantity']);
