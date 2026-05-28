@@ -201,7 +201,7 @@
 
 
 <div id="addProductModal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/60 p-4">
-    <div class="bg-white w-full max-w-6xl rounded-xl shadow-2xl flex flex-col max-h-[95vh]">
+    <div class="bg-white w-full max-w-5xl rounded-xl shadow-2xl flex flex-col max-h-[95vh]">
 
         
         <div class="flex items-center justify-between px-6 py-4 border-b">
@@ -294,7 +294,7 @@
                 <div id="variantsContainer" class="space-y-3 overflow-x-auto pb-1">
                     
                     <div class="variant-row border border-gray-200 rounded p-3">
-                        <div class="mb-2 grid min-w-[1040px] grid-cols-[1fr_1.15fr_0.8fr_0.8fr_0.95fr_0.95fr_0.95fr_0.8fr_24px] items-end gap-2">
+                        <div class="mb-2 grid min-w-[960px] grid-cols-[0.9fr_1.05fr_0.75fr_0.75fr_0.85fr_0.85fr_0.85fr_0.72fr_22px] items-end gap-2">
                             <div class="min-w-0">
                                 <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Quantity</p>
                                 <input type="text" name="variants[0][quantity]" placeholder="e.g. 500-600"
@@ -375,7 +375,7 @@
 
 
 <div id="editProductModal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-    <div class="bg-white w-full max-w-6xl rounded-2xl shadow-2xl flex flex-col max-h-[95vh]">
+    <div class="bg-white w-full max-w-5xl rounded-2xl shadow-2xl flex flex-col max-h-[95vh]">
         <div class="p-5 border-b flex justify-between items-center bg-slate-50 rounded-t-2xl">
             <h2 class="font-bold text-slate-700">Edit Product</h2>
             <button onclick="closeModal('editProductModal')" class="text-slate-400 hover:text-red-500 text-2xl">&times;</button>
@@ -425,11 +425,11 @@
                 <input type="file" id="finalEditImagesInput" name="images[]" multiple class="hidden">
                 <div id="editExistingImagesInputs" class="hidden"></div>
                 <p id="editImageHint" class="mt-1 text-[11px] text-slate-400">Current images neeche dikhengi. Delete icon se hata sakte ho, aur new images add karne ke liye image choose karke Add dabao.</p>
-                <div class="mt-4">
+                <div id="editCurrentImagesSection" class="mt-4 hidden">
                     <p class="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Current Images</p>
                     <div id="editCurrentImagePreviews" class="flex flex-wrap gap-3"></div>
                 </div>
-                <div class="mt-4">
+                <div id="editNewImagesSection" class="mt-4 hidden">
                     <p class="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">New Images</p>
                     <div id="editNewImagePreviews" class="flex flex-wrap gap-3"></div>
                 </div>
@@ -742,6 +742,8 @@ function syncEditImagePreviews() {
 
         previewContainer.appendChild(previewCard);
     });
+
+    toggleEditImageSection('editNewImagesSection', editProductImages.length > 0);
 }
 
 function removeSelectedEditImage(previewId) {
@@ -792,6 +794,12 @@ function resetEditProductImages(shouldClearCurrent = true) {
         finalInput.value = '';
     }
 
+    toggleEditImageSection('editNewImagesSection', false);
+
+    if (shouldClearCurrent) {
+        toggleEditImageSection('editCurrentImagesSection', false);
+    }
+
     renderEditImagePickerRow();
 }
 
@@ -805,9 +813,11 @@ function renderEditCurrentImages(images) {
     syncEditExistingImagesInputs();
 
     if (!currentEditImages.length) {
-        currentContainer.innerHTML = `<div class="rounded-xl bg-slate-50 px-4 py-8 text-sm font-semibold text-slate-400">No current images uploaded.</div>`;
+        toggleEditImageSection('editCurrentImagesSection', false);
         return;
     }
+
+    toggleEditImageSection('editCurrentImagesSection', true);
 
     currentEditImages.forEach((imagePath, index) => {
         const previewCard = document.createElement('div');
@@ -846,6 +856,14 @@ function syncEditExistingImagesInputs() {
 function removeCurrentEditImage(imagePath) {
     currentEditImages = currentEditImages.filter((item) => item !== imagePath);
     renderEditCurrentImages(currentEditImages);
+}
+
+function toggleEditImageSection(sectionId, shouldShow) {
+    const section = document.getElementById(sectionId);
+
+    if (!section) return;
+
+    section.classList.toggle('hidden', !shouldShow);
 }
 
 
@@ -891,7 +909,7 @@ function getVariantRowTemplate(idx, tone = 'gray', values = {}) {
     const saveOffer = values.save_offer ?? '';
 
     return `
-        <div class="grid min-w-[1040px] grid-cols-[1fr_1.15fr_0.8fr_0.8fr_0.95fr_0.95fr_0.95fr_0.8fr_24px] items-end gap-2 mb-2">
+        <div class="grid min-w-[960px] grid-cols-[0.9fr_1.05fr_0.75fr_0.75fr_0.85fr_0.85fr_0.85fr_0.72fr_22px] items-end gap-2 mb-2">
             <div class="min-w-0">
                 <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Quantity (Optional)</p>
                 <input type="text" name="variants[${idx}][quantity]" value="${quantity}" placeholder="e.g. 500-600"

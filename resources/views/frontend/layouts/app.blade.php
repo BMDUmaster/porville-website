@@ -320,7 +320,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
 
         <div class="grid grid-cols-2 gap-x-6 gap-y-7 py-6 lg:grid-cols-[1fr_1fr_1fr_1fr_180px] lg:gap-x-8 lg:gap-y-6 lg:py-7">
             <div>
-                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Company</h4>
+                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Info</h4>
                 <ul class="space-y-3.5">
                     <li><a href="{{ route('frontend.about') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">About Us</a></li>
                     <li><a href="{{ route('frontend.contact') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Contact Us</a></li>
@@ -329,7 +329,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
             </div>
 
             <div>
-                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Support</h4>
+                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Useful Links</h4>
                 <ul class="space-y-3.5">
                     <li><a href="{{ route('frontend.contact') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Help Center</a></li>
                     <li><a href="{{ route('frontend.shipping') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Shipping Info</a></li>

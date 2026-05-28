@@ -371,7 +371,7 @@
                             Best Seller
                         </span>
                     </div>
-                    <h1 class="text-[32px] font-black leading-[1.02] tracking-[-0.035em] text-slate-900 md:text-[42px]">
+                    <h1 class="text-[26px] font-black leading-[1.06] tracking-[-0.02em] text-slate-900 md:text-[32px]">
                         {{ $product->name }}
                     </h1>
                     <p class="mt-2 text-[12px] font-semibold tracking-[0.01em] text-slate-400">
