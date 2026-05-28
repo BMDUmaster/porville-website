@@ -60,6 +60,7 @@ Route::middleware('admin')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.home');
     Route::get('/dashboard/system-check', SystemCheckController::class)->name('dashboard.system-check');
+    Route::get('/system-check', SystemCheckController::class)->name('dashboard.system-check.short');
 
     // Categories
     Route::get('/categories',               [CategoryController::class, 'index'])->name('dashboard.categories');

@@ -7,20 +7,34 @@ use App\Models\Category;
 use App\Support\WebpImage;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Category::parents()->with('children');
+        try {
+            $query = Category::parents()->with('children');
 
-        if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            if ($request->filled('search')) {
+                $query->where('name', 'like', '%' . $request->search . '%');
+            }
+
+            $categories = $query->latest()->paginate(15);
+
+            return view('dashboard.categories.index', compact('categories'));
+        } catch (\Throwable $e) {
+            report($e);
+
+            $categories = new LengthAwarePaginator([], 0, 15, 1, [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]);
+
+            return view('dashboard.categories.index', compact('categories'))
+                ->with('error', 'Could not load categories. ' . $this->friendlyExceptionMessage($e));
         }
-
-        $categories = $query->latest()->paginate(15);
-        return view('dashboard.categories.index', compact('categories'));
     }
 
     public function store(Request $request)
@@ -104,6 +118,15 @@ class CategoryController extends Controller
         }
 
         return $slug;
+    }
+
+    private function friendlyExceptionMessage(\Throwable $e): string
+    {
+        if ($e instanceof QueryException) {
+            return $this->databaseErrorMessage($e);
+        }
+
+        return $e->getMessage();
     }
 
     private function databaseErrorMessage(QueryException $e): string

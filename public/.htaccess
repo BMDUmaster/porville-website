@@ -5,6 +5,9 @@
 
     RewriteEngine On
 
+    # REQUIRED when site runs in a subfolder (e.g. https://bmdublog.com/farmsea/)
+    RewriteBase /farmsea/
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

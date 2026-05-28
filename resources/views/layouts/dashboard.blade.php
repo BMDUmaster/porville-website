@@ -279,21 +279,13 @@
                     <i class="fa-solid fa-circle-xmark"></i> {{ session('error') }}
                 </div>
             @endif
-            @if($errors->any())
+            @if(isset($errors) && $errors->any())
                 <div class="mx-6 mt-4 rounded-lg bg-red-100 p-3 text-sm text-red-700">
                     <ul class="list-disc pl-5 space-y-1">
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
-                </div>
-            @endif
-            @if($errors->any())
-                <div data-auto-dismiss="3000" class="mx-6 mt-4 rounded-lg bg-red-100 p-3 text-sm text-red-700 transition-all duration-500">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-circle-xmark"></i>
-                        <span>{{ $errors->first() }}</span>
-                    </div>
                 </div>
             @endif
 
