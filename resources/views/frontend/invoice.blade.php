@@ -46,7 +46,7 @@
             <div class="flex items-start justify-between gap-4">
                 <div class="flex min-w-0 items-center gap-3">
                     <div class="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-white/10">
-                        <img src="{{ asset('images/Farmsea.webp') }}" alt="FarmSea" class="h-10 w-10 object-contain">
+                        <img src="{{ $brandLogoUrl }}" alt="FarmSea" class="h-10 w-10 object-contain">
                     </div>
                     <div>
                         <p class="text-[10px] font-bold uppercase tracking-[0.28em] text-white/70">Tax Invoice</p>

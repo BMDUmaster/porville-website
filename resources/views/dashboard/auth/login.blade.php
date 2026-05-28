@@ -28,7 +28,7 @@
                  style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 22px 22px;"></div>
             <div class="relative z-10 flex flex-col items-center">
                 <div class="mb-3 flex h-20 w-20 items-center justify-center rounded-2xl bg-white p-3 shadow-lg shadow-black/10">
-                    <img src="{{ asset('images/Farmsea.webp') }}" alt="FarmSea" class="max-h-full max-w-full object-contain">
+                    <img src="{{ $brandLogoUrl }}" alt="FarmSea" class="max-h-full max-w-full object-contain">
                 </div>
                 <h1 class="text-xl font-extrabold text-white tracking-tight">FarmSea Portal</h1>
                 <div class="mt-2 h-0.5 w-10 rounded-full bg-mayview-light"></div>

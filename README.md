@@ -20,6 +20,14 @@ php artisan storage:link
 php artisan serve
 ```
 
+## Live / Production Checklist
+
+1. Set `APP_URL` in `.env` to your real domain (e.g. `https://farmsea.in`) — required for logos and uploaded images.
+2. Run `php artisan storage:link` on the server (or rely on the auto-link on first request).
+3. Ensure `public/images/Farmsea.webp` is deployed and `storage/app/public` is writable (`chmod -R 775 storage bootstrap/cache`).
+4. PHP extensions: `gd` (recommended) or optional `IMAGEMAGICK_BINARY` in `.env` for WebP uploads.
+5. `APP_DEBUG=false` on production.
+
 ## Default Credentials
 
 | Role  | Email              | Password |

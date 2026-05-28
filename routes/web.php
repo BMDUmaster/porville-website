@@ -1,6 +1,19 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\File;
+
+// Serve uploaded files when public/storage symlink is missing (common on shared hosting).
+Route::get('/storage/{path}', function (string $path) {
+    $path = str_replace(['..', '\\'], '', $path);
+    $fullPath = storage_path('app/public/' . $path);
+
+    if (! File::isFile($fullPath)) {
+        abort(404);
+    }
+
+    return response()->file($fullPath);
+})->where('path', '.*');
 
 // ── Dashboard Controllers
 use App\Http\Controllers\Dashboard\AuthController;

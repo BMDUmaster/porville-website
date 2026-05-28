@@ -167,15 +167,12 @@ html, body { overflow-x: hidden; max-width: 100vw; }
         <button onclick="toggleSidebar()" class="text-gray-700 text-xl lg:hidden">
             <i class="fa-solid fa-bars"></i>
         </button>
-        <a href="{{ route('frontend.home') }}" class="flex-shrink-0 md:ml-[100px]">
-            @if(file_exists(public_path('images/Farmsea.webp')))
-                <img src="{{ asset('images/Farmsea.webp') }}" alt="FarmSea" class="h-10 w-auto object-contain">
-            @else
-                <span class="text-xl font-extrabold text-green-700"><img src="{{ asset('images/Farmsea.webp') }}"
-                     alt="FarmSea"
-                     class="h-14 w-auto object-contain"
-                     onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex'"></span>
-            @endif
+        <a href="{{ route('frontend.home') }}" class="flex-shrink-0 md:ml-[100px] flex items-center">
+            <img src="{{ $brandLogoUrl }}"
+                 alt="FarmSea"
+                 class="h-10 w-auto object-contain"
+                 onerror="this.style.display='none'; document.getElementById('header-logo-fallback').style.display='inline-flex'">
+            <span id="header-logo-fallback" class="hidden text-xl font-extrabold text-green-700">FarmSea</span>
         </a>
         <form action="{{ route('frontend.products') }}" method="GET" class="hidden md:flex flex-grow max-w-lg mx-4 relative">
             <input type="text" name="search" placeholder="Search Ready to Cook Items"

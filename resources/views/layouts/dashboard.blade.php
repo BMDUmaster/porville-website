@@ -70,7 +70,7 @@
         <!-- Logo -->
         <div class="p-4 border-b border-green-200 bg-green-400 flex items-center justify-between">
             <a href="{{ route('dashboard.home') }}" class="flex items-center">
-                <img src="{{ asset('images/Farmsea.webp') }}"
+                <img src="{{ $brandLogoUrl }}"
                      alt="FarmSea"
                      class="h-14 w-auto object-contain"
                      onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex'">
