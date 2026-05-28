@@ -30,6 +30,10 @@ use App\Http\Controllers\Dashboard\ProfileController;
 use App\Http\Controllers\Dashboard\ServiceChargeController;
 use App\Http\Controllers\Dashboard\DeliverySlotController;
 use App\Http\Controllers\Dashboard\SystemCheckController;
+use App\Http\Controllers\ServerDiagnosticsController;
+
+// Public server diagnostics (no login) — use this URL on live hosting
+Route::get('/server-check', ServerDiagnosticsController::class)->name('server-check');
 
 // ── Frontend Controllers 
 use App\Http\Controllers\Frontend\HomeController;
