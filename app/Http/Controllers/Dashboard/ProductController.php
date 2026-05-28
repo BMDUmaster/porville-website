@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Support\ProductDayPricing;
 use App\Support\WebpImage;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -51,6 +52,21 @@ class ProductController extends Controller
     }
 
     public function store(Request $request)
+    {
+        try {
+            return $this->performStore($request);
+        } catch (QueryException $e) {
+            report($e);
+
+            return back()->withInput()->with('error', $this->databaseErrorMessage($e));
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->withInput()->with('error', 'Could not save product. ' . $e->getMessage());
+        }
+    }
+
+    private function performStore(Request $request)
     {
         $data = $request->validate([
             'name'                  => 'required|string|max:200',
@@ -114,6 +130,21 @@ class ProductController extends Controller
     }
 
     public function update(Request $request, Product $product)
+    {
+        try {
+            return $this->performUpdate($request, $product);
+        } catch (QueryException $e) {
+            report($e);
+
+            return back()->withInput()->with('error', $this->databaseErrorMessage($e));
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->withInput()->with('error', 'Could not update product. ' . $e->getMessage());
+        }
+    }
+
+    private function performUpdate(Request $request, Product $product)
     {
         $data = $request->validate([
             'name'                  => 'required|string|max:200',
@@ -274,5 +305,20 @@ class ProductController extends Controller
         }
 
         return $slug;
+    }
+
+    private function databaseErrorMessage(QueryException $e): string
+    {
+        $message = $e->getMessage();
+
+        if (str_contains($message, 'Unknown column') || str_contains($message, "doesn't exist")) {
+            return 'Database is outdated (missing variants/videos columns). Run: php artisan migrate --force — or open /dashboard/system-check.';
+        }
+
+        if (str_contains($message, 'Duplicate entry')) {
+            return 'A product with this name already exists. Use a different name.';
+        }
+
+        return 'Database error while saving. Check /dashboard/system-check or server logs.';
     }
 }

@@ -29,6 +29,7 @@ use App\Http\Controllers\Dashboard\CouponController;
 use App\Http\Controllers\Dashboard\ProfileController;
 use App\Http\Controllers\Dashboard\ServiceChargeController;
 use App\Http\Controllers\Dashboard\DeliverySlotController;
+use App\Http\Controllers\Dashboard\SystemCheckController;
 
 // ── Frontend Controllers 
 use App\Http\Controllers\Frontend\HomeController;
@@ -58,6 +59,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('dashboard.logou
 Route::middleware('admin')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.home');
+    Route::get('/dashboard/system-check', SystemCheckController::class)->name('dashboard.system-check');
 
     // Categories
     Route::get('/categories',               [CategoryController::class, 'index'])->name('dashboard.categories');

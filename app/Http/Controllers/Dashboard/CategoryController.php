@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Support\WebpImage;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -24,38 +25,60 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name'        => 'required|string|max:100',
-            'description' => 'nullable|string',
-            'image'       => 'nullable|image|max:2048',
-        ]);
+        try {
+            $data = $request->validate([
+                'name'        => 'required|string|max:100',
+                'description' => 'nullable|string',
+                'image'       => 'nullable|image|max:2048',
+            ]);
 
-        $data['slug'] = $this->generateUniqueSlug($data['name']);
+            $data['slug'] = $this->generateUniqueSlug($data['name']);
 
-        if ($request->hasFile('image')) {
-            $data['image'] = WebpImage::store($request->file('image'), 'categories');
+            if ($request->hasFile('image')) {
+                $data['image'] = WebpImage::store($request->file('image'), 'categories');
+            }
+
+            Category::create($data);
+
+            return back()->with('success', 'Category created successfully.');
+        } catch (QueryException $e) {
+            report($e);
+
+            return back()->withInput()->with('error', $this->databaseErrorMessage($e));
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->withInput()->with('error', 'Could not save category. ' . $e->getMessage());
         }
-
-        Category::create($data);
-        return back()->with('success', 'Category created successfully.');
     }
 
     public function update(Request $request, Category $category)
     {
-        $data = $request->validate([
-            'name'        => 'required|string|max:100',
-            'description' => 'nullable|string',
-            'image'       => 'nullable|image|max:2048',
-        ]);
+        try {
+            $data = $request->validate([
+                'name'        => 'required|string|max:100',
+                'description' => 'nullable|string',
+                'image'       => 'nullable|image|max:2048',
+            ]);
 
-        $data['slug'] = $this->generateUniqueSlug($data['name'], $category->id);
+            $data['slug'] = $this->generateUniqueSlug($data['name'], $category->id);
 
-        if ($request->hasFile('image')) {
-            $data['image'] = WebpImage::store($request->file('image'), 'categories');
+            if ($request->hasFile('image')) {
+                $data['image'] = WebpImage::store($request->file('image'), 'categories');
+            }
+
+            $category->update($data);
+
+            return back()->with('success', 'Category updated successfully.');
+        } catch (QueryException $e) {
+            report($e);
+
+            return back()->withInput()->with('error', $this->databaseErrorMessage($e));
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->withInput()->with('error', 'Could not update category. ' . $e->getMessage());
         }
-
-        $category->update($data);
-        return back()->with('success', 'Category updated successfully.');
     }
 
     public function destroy(Category $category)
@@ -81,5 +104,20 @@ class CategoryController extends Controller
         }
 
         return $slug;
+    }
+
+    private function databaseErrorMessage(QueryException $e): string
+    {
+        $message = $e->getMessage();
+
+        if (str_contains($message, 'Unknown column') || str_contains($message, "doesn't exist")) {
+            return 'Database is outdated. Run php artisan migrate --force on the server, or open /dashboard/system-check.';
+        }
+
+        if (str_contains($message, 'Duplicate entry')) {
+            return 'A category with this name already exists. Use a different name.';
+        }
+
+        return 'Database error while saving. Check /dashboard/system-check or server logs.';
     }
 }

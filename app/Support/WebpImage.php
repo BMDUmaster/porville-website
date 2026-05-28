@@ -5,7 +5,6 @@ namespace App\Support;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use RuntimeException;
 
 class WebpImage
 {
@@ -23,7 +22,7 @@ class WebpImage
             return $relativePath;
         }
 
-        return self::storeOriginal($file, $directory);
+        return self::storeOriginal($file, $directory, $storageDirectory);
     }
 
     private static function convertWithGd(UploadedFile $file, string $directory, string $storageDirectory, int $quality): ?string
@@ -45,10 +44,10 @@ class WebpImage
 
         $filename = Str::random(40) . '.webp';
         $targetPath = $storageDirectory . DIRECTORY_SEPARATOR . $filename;
-        $saved = imagewebp($source, $targetPath, max(1, min(100, $quality)));
+        $saved = @imagewebp($source, $targetPath, max(1, min(100, $quality)));
         imagedestroy($source);
 
-        if (! $saved || ! File::exists($targetPath)) {
+        if (! $saved || ! File::isFile($targetPath)) {
             return null;
         }
 
@@ -59,7 +58,7 @@ class WebpImage
     {
         $path = $file->getRealPath();
 
-        if (! $path) {
+        if (! $path || ! is_readable($path)) {
             return false;
         }
 
@@ -102,9 +101,9 @@ class WebpImage
             return null;
         }
 
-        try {
-            $binary = self::resolveBinary();
-        } catch (RuntimeException) {
+        $binary = self::resolveBinary();
+
+        if (! $binary) {
             return null;
         }
 
@@ -119,27 +118,42 @@ class WebpImage
             escapeshellarg($targetPath)
         );
 
-        exec($command, $output, $exitCode);
+        @exec($command, $output, $exitCode);
 
-        if ($exitCode !== 0 || ! File::exists($targetPath)) {
+        if ($exitCode !== 0 || ! File::isFile($targetPath)) {
             return null;
         }
 
         return $directory . '/' . $filename;
     }
 
-    private static function storeOriginal(UploadedFile $file, string $directory): string
+    private static function storeOriginal(UploadedFile $file, string $directory, string $storageDirectory): string
     {
-        $storedPath = $file->store($directory, 'public');
+        $extension = strtolower($file->getClientOriginalExtension() ?: 'jpg');
+        $extension = preg_replace('/[^a-z0-9]/', '', $extension) ?: 'jpg';
+        $filename = Str::random(40) . '.' . $extension;
+        $targetPath = $storageDirectory . DIRECTORY_SEPARATOR . $filename;
 
-        if (! $storedPath) {
-            throw new RuntimeException('Unable to store uploaded image.');
+        if ($file->move($storageDirectory, $filename)) {
+            return $directory . '/' . $filename;
         }
 
-        return $storedPath;
+        $copied = @copy($file->getRealPath(), $targetPath);
+
+        if ($copied && File::isFile($targetPath)) {
+            return $directory . '/' . $filename;
+        }
+
+        $storedPath = $file->store($directory, 'public');
+
+        if ($storedPath) {
+            return $storedPath;
+        }
+
+        throw new \RuntimeException('Unable to save image. Check that storage/app/public is writable on the server.');
     }
 
-    private static function resolveBinary(): string
+    private static function resolveBinary(): ?string
     {
         $configuredPath = env('IMAGEMAGICK_BINARY');
 
@@ -154,20 +168,14 @@ class WebpImage
             '/usr/local/bin/magick',
             '/usr/bin/convert',
             '/usr/local/bin/convert',
-            'magick',
-            'convert',
         ]);
 
         foreach ($candidates as $candidate) {
-            if (in_array($candidate, ['magick', 'convert'], true)) {
-                return $candidate;
-            }
-
             if (File::exists($candidate)) {
                 return $candidate;
             }
         }
 
-        throw new RuntimeException('ImageMagick binary not found for WebP conversion.');
+        return null;
     }
 }

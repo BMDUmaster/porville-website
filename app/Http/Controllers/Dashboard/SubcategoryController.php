@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Support\WebpImage;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -39,44 +40,66 @@ class SubcategoryController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name'        => 'required|string|max:100',
-            'parent_id'   => ['required', Rule::exists('categories', 'id')->whereNull('parent_id')],
-            'description' => 'nullable|string',
-            'is_active'   => 'boolean',
-            'image'       => 'nullable|image|max:2048',
-        ]);
+        try {
+            $data = $request->validate([
+                'name'        => 'required|string|max:100',
+                'parent_id'   => ['required', Rule::exists('categories', 'id')->whereNull('parent_id')],
+                'description' => 'nullable|string',
+                'is_active'   => 'boolean',
+                'image'       => 'nullable|image|max:2048',
+            ]);
 
-        $data['slug']      = $this->generateUniqueSlug($data['name']);
-        $data['is_active'] = $request->boolean('is_active', true);
+            $data['slug']      = $this->generateUniqueSlug($data['name']);
+            $data['is_active'] = $request->boolean('is_active', true);
 
-        if ($request->hasFile('image')) {
-            $data['image'] = WebpImage::store($request->file('image'), 'subcategories');
+            if ($request->hasFile('image')) {
+                $data['image'] = WebpImage::store($request->file('image'), 'subcategories');
+            }
+
+            Category::create($data);
+
+            return back()->with('success', 'Sub-category created successfully.');
+        } catch (QueryException $e) {
+            report($e);
+
+            return back()->withInput()->with('error', $this->databaseErrorMessage($e));
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->withInput()->with('error', 'Could not save sub-category. ' . $e->getMessage());
         }
-
-        Category::create($data);
-        return back()->with('success', 'Sub-category created successfully.');
     }
 
     public function update(Request $request, Category $subcategory)
     {
-        $data = $request->validate([
-            'name'        => 'required|string|max:100',
-            'parent_id'   => ['required', Rule::exists('categories', 'id')->whereNull('parent_id')],
-            'description' => 'nullable|string',
-            'is_active'   => 'boolean',
-            'image'       => 'nullable|image|max:2048',
-        ]);
+        try {
+            $data = $request->validate([
+                'name'        => 'required|string|max:100',
+                'parent_id'   => ['required', Rule::exists('categories', 'id')->whereNull('parent_id')],
+                'description' => 'nullable|string',
+                'is_active'   => 'boolean',
+                'image'       => 'nullable|image|max:2048',
+            ]);
 
-        $data['slug']      = $this->generateUniqueSlug($data['name'], $subcategory->id);
-        $data['is_active'] = $request->boolean('is_active', true);
+            $data['slug']      = $this->generateUniqueSlug($data['name'], $subcategory->id);
+            $data['is_active'] = $request->boolean('is_active', true);
 
-        if ($request->hasFile('image')) {
-            $data['image'] = WebpImage::store($request->file('image'), 'subcategories');
+            if ($request->hasFile('image')) {
+                $data['image'] = WebpImage::store($request->file('image'), 'subcategories');
+            }
+
+            $subcategory->update($data);
+
+            return back()->with('success', 'Sub-category updated.');
+        } catch (QueryException $e) {
+            report($e);
+
+            return back()->withInput()->with('error', $this->databaseErrorMessage($e));
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->withInput()->with('error', 'Could not update sub-category. ' . $e->getMessage());
         }
-
-        $subcategory->update($data);
-        return back()->with('success', 'Sub-category updated.');
     }
 
     public function destroy(Category $subcategory)
@@ -102,5 +125,20 @@ class SubcategoryController extends Controller
         }
 
         return $slug;
+    }
+
+    private function databaseErrorMessage(QueryException $e): string
+    {
+        $message = $e->getMessage();
+
+        if (str_contains($message, 'Unknown column') || str_contains($message, "doesn't exist")) {
+            return 'Database is outdated. Run php artisan migrate --force on the server, or open /dashboard/system-check.';
+        }
+
+        if (str_contains($message, 'Duplicate entry')) {
+            return 'A sub-category with this name already exists. Use a different name.';
+        }
+
+        return 'Database error while saving. Check /dashboard/system-check or server logs.';
     }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 
 class Coupon extends Model
 {
@@ -21,11 +22,19 @@ class Coupon extends Model
 
     public function scopeCoupons($query)
     {
+        if (! Schema::hasColumn($this->getTable(), 'entry_type')) {
+            return $query;
+        }
+
         return $query->where('entry_type', 'coupon');
     }
 
     public function scopeOffers($query)
     {
+        if (! Schema::hasColumn($this->getTable(), 'entry_type')) {
+            return $query;
+        }
+
         return $query->where('entry_type', 'offer');
     }
 
