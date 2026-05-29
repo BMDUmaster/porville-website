@@ -43,7 +43,7 @@ class CategoryController extends Controller
             $data = $request->validate([
                 'name'        => 'required|string|max:100',
                 'description' => 'nullable|string',
-                'image'       => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
+                'image'       => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,avif|max:5120',
             ]);
 
             $data['slug'] = $this->generateUniqueSlug($data['name']);
@@ -72,7 +72,7 @@ class CategoryController extends Controller
             $data = $request->validate([
                 'name'        => 'required|string|max:100',
                 'description' => 'nullable|string',
-                'image'       => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
+                'image'       => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,avif|max:5120',
             ]);
 
             $data['slug'] = $this->generateUniqueSlug($data['name'], $category->id);

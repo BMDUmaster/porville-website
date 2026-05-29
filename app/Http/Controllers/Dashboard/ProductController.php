@@ -85,7 +85,7 @@ class ProductController extends Controller
             'variants.*.save_offer' => 'nullable|string|max:100',
             'variants.*.admin_amount' => 'nullable|numeric|min:0|max:99999999.99',
             'variants.*.vendor_amount' => 'nullable|numeric|min:0|max:99999999.99',
-            'images.*'              => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
+            'images.*'              => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,avif|max:5120',
             'videos.*'              => 'nullable|file|mimes:mp4,mov,avi,webm,mkv|max:51200',
         ]);
 
@@ -168,7 +168,7 @@ class ProductController extends Controller
             'existing_images_present' => 'nullable',
             'existing_images'       => 'nullable|array',
             'existing_images.*'     => 'string',
-            'images.*'              => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
+            'images.*'              => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,avif|max:5120',
             'videos.*'              => 'nullable|file|mimes:mp4,mov,avi,webm,mkv|max:51200',
         ]);
 

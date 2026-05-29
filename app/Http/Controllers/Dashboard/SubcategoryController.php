@@ -46,7 +46,7 @@ class SubcategoryController extends Controller
                 'parent_id'   => ['required', Rule::exists('categories', 'id')->whereNull('parent_id')],
                 'description' => 'nullable|string',
                 'is_active'   => 'boolean',
-                'image'       => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
+                'image'       => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,avif|max:5120',
             ]);
 
             $data['slug']      = $this->generateUniqueSlug($data['name']);
@@ -78,7 +78,7 @@ class SubcategoryController extends Controller
                 'parent_id'   => ['required', Rule::exists('categories', 'id')->whereNull('parent_id')],
                 'description' => 'nullable|string',
                 'is_active'   => 'boolean',
-                'image'       => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
+                'image'       => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,avif|max:5120',
             ]);
 
             $data['slug']      = $this->generateUniqueSlug($data['name'], $subcategory->id);
