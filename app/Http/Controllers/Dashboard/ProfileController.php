@@ -21,7 +21,7 @@ class ProfileController extends Controller
         $data = $request->validate([
             'name'  => 'required|string|max:100',
             'phone' => 'nullable|string|max:20',
-            'photo' => 'nullable|image|max:2048',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
         ]);
 
         if ($request->hasFile('photo')) {

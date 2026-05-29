@@ -8,6 +8,10 @@ use Illuminate\Support\Str;
 
 class WebpImage
 {
+    /**
+     * Save uploaded image. By default keeps original JPG/PNG (best for shared hosting).
+     * Set IMAGE_USE_WEBP=true in .env only if server has GD with WebP support.
+     */
     public static function store(UploadedFile $file, string $directory, int $quality = 85): string
     {
         $directory = trim($directory, '/');
@@ -15,14 +19,30 @@ class WebpImage
 
         File::ensureDirectoryExists($storageDirectory);
 
-        $relativePath = self::convertWithGd($file, $directory, $storageDirectory, $quality)
-            ?? self::convertWithImageMagick($file, $directory, $storageDirectory, $quality);
+        if (self::shouldConvertToWebp()) {
+            try {
+                $converted = self::tryConvertToWebp($file, $directory, $storageDirectory, $quality);
 
-        if ($relativePath) {
-            return $relativePath;
+                if ($converted) {
+                    return $converted;
+                }
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
 
         return self::storeOriginal($file, $directory, $storageDirectory);
+    }
+
+    private static function shouldConvertToWebp(): bool
+    {
+        return filter_var(env('IMAGE_USE_WEBP', false), FILTER_VALIDATE_BOOL);
+    }
+
+    private static function tryConvertToWebp(UploadedFile $file, string $directory, string $storageDirectory, int $quality): ?string
+    {
+        return self::convertWithGd($file, $directory, $storageDirectory, $quality)
+            ?? self::convertWithImageMagick($file, $directory, $storageDirectory, $quality);
     }
 
     private static function convertWithGd(UploadedFile $file, string $directory, string $storageDirectory, int $quality): ?string
@@ -37,21 +57,30 @@ class WebpImage
             return null;
         }
 
-        $source = self::applyExifOrientation($source, $file);
-        imagepalettetotruecolor($source);
-        imagealphablending($source, true);
-        imagesavealpha($source, true);
+        try {
+            $source = self::applyExifOrientation($source, $file);
 
-        $filename = Str::random(40) . '.webp';
-        $targetPath = $storageDirectory . DIRECTORY_SEPARATOR . $filename;
-        $saved = @imagewebp($source, $targetPath, max(1, min(100, $quality)));
-        imagedestroy($source);
+            if (function_exists('imagepalettetotruecolor')) {
+                @imagepalettetotruecolor($source);
+            }
 
-        if (! $saved || ! File::isFile($targetPath)) {
-            return null;
+            @imagealphablending($source, true);
+            @imagesavealpha($source, true);
+
+            $filename = Str::random(40) . '.webp';
+            $targetPath = $storageDirectory . DIRECTORY_SEPARATOR . $filename;
+            $saved = @imagewebp($source, $targetPath, max(1, min(100, $quality)));
+
+            if ($saved && File::isFile($targetPath)) {
+                return $directory . '/' . $filename;
+            }
+        } finally {
+            if (is_resource($source) || $source instanceof \GdImage) {
+                @imagedestroy($source);
+            }
         }
 
-        return $directory . '/' . $filename;
+        return null;
     }
 
     private static function createGdImage(UploadedFile $file)
@@ -72,27 +101,33 @@ class WebpImage
     }
 
     /**
-     * @param resource $image
-     * @return resource
+     * @param resource|\GdImage $image
+     * @return resource|\GdImage
      */
     private static function applyExifOrientation($image, UploadedFile $file)
     {
-        if (! function_exists('exif_read_data') || ! in_array($file->getMimeType(), ['image/jpeg', 'image/jpg'], true)) {
+        try {
+            if (! function_exists('exif_read_data') || ! in_array($file->getMimeType(), ['image/jpeg', 'image/jpg'], true)) {
+                return $image;
+            }
+
+            $exif = @exif_read_data($file->getRealPath());
+
+            if (! is_array($exif) || empty($exif['Orientation'])) {
+                return $image;
+            }
+
+            $rotated = match ((int) $exif['Orientation']) {
+                3 => @imagerotate($image, 180, 0),
+                6 => @imagerotate($image, -90, 0),
+                8 => @imagerotate($image, 90, 0),
+                default => false,
+            };
+
+            return $rotated ?: $image;
+        } catch (\Throwable) {
             return $image;
         }
-
-        $exif = @exif_read_data($file->getRealPath());
-
-        if (! is_array($exif) || empty($exif['Orientation'])) {
-            return $image;
-        }
-
-        return match ((int) $exif['Orientation']) {
-            3 => imagerotate($image, 180, 0) ?: $image,
-            6 => imagerotate($image, -90, 0) ?: $image,
-            8 => imagerotate($image, 90, 0) ?: $image,
-            default => $image,
-        };
     }
 
     private static function convertWithImageMagick(UploadedFile $file, string $directory, string $storageDirectory, int $quality): ?string
@@ -120,37 +155,51 @@ class WebpImage
 
         @exec($command, $output, $exitCode);
 
-        if ($exitCode !== 0 || ! File::isFile($targetPath)) {
-            return null;
+        if ($exitCode === 0 && File::isFile($targetPath)) {
+            return $directory . '/' . $filename;
         }
 
-        return $directory . '/' . $filename;
+        return null;
     }
 
     private static function storeOriginal(UploadedFile $file, string $directory, string $storageDirectory): string
     {
         $extension = strtolower($file->getClientOriginalExtension() ?: 'jpg');
         $extension = preg_replace('/[^a-z0-9]/', '', $extension) ?: 'jpg';
+
+        if (! in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
+            $extension = 'jpg';
+        }
+
         $filename = Str::random(40) . '.' . $extension;
         $targetPath = $storageDirectory . DIRECTORY_SEPARATOR . $filename;
+        $source = $file->getRealPath();
 
-        if ($file->move($storageDirectory, $filename)) {
+        if ($source && is_readable($source)) {
+            if (@copy($source, $targetPath) && File::isFile($targetPath)) {
+                return $directory . '/' . $filename;
+            }
+
+            $contents = @file_get_contents($source);
+
+            if ($contents !== false && @file_put_contents($targetPath, $contents) !== false) {
+                return $directory . '/' . $filename;
+            }
+        }
+
+        if (@$file->move($storageDirectory, $filename) && File::isFile($targetPath)) {
             return $directory . '/' . $filename;
         }
 
-        $copied = @copy($file->getRealPath(), $targetPath);
-
-        if ($copied && File::isFile($targetPath)) {
-            return $directory . '/' . $filename;
-        }
-
-        $storedPath = $file->store($directory, 'public');
+        $storedPath = $file->storeAs($directory, $filename, 'public');
 
         if ($storedPath) {
             return $storedPath;
         }
 
-        throw new \RuntimeException('Unable to save image. Check that storage/app/public is writable on the server.');
+        throw new \RuntimeException(
+            'Image save failed. Run: chmod -R 775 storage && php artisan storage:link'
+        );
     }
 
     private static function resolveBinary(): ?string
@@ -161,16 +210,7 @@ class WebpImage
             return $configuredPath;
         }
 
-        $candidates = array_filter([
-            ...glob('C:\\Program Files\\ImageMagick-*\\magick.exe') ?: [],
-            ...glob('C:\\Program Files (x86)\\ImageMagick-*\\magick.exe') ?: [],
-            '/usr/bin/magick',
-            '/usr/local/bin/magick',
-            '/usr/bin/convert',
-            '/usr/local/bin/convert',
-        ]);
-
-        foreach ($candidates as $candidate) {
+        foreach (['/usr/bin/magick', '/usr/local/bin/magick', '/usr/bin/convert'] as $candidate) {
             if (File::exists($candidate)) {
                 return $candidate;
             }
