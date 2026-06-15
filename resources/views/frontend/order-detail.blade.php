@@ -68,7 +68,10 @@
                 @if($order->discount > 0)
                 <div class="flex justify-between text-green-600"><span>Discount</span><span>-&#8377;{{ number_format($order->discount, 2) }}</span></div>
                 @endif
-                <div class="flex justify-between"><span class="text-gray-500">Delivery</span><span>&#8377;{{ number_format($order->delivery_charge ?? $order->shipping_cost ?? 0, 2) }}</span></div>
+                @if((float) ($order->delivery_charge ?? $order->shipping_cost ?? 0) > 0)
+                    <div class="flex justify-between"><span class="text-gray-500">Delivery</span><span>&#8377;{{ number_format($order->delivery_charge ?? $order->shipping_cost ?? 0, 2) }}</span></div>
+                @endif
+                @if((float) ($order->service_charge ?? 0) > 0)
                 <div class="flex justify-between">
                     <span class="text-gray-500">
                         &#8505;&#65039; Service Charge
@@ -78,6 +81,7 @@
                     </span>
                     <span>&#8377;{{ number_format($order->service_charge, 2) }}</span>
                 </div>
+                @endif
                 <hr class="border-gray-100">
                 <div class="flex justify-between text-base font-bold text-gray-800">
                     <span>Grand Total</span>

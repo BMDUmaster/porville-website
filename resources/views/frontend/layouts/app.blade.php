@@ -22,6 +22,10 @@
 @media (max-width: 640px) {
     .container { padding-left: 12px !important; padding-right: 12px !important; }
 }
+@media (min-width: 1024px) {
+    #mobile-sidebar { display: none !important; }
+    #sidebar-overlay { display: none !important; }
+}
 /* Prevent horizontal overflow */
 html, body { overflow-x: hidden; max-width: 100vw; }
 /* Scrollbar hide utility */
@@ -64,18 +68,38 @@ html, body { overflow-x: hidden; max-width: 100vw; }
         <button onclick="toggleSidebar()"><i class="fa-solid fa-xmark text-2xl"></i></button>
     </div>
     <div class="p-4 overflow-y-auto h-full pb-20">
-        <h3 class="text-green-700 font-bold mb-3 mt-2">Non-Veg Fresh</h3>
+        <h3 class="text-green-700 font-bold mb-3 mt-2">Categories</h3>
         <ul class="space-y-1 text-gray-700 text-sm mb-5">
-            <li><a href="{{ route('frontend.products', ['category' => 'Chicken']) }}" class="block p-2 hover:bg-gray-100 rounded">Chicken</a></li>
-            <li><a href="{{ route('frontend.products', ['category' => 'Mutton']) }}" class="block p-2 hover:bg-gray-100 rounded">Mutton</a></li>
-            <li><a href="{{ route('frontend.products', ['category' => 'Fish']) }}" class="block p-2 hover:bg-gray-100 rounded">Fish</a></li>
-            <li><a href="{{ route('frontend.products', ['category' => 'Seafood']) }}" class="block p-2 hover:bg-gray-100 rounded">Seafood</a></li>
-            <li><a href="{{ route('frontend.products', ['category' => 'Eggs']) }}" class="block p-2 hover:bg-gray-100 rounded">Eggs</a></li>
-        </ul>
-        <h3 class="text-green-700 font-bold mb-3">Veg Fresh</h3>
-        <ul class="space-y-1 text-gray-700 text-sm mb-5">
-            <li><a href="{{ route('frontend.products', ['category' => 'Vegetables']) }}" class="block p-2 hover:bg-gray-100 rounded">Vegetables</a></li>
-            <li><a href="{{ route('frontend.products', ['category' => 'Fruits']) }}" class="block p-2 hover:bg-gray-100 rounded">Fruits</a></li>
+            @forelse($frontendNavCategories ?? collect() as $category)
+                <li>
+                    @if($category->children->isNotEmpty())
+                        <button
+                            type="button"
+                            onclick="toggleMobileCategory('{{ $category->id }}')"
+                            class="flex w-full items-center justify-between rounded p-2 text-left font-semibold hover:bg-gray-100"
+                        >
+                            <span>{{ $category->name }}</span>
+                            <i id="mobile-category-icon-{{ $category->id }}" class="fa-solid fa-chevron-down text-[10px] text-green-700 transition-transform"></i>
+                        </button>
+                        <ul id="mobile-category-{{ $category->id }}" class="ml-3 hidden border-l border-green-100 pl-2">
+                            <li>
+                                <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="block rounded p-2 text-xs font-semibold text-green-700 hover:bg-gray-100">
+                                    View all {{ $category->name }}
+                                </a>
+                            </li>
+                            @foreach($category->children as $subcategory)
+                                <li>
+                                    <a href="{{ route('frontend.products', ['category' => $category->slug, 'subcategory' => $subcategory->slug]) }}" class="block p-2 text-xs text-gray-500 hover:bg-gray-100 hover:text-green-700 rounded">{{ $subcategory->name }}</a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="block p-2 font-semibold hover:bg-gray-100 rounded">{{ $category->name }}</a>
+                    @endif
+                </li>
+            @empty
+                <li class="p-2 text-gray-400">No categories available</li>
+            @endforelse
         </ul>
         <hr class="my-4">
         <a href="{{ route('frontend.track') }}" class="block p-2 font-bold text-blue-600">Track Order</a>
@@ -89,11 +113,18 @@ html, body { overflow-x: hidden; max-width: 100vw; }
 </div>
 
 @php
-    $drawerDeliverySlotOptions = \App\Support\DeliverySlotManager::options();
+    $drawerCart = session('cart', []);
+    $drawerCartDays = collect($drawerCart)->pluck('pricing_day')->filter();
+    $drawerUsesTomorrowDelivery = $drawerCartDays->contains('tomorrow') && ! $drawerCartDays->contains('today');
+    $drawerDeliveryDayLabel = $drawerUsesTomorrowDelivery ? 'Tomorrow' : 'Today';
+    $drawerDeliverySlotOptions = $drawerUsesTomorrowDelivery
+        ? \App\Support\DeliverySlotManager::options()
+        : \App\Support\DeliverySlotManager::availableOptions();
     $drawerSelectedDeliverySlot = session('selected_delivery_slot');
 
-    if (! in_array($drawerSelectedDeliverySlot, \App\Support\DeliverySlotManager::values(), true)) {
-        $drawerSelectedDeliverySlot = \App\Support\DeliverySlotManager::defaultValue();
+    if (! in_array($drawerSelectedDeliverySlot, array_column($drawerDeliverySlotOptions, 'value'), true)) {
+        $drawerSelectedDeliverySlot = $drawerDeliverySlotOptions[0]['value'] ?? null;
+        session(['selected_delivery_slot' => $drawerSelectedDeliverySlot]);
     }
 @endphp
 <!-- Cart Drawer -->
@@ -113,13 +144,18 @@ html, body { overflow-x: hidden; max-width: 100vw; }
     <div class="px-5 py-4 border-t bg-white">
         <div class="mb-4 rounded-2xl border border-green-100 bg-green-50/60 p-3">
             <div class="mb-2 flex items-center justify-between gap-3">
-                <span class="text-xs font-black uppercase tracking-[0.16em] text-slate-600">Delivery Slot</span>
+                <span class="text-xs font-black uppercase tracking-[0.16em] text-slate-600">
+                    Delivery Slot
+                    <span id="drawer-delivery-day-label" class="ml-1 rounded-full bg-white px-2 py-1 text-[9px] tracking-[0.12em] text-green-700">
+                        {{ $drawerDeliveryDayLabel }}
+                    </span>
+                </span>
                 <span id="drawer-delivery-slot-label" class="text-[10px] font-bold text-green-700">
                     {{ \App\Support\DeliverySlotManager::label($drawerSelectedDeliverySlot) }}
                 </span>
             </div>
-            <div class="flex flex-wrap gap-2">
-                @foreach($drawerDeliverySlotOptions as $slot)
+            <div id="drawer-delivery-slot-options" class="flex flex-wrap gap-2">
+                @forelse($drawerDeliverySlotOptions as $slot)
                     <button
                         type="button"
                         onclick="updateCartDrawerDeliverySlot('{{ $slot['value'] }}')"
@@ -128,18 +164,22 @@ html, body { overflow-x: hidden; max-width: 100vw; }
                     >
                         {{ $slot['label'] }}
                     </button>
-                @endforeach
+                @empty
+                    <span class="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-2 text-[10px] font-bold leading-none text-amber-700">
+                        No slots left for today
+                    </span>
+                @endforelse
             </div>
         </div>
         <div class="flex justify-between text-sm font-semibold mb-2">
             <span>Subtotal</span>
             <span id="cart-subtotal-drawer">₹0.00</span>
         </div>
-        <div class="mb-2 flex justify-between text-xs text-slate-500">
+        <div id="cart-delivery-charge-row" class="mb-2 flex justify-between text-xs text-slate-500">
             <span>Delivery</span>
             <span id="cart-delivery-charge-drawer">Rs0.00</span>
         </div>
-        <div class="mb-2 flex justify-between text-xs text-slate-500">
+        <div id="cart-service-charge-row" class="mb-2 flex justify-between text-xs text-slate-500">
             <span id="cart-service-charge-label">&#8505;&#65039; Service Charge (0%)</span>
             <span id="cart-service-charge-drawer">Rs0.00</span>
         </div>
@@ -181,11 +221,31 @@ html, body { overflow-x: hidden; max-width: 100vw; }
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
         </form>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4 pr-4 md:pr-7">
             <!-- Account -->
             <div class="relative">
+                @auth('web_frontend')
+                    @php
+                        $frontendTotalNotifications = \App\Models\Notification::query()
+                            ->forUser(auth('web_frontend')->id())
+                            ->count();
+                        $frontendUnreadNotifications = \App\Models\Notification::query()
+                            ->where('recipient_id', auth('web_frontend')->id())
+                            ->whereNull('read_at')
+                            ->count();
+                    @endphp
+                @endauth
                 <button onclick="toggleAccountMenu()" class="text-gray-700 flex flex-col items-center group">
-                    <i class="fa-regular fa-user text-xl group-hover:text-blue-600"></i>
+                    <span class="relative">
+                        <i class="fa-regular fa-user text-xl group-hover:text-blue-600"></i>
+                        @auth('web_frontend')
+                            @if($frontendUnreadNotifications > 0)
+                                <span class="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-black leading-none text-white ring-2 ring-white">
+                                    {{ $frontendUnreadNotifications > 99 ? '99+' : $frontendUnreadNotifications }}
+                                </span>
+                            @endif
+                        @endauth
+                    </span>
                     <span class="text-[10px] font-bold mt-0.5 hidden md:block">
                         @auth('web_frontend') Hello, {{ Str::limit(auth('web_frontend')->user()->name, 12) }} @else Sign in/Account @endauth
                     </span>
@@ -194,6 +254,15 @@ html, body { overflow-x: hidden; max-width: 100vw; }
                     @auth('web_frontend')
                         <a href="{{ route('frontend.profile') }}" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
                             <i class="fa-regular fa-user text-gray-500"></i> My Profile
+                        </a>
+                        <a href="{{ route('frontend.profile') }}#notifications-panel" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
+                            <i class="fa-regular fa-bell text-gray-500"></i>
+                            Notifications
+                            @if($frontendTotalNotifications > 0)
+                                <span class="ml-auto rounded-full {{ $frontendUnreadNotifications > 0 ? 'bg-red-500 text-white' : 'bg-slate-100 text-slate-600' }} px-2 py-0.5 text-[10px] font-bold">
+                                    {{ $frontendTotalNotifications > 99 ? '99+' : $frontendTotalNotifications }}
+                                </span>
+                            @endif
                         </a>
                         <a href="{{ route('frontend.orders') }}" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
                             <i class="fa-solid fa-box text-gray-500"></i> My Orders
@@ -239,40 +308,24 @@ html, body { overflow-x: hidden; max-width: 100vw; }
     <div class="border-t border-gray-100 hidden md:block overflow-visible bg-white">
         <div class="max-w-screen-xl mx-auto px-4 flex items-center gap-1 h-10 text-sm scrollbar-hide overflow-visible">
             <a href="{{ route('frontend.products') }}" class="px-3 py-1.5 bg-gray-100 text-gray-600 font-semibold whitespace-nowrap rounded-md flex-shrink-0">All Products</a>
-            <div class="header-nav-group relative mr-2 flex-shrink-0">
-                <button type="button" class="inline-flex items-center gap-2 rounded-md bg-green-50 px-3 py-1.5 font-medium text-green-700 transition hover:bg-green-100">
-                    Veg Fresh
-                    <i class="fa-solid fa-angle-down text-xs"></i>
-                </button>
-                <div class="header-nav-dropdown absolute left-0 top-full z-[10010] mt-3 min-w-[235px] space-y-1 rounded-2xl border border-green-100 bg-white p-2 shadow-[0_20px_40px_rgba(15,23,42,0.14)]">
-                    <a href="{{ route('frontend.products', ['category' => 'Vegetables', 'search' => 'Leafy']) }}" class="block rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 transition hover:bg-green-50 hover:text-green-700">Leafy Vegetables</a>
-                    <a href="{{ route('frontend.products', ['category' => 'Vegetables', 'search' => 'Root']) }}" class="block rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 transition hover:bg-green-50 hover:text-green-700">Root Vegetables</a>
-                    <a href="{{ route('frontend.products', ['category' => 'Vegetables', 'search' => 'Seasonal']) }}" class="block rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 transition hover:bg-green-50 hover:text-green-700">Seasonal Vegetables</a>
-                    <a href="{{ route('frontend.products', ['category' => 'Vegetables', 'search' => 'Organic']) }}" class="block rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 transition hover:bg-green-50 hover:text-green-700">Organic Vegetables</a>
-                    <a href="{{ route('frontend.products', ['category' => 'Fruits']) }}" class="block rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 transition hover:bg-green-50 hover:text-green-700">Fresh Fruits</a>
-                </div>
-            </div>
-            <div class="header-nav-group relative mr-2 flex-shrink-0">
-                <button type="button" class="inline-flex items-center gap-2 rounded-md bg-green-50 px-3 py-1.5 font-medium text-green-700 transition hover:bg-green-100">
-                    Non-Veg Fresh
-                    <i class="fa-solid fa-angle-down text-xs"></i>
-                </button>
-                <div class="header-nav-dropdown absolute left-0 top-full z-[10010] mt-3 min-w-[230px] space-y-1 rounded-2xl border border-amber-100 bg-white p-2 shadow-[0_20px_40px_rgba(15,23,42,0.14)]">
-                    <a href="{{ route('frontend.products', ['category' => 'Chicken']) }}" class="block rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 transition hover:bg-amber-50 hover:text-green-700">Chicken</a>
-                    <a href="{{ route('frontend.products', ['category' => 'Mutton']) }}" class="block rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 transition hover:bg-amber-50 hover:text-green-700">Mutton</a>
-                    <a href="{{ route('frontend.products', ['category' => 'Fish']) }}" class="block rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 transition hover:bg-amber-50 hover:text-green-700">Fish</a>
-                    <a href="{{ route('frontend.products', ['category' => 'Eggs']) }}" class="block rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 transition hover:bg-amber-50 hover:text-green-700">Eggs</a>
-                    <a href="{{ route('frontend.products', ['category' => 'Seafood']) }}" class="block rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 transition hover:bg-amber-50 hover:text-green-700">Seafood</a>
-                </div>
-            </div>
-            <span class="w-px h-5 bg-gray-200 mx-1 shrink-0"></span>
-            <a href="{{ route('frontend.products', ['category' => 'Vegetables']) }}" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-green-50 rounded-md flex-shrink-0">Vegetables</a>
-            <a href="{{ route('frontend.products', ['category' => 'Fruits']) }}" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-green-50 rounded-md flex-shrink-0">Fruits</a>
-            <span class="w-px h-5 bg-gray-200 mx-1 shrink-0"></span>
-            <a href="{{ route('frontend.products', ['category' => 'Chicken']) }}" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-red-50 rounded-md flex-shrink-0">Chicken</a>
-            <a href="{{ route('frontend.products', ['category' => 'Fish']) }}" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-red-50 rounded-md flex-shrink-0">Fish</a>
-            <a href="{{ route('frontend.products', ['category' => 'Seafood']) }}" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-red-50 rounded-md flex-shrink-0">Seafood</a>
-            <span class="w-px h-5 bg-gray-200 mx-1 shrink-0"></span>
+            @foreach($frontendNavCategories ?? collect() as $category)
+                @if($category->children->isNotEmpty())
+                    <div class="header-nav-group relative mr-2 flex-shrink-0">
+                        <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="inline-flex items-center gap-2 rounded-md bg-green-50 px-3 py-1.5 font-medium text-green-700 transition hover:bg-green-100">
+                            {{ $category->name }}
+                            <i class="fa-solid fa-angle-down text-xs"></i>
+                        </a>
+                        <div class="header-nav-dropdown absolute left-0 top-full z-[10010] mt-3 min-w-[230px] space-y-1 rounded-2xl border border-green-100 bg-white p-2 shadow-[0_20px_40px_rgba(15,23,42,0.14)]">
+                            <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="block rounded-xl px-4 py-3 text-[15px] font-semibold text-green-700 transition hover:bg-green-50">All {{ $category->name }}</a>
+                            @foreach($category->children as $subcategory)
+                                <a href="{{ route('frontend.products', ['category' => $category->slug, 'subcategory' => $subcategory->slug]) }}" class="block rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 transition hover:bg-green-50 hover:text-green-700">{{ $subcategory->name }}</a>
+                            @endforeach
+                        </div>
+                    </div>
+                @else
+                    <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-green-50 rounded-md flex-shrink-0">{{ $category->name }}</a>
+                @endif
+            @endforeach
             <span class="ml-auto"></span>
             <a href="{{ route('frontend.orders') }}" class="inline-flex items-center gap-2 px-3 py-1.5 font-extrabold text-green-700 whitespace-nowrap rounded-md transition hover:bg-green-50">
                 <i class="fa-solid fa-rotate-left text-[13px]"></i>
@@ -367,10 +420,12 @@ html, body { overflow-x: hidden; max-width: 100vw; }
             <p class="text-[10px] uppercase tracking-[0.2em] text-[#84a0c3]">
                 &copy; {{ date('Y') }} FarmSea - Fresh Meat &amp; Seafood Delivered
             </p>
-            <div class="flex items-center justify-center gap-4 md:justify-end">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" class="h-3 opacity-70" alt="Visa">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" class="h-5 opacity-70" alt="Mastercard">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-4 opacity-70" alt="PayPal">
+            <div class="flex min-h-7 flex-wrap items-center justify-center gap-4 md:justify-end">
+                <span class="inline-flex h-7 w-[58px] items-center justify-center rounded bg-white px-2 shadow-sm ring-1 ring-white/20" aria-label="Visa">
+                    <span class="font-sans text-[18px] font-black italic leading-none tracking-[-0.02em] text-[#1434cb]">VISA</span>
+                </span>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" class="block h-6 w-[78px] object-contain opacity-80" alt="Mastercard">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="block h-6 w-[72px] object-contain opacity-80" alt="PayPal">
             </div>
         </div>
     </div>
@@ -381,6 +436,18 @@ html, body { overflow-x: hidden; max-width: 100vw; }
 function toggleSidebar() {
     document.getElementById('mobile-sidebar').classList.toggle('sidebar-open');
     document.getElementById('sidebar-overlay').classList.toggle('active');
+}
+
+function toggleMobileCategory(categoryId) {
+    const panel = document.getElementById(`mobile-category-${categoryId}`);
+    const icon = document.getElementById(`mobile-category-icon-${categoryId}`);
+
+    if (!panel) {
+        return;
+    }
+
+    panel.classList.toggle('hidden');
+    icon?.classList.toggle('rotate-180');
 }
 // Account menu
 function toggleAccountMenu() {
@@ -583,6 +650,52 @@ function updateCartDrawerDeliverySlot(value) {
         }
     });
 }
+
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    }[char]));
+}
+
+function renderDrawerDeliverySlots(options = [], selectedValue = '') {
+    const container = document.getElementById('drawer-delivery-slot-options');
+
+    if (!container) {
+        return;
+    }
+
+    if (!options.length) {
+        container.innerHTML = `
+            <span class="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-2 text-[10px] font-bold leading-none text-amber-700">
+                No slots left for today
+            </span>
+        `;
+        return;
+    }
+
+    container.innerHTML = options.map((slot) => {
+        const isActive = slot.value === selectedValue;
+        const classes = isActive
+            ? 'border-green-600 bg-white text-green-700 shadow-sm'
+            : 'border-green-100 bg-white/80 text-slate-600';
+
+        return `
+            <button
+                type="button"
+                onclick="updateCartDrawerDeliverySlot('${escapeHtml(slot.value)}')"
+                data-drawer-delivery-slot="${escapeHtml(slot.value)}"
+                class="drawer-delivery-slot-chip ${classes} rounded-full border px-2.5 py-2 text-[10px] font-bold leading-none transition hover:border-green-400 hover:text-green-700"
+            >
+                ${escapeHtml(slot.label)}
+            </button>
+        `;
+    }).join('');
+}
+
 // Refresh cart drawer
 function refreshCartDrawer() {
     fetch('{{ route("frontend.cart.count") }}')
@@ -596,11 +709,18 @@ function refreshCartDrawer() {
             document.getElementById('cart-delivery-charge-drawer').textContent = formatCartCurrency(data.delivery_charge);
             document.getElementById('cart-service-charge-label').textContent = '\u2139\uFE0F Service Charge (' + chargePercentText + '%)';
             document.getElementById('cart-service-charge-drawer').textContent = formatCartCurrency(data.service_charge);
+            document.getElementById('cart-delivery-charge-row')?.classList.toggle('hidden', Number(data.delivery_charge || 0) <= 0);
+            document.getElementById('cart-service-charge-row')?.classList.toggle('hidden', Number(data.service_charge || 0) <= 0);
             document.getElementById('cart-total-drawer').textContent = formatCartCurrency(data.total);
             const drawerSlotLabel = document.getElementById('drawer-delivery-slot-label');
             if (drawerSlotLabel) {
                 drawerSlotLabel.textContent = data.selected_delivery_slot_label || '';
             }
+            const drawerDayLabel = document.getElementById('drawer-delivery-day-label');
+            if (drawerDayLabel) {
+                drawerDayLabel.textContent = data.delivery_day_label || 'Today';
+            }
+            renderDrawerDeliverySlots(data.delivery_slot_options || [], data.selected_delivery_slot || '');
             document.querySelectorAll('[data-drawer-delivery-slot]').forEach((chip) => {
                 const isActive = chip.dataset.drawerDeliverySlot === data.selected_delivery_slot;
                 chip.classList.toggle('border-green-600', isActive);

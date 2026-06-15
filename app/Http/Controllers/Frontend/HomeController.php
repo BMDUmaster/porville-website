@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\HomeBanner;
 use App\Models\Product;
+use Illuminate\Support\Facades\Schema;
 
 class HomeController extends Controller
 {
@@ -66,6 +68,14 @@ class HomeController extends Controller
             ->take(8)
             ->get();
 
-        return view('frontend.home', compact('categories', 'newArrivals', 'featuredProducts', 'bestSellers', 'newArrivalProductIds'));
+        $homeBanners = Schema::hasTable('home_banners')
+            ? HomeBanner::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->latest('id')
+                ->get()
+            : collect();
+
+        return view('frontend.home', compact('categories', 'newArrivals', 'featuredProducts', 'bestSellers', 'newArrivalProductIds', 'homeBanners'));
     }
 }

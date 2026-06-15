@@ -38,13 +38,34 @@
         html, body { overflow-x: hidden; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+        .nav-link,
+        .sidebar-sub-link {
+            position: relative;
+        }
         .active-link {
             background: linear-gradient(to right, #3b82f6, #6366f1) !important;
             color: #ffffff !important;
             border-radius: 10px;
             box-shadow: 0 4px 14px rgba(59,130,246,0.35);
         }
+        .active-link::before,
+        .active-sub-link::before {
+            content: "";
+            position: absolute;
+            left: 6px;
+            top: 50%;
+            width: 4px;
+            height: 22px;
+            border-radius: 999px;
+            background: #000000;
+            transform: translateY(-50%);
+        }
         .active-link i { color: #ffffff !important; }
+        .active-sub-link {
+            background: #111827 !important;
+            color: #ffffff !important;
+        }
+        .active-sub-link i { color: #ffffff !important; }
         /* Responsive table fix */
         @media (max-width: 768px) {
             table { font-size: 12px; }
@@ -73,7 +94,7 @@
                 <img src="{{ $brandLogoUrl }}"
                      alt="FarmSea"
                      class="h-14 w-auto object-contain"
-                     onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex'">
+                     onerror="this.remove(); document.getElementById('logo-fallback').style.display='flex'">
                 <span id="logo-fallback" class="hidden items-center gap-2 text-xl font-extrabold text-green-700 tracking-tight">
                     🌿 FarmSea
                 </span>
@@ -113,23 +134,23 @@
                             flex-col pl-9 pr-2 py-2 space-y-1 bg-green-50/50 rounded-xl mt-1 mx-2 border-l-2 border-green-200">
 
                     <a href="{{ route('dashboard.categories') }}"
-                       class="flex items-center gap-3 px-4 py-2 text-xs font-semibold rounded-lg transition
+                       class="sidebar-sub-link flex items-center gap-3 px-4 py-2 text-xs font-semibold rounded-lg transition
                               hover:bg-blue-500 hover:text-white
-                              {{ request()->routeIs('dashboard.categories') ? 'bg-blue-500 text-white' : 'text-slate-700' }}">
+                              {{ request()->routeIs('dashboard.categories') ? 'active-sub-link' : 'text-slate-700' }}">
                         <i class="fa-solid fa-sitemap w-4 text-green-600"></i> Categories
                     </a>
 
                     <a href="{{ route('dashboard.subcategories') }}"
-                       class="flex items-center gap-3 px-4 py-2 text-xs font-semibold rounded-lg transition
+                       class="sidebar-sub-link flex items-center gap-3 px-4 py-2 text-xs font-semibold rounded-lg transition
                               hover:bg-blue-500 hover:text-white
-                              {{ request()->routeIs('dashboard.subcategories') ? 'bg-blue-500 text-white' : 'text-slate-700' }}">
+                              {{ request()->routeIs('dashboard.subcategories') ? 'active-sub-link' : 'text-slate-700' }}">
                         <i class="fa-solid fa-layer-group w-4 text-green-600"></i> Sub-Categories
                     </a>
 
                     <a href="{{ route('dashboard.products') }}"
-                       class="flex items-center gap-3 px-4 py-2 text-xs font-semibold rounded-lg transition
+                       class="sidebar-sub-link flex items-center gap-3 px-4 py-2 text-xs font-semibold rounded-lg transition
                               hover:bg-blue-500 hover:text-white
-                              {{ request()->routeIs('dashboard.products') ? 'bg-blue-500 text-white' : 'text-slate-700' }}">
+                              {{ request()->routeIs('dashboard.products') ? 'active-sub-link' : 'text-slate-700' }}">
                         <i class="fa-solid fa-circle-plus w-4 text-green-600"></i> Products
                     </a>
                 </div>
@@ -149,6 +170,23 @@
                       {{ request()->routeIs('dashboard.orders.history') ? 'active-link' : 'text-slate-700' }}">
                 <i class="fa-solid fa-clock-rotate-left w-5 text-green-700"></i>
                 <span>Order History</span>
+            </a>
+
+            <a href="{{ route('dashboard.banners') }}"
+               class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
+                      hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
+                      {{ request()->routeIs('dashboard.banners*') ? 'active-link' : 'text-slate-700' }}">
+                <i class="fa-regular fa-images w-5 text-green-700"></i>
+                <span>Home Banners</span>
+            </a>
+
+            <a href="{{ route('dashboard.contact-messages') }}"
+               class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
+                      hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
+                      {{ request()->routeIs('dashboard.contact-messages*') ? 'active-link' : 'text-slate-700' }}">
+                <i class="fa-regular fa-envelope w-5 text-green-700"></i>
+                <span>Contact Us</span>
+                <span id="contactSidebarUnreadBadge" class="ml-auto hidden min-w-5 rounded-full bg-red-500 px-1.5 py-0.5 text-center text-[10px] font-bold text-white"></span>
             </a>
 
             <a href="{{ route('dashboard.users') }}"
@@ -352,6 +390,31 @@
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape') { closeSidebar(); closeProfile(); }
         });
+
+        (() => {
+            const badge = document.getElementById('contactSidebarUnreadBadge');
+            if (!badge) return;
+
+            function refreshContactBadge() {
+                fetch(@json(route('dashboard.contact-messages.live')), {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                })
+                    .then(response => response.ok ? response.json() : null)
+                    .then(data => {
+                        if (!data) return;
+                        const unread = Number(data.unread || 0);
+                        badge.textContent = unread > 99 ? '99+' : unread;
+                        badge.classList.toggle('hidden', unread <= 0);
+                    })
+                    .catch(() => {});
+            }
+
+            refreshContactBadge();
+            window.setInterval(refreshContactBadge, 10000);
+        })();
     </script>
 
     @yield('scripts')

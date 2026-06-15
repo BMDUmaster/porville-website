@@ -21,26 +21,56 @@
     $discount = (float) ($order->discount ?? 0);
 @endphp
 
-@section('content')
+@section('styles')
 <style>
+body > footer {
+    display: none !important;
+}
+
 @page {
     size: A4;
     margin: 12mm;
 }
 @media print {
+    html,
+    body {
+        background: #f3f6fb !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    body > header,
+    body > footer,
+    #mobile-sidebar,
+    #sidebar-overlay,
+    #cart-overlay,
+    #cart-drawer {
+        display: none !important;
+    }
+    body > div[class*="pt-"] {
+        padding-top: 0 !important;
+    }
+    main {
+        display: block !important;
+    }
+    .invoice-page {
+        background: #f3f6fb !important;
+        padding: 0 !important;
+    }
     .invoice-shell {
-        box-shadow: none !important;
-        border: 0 !important;
-        border-radius: 0 !important;
-        max-width: none !important;
+        box-shadow: 0 24px 80px rgba(15,23,42,0.08) !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 24px !important;
+        max-width: 960px !important;
     }
     .invoice-print-hide {
         display: none !important;
     }
 }
 </style>
+@endsection
 
-<div class="bg-[#f3f6fb] px-3 py-4 print:bg-white">
+@section('content')
+<div class="invoice-page bg-[#f3f6fb] px-3 py-4">
     <div class="invoice-shell mx-auto max-w-[960px] overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.08)]">
         <div class="bg-gradient-to-r from-[#0f766e] via-[#0f8a79] to-[#164e63] px-5 py-4 text-white">
             <div class="flex items-start justify-between gap-4">
@@ -141,7 +171,7 @@
             <div class="mt-4 grid gap-4 md:grid-cols-[minmax(0,1fr)_320px]">
                 <div class="rounded-xl bg-slate-50 px-3 py-3">
                     <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Note</p>
-                    <p class="mt-2 text-xs leading-5 text-slate-600">Unavailable fields in this invoice are shown as <span class="font-bold text-slate-900">0</span>. Authorized Signature: 0</p>
+                    <p class="mt-2 text-xs leading-5 text-slate-600">Only applicable charges are shown in this invoice.</p>
                 </div>
 
                 <div class="rounded-xl border border-slate-200 bg-white p-3">
@@ -150,27 +180,35 @@
                             <span class="text-slate-500">Subtotal</span>
                             <span class="font-semibold text-slate-800">&#8377;{{ number_format((float) ($order->subtotal ?? 0), 2) }}</span>
                         </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-slate-500">Discount</span>
-                            <span class="font-semibold text-slate-800">&#8377;{{ number_format($discount, 2) }}</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-slate-500">Delivery</span>
-                            <span class="font-semibold text-slate-800">&#8377;{{ number_format($deliveryCharge, 2) }}</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-slate-500">
-                                &#8505;&#65039; Service Charge
-                                @if($serviceChargePercent)
-                                    ({{ rtrim(rtrim(number_format($serviceChargePercent, 2), '0'), '.') }}%)
-                                @endif
-                            </span>
-                            <span class="font-semibold text-slate-800">&#8377;{{ number_format($serviceCharge, 2) }}</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-slate-500">Tax</span>
-                            <span class="font-semibold text-slate-800">&#8377;{{ number_format($taxAmount, 2) }}</span>
-                        </div>
+                        @if($discount > 0)
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-500">Discount</span>
+                                <span class="font-semibold text-green-700">-&#8377;{{ number_format($discount, 2) }}</span>
+                            </div>
+                        @endif
+                        @if($deliveryCharge > 0)
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-500">Delivery</span>
+                                <span class="font-semibold text-slate-800">&#8377;{{ number_format($deliveryCharge, 2) }}</span>
+                            </div>
+                        @endif
+                        @if($serviceCharge > 0)
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-500">
+                                    &#8505;&#65039; Service Charge
+                                    @if($serviceChargePercent)
+                                        ({{ rtrim(rtrim(number_format($serviceChargePercent, 2), '0'), '.') }}%)
+                                    @endif
+                                </span>
+                                <span class="font-semibold text-slate-800">&#8377;{{ number_format($serviceCharge, 2) }}</span>
+                            </div>
+                        @endif
+                        @if($taxAmount > 0)
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-500">Tax</span>
+                                <span class="font-semibold text-slate-800">&#8377;{{ number_format($taxAmount, 2) }}</span>
+                            </div>
+                        @endif
                         <div class="border-t border-dashed border-slate-200 pt-2">
                             <div class="flex items-center justify-between">
                                 <span class="text-sm font-black text-slate-900">Grand Total</span>
@@ -198,7 +236,9 @@
 @if($autoPrint)
 <script>
 window.addEventListener('load', () => {
-    window.print();
+    window.setTimeout(() => {
+        window.print();
+    }, 350);
 });
 </script>
 @endif

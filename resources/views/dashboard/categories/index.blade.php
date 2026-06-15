@@ -143,6 +143,8 @@
 
 @section('scripts')
 <script>
+const categoryUpdateUrlTemplate = @json(route('dashboard.categories.update', ['category' => '__ID__']));
+
 function openModal(id) {
     document.getElementById(id).classList.remove('hidden');
     document.getElementById(id).classList.add('flex');
@@ -154,7 +156,7 @@ function closeModal(id) {
 function openEditModal(id, name, desc) {
     document.getElementById('editName').value = name;
     document.getElementById('editDesc').value = desc;
-    document.getElementById('editForm').action = '/categories/' + id;
+    document.getElementById('editForm').action = categoryUpdateUrlTemplate.replace('__ID__', encodeURIComponent(id));
     openModal('editModal');
 }
 </script>

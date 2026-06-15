@@ -22,6 +22,7 @@
                 <tr>
                     <th class="px-4 py-4 text-xs font-bold uppercase text-gray-700 w-16">Sr.No</th>
                     <th class="px-4 py-4 text-xs font-bold uppercase text-gray-700 w-36">Date</th>
+                    <th class="px-4 py-4 text-xs font-bold uppercase text-gray-700">Customer</th>
                     <th class="px-4 py-4 text-xs font-bold uppercase text-gray-700">Subject</th>
                     <th class="px-4 py-4 text-xs font-bold uppercase text-gray-700">Message</th>
                     <th class="px-4 py-4 text-xs font-bold uppercase text-gray-700 text-center">Action</th>
@@ -32,6 +33,14 @@
                 <tr class="hover:bg-slate-50 transition">
                     <td class="px-4 py-4 text-sm text-gray-600">{{ $notifications->firstItem() + $i }}</td>
                     <td class="px-4 py-4 text-sm text-gray-600">{{ $notif->created_at->format('d-m-Y') }}</td>
+                    <td class="px-4 py-4 text-sm text-gray-600">
+                        @if($notif->recipient)
+                            <p class="font-bold text-slate-800">{{ $notif->recipient->name }}</p>
+                            <p class="text-xs text-slate-400">{{ $notif->recipient->email }}</p>
+                        @else
+                            <span class="rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-bold text-blue-700">All Customers</span>
+                        @endif
+                    </td>
                     <td class="px-4 py-4 text-sm font-semibold text-gray-800">{{ $notif->subject }}</td>
                     <td class="px-4 py-4 text-sm text-gray-600 max-w-md truncate">{{ $notif->message }}</td>
                     <td class="px-4 py-4 text-center">
@@ -49,7 +58,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">No notifications found.</td></tr>
+                <tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">No notifications found.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -71,7 +80,7 @@
             <h2 id="modalTitle" class="text-[22px] font-extrabold tracking-tight text-slate-800">New Notification</h2>
             <button onclick="closeModal()" class="text-4xl font-light leading-none text-slate-300 transition hover:text-slate-500">&times;</button>
         </div>
-        <form id="notifForm" method="POST" action="{{ route('dashboard.notifications.store') }}">
+        <form id="notifForm" method="POST" action="{{ route('dashboard.notifications.store') }}" onsubmit="return validateNotificationForm()">
             @csrf
             <span id="methodField"></span>
             <div class="space-y-7 px-5 py-5 sm:space-y-9 sm:px-8 sm:py-8">
@@ -225,5 +234,22 @@ document.getElementById('selectAllUsers')?.addEventListener('change', function (
         }
     });
 });
+
+function validateNotificationForm() {
+    const selectingUsers = !document.getElementById('userSelectSection').classList.contains('hidden');
+
+    if (!selectingUsers) {
+        return true;
+    }
+
+    const selectedCount = document.querySelectorAll('.user-checkbox:checked').length;
+
+    if (selectedCount === 0) {
+        alert('Please select at least one customer.');
+        return false;
+    }
+
+    return true;
+}
 </script>
 @endsection

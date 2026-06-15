@@ -5,6 +5,13 @@
 @section('content')
 @php
     $statusOptions = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered', 'cancelled'];
+    $pricingDayLabel = fn (?string $day) => $day === 'tomorrow' ? 'Tomorrow' : 'Today';
+    $orderPricingDays = $order->items
+        ->pluck('pricing_day')
+        ->filter()
+        ->unique()
+        ->map($pricingDayLabel)
+        ->values();
 @endphp
 <div class="p-4 md:p-6">
     <div class="mb-4 flex items-center justify-between">
@@ -63,6 +70,26 @@
                 @endif
             </div>
 
+            <div class="border-b bg-emerald-50 px-5 py-4">
+                <p class="mb-2 flex items-center gap-1 text-xs font-black uppercase tracking-[0.14em] text-emerald-700">
+                    <i class="fa-solid fa-truck-fast"></i> Delivery Schedule
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    @forelse($orderPricingDays as $dayLabel)
+                        <span class="inline-flex items-center rounded-full bg-white px-3 py-1.5 text-xs font-black text-emerald-700 shadow-sm ring-1 ring-emerald-100">
+                            <i class="fa-regular fa-calendar-check mr-1.5"></i>{{ $dayLabel }}
+                        </span>
+                    @empty
+                        <span class="inline-flex items-center rounded-full bg-white px-3 py-1.5 text-xs font-black text-gray-500 shadow-sm ring-1 ring-gray-100">
+                            Day not set
+                        </span>
+                    @endforelse
+                    <span class="inline-flex items-center rounded-full bg-amber-100 px-3 py-1.5 text-xs font-black text-amber-800">
+                        <i class="fa-regular fa-clock mr-1.5"></i>{{ $order->delivery_slot_label ?? 'Slot not set' }}
+                    </span>
+                </div>
+            </div>
+
             <div class="border-b">
                 <div class="px-5 py-4">
                     <p class="mb-2 flex items-center gap-1 text-xs font-bold text-teal-600">
@@ -111,6 +138,7 @@
                             <tr class="border-b border-gray-200">
                                 <th class="pb-2 pr-4 text-left text-xs font-bold uppercase text-gray-600">Image</th>
                                 <th class="pb-2 pr-4 text-left text-xs font-bold uppercase text-gray-600">Product</th>
+                                <th class="pb-2 pr-4 text-left text-xs font-bold uppercase text-gray-600">Delivery Day</th>
                                 <th class="pb-2 pr-4 text-left text-xs font-bold uppercase text-gray-600">QTY</th>
                                 <th class="pb-2 pr-4 text-left text-xs font-bold uppercase text-gray-600">Unit</th>
                                 <th class="pb-2 pr-4 text-left text-xs font-bold uppercase text-gray-600">MRP</th>
@@ -132,6 +160,11 @@
                                         @endif
                                     </td>
                                     <td class="py-3 pr-4 text-sm font-medium text-gray-800">{{ $item->product->name ?? 'Deleted Product' }}</td>
+                                    <td class="py-3 pr-4">
+                                        <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-black text-emerald-700">
+                                            {{ $item->pricing_day_label }}
+                                        </span>
+                                    </td>
                                     <td class="py-3 pr-4 text-sm text-gray-700">{{ $item->quantity }}</td>
                                     <td class="py-3 pr-4 text-sm text-gray-700">{{ $item->unit ?? $item->product->unit ?? '-' }}</td>
                                     <td class="py-3 pr-4 text-sm text-gray-700">Rs{{ number_format($item->mrp ?? $item->unit_price, 2) }}</td>
@@ -151,23 +184,29 @@
 
                 <div class="mt-4 flex justify-end">
                     <div class="w-full max-w-sm">
-                        <div class="flex justify-between border-b border-gray-100 py-2 text-sm">
-                            <span class="font-semibold text-gray-700">Delivery</span>
-                            <span class="text-gray-700">Rs{{ number_format($order->delivery_charge ?? $order->shipping_cost ?? 0, 2) }}</span>
-                        </div>
-                        <div class="flex justify-between border-b border-gray-100 py-2 text-sm">
-                            <span class="font-semibold text-gray-700">
-                                &#8505;&#65039; Service Charge
-                                @if($order->service_charge_percent)
-                                    ({{ rtrim(rtrim(number_format($order->service_charge_percent, 2), '0'), '.') }}%)
-                                @endif
-                            </span>
-                            <span class="text-gray-700">Rs{{ number_format($order->service_charge, 2) }}</span>
-                        </div>
-                        <div class="flex justify-between border-b border-gray-100 py-2 text-sm">
-                            <span class="font-semibold text-gray-700">Admin Commission</span>
-                            <span class="text-gray-700">Rs{{ number_format($order->admin_commission ?? 0, 2) }}</span>
-                        </div>
+                        @if((float) ($order->delivery_charge ?? $order->shipping_cost ?? 0) > 0)
+                            <div class="flex justify-between border-b border-gray-100 py-2 text-sm">
+                                <span class="font-semibold text-gray-700">Delivery</span>
+                                <span class="text-gray-700">Rs{{ number_format($order->delivery_charge ?? $order->shipping_cost ?? 0, 2) }}</span>
+                            </div>
+                        @endif
+                        @if((float) ($order->service_charge ?? 0) > 0)
+                            <div class="flex justify-between border-b border-gray-100 py-2 text-sm">
+                                <span class="font-semibold text-gray-700">
+                                    &#8505;&#65039; Service Charge
+                                    @if($order->service_charge_percent)
+                                        ({{ rtrim(rtrim(number_format($order->service_charge_percent, 2), '0'), '.') }}%)
+                                    @endif
+                                </span>
+                                <span class="text-gray-700">Rs{{ number_format($order->service_charge, 2) }}</span>
+                            </div>
+                        @endif
+                        @if((float) ($order->admin_commission ?? 0) > 0)
+                            <div class="flex justify-between border-b border-gray-100 py-2 text-sm">
+                                <span class="font-semibold text-gray-700">Admin Commission</span>
+                                <span class="text-gray-700">Rs{{ number_format($order->admin_commission ?? 0, 2) }}</span>
+                            </div>
+                        @endif
                         <div class="mt-1 flex justify-between rounded bg-green-50 px-3 py-2.5 text-sm">
                             <span class="font-bold text-gray-800">Grand Total</span>
                             <span class="font-bold text-gray-800">Rs{{ number_format($order->total, 2) }}</span>

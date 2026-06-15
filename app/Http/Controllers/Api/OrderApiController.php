@@ -17,6 +17,8 @@ use Illuminate\Validation\ValidationException;
 
 class OrderApiController extends Controller
 {
+    private const COD_MAX_SUBTOTAL = 2000;
+
     /**
      * GET /api/orders  (auth required)
      * Returns the authenticated user's orders
@@ -82,7 +84,7 @@ class OrderApiController extends Controller
             'shipping_address.name'    => 'required|string',
             'shipping_address.phone'   => 'required|string',
             'shipping_address.address' => 'required|string',
-            'delivery_slot'            => ['required', 'string', Rule::in(DeliverySlotManager::values())],
+            'delivery_slot'            => ['required', 'string', Rule::in(DeliverySlotManager::availableValues())],
             'payment_method'           => 'nullable|string|in:COD,online,wallet',
             'coupon_code'              => 'nullable|string',
         ]);
@@ -90,8 +92,15 @@ class OrderApiController extends Controller
         $orderItems = $this->buildOrderItems($data['items']);
         $subtotal = collect($orderItems)->sum('subtotal');
         $pricing = OrderPricing::summary($subtotal, $request->user());
+        $paymentMethod = $data['payment_method'] ?? 'COD';
 
-        $order = DB::transaction(function () use ($request, $data, $orderItems, $subtotal, $pricing) {
+        if ($paymentMethod === 'COD' && $subtotal > self::COD_MAX_SUBTOTAL) {
+            throw ValidationException::withMessages([
+                'payment_method' => ['Cash on Delivery is available only for orders up to Rs2,000.'],
+            ]);
+        }
+
+        $order = DB::transaction(function () use ($request, $data, $orderItems, $subtotal, $pricing, $paymentMethod) {
             $discount = 0;
             $coupon = $this->resolveCoupon($data['coupon_code'] ?? null, $subtotal, true);
 
@@ -116,7 +125,7 @@ class OrderApiController extends Controller
                 'total'            => $total,
                 'shipping_address' => $data['shipping_address'],
                 'delivery_slot'    => $data['delivery_slot'],
-                'payment_method'   => $data['payment_method'] ?? 'COD',
+                'payment_method'   => $paymentMethod,
                 'payment_status'   => 'pending',
             ]);
 
@@ -171,8 +180,23 @@ class OrderApiController extends Controller
                 $variant = $variants[$variantIndex];
             }
 
+            $pricingDay = ProductDayPricing::normalizeDay($item['pricing_day'] ?? 'today');
+
+            if (
+                $pricingDay === 'tomorrow'
+                && (
+                    ! $variant
+                    || ! array_key_exists('tomorrow_price', $variant)
+                    || $variant['tomorrow_price'] === null
+                    || $variant['tomorrow_price'] === ''
+                    || (float) $variant['tomorrow_price'] <= 0
+                )
+            ) {
+                $pricingDay = 'today';
+            }
+
             $unitPrice = $variant
-                ? ProductDayPricing::sellingPrice($variant, $item['pricing_day'] ?? 'today', (float) $product->price)
+                ? ProductDayPricing::sellingPrice($variant, $pricingDay, (float) $product->price)
                 : (float) $product->price;
 
             $mrp = $variant
@@ -190,6 +214,7 @@ class OrderApiController extends Controller
                 'mrp'           => $mrp,
                 'unit'          => $variant['unit'] ?? $product->unit,
                 'variant_label' => $variant ? $this->formatVariantLabel($variant, $product->unit) : null,
+                'pricing_day'   => $pricingDay,
                 'save_offer'    => $variant['save_offer'] ?? null,
                 'vendor_amount' => (float) ($variant['vendor_amount'] ?? 0),
                 'admin_amount'  => (float) ($variant['admin_amount'] ?? 0),
@@ -268,6 +293,8 @@ class OrderApiController extends Controller
                 'pack_quantity' => $item->pack_quantity,
                 'unit'       => $item->unit,
                 'variant_label' => $item->variant_label,
+                'pricing_day' => $item->pricing_day ?? 'today',
+                'pricing_day_label' => $item->pricing_day_label,
                 'unit_price' => (float) $item->unit_price,
                 'mrp'        => (float) ($item->mrp ?? $item->unit_price),
                 'save_offer' => $item->save_offer,

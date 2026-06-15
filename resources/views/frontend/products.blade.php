@@ -71,10 +71,104 @@
     $packWeights = ['250g', '500g', '1 kg', '1.5 kg'];
 @endphp
 
+<div id="mobileFilterModal" class="fixed inset-0 z-[10000] hidden bg-black/50 p-4 backdrop-blur-sm lg:hidden">
+    <div class="ml-auto flex h-full w-full max-w-[380px] flex-col overflow-hidden rounded-[28px] bg-white shadow-2xl">
+        <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+            <h3 class="text-[13px] font-black uppercase tracking-[0.22em] text-slate-900">Filter Products</h3>
+            <button type="button" onclick="closeMobileFilter()" class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form method="GET" action="{{ route('frontend.products') }}" id="mobileFilterForm" class="flex-1 overflow-y-auto">
+            <div class="space-y-6 px-5 py-5">
+                <div>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search cuts, packs, combos..."
+                           data-filter-search
+                           class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-green-500 focus:bg-white">
+                </div>
+
+                <div class="border-b border-slate-100 pb-5">
+                    <div class="mb-3 text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">Category</div>
+                    <div class="space-y-1.5">
+                        @foreach($categories as $cat)
+                            <label class="flex cursor-pointer items-center justify-between rounded-2xl px-3 py-2.5 transition hover:bg-slate-50">
+                                <span class="flex items-center gap-3">
+                                    <input type="radio" name="category" value="{{ $cat->slug }}"
+                                           {{ request('category') == $cat->slug ? 'checked' : '' }}
+                                           data-auto-submit
+                                           class="h-4 w-4 border-slate-300 text-green-600 focus:ring-green-500">
+                                    <span class="text-[13px] font-semibold text-slate-700">{{ $cat->name }}</span>
+                                </span>
+                                <span class="text-[11px] font-bold text-slate-400">{{ $cat->active_products_count }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div class="border-b border-slate-100 pb-5">
+                    <div class="mb-3 text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">Sort By</div>
+                    <div class="space-y-1.5">
+                        @foreach($sortOptions as $value => $label)
+                            <label class="flex cursor-pointer items-center gap-3 rounded-2xl px-3 py-2.5 transition hover:bg-slate-50">
+                                <input type="radio" name="sort" value="{{ $value }}"
+                                       {{ request('sort', 'latest') === $value ? 'checked' : '' }}
+                                       data-auto-submit
+                                       class="h-4 w-4 border-slate-300 text-green-600 focus:ring-green-500">
+                                <span class="text-[13px] font-semibold text-slate-700">{{ $label }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div class="border-b border-slate-100 pb-5">
+                    <div class="mb-4 flex items-center justify-between">
+                        <div class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">Price Range</div>
+                        <span class="rounded-full bg-green-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-green-700">Rs {{ $selectedMinPrice }} - <span id="mobilePriceRangeValue">{{ $selectedMaxPrice }}</span></span>
+                    </div>
+                    <input type="range" name="max_price" min="0" max="{{ $sidebarMaxPrice }}" value="{{ $selectedMaxPrice }}" step="10"
+                           id="mobileSidebarPriceRange"
+                           class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-green-600">
+                    <div class="mt-4 grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Min</label>
+                            <input type="number" name="min_price" min="0" max="{{ $sidebarMaxPrice }}" value="{{ $selectedMinPrice }}"
+                                   class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-semibold text-slate-700 outline-none focus:border-green-500 focus:bg-white">
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Max</label>
+                            <input type="number" min="0" max="{{ $sidebarMaxPrice }}" value="{{ $selectedMaxPrice }}"
+                                   id="mobileSidebarPriceRangeInput"
+                                   class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-semibold text-slate-700 outline-none focus:border-green-500 focus:bg-white">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="mb-3 text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">Pack Weight</div>
+                    <div class="grid grid-cols-2 gap-2">
+                        @foreach($packWeights as $weight)
+                            <button type="button" class="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-left text-[12px] font-bold text-slate-600 transition hover:border-green-200 hover:bg-green-50 hover:text-green-700">
+                                {{ $weight }}
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            <div class="sticky bottom-0 border-t border-slate-200 bg-white p-4">
+                <button type="submit" class="w-full rounded-2xl bg-[#1f9d47] px-5 py-3 text-[13px] font-black uppercase tracking-[0.18em] text-white shadow-[0_16px_30px_rgba(31,157,71,0.22)]">
+                    Apply Filters
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="max-w-7xl mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8">
 
     {{-- Sidebar Filters --}}
-    <aside class="w-full lg:w-[290px] xl:w-[310px] flex-shrink-0">
+    <aside class="hidden w-full flex-shrink-0 lg:block lg:w-[290px] xl:w-[310px]">
         <div class="space-y-5 lg:sticky lg:top-[150px]">
             <form method="GET" action="{{ route('frontend.products') }}" id="filterForm">
                 <div class="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_22px_55px_rgba(15,23,42,0.08)]">
@@ -245,8 +339,12 @@
 
     {{-- Products Grid --}}
     <div class="flex-1">
-        <div class="flex items-center justify-between mb-4">
+        <div class="mb-4 flex items-center justify-between gap-3">
             <p class="text-sm text-gray-500 font-semibold">{{ $products->total() }} products found</p>
+            <button type="button" onclick="openMobileFilter()" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-white lg:hidden">
+                <i class="fa-solid fa-sliders"></i>
+                Filter
+            </button>
         </div>
 
         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -280,9 +378,9 @@
                     <p class="text-[10px] text-gray-400 mt-1">{{ $product->category->name ?? '' }}</p>
                     <div class="flex items-center justify-between mt-auto pt-3">
                         <div>
-                            <p class="text-lg font-extrabold text-gray-800">Rs{{ number_format($product->price, 0) }}<span class="ml-1 text-xs font-semibold text-gray-400">/{{ $product->unit ?: 'unit' }}</span></p>
-                            @if($product->mrp && $product->mrp > $product->price)
-                                <p class="text-xs text-gray-400 line-through">Rs{{ number_format($product->mrp, 0) }}</p>
+                            <p class="text-lg font-extrabold text-gray-800">Rs{{ number_format($product->display_price, 0) }}<span class="ml-1 text-xs font-semibold text-gray-400">{{ $product->display_pack_label }}</span></p>
+                            @if($product->display_mrp && $product->display_mrp > $product->display_price)
+                                <p class="text-xs text-gray-400 line-through">Rs{{ number_format($product->display_mrp, 0) }}</p>
                             @endif
                         </div>
                         @if($product->is_active)
@@ -308,6 +406,65 @@
         </div>
 
         <div class="mt-8">{{ $products->links() }}</div>
+
+        <div class="mt-8 space-y-5 lg:hidden">
+            <div class="overflow-hidden rounded-[28px] border border-slate-200 bg-white p-4 shadow-[0_20px_45px_rgba(15,23,42,0.06)]">
+                <div class="mb-4 flex items-center justify-between">
+                    <h4 class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">Best Deals</h4>
+                    <span class="rounded-full bg-red-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-red-500">Hot</span>
+                </div>
+                <div class="space-y-3">
+                    @forelse($sidebarBestDeals as $deal)
+                        <a href="{{ route('frontend.product.show', $deal->slug) }}" class="group flex items-center gap-3 rounded-[22px] border border-slate-100 bg-slate-50 p-2.5 transition hover:-translate-y-0.5 hover:border-green-200 hover:bg-white hover:shadow-md">
+                            <div class="h-16 w-16 overflow-hidden rounded-2xl bg-slate-200">
+                                @if($deal->images && count($deal->images))
+                                    <img src="{{ asset('storage/' . $deal->images[0]) }}" alt="{{ $deal->name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
+                                @else
+                                    <div class="flex h-full w-full items-center justify-center text-xl text-slate-400">
+                                        <i class="fa-solid fa-drumstick-bite"></i>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <p class="line-clamp-2 text-[12px] font-black leading-5 text-slate-900">{{ $deal->name }}</p>
+                                <div class="mt-1 flex items-center gap-2">
+                                    <span class="text-[12px] font-black text-green-700">Rs{{ number_format($deal->display_price, 0) }}</span>
+                                    @if($deal->display_mrp && $deal->display_mrp > $deal->display_price)
+                                        <span class="text-[11px] font-bold text-slate-400 line-through">Rs{{ number_format($deal->display_mrp, 0) }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </a>
+                    @empty
+                        <p class="rounded-2xl bg-slate-50 px-4 py-4 text-[13px] font-semibold text-slate-500">Deals will appear here once products with offers are available.</p>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="overflow-hidden rounded-[28px] border border-slate-200 bg-white p-4 shadow-[0_20px_45px_rgba(15,23,42,0.06)]">
+                <h4 class="mb-4 text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">New Arrivals</h4>
+                <div class="space-y-3">
+                    @foreach($sidebarNewArrivals as $arrival)
+                        <a href="{{ route('frontend.product.show', $arrival->slug) }}" class="group flex items-center gap-3 rounded-[20px] px-1 py-1 transition hover:bg-slate-50">
+                            <div class="h-12 w-12 overflow-hidden rounded-xl bg-slate-200">
+                                @if($arrival->images && count($arrival->images))
+                                    <img src="{{ asset('storage/' . $arrival->images[0]) }}" alt="{{ $arrival->name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
+                                @else
+                                    <div class="flex h-full w-full items-center justify-center text-sm text-slate-400">
+                                        <i class="fa-solid fa-fish"></i>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <p class="line-clamp-2 text-[12px] font-black leading-5 text-slate-900">{{ $arrival->name }}</p>
+                                <p class="mt-1 text-[11px] font-semibold text-slate-400">{{ $arrival->category->name ?? 'Fresh cut' }}</p>
+                            </div>
+                            <span class="text-[12px] font-black text-green-700">Rs{{ number_format($arrival->display_price, 0) }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -402,47 +559,78 @@
 @section('scripts')
 <script>
 (() => {
-    const filterForm = document.getElementById('filterForm');
-    const range = document.getElementById('sidebarPriceRange');
-    const rangeInput = document.getElementById('sidebarPriceRangeInput');
-    const rangeValue = document.getElementById('priceRangeValue');
-    const autoSubmitInputs = document.querySelectorAll('#filterForm [data-auto-submit]');
-    const searchInput = document.querySelector('#filterForm [data-filter-search]');
+    function setupFilterForm(formId, rangeId, rangeInputId, rangeValueId) {
+        const filterForm = document.getElementById(formId);
+        const range = document.getElementById(rangeId);
+        const rangeInput = document.getElementById(rangeInputId);
+        const rangeValue = document.getElementById(rangeValueId);
+        const autoSubmitInputs = document.querySelectorAll(`#${formId} [data-auto-submit]`);
+        const searchInput = document.querySelector(`#${formId} [data-filter-search]`);
 
-    if (filterForm) {
+        if (!filterForm) {
+            return;
+        }
+
         autoSubmitInputs.forEach((input) => {
             input.addEventListener('change', () => filterForm.submit());
         });
+
+        if (searchInput) {
+            let searchTimer;
+
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimer);
+                searchTimer = setTimeout(() => {
+                    filterForm.submit();
+                }, 450);
+            });
+        }
+
+        if (!range || !rangeInput || !rangeValue) return;
+
+        const syncFromRange = () => {
+            rangeInput.value = range.value;
+            rangeValue.textContent = range.value;
+        };
+
+        const syncFromInput = () => {
+            const max = Number(range.max || 0);
+            const nextValue = Math.min(Math.max(Number(rangeInput.value || 0), 0), max);
+            rangeInput.value = nextValue;
+            range.value = nextValue;
+            rangeValue.textContent = nextValue;
+        };
+
+        range.addEventListener('input', syncFromRange);
+        rangeInput.addEventListener('input', syncFromInput);
     }
 
-    if (filterForm && searchInput) {
-        let searchTimer;
-
-        searchInput.addEventListener('input', () => {
-            clearTimeout(searchTimer);
-            searchTimer = setTimeout(() => {
-                filterForm.submit();
-            }, 450);
-        });
-    }
-
-    if (!range || !rangeInput || !rangeValue) return;
-
-    const syncFromRange = () => {
-        rangeInput.value = range.value;
-        rangeValue.textContent = range.value;
-    };
-
-    const syncFromInput = () => {
-        const max = Number(range.max || 0);
-        const nextValue = Math.min(Math.max(Number(rangeInput.value || 0), 0), max);
-        rangeInput.value = nextValue;
-        range.value = nextValue;
-        rangeValue.textContent = nextValue;
-    };
-
-    range.addEventListener('input', syncFromRange);
-    rangeInput.addEventListener('input', syncFromInput);
+    setupFilterForm('filterForm', 'sidebarPriceRange', 'sidebarPriceRangeInput', 'priceRangeValue');
+    setupFilterForm('mobileFilterForm', 'mobileSidebarPriceRange', 'mobileSidebarPriceRangeInput', 'mobilePriceRangeValue');
 })();
+
+function openMobileFilter() {
+    const modal = document.getElementById('mobileFilterModal');
+    if (!modal) return;
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.classList.add('overflow-hidden');
+}
+
+function closeMobileFilter() {
+    const modal = document.getElementById('mobileFilterModal');
+    if (!modal) return;
+
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.classList.remove('overflow-hidden');
+}
+
+document.getElementById('mobileFilterModal')?.addEventListener('click', (event) => {
+    if (event.target.id === 'mobileFilterModal') {
+        closeMobileFilter();
+    }
+});
 </script>
 @endsection

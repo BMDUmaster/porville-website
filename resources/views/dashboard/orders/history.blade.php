@@ -5,6 +5,13 @@
 @section('content')
 @php
     $statusOptions = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered', 'cancelled'];
+    $dateFilterOptions = [
+        '' => 'All Dates',
+        'today' => 'Today',
+        'last_7_days' => 'Last 7 Days',
+        'last_30_days' => 'Last 30 Days',
+        'custom' => 'Custom Range',
+    ];
 @endphp
 <div class="p-4 md:p-8 space-y-6">
 
@@ -22,9 +29,9 @@
         @endforeach
     </div>
 
-    <form method="GET" class="grid grid-cols-1 gap-3 rounded-2xl border bg-white p-4 shadow-sm sm:grid-cols-2 md:grid-cols-6">
+    <form method="GET" class="grid grid-cols-1 gap-3 rounded-2xl border bg-white p-4 shadow-sm sm:grid-cols-2 xl:grid-cols-8">
         <input type="text" name="search" value="{{ request('search') }}" placeholder="Search"
-               class="rounded-full border bg-gray-50 px-4 py-2.5 text-sm outline-none sm:col-span-2 md:col-span-1">
+               class="rounded-full border bg-gray-50 px-4 py-2.5 text-sm outline-none sm:col-span-2 xl:col-span-1">
         <input type="text" name="order_id" value="{{ request('order_id') }}" placeholder="Order ID"
                class="rounded-full border bg-gray-50 px-4 py-2.5 text-sm outline-none">
         <select name="status" class="rounded-full border bg-gray-50 px-4 py-2.5 text-sm outline-none">
@@ -35,11 +42,19 @@
                 </option>
             @endforeach
         </select>
-        <input type="date" name="date_from" value="{{ request('date_from') }}"
-               class="rounded-full border bg-gray-50 px-4 py-2.5 text-sm outline-none">
-        <input type="date" name="date_to" value="{{ request('date_to') }}"
-               class="rounded-full border bg-gray-50 px-4 py-2.5 text-sm outline-none">
+        <select name="date_filter" id="historyDateFilter" onchange="toggleHistoryCustomDates()" class="rounded-full border bg-gray-50 px-4 py-2.5 text-sm outline-none">
+            @foreach($dateFilterOptions as $value => $label)
+                <option value="{{ $value }}" {{ request('date_filter') === $value ? 'selected' : '' }}>{{ $label }}</option>
+            @endforeach
+        </select>
+        <div id="historyCustomDateFields" class="{{ request('date_filter') === 'custom' ? 'contents' : 'hidden' }}">
+            <input type="date" name="date_from" value="{{ request('date_from') }}"
+                   class="rounded-full border bg-gray-50 px-4 py-2.5 text-sm outline-none">
+            <input type="date" name="date_to" value="{{ request('date_to') }}"
+                   class="rounded-full border bg-gray-50 px-4 py-2.5 text-sm outline-none">
+        </div>
         <button type="submit" class="rounded-full bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white">Filter</button>
+        <a href="{{ route('dashboard.orders.history') }}" class="rounded-full bg-gray-100 px-4 py-2.5 text-center text-sm font-semibold text-gray-600">Reset</a>
     </form>
 
     <div class="space-y-4 md:hidden">
@@ -154,4 +169,22 @@
 
     <div>{{ $orders->withQueryString()->links() }}</div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+function toggleHistoryCustomDates() {
+    const filter = document.getElementById('historyDateFilter');
+    const customFields = document.getElementById('historyCustomDateFields');
+
+    if (!filter || !customFields) {
+        return;
+    }
+
+    customFields.classList.toggle('hidden', filter.value !== 'custom');
+    customFields.classList.toggle('contents', filter.value === 'custom');
+}
+
+toggleHistoryCustomDates();
+</script>
 @endsection

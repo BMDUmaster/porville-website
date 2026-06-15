@@ -40,4 +40,69 @@ class Product extends Model
     {
         return $query->where('is_active', true);
     }
+
+    public function getDisplayPackLabelAttribute(): string
+    {
+        $variant = collect($this->variants ?? [])
+            ->first(fn ($item) => filled($item['quantity'] ?? null) || filled($item['piece'] ?? null) || filled($item['unit'] ?? null));
+
+        if ($variant) {
+            return $this->formatPackLabel(
+                $variant['quantity'] ?? null,
+                $variant['unit'] ?? $this->unit,
+                $variant['piece'] ?? null
+            );
+        }
+
+        return $this->formatPackLabel($this->weight ?? null, $this->unit ?? null, null);
+    }
+
+    public function getDisplayPriceAttribute(): float
+    {
+        $variant = collect($this->variants ?? [])
+            ->first(fn ($item) => filled($item['selling_price'] ?? null) || filled($item['today_price'] ?? null));
+
+        if ($variant) {
+            return (float) \App\Support\ProductDayPricing::sellingPrice($variant, 'today', (float) $this->price);
+        }
+
+        return (float) $this->price;
+    }
+
+    public function getDisplayMrpAttribute(): float
+    {
+        $variant = collect($this->variants ?? [])
+            ->first(fn ($item) => filled($item['mrp'] ?? null));
+
+        return (float) ($variant['mrp'] ?? $this->mrp ?? $this->display_price);
+    }
+
+    private function formatPackLabel($quantity, $unit, $piece): string
+    {
+        $quantity = trim((string) $quantity);
+        $unit = $this->normalizeUnit(trim((string) $unit));
+        $piece = trim((string) $piece);
+
+        if ($quantity !== '') {
+            return trim($quantity . ' ' . $unit);
+        }
+
+        if ($piece !== '') {
+            return preg_match('/[A-Za-z]/', $piece)
+                ? $piece
+                : trim($piece . ' ' . ($unit !== '' ? $unit : 'Pcs'));
+        }
+
+        return $unit !== '' ? $unit : 'Standard Pack';
+    }
+
+    private function normalizeUnit(string $unit): string
+    {
+        return match (strtolower($unit)) {
+            'pc', 'pcs', 'piece', 'pieces' => 'Pcs',
+            'kg', 'kgs', 'kilogram', 'kilograms' => 'Kg',
+            'gm', 'g', 'gram', 'grams' => 'Gram',
+            default => $unit,
+        };
+    }
 }

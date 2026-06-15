@@ -11,7 +11,7 @@ class NotificationController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Notification::latest();
+        $query = Notification::with('recipient')->latest();
 
         if ($request->filled('search')) {
             $query->where('subject', 'like', '%' . $request->search . '%')
@@ -33,12 +33,32 @@ class NotificationController extends Controller
         $data = $request->validate([
             'subject' => 'required|string|max:200',
             'message' => 'required|string',
+            'user_ids' => ['required', 'array', 'min:1'],
+            'user_ids.*' => ['integer', 'exists:users,id'],
         ]);
 
-        $data['sent_by'] = auth()->id();
-        Notification::create($data);
+        $validUserIds = User::query()
+            ->whereIn('id', $data['user_ids'])
+            ->where('role', 'customer')
+            ->where('status', 'active')
+            ->pluck('id');
 
-        return back()->with('success', 'Notification sent successfully.');
+        if ($validUserIds->isEmpty()) {
+            return back()->withInput()->withErrors([
+                'user_ids' => 'Please select at least one active customer.',
+            ]);
+        }
+
+        $validUserIds->each(function ($userId) use ($data) {
+            Notification::create([
+                'subject' => $data['subject'],
+                'message' => $data['message'],
+                'sent_by' => auth()->id(),
+                'recipient_id' => $userId,
+            ]);
+        });
+
+        return back()->with('success', 'Notification sent to selected customer(s).');
     }
 
     public function update(Request $request, Notification $notification)

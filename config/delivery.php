@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'timezone' => env('DELIVERY_TIMEZONE', env('APP_TIMEZONE', 'Asia/Kolkata')),
+
     'slot_duration_hours' => 2,
 
     'fixed_slots' => [

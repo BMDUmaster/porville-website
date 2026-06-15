@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -16,6 +17,18 @@ class ProfileController extends Controller
 
         $ordersQuery = $user->orders();
         $orders = $user->orders()->with('items.product')->latest()->take(4)->get();
+        $userNotifications = Notification::query()
+            ->forUser($user->id)
+            ->latest()
+            ->take(8)
+            ->get();
+        $unreadNotifications = Notification::query()
+            ->where('recipient_id', $user->id)
+            ->whereNull('read_at')
+            ->count();
+        $totalNotifications = Notification::query()
+            ->forUser($user->id)
+            ->count();
         $latestAddressOrder = $user->orders()
             ->whereNotNull('shipping_address')
             ->latest()
@@ -48,7 +61,7 @@ class ProfileController extends Controller
             'profile_completion' => $profileCompletion,
         ];
 
-        return view('frontend.profile', compact('user', 'orders', 'stats', 'latestAddress'));
+        return view('frontend.profile', compact('user', 'orders', 'stats', 'latestAddress', 'userNotifications', 'unreadNotifications', 'totalNotifications'));
     }
 
     /** PUT /account/profile */
@@ -58,8 +71,12 @@ class ProfileController extends Controller
 
         $data = $request->validate([
             'name'  => 'required|string|max:100',
-            'phone' => 'nullable|string|max:20',
+            'phone' => ['nullable', 'regex:/^(?:\d{10}|\d{12})$/'],
+        ], [
+            'phone.regex' => 'Phone number must be 10 or 12 digits.',
         ]);
+
+        $data['phone'] = $data['phone'] ? preg_replace('/\D/', '', $data['phone']) : null;
 
         $user->update($data);
 
@@ -83,5 +100,17 @@ class ProfileController extends Controller
         $user->update(['password' => Hash::make($request->password)]);
 
         return back()->with('success', 'Password updated successfully.');
+    }
+
+    public function markNotificationsRead()
+    {
+        $user = Auth::guard('web_frontend')->user();
+
+        Notification::query()
+            ->where('recipient_id', $user->id)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        return back()->with('success', 'Notifications marked as read.');
     }
 }

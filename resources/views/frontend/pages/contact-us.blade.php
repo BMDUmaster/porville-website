@@ -158,31 +158,40 @@
 
                 <div class="rounded-[28px] border border-slate-200 bg-slate-50 p-5 shadow-[0_10px_35px_rgba(148,163,184,0.12)] md:p-7">
                     <p class="text-[10px] font-extrabold uppercase tracking-[0.28em] text-slate-400">How can we contact you?</p>
-                    <form class="mt-6 space-y-5">
+                    @if(session('success'))
+                        <div class="mt-5 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+                    <form method="POST" action="{{ route('frontend.contact.submit') }}" class="mt-6 space-y-5">
+                        @csrf
                         <div>
                             <label class="mb-2 block text-[10px] font-extrabold uppercase tracking-[0.18em] text-slate-900">Select Department</label>
-                            <select class="contact-input h-12 w-full rounded-2xl px-4 text-sm text-slate-700">
-                                <option>Customer Support</option>
-                                <option>Vendor Partnership</option>
-                                <option>Delivery Help</option>
-                                <option>Bulk Orders</option>
+                            <select name="department" class="contact-input h-12 w-full rounded-2xl px-4 text-sm text-slate-700" required>
+                                @foreach(['Customer Support', 'Vendor Partnership', 'Delivery Help', 'Bulk Orders'] as $department)
+                                    <option value="{{ $department }}" @selected(old('department') === $department)>{{ $department }}</option>
+                                @endforeach
                             </select>
+                            @error('department')<p class="mt-2 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
                         </div>
 
                         <div class="grid gap-4 md:grid-cols-2">
                             <div>
                                 <label class="mb-2 block text-[10px] font-extrabold uppercase tracking-[0.18em] text-slate-900">Full Name</label>
-                                <input type="text" placeholder="John Doe" class="contact-input h-12 w-full rounded-2xl px-4 text-sm text-slate-700">
+                                <input type="text" name="name" value="{{ old('name') }}" placeholder="John Doe" class="contact-input h-12 w-full rounded-2xl px-4 text-sm text-slate-700" required>
+                                @error('name')<p class="mt-2 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label class="mb-2 block text-[10px] font-extrabold uppercase tracking-[0.18em] text-slate-900">Email Address</label>
-                                <input type="email" placeholder="john@example.com" class="contact-input h-12 w-full rounded-2xl px-4 text-sm text-slate-700">
+                                <input type="email" name="email" value="{{ old('email') }}" placeholder="john@example.com" class="contact-input h-12 w-full rounded-2xl px-4 text-sm text-slate-700" required>
+                                @error('email')<p class="mt-2 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
                             </div>
                         </div>
 
                         <div>
                             <label class="mb-2 block text-[10px] font-extrabold uppercase tracking-[0.18em] text-slate-900">Your Message</label>
-                            <textarea rows="5" placeholder="How can we help you?" class="contact-input w-full rounded-3xl px-4 py-3 text-sm text-slate-700 resize-none"></textarea>
+                            <textarea name="message" rows="5" placeholder="How can we help you?" class="contact-input w-full rounded-3xl px-4 py-3 text-sm text-slate-700 resize-none" required>{{ old('message') }}</textarea>
+                            @error('message')<p class="mt-2 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
                         </div>
 
                         <button type="submit" class="inline-flex min-w-[146px] items-center justify-center rounded-2xl bg-green-600 px-6 py-3 text-[11px] font-extrabold uppercase tracking-[0.24em] text-white shadow-[0_14px_28px_rgba(22,163,74,0.28)] transition hover:-translate-y-0.5 hover:bg-green-700">

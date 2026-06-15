@@ -261,6 +261,60 @@
                     </div>
                 </div>
 
+                <div id="notifications-panel" class="rounded-[24px] border border-slate-200/80 bg-white p-4 profile-soft-shadow md:p-5">
+                    <div class="mb-4 flex items-start justify-between gap-3">
+                        <div>
+                            <h2 class="text-sm font-extrabold text-slate-900">
+                                <i class="fa-regular fa-bell mr-2 text-blue-600"></i>
+                                Notifications
+                            </h2>
+                            <p class="mt-1 text-xs text-slate-400">
+                                {{ $totalNotifications ?? ($userNotifications ?? collect())->count() }} message(s) from FarmSea team.
+                            </p>
+                        </div>
+                        <div class="flex flex-col items-end gap-2">
+                            <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-slate-600">
+                                {{ $totalNotifications ?? ($userNotifications ?? collect())->count() }} Total
+                            </span>
+                            @if(($unreadNotifications ?? 0) > 0)
+                                <span class="rounded-full bg-red-500 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-white">
+                                    {{ $unreadNotifications }} New
+                                </span>
+                                <form method="POST" action="{{ route('frontend.notifications.read') }}">
+                                    @csrf
+                                    <button type="submit" class="text-[10px] font-black uppercase tracking-[0.14em] text-blue-600 hover:underline">
+                                        Mark all read
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
+
+                    @if(($userNotifications ?? collect())->count())
+                        <div class="space-y-3">
+                            @foreach($userNotifications as $notification)
+                                <div class="rounded-2xl border {{ $notification->read_at ? 'border-slate-200 bg-slate-50/70' : 'border-blue-100 bg-blue-50/70' }} px-4 py-3">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <p class="text-sm font-bold text-slate-900">{{ $notification->subject }}</p>
+                                        @if(! $notification->read_at && $notification->recipient_id)
+                                            <span class="rounded-full bg-blue-600 px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.12em] text-white">New</span>
+                                        @endif
+                                    </div>
+                                    <p class="mt-2 text-sm leading-6 text-slate-600">{{ $notification->message }}</p>
+                                    <p class="mt-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                                        {{ $notification->created_at->format('d M Y, h:i A') }}
+                                    </p>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center">
+                            <i class="fa-regular fa-bell text-2xl text-slate-300"></i>
+                            <p class="mt-3 text-sm font-semibold text-slate-500">No notifications yet.</p>
+                        </div>
+                    @endif
+                </div>
+
                 <div id="security-panel" class="rounded-[24px] border border-slate-200/80 bg-white p-4 profile-soft-shadow md:p-5">
                     <h2 class="text-sm font-extrabold text-slate-900">
                         <i class="fa-solid fa-shield-heart mr-2 text-red-500"></i>
@@ -334,7 +388,11 @@
                         </div>
                         <div>
                             <label class="mb-1 block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Phone</label>
-                            <input type="tel" name="phone" value="{{ old('phone', $user->phone) }}" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-400 focus:bg-white">
+                            <input type="tel" id="profilePhoneInput" name="phone" value="{{ old('phone', $user->phone) }}"
+                                   inputmode="numeric" pattern="(?:\d{10}|\d{12})" minlength="10" maxlength="12" autocomplete="off"
+                                   title="Phone number must be 10 or 12 digits"
+                                   class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-400 focus:bg-white">
+                            <p class="mt-1 text-[11px] font-semibold text-slate-400">Only 10 or 12 digit numbers are allowed.</p>
                         </div>
                         <div>
                             <label class="mb-1 block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Email</label>
@@ -375,4 +433,18 @@
         </div>
     </div>
 </div>
+<script>
+const profilePhoneInput = document.getElementById('profilePhoneInput');
+
+function sanitizeProfilePhone() {
+    if (!profilePhoneInput) {
+        return;
+    }
+
+    profilePhoneInput.value = profilePhoneInput.value.replace(/\D/g, '').slice(0, 12);
+}
+
+profilePhoneInput?.addEventListener('input', sanitizeProfilePhone);
+sanitizeProfilePhone();
+</script>
 @endsection

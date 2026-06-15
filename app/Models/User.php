@@ -33,4 +33,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Order::class);
     }
+
+    public function receivedNotifications()
+    {
+        return $this->hasMany(Notification::class, 'recipient_id');
+    }
 }

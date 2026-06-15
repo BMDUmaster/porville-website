@@ -30,6 +30,8 @@ use App\Http\Controllers\Dashboard\ProfileController;
 use App\Http\Controllers\Dashboard\ServiceChargeController;
 use App\Http\Controllers\Dashboard\DeliverySlotController;
 use App\Http\Controllers\Dashboard\SystemCheckController;
+use App\Http\Controllers\Dashboard\HomeBannerController;
+use App\Http\Controllers\Dashboard\ContactMessageController;
 use App\Http\Controllers\ServerDiagnosticsController;
 
 // Public server diagnostics (no login) — use this URL on live hosting
@@ -65,6 +67,19 @@ Route::middleware('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.home');
     Route::get('/dashboard/system-check', SystemCheckController::class)->name('dashboard.system-check');
     Route::get('/system-check', SystemCheckController::class)->name('dashboard.system-check.short');
+
+    // Home Banners
+    Route::get('/banners',              [HomeBannerController::class, 'index'])->name('dashboard.banners');
+    Route::post('/banners',             [HomeBannerController::class, 'store'])->name('dashboard.banners.store');
+    Route::put('/banners/{banner}',     [HomeBannerController::class, 'update'])->name('dashboard.banners.update');
+    Route::delete('/banners/{banner}',  [HomeBannerController::class, 'destroy'])->name('dashboard.banners.destroy');
+
+    // Contact Messages
+    Route::get('/contact-messages',                    [ContactMessageController::class, 'index'])->name('dashboard.contact-messages');
+    Route::get('/contact-messages/live',               [ContactMessageController::class, 'live'])->name('dashboard.contact-messages.live');
+    Route::get('/contact-messages/{message}',          [ContactMessageController::class, 'show'])->name('dashboard.contact-messages.show');
+    Route::patch('/contact-messages/{message}/read',   [ContactMessageController::class, 'markRead'])->name('dashboard.contact-messages.read');
+    Route::delete('/contact-messages/{message}',       [ContactMessageController::class, 'destroy'])->name('dashboard.contact-messages.destroy');
 
     // Categories
     Route::get('/categories',               [CategoryController::class, 'index'])->name('dashboard.categories');
@@ -154,6 +169,7 @@ Route::middleware('guest:web_frontend')->group(function () {
     Route::get('/account/login',     [FrontAuthController::class, 'showLogin'])->name('frontend.login');
     Route::post('/account/login',    [FrontAuthController::class, 'login'])->middleware('throttle:5,1')->name('frontend.login.post');
     Route::get('/account/register',  [FrontAuthController::class, 'showRegister'])->name('frontend.register');
+    Route::post('/account/register/send-otp', [FrontAuthController::class, 'sendRegisterOtp'])->middleware('throttle:3,1')->name('frontend.register.otp');
     Route::post('/account/register', [FrontAuthController::class, 'register'])->middleware('throttle:3,1')->name('frontend.register.post');
 });
 Route::post('/account/logout', [FrontAuthController::class, 'logout'])->name('frontend.logout');
@@ -163,6 +179,7 @@ Route::middleware('auth:web_frontend')->group(function () {
     Route::get('/account/profile',      [FrontProfileController::class, 'index'])->name('frontend.profile');
     Route::put('/account/profile',      [FrontProfileController::class, 'update'])->name('frontend.profile.update');
     Route::put('/account/password',     [FrontProfileController::class, 'updatePassword'])->name('frontend.profile.password');
+    Route::post('/account/notifications/read', [FrontProfileController::class, 'markNotificationsRead'])->name('frontend.notifications.read');
 
     Route::get('/account/orders',       [FrontOrderController::class, 'index'])->name('frontend.orders');
     Route::get('/account/orders/{id}',  [FrontOrderController::class, 'show'])->name('frontend.order.show');
@@ -180,6 +197,7 @@ Route::get('/track-order', [FrontOrderController::class, 'track'])->name('fronte
 Route::get('/about-us',             [PageController::class, 'about'])->name('frontend.about');
 Route::get('/our-farms',            [PageController::class, 'farms'])->name('frontend.farms');
 Route::get('/contact-us',           [PageController::class, 'contact'])->name('frontend.contact');
+Route::post('/contact-us',          [PageController::class, 'submitContact'])->middleware('throttle:5,1')->name('frontend.contact.submit');
 Route::get('/privacy-policy',       [PageController::class, 'privacy'])->name('frontend.privacy');
 Route::get('/terms-of-service',     [PageController::class, 'terms'])->name('frontend.terms');
 Route::get('/shipping-policy',      [PageController::class, 'shipping'])->name('frontend.shipping');

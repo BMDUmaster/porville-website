@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title><?php echo $__env->yieldContent('title', 'FarmSea'); ?> — Fresh Meat & Seafood</title>
+<meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+* { font-family: 'Poppins', sans-serif; box-sizing: border-box; }
+.nunito { font-family: 'Nunito', sans-serif; }
+.sidebar-transition { transition: transform .3s ease; }
+.sidebar-open { transform: translateX(0) !important; }
+#sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:90; }
+#sidebar-overlay.active { display:block; }
+/* Cart drawer */
+#cart-drawer { transform: translateX(100%); transition: transform .35s cubic-bezier(.4,0,.2,1); }
+#cart-drawer.open { transform: translateX(0); }
+/* Mobile responsive fixes */
+@media (max-width: 640px) {
+    .container { padding-left: 12px !important; padding-right: 12px !important; }
+}
+@media (min-width: 1024px) {
+    #mobile-sidebar { display: none !important; }
+    #sidebar-overlay { display: none !important; }
+}
+/* Prevent horizontal overflow */
+html, body { overflow-x: hidden; max-width: 100vw; }
+/* Scrollbar hide utility */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.header-nav-dropdown {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+}
+
+.header-nav-group::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: 16px;
+}
+
+.header-nav-group:hover .header-nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+</style>
+<?php echo $__env->yieldContent('styles'); ?>
+</head>
+<body class="min-h-screen flex flex-col" style="background:#f5f6fa;">
+
+<div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<!-- Mobile Sidebar -->
+<div id="mobile-sidebar" class="fixed inset-y-0 left-0 z-[100] w-72 bg-white shadow-2xl transform -translate-x-full sidebar-transition">
+    <div class="p-5 border-b flex justify-between items-center bg-green-700 text-white">
+        <span class="font-bold uppercase tracking-wider">FarmSea Menu</span>
+        <button onclick="toggleSidebar()"><i class="fa-solid fa-xmark text-2xl"></i></button>
+    </div>
+    <div class="p-4 overflow-y-auto h-full pb-20">
+        <h3 class="text-green-700 font-bold mb-3 mt-2">Categories</h3>
+        <ul class="space-y-1 text-gray-700 text-sm mb-5">
+            <?php $__empty_1 = true; $__currentLoopData = $frontendNavCategories ?? collect(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                <li>
+                    <?php if($category->children->isNotEmpty()): ?>
+                        <button
+                            type="button"
+                            onclick="toggleMobileCategory('<?php echo e($category->id); ?>')"
+                            class="flex w-full items-center justify-between rounded p-2 text-left font-semibold hover:bg-gray-100"
+                        >
+                            <span><?php echo e($category->name); ?></span>
+                            <i id="mobile-category-icon-<?php echo e($category->id); ?>" class="fa-solid fa-chevron-down text-[10px] text-green-700 transition-transform"></i>
+                        </button>
+                        <ul id="mobile-category-<?php echo e($category->id); ?>" class="ml-3 hidden border-l border-green-100 pl-2">
+                            <li>
+                                <a href="<?php echo e(route('frontend.products', ['category' => $category->slug])); ?>" class="block rounded p-2 text-xs font-semibold text-green-700 hover:bg-gray-100">
+                                    View all <?php echo e($category->name); ?>
+
+                                </a>
+                            </li>
+                            <?php $__currentLoopData = $category->children; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subcategory): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <li>
+                                    <a href="<?php echo e(route('frontend.products', ['category' => $category->slug, 'subcategory' => $subcategory->slug])); ?>" class="block p-2 text-xs text-gray-500 hover:bg-gray-100 hover:text-green-700 rounded"><?php echo e($subcategory->name); ?></a>
+                                </li>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </ul>
+                    <?php else: ?>
+                        <a href="<?php echo e(route('frontend.products', ['category' => $category->slug])); ?>" class="block p-2 font-semibold hover:bg-gray-100 rounded"><?php echo e($category->name); ?></a>
+                    <?php endif; ?>
+                </li>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                <li class="p-2 text-gray-400">No categories available</li>
+            <?php endif; ?>
+        </ul>
+        <hr class="my-4">
+        <a href="<?php echo e(route('frontend.track')); ?>" class="block p-2 font-bold text-blue-600">Track Order</a>
+        <?php if(auth()->guard('web_frontend')->check()): ?>
+            <a href="<?php echo e(route('frontend.profile')); ?>" class="block p-2 font-bold text-green-700">My Profile</a>
+            <a href="<?php echo e(route('frontend.orders')); ?>" class="block p-2 font-bold text-green-700">My Orders</a>
+        <?php else: ?>
+            <a href="<?php echo e(route('frontend.login')); ?>" class="block p-2 font-bold text-blue-600">Login / Register</a>
+        <?php endif; ?>
+    </div>
+</div>
+
+<?php
+    $drawerCart = session('cart', []);
+    $drawerCartDays = collect($drawerCart)->pluck('pricing_day')->filter();
+    $drawerUsesTomorrowDelivery = $drawerCartDays->contains('tomorrow') && ! $drawerCartDays->contains('today');
+    $drawerDeliveryDayLabel = $drawerUsesTomorrowDelivery ? 'Tomorrow' : 'Today';
+    $drawerDeliverySlotOptions = $drawerUsesTomorrowDelivery
+        ? \App\Support\DeliverySlotManager::options()
+        : \App\Support\DeliverySlotManager::availableOptions();
+    $drawerSelectedDeliverySlot = session('selected_delivery_slot');
+
+    if (! in_array($drawerSelectedDeliverySlot, array_column($drawerDeliverySlotOptions, 'value'), true)) {
+        $drawerSelectedDeliverySlot = $drawerDeliverySlotOptions[0]['value'] ?? null;
+        session(['selected_delivery_slot' => $drawerSelectedDeliverySlot]);
+    }
+?>
+<!-- Cart Drawer -->
+<div id="cart-overlay" class="hidden fixed inset-0 bg-black/40 z-[9998]" onclick="closeCart()"></div>
+<div id="cart-drawer" class="fixed top-0 right-0 h-full w-[420px] max-w-[95vw] bg-white shadow-2xl z-[9999] flex flex-col">
+    <div class="flex items-center justify-between px-5 py-4 border-b">
+        <div class="flex items-center gap-2">
+            <i class="fa-solid fa-cart-shopping text-blue-700"></i>
+            <span class="nunito font-extrabold text-base">Your Cart</span>
+            <span id="cart-badge-drawer" class="bg-blue-700 text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+        </div>
+        <button onclick="closeCart()" class="text-gray-400 hover:text-gray-700 text-xl">&times;</button>
+    </div>
+    <div id="cart-items-drawer" class="flex-1 overflow-y-auto px-5 py-3 space-y-3">
+        <p class="text-center text-gray-400 py-8">Your cart is empty</p>
+    </div>
+    <div class="px-5 py-4 border-t bg-white">
+        <div class="mb-4 rounded-2xl border border-green-100 bg-green-50/60 p-3">
+            <div class="mb-2 flex items-center justify-between gap-3">
+                <span class="text-xs font-black uppercase tracking-[0.16em] text-slate-600">
+                    Delivery Slot
+                    <span id="drawer-delivery-day-label" class="ml-1 rounded-full bg-white px-2 py-1 text-[9px] tracking-[0.12em] text-green-700">
+                        <?php echo e($drawerDeliveryDayLabel); ?>
+
+                    </span>
+                </span>
+                <span id="drawer-delivery-slot-label" class="text-[10px] font-bold text-green-700">
+                    <?php echo e(\App\Support\DeliverySlotManager::label($drawerSelectedDeliverySlot)); ?>
+
+                </span>
+            </div>
+            <div id="drawer-delivery-slot-options" class="flex flex-wrap gap-2">
+                <?php $__empty_1 = true; $__currentLoopData = $drawerDeliverySlotOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $slot): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <button
+                        type="button"
+                        onclick="updateCartDrawerDeliverySlot('<?php echo e($slot['value']); ?>')"
+                        data-drawer-delivery-slot="<?php echo e($slot['value']); ?>"
+                        class="drawer-delivery-slot-chip <?php echo e($drawerSelectedDeliverySlot === $slot['value'] ? 'border-green-600 bg-white text-green-700 shadow-sm' : 'border-green-100 bg-white/80 text-slate-600'); ?> rounded-full border px-2.5 py-2 text-[10px] font-bold leading-none transition hover:border-green-400 hover:text-green-700"
+                    >
+                        <?php echo e($slot['label']); ?>
+
+                    </button>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <span class="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-2 text-[10px] font-bold leading-none text-amber-700">
+                        No slots left for today
+                    </span>
+                <?php endif; ?>
+            </div>
+        </div>
+        <div class="flex justify-between text-sm font-semibold mb-2">
+            <span>Subtotal</span>
+            <span id="cart-subtotal-drawer">₹0.00</span>
+        </div>
+        <div id="cart-delivery-charge-row" class="mb-2 flex justify-between text-xs text-slate-500">
+            <span>Delivery</span>
+            <span id="cart-delivery-charge-drawer">Rs0.00</span>
+        </div>
+        <div id="cart-service-charge-row" class="mb-2 flex justify-between text-xs text-slate-500">
+            <span id="cart-service-charge-label">&#8505;&#65039; Service Charge (0%)</span>
+            <span id="cart-service-charge-drawer">Rs0.00</span>
+        </div>
+        <div class="mb-3 flex justify-between text-sm font-bold text-slate-900">
+            <span>Total</span>
+            <span id="cart-total-drawer">Rs0.00</span>
+        </div>
+        <a href="<?php echo e(route('frontend.checkout')); ?>"
+           class="flex items-center justify-center gap-2 w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl text-sm mb-2">
+            <i class="fa-solid fa-lock text-xs"></i> Proceed to Checkout
+        </a>
+        <a href="<?php echo e(route('frontend.cart')); ?>"
+           class="flex items-center justify-center gap-2 w-full border border-gray-200 text-blue-700 font-semibold py-2.5 rounded-xl text-sm hover:bg-gray-50">
+            View Full Cart
+        </a>
+    </div>
+</div>
+
+<!-- Header -->
+<header class="fixed inset-x-0 top-0 z-[9997] bg-white shadow-sm">
+    <div class="hidden md:flex bg-blue-900 text-white text-xs py-2 px-8 items-center justify-center font-medium h-8 text-center">
+        <span>FarmSea Premium Meat & Seafood</span>
+    </div>
+    <div class="w-full px-2 sm:px-3 md:px-4 py-3 flex items-center justify-between gap-4">
+        <button onclick="toggleSidebar()" class="text-gray-700 text-xl lg:hidden">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <a href="<?php echo e(route('frontend.home')); ?>" class="flex-shrink-0 md:ml-[100px] flex items-center">
+            <img src="<?php echo e($brandLogoUrl); ?>"
+                 alt="FarmSea"
+                 class="h-10 w-auto object-contain"
+                 onerror="this.style.display='none'; document.getElementById('header-logo-fallback').style.display='inline-flex'">
+            <span id="header-logo-fallback" class="hidden text-xl font-extrabold text-green-700">FarmSea</span>
+        </a>
+        <form action="<?php echo e(route('frontend.products')); ?>" method="GET" class="hidden md:flex flex-grow max-w-lg mx-4 relative">
+            <input type="text" name="search" placeholder="Search Ready to Cook Items"
+                   class="w-full border border-gray-200 rounded-xl px-5 py-2.5 text-sm focus:outline-none focus:border-green-500 transition">
+            <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-600">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </form>
+        <div class="flex items-center gap-4 pr-4 md:pr-7">
+            <!-- Account -->
+            <div class="relative">
+                <?php if(auth()->guard('web_frontend')->check()): ?>
+                    <?php
+                        $frontendTotalNotifications = \App\Models\Notification::query()
+                            ->forUser(auth('web_frontend')->id())
+                            ->count();
+                        $frontendUnreadNotifications = \App\Models\Notification::query()
+                            ->where('recipient_id', auth('web_frontend')->id())
+                            ->whereNull('read_at')
+                            ->count();
+                    ?>
+                <?php endif; ?>
+                <button onclick="toggleAccountMenu()" class="text-gray-700 flex flex-col items-center group">
+                    <span class="relative">
+                        <i class="fa-regular fa-user text-xl group-hover:text-blue-600"></i>
+                        <?php if(auth()->guard('web_frontend')->check()): ?>
+                            <?php if($frontendUnreadNotifications > 0): ?>
+                                <span class="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-black leading-none text-white ring-2 ring-white">
+                                    <?php echo e($frontendUnreadNotifications > 99 ? '99+' : $frontendUnreadNotifications); ?>
+
+                                </span>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                    </span>
+                    <span class="text-[10px] font-bold mt-0.5 hidden md:block">
+                        <?php if(auth()->guard('web_frontend')->check()): ?> Hello, <?php echo e(Str::limit(auth('web_frontend')->user()->name, 12)); ?> <?php else: ?> Sign in/Account <?php endif; ?>
+                    </span>
+                </button>
+                <div id="accountMenu" class="hidden absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-3 z-50">
+                    <?php if(auth()->guard('web_frontend')->check()): ?>
+                        <a href="<?php echo e(route('frontend.profile')); ?>" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
+                            <i class="fa-regular fa-user text-gray-500"></i> My Profile
+                        </a>
+                        <a href="<?php echo e(route('frontend.profile')); ?>#notifications-panel" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
+                            <i class="fa-regular fa-bell text-gray-500"></i>
+                            Notifications
+                            <?php if($frontendTotalNotifications > 0): ?>
+                                <span class="ml-auto rounded-full <?php echo e($frontendUnreadNotifications > 0 ? 'bg-red-500 text-white' : 'bg-slate-100 text-slate-600'); ?> px-2 py-0.5 text-[10px] font-bold">
+                                    <?php echo e($frontendTotalNotifications > 99 ? '99+' : $frontendTotalNotifications); ?>
+
+                                </span>
+                            <?php endif; ?>
+                        </a>
+                        <a href="<?php echo e(route('frontend.orders')); ?>" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
+                            <i class="fa-solid fa-box text-gray-500"></i> My Orders
+                        </a>
+                        <hr class="my-2">
+                        <form method="POST" action="<?php echo e(route('frontend.logout')); ?>">
+                            <?php echo csrf_field(); ?>
+                            <button type="submit" class="w-full flex items-center gap-3 px-5 py-2 text-red-500 hover:bg-red-50 text-sm">
+                                <i class="fa-solid fa-right-from-bracket"></i> Logout
+                            </button>
+                        </form>
+                    <?php else: ?>
+                        <a href="<?php echo e(route('frontend.login')); ?>" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
+                            <i class="fa-solid fa-right-to-bracket text-gray-500"></i> Sign In
+                        </a>
+                        <a href="<?php echo e(route('frontend.register')); ?>" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
+                            <i class="fa-solid fa-user-plus text-gray-500"></i> Register
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <!-- Cart -->
+            <button onclick="openCart()" class="text-blue-700 relative flex flex-col items-center group">
+                <div class="relative">
+                    <i class="fa-solid fa-cart-shopping text-xl group-hover:text-blue-800"></i>
+                    <span id="header-cart-badge"
+                          class="absolute -top-2 -right-2 bg-yellow-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-black border border-white">0</span>
+                </div>
+                <span class="text-[10px] font-bold mt-0.5 hidden md:block">Cart</span>
+            </button>
+        </div>
+    </div>
+    <div class="px-3 pb-3 md:hidden">
+        <form action="<?php echo e(route('frontend.products')); ?>" method="GET" class="relative">
+            <input type="text" name="search" placeholder="Search fresh items"
+                   class="w-full rounded-xl border border-gray-200 px-4 py-2.5 pr-11 text-sm focus:border-green-500 focus:outline-none transition">
+            <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-600">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </form>
+    </div>
+    <!-- Nav strip -->
+    <div class="border-t border-gray-100 hidden md:block overflow-visible bg-white">
+        <div class="max-w-screen-xl mx-auto px-4 flex items-center gap-1 h-10 text-sm scrollbar-hide overflow-visible">
+            <a href="<?php echo e(route('frontend.products')); ?>" class="px-3 py-1.5 bg-gray-100 text-gray-600 font-semibold whitespace-nowrap rounded-md flex-shrink-0">All Products</a>
+            <?php $__currentLoopData = $frontendNavCategories ?? collect(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php if($category->children->isNotEmpty()): ?>
+                    <div class="header-nav-group relative mr-2 flex-shrink-0">
+                        <a href="<?php echo e(route('frontend.products', ['category' => $category->slug])); ?>" class="inline-flex items-center gap-2 rounded-md bg-green-50 px-3 py-1.5 font-medium text-green-700 transition hover:bg-green-100">
+                            <?php echo e($category->name); ?>
+
+                            <i class="fa-solid fa-angle-down text-xs"></i>
+                        </a>
+                        <div class="header-nav-dropdown absolute left-0 top-full z-[10010] mt-3 min-w-[230px] space-y-1 rounded-2xl border border-green-100 bg-white p-2 shadow-[0_20px_40px_rgba(15,23,42,0.14)]">
+                            <a href="<?php echo e(route('frontend.products', ['category' => $category->slug])); ?>" class="block rounded-xl px-4 py-3 text-[15px] font-semibold text-green-700 transition hover:bg-green-50">All <?php echo e($category->name); ?></a>
+                            <?php $__currentLoopData = $category->children; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subcategory): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <a href="<?php echo e(route('frontend.products', ['category' => $category->slug, 'subcategory' => $subcategory->slug])); ?>" class="block rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 transition hover:bg-green-50 hover:text-green-700"><?php echo e($subcategory->name); ?></a>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <a href="<?php echo e(route('frontend.products', ['category' => $category->slug])); ?>" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-green-50 rounded-md flex-shrink-0"><?php echo e($category->name); ?></a>
+                <?php endif; ?>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            <span class="ml-auto"></span>
+            <a href="<?php echo e(route('frontend.orders')); ?>" class="inline-flex items-center gap-2 px-3 py-1.5 font-extrabold text-green-700 whitespace-nowrap rounded-md transition hover:bg-green-50">
+                <i class="fa-solid fa-rotate-left text-[13px]"></i>
+                Reorder
+            </a>
+            <a href="<?php echo e(route('frontend.products')); ?>" class="px-3 py-1.5 text-slate-700 font-semibold whitespace-nowrap rounded-md transition hover:bg-slate-100">Recommended</a>
+        </div>
+    </div>
+</header>
+
+<div class="pt-[74px] md:pt-[138px]">
+    <!-- Flash Messages -->
+    <?php if(session('success')): ?>
+        <div data-auto-dismiss="3000" class="mx-4 mt-3 flex items-center gap-2 rounded-lg bg-green-100 p-3 text-sm text-green-700 transition-all duration-500">
+            <i class="fa-solid fa-circle-check"></i> <?php echo e(session('success')); ?>
+
+        </div>
+    <?php endif; ?>
+    <?php if(session('error')): ?>
+        <div data-auto-dismiss="3000" class="mx-4 mt-3 flex items-center gap-2 rounded-lg bg-red-100 p-3 text-sm text-red-700 transition-all duration-500">
+            <i class="fa-solid fa-circle-xmark"></i> <?php echo e(session('error')); ?>
+
+        </div>
+    <?php endif; ?>
+
+    <!-- Main Content -->
+    <main class="flex-1">
+        <?php echo $__env->yieldContent('content'); ?>
+    </main>
+</div>
+
+<!-- Footer -->
+<footer class="relative overflow-hidden bg-[#0f172b] pt-10 md:pt-12 lg:pt-14 pb-5 md:pb-6 lg:pb-7 text-white" style="font-family:'Poppins',sans-serif;">
+    <div class="relative z-10 mx-auto max-w-[1220px] px-5 sm:px-6 lg:px-8">
+        <div class="border-b border-white/6 pb-5 lg:pb-7">
+            <div class="max-w-[430px]">
+                <h4 class="mb-3 text-[14px] font-semibold text-white">About FarmSea</h4>
+                <p class="text-[13px] leading-[1.5] text-[#94a7c6]">
+                    FarmSea brings farm-fresh chicken, premium mutton, and fresh seafood directly to your doorstep.
+                    We ensure hygienic processing, quality cuts, and same-day delivery for the freshest experience.
+                </p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-x-6 gap-y-7 py-6 lg:grid-cols-[1fr_1fr_1fr_1fr_180px] lg:gap-x-8 lg:gap-y-6 lg:py-7">
+            <div>
+                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Info</h4>
+                <ul class="space-y-3.5">
+                    <li><a href="<?php echo e(route('frontend.about')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">About Us</a></li>
+                    <li><a href="<?php echo e(route('frontend.contact')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Contact Us</a></li>
+                    <li><a href="<?php echo e(route('frontend.farms')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Our Farms</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Useful Links</h4>
+                <ul class="space-y-3.5">
+                    <li><a href="<?php echo e(route('frontend.contact')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Help Center</a></li>
+                    <li><a href="<?php echo e(route('frontend.shipping')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Shipping Info</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Categories</h4>
+                <ul class="space-y-3.5">
+                    <li><a href="<?php echo e(route('frontend.products', ['category' => 'Chicken'])); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Chicken</a></li>
+                    <li><a href="<?php echo e(route('frontend.products', ['category' => 'Mutton'])); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Mutton</a></li>
+                    <li><a href="<?php echo e(route('frontend.products', ['category' => 'Fish'])); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Fish &amp; Seafood</a></li>
+                    <li><a href="<?php echo e(route('frontend.products')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Ready to Cook</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Reach Us</h4>
+                <p class="mb-3 text-[14px] text-[#9bb0cf]">Delhi NCR, India</p>
+                <a href="tel:+919876543210" class="mb-2 block text-[15px] font-semibold text-white transition hover:text-[#26c95a]">+91 98765 43210</a>
+                <a href="mailto:support@farmsea.com" class="mb-4 block text-[14px] text-[#9bb0cf] transition hover:text-white">support@farmsea.com</a>
+                <div class="flex items-center gap-3.5 text-[15px] text-[#9bb0cf]">
+                    <a href="#" class="transition hover:text-white" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                    <a href="#" class="transition hover:text-white" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+
+            <div class="col-span-2 lg:col-span-1">
+                <div class="flex h-full min-h-[140px] flex-col items-center justify-center rounded-[14px] border border-[#175f49] bg-[#112d35] px-5 py-6 text-center">
+                    <i class="fa-solid fa-drumstick-bite mb-3 text-[22px] text-[#1dd15a]"></i>
+                    <h5 class="text-[13px] font-bold uppercase leading-none text-white">Fresh &amp; Hygienic</h5>
+                    <p class="mt-2 text-[12px] text-[#8ba7ba]">Farm to Home Delivery</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-4 border-t border-white/6 pt-4 text-center sm:pt-5 md:flex-row md:items-center md:justify-between md:text-left">
+            <p class="text-[10px] uppercase tracking-[0.2em] text-[#84a0c3]">
+                &copy; <?php echo e(date('Y')); ?> FarmSea - Fresh Meat &amp; Seafood Delivered
+            </p>
+            <div class="flex min-h-7 flex-wrap items-center justify-center gap-4 md:justify-end">
+                <span class="inline-flex h-7 w-[58px] items-center justify-center rounded bg-white px-2 shadow-sm ring-1 ring-white/20" aria-label="Visa">
+                    <span class="font-sans text-[18px] font-black italic leading-none tracking-[-0.02em] text-[#1434cb]">VISA</span>
+                </span>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" class="block h-6 w-[78px] object-contain opacity-80" alt="Mastercard">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="block h-6 w-[72px] object-contain opacity-80" alt="PayPal">
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+// Sidebar
+function toggleSidebar() {
+    document.getElementById('mobile-sidebar').classList.toggle('sidebar-open');
+    document.getElementById('sidebar-overlay').classList.toggle('active');
+}
+
+function toggleMobileCategory(categoryId) {
+    const panel = document.getElementById(`mobile-category-${categoryId}`);
+    const icon = document.getElementById(`mobile-category-icon-${categoryId}`);
+
+    if (!panel) {
+        return;
+    }
+
+    panel.classList.toggle('hidden');
+    icon?.classList.toggle('rotate-180');
+}
+// Account menu
+function toggleAccountMenu() {
+    document.getElementById('accountMenu').classList.toggle('hidden');
+}
+document.querySelectorAll('[data-auto-dismiss]').forEach((notice) => {
+    const delay = Number(notice.dataset.autoDismiss || 3000);
+
+    window.setTimeout(() => {
+        notice.classList.add('opacity-0', '-translate-y-2');
+
+        window.setTimeout(() => {
+            notice.remove();
+        }, 500);
+    }, delay);
+});
+
+document.addEventListener('click', function(e) {
+    const menu = document.getElementById('accountMenu');
+    if (menu && !menu.contains(e.target) && !e.target.closest('[onclick="toggleAccountMenu()"]')) {
+        menu.classList.add('hidden');
+    }
+});
+// Cart drawer
+function openCart() {
+    document.getElementById('cart-overlay').classList.remove('hidden');
+    document.getElementById('cart-drawer').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    refreshCartDrawer();
+}
+function closeCart() {
+    document.getElementById('cart-overlay').classList.add('hidden');
+    document.getElementById('cart-drawer').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+let cartToastTimeout;
+
+function showCartAddedAlert(message = 'Add to Cart') {
+    let toast = document.getElementById('cart-added-toast');
+
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'cart-added-toast';
+        toast.className = 'pointer-events-none fixed right-4 top-[88px] z-[10050] opacity-0 transition-all duration-300';
+        toast.style.transform = 'translateY(-14px) scale(0.96)';
+        toast.innerHTML = `
+            <div class="flex min-w-[240px] items-center gap-3 rounded-2xl border border-emerald-200 bg-white px-4 py-3.5 shadow-[0_24px_50px_rgba(15,23,42,0.22)] ring-1 ring-emerald-50">
+                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-sm">
+                    <i class="fa-solid fa-check text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-600">Success</p>
+                    <p id="cart-added-toast-message" class="mt-0.5 text-sm font-bold text-slate-900">Add to Cart</p>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+    }
+
+    const messageNode = document.getElementById('cart-added-toast-message');
+    if (messageNode) {
+        messageNode.textContent = message;
+    }
+
+    clearTimeout(cartToastTimeout);
+    toast.classList.remove('opacity-0');
+    toast.classList.add('opacity-100');
+    toast.style.transform = 'translateY(0) scale(1)';
+
+    cartToastTimeout = setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+        toast.style.transform = 'translateY(-14px) scale(0.96)';
+    }, 1800);
+}
+// Add to cart (AJAX)
+function addToCart(productId, variantIndex, pricingDay = 'today') {
+    fetch('<?php echo e(route("frontend.cart.add")); ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({ product_id: productId, quantity: 1, variant_index: variantIndex ?? null, pricing_day: pricingDay })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (!data.success) {
+            alert(data.message || 'This product is currently unavailable.');
+            return;
+        }
+
+        document.getElementById('header-cart-badge').textContent = data.cart_count;
+        showCartAddedAlert('Add to Cart');
+    });
+}
+function formatCartCurrency(amount) {
+    return 'Rs' + Number(amount || 0).toFixed(2);
+}
+function renderCartDrawerItems(items) {
+    const container = document.getElementById('cart-items-drawer');
+
+    if (!items || !items.length) {
+        container.innerHTML = '<p class="text-center text-gray-400 py-8">Your cart is empty</p>';
+        return;
+    }
+
+    container.innerHTML = items.map((item) => `
+        <div class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
+            <div class="flex gap-3">
+                <a href="${item.product_url}" class="h-20 w-20 overflow-hidden rounded-xl bg-gray-100 flex-shrink-0">
+                    ${item.image_url
+                        ? `<img src="${item.image_url}" alt="${item.name}" class="h-full w-full object-cover">`
+                        : '<div class="flex h-full w-full items-center justify-center text-2xl text-gray-300"><i class="fa-solid fa-drumstick-bite"></i></div>'}
+                </a>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <a href="${item.product_url}" class="line-clamp-2 text-sm font-bold leading-5 text-slate-900 hover:text-blue-700">
+                            ${item.name}
+                        </a>
+                        <button onclick="removeCartDrawerItem('${item.key}')" class="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 transition hover:bg-red-50 hover:text-red-500">
+                            <i class="fa-solid fa-xmark text-xs"></i>
+                        </button>
+                    </div>
+                    <p class="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+                        ${item.variant_label || item.unit || 'Fresh Cut'}
+                    </p>
+                    <div class="mt-3 flex items-end justify-between gap-3">
+                        <div>
+                            <p class="text-sm font-black text-slate-900">${formatCartCurrency(item.price)}</p>
+                            <div class="mt-2 inline-flex items-center overflow-hidden rounded-lg border border-gray-200 bg-white">
+                                <button onclick="updateCartDrawerQty('${item.key}', ${item.quantity - 1})" class="flex h-8 w-8 items-center justify-center text-gray-500 transition hover:bg-gray-50 hover:text-red-500">
+                                    <i class="fa-solid fa-minus text-[10px]"></i>
+                                </button>
+                                <span class="flex h-8 min-w-[34px] items-center justify-center border-x border-gray-200 px-2 text-xs font-bold text-slate-700">
+                                    ${item.quantity}
+                                </span>
+                                <button onclick="updateCartDrawerQty('${item.key}', ${item.quantity + 1})" class="flex h-8 w-8 items-center justify-center text-gray-500 transition hover:bg-gray-50 hover:text-green-600">
+                                    <i class="fa-solid fa-plus text-[10px]"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-sm font-extrabold text-blue-700">${formatCartCurrency(item.subtotal)}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+function removeCartDrawerItem(key) {
+    fetch('<?php echo e(route("frontend.cart.remove")); ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({ key })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            refreshCartDrawer();
+        }
+    });
+}
+function updateCartDrawerQty(key, quantity) {
+    fetch('<?php echo e(route("frontend.cart.update")); ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({ key, quantity })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            refreshCartDrawer();
+        }
+    });
+}
+function updateCartDrawerDeliverySlot(value) {
+    fetch('<?php echo e(route("frontend.cart.delivery-slot")); ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({ delivery_slot: value })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            refreshCartDrawer();
+        }
+    });
+}
+
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    }[char]));
+}
+
+function renderDrawerDeliverySlots(options = [], selectedValue = '') {
+    const container = document.getElementById('drawer-delivery-slot-options');
+
+    if (!container) {
+        return;
+    }
+
+    if (!options.length) {
+        container.innerHTML = `
+            <span class="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-2 text-[10px] font-bold leading-none text-amber-700">
+                No slots left for today
+            </span>
+        `;
+        return;
+    }
+
+    container.innerHTML = options.map((slot) => {
+        const isActive = slot.value === selectedValue;
+        const classes = isActive
+            ? 'border-green-600 bg-white text-green-700 shadow-sm'
+            : 'border-green-100 bg-white/80 text-slate-600';
+
+        return `
+            <button
+                type="button"
+                onclick="updateCartDrawerDeliverySlot('${escapeHtml(slot.value)}')"
+                data-drawer-delivery-slot="${escapeHtml(slot.value)}"
+                class="drawer-delivery-slot-chip ${classes} rounded-full border px-2.5 py-2 text-[10px] font-bold leading-none transition hover:border-green-400 hover:text-green-700"
+            >
+                ${escapeHtml(slot.label)}
+            </button>
+        `;
+    }).join('');
+}
+
+// Refresh cart drawer
+function refreshCartDrawer() {
+    fetch('<?php echo e(route("frontend.cart.count")); ?>')
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('header-cart-badge').textContent = data.count;
+            document.getElementById('cart-badge-drawer').textContent = data.count + ' item' + (data.count !== 1 ? 's' : '');
+            document.getElementById('cart-subtotal-drawer').textContent = formatCartCurrency(data.subtotal);
+            const chargePercent = Number(data.service_charge_percent || 0);
+            const chargePercentText = chargePercent.toFixed(chargePercent % 1 === 0 ? 0 : 2).replace(/\.?0+$/, '');
+            document.getElementById('cart-delivery-charge-drawer').textContent = formatCartCurrency(data.delivery_charge);
+            document.getElementById('cart-service-charge-label').textContent = '\u2139\uFE0F Service Charge (' + chargePercentText + '%)';
+            document.getElementById('cart-service-charge-drawer').textContent = formatCartCurrency(data.service_charge);
+            document.getElementById('cart-delivery-charge-row')?.classList.toggle('hidden', Number(data.delivery_charge || 0) <= 0);
+            document.getElementById('cart-service-charge-row')?.classList.toggle('hidden', Number(data.service_charge || 0) <= 0);
+            document.getElementById('cart-total-drawer').textContent = formatCartCurrency(data.total);
+            const drawerSlotLabel = document.getElementById('drawer-delivery-slot-label');
+            if (drawerSlotLabel) {
+                drawerSlotLabel.textContent = data.selected_delivery_slot_label || '';
+            }
+            const drawerDayLabel = document.getElementById('drawer-delivery-day-label');
+            if (drawerDayLabel) {
+                drawerDayLabel.textContent = data.delivery_day_label || 'Today';
+            }
+            renderDrawerDeliverySlots(data.delivery_slot_options || [], data.selected_delivery_slot || '');
+            document.querySelectorAll('[data-drawer-delivery-slot]').forEach((chip) => {
+                const isActive = chip.dataset.drawerDeliverySlot === data.selected_delivery_slot;
+                chip.classList.toggle('border-green-600', isActive);
+                chip.classList.toggle('bg-white', isActive);
+                chip.classList.toggle('text-green-700', isActive);
+                chip.classList.toggle('shadow-sm', isActive);
+                chip.classList.toggle('border-green-100', !isActive);
+                chip.classList.toggle('bg-white/80', !isActive);
+                chip.classList.toggle('text-slate-600', !isActive);
+            });
+            renderCartDrawerItems(data.items || []);
+        });
+}
+// Init badge
+refreshCartDrawer();
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
+</script>
+<?php echo $__env->yieldContent('scripts'); ?>
+</body>
+</html>
+<?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views/frontend/layouts/app.blade.php ENDPATH**/ ?>

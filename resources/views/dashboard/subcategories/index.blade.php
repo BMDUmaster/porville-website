@@ -271,6 +271,8 @@
 
 @section('scripts')
 <script>
+const subcategoryUpdateUrlTemplate = @json(route('dashboard.subcategories.update', ['subcategory' => '__ID__']));
+
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
 function openEditModal(id, name, parentId, status, desc) {
@@ -278,7 +280,7 @@ function openEditModal(id, name, parentId, status, desc) {
     document.getElementById('editDesc').value   = desc;
     document.getElementById('editParent').value = parentId;
     document.getElementById('editStatus').value = status === 'active' ? '1' : '0';
-    document.getElementById('editForm').action  = '/subcategories/' + id;
+    document.getElementById('editForm').action  = subcategoryUpdateUrlTemplate.replace('__ID__', encodeURIComponent(id));
     openModal('editModal');
 }
 </script>

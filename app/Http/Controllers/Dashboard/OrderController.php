@@ -25,6 +25,7 @@ class OrderController extends Controller
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
+        $this->applyDateFilter($query, $request);
 
         $orders = $query->latest()->paginate(20);
         $deliveryBoysByOrder = $orders->getCollection()->mapWithKeys(function (Order $order) {
@@ -99,12 +100,10 @@ class OrderController extends Controller
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
-        if ($request->filled('date_from')) {
-            $query->whereDate('created_at', '>=', $request->date_from);
+        if ($request->filled('order_id')) {
+            $query->where('id', preg_replace('/\D+/', '', (string) $request->order_id));
         }
-        if ($request->filled('date_to')) {
-            $query->whereDate('created_at', '<=', $request->date_to);
-        }
+        $this->applyDateFilter($query, $request);
 
         $stats = [
             'today'     => Order::whereDate('created_at', today())->count(),
@@ -206,5 +205,35 @@ class OrderController extends Controller
             })
             ->orderBy('partner_name')
             ->get();
+    }
+
+    private function applyDateFilter($query, Request $request): void
+    {
+        $dateFilter = $request->input('date_filter');
+
+        if ($dateFilter === 'today') {
+            $query->whereDate('created_at', today());
+            return;
+        }
+
+        if ($dateFilter === 'last_7_days') {
+            $query->whereBetween('created_at', [now()->subDays(6)->startOfDay(), now()->endOfDay()]);
+            return;
+        }
+
+        if ($dateFilter === 'last_30_days') {
+            $query->whereBetween('created_at', [now()->subDays(29)->startOfDay(), now()->endOfDay()]);
+            return;
+        }
+
+        if ($dateFilter === 'custom') {
+            if ($request->filled('date_from')) {
+                $query->whereDate('created_at', '>=', $request->date_from);
+            }
+
+            if ($request->filled('date_to')) {
+                $query->whereDate('created_at', '<=', $request->date_to);
+            }
+        }
     }
 }

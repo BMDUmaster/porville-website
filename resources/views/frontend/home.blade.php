@@ -141,7 +141,7 @@
 
 {{-- Hero Slider --}}
 @php
-    $heroSlides = [
+    $defaultHeroSlides = [
         [
             'image' => 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1800&q=80',
             'badge' => 'Farm Fresh Daily',
@@ -173,6 +173,20 @@
             'link' => route('frontend.products', ['category' => 'Fish']),
         ],
     ];
+
+    $heroSlides = ($homeBanners ?? collect())->map(fn ($banner) => [
+        'image' => $banner->image_url,
+        'badge' => $banner->badge,
+        'title_1' => $banner->title_1,
+        'title_2' => $banner->title_2,
+        'description' => $banner->description,
+        'button' => $banner->button_text ?: 'Shop Now',
+        'link' => $banner->link_url ?: route('frontend.products'),
+    ])->values()->all();
+
+    if (empty($heroSlides)) {
+        $heroSlides = $defaultHeroSlides;
+    }
 @endphp
 
 <section class="relative bg-[#0a0f1a] px-0 py-0">
@@ -398,9 +412,9 @@
                         </a>
                         <div class="mt-auto flex items-center justify-between pt-3">
                             <div>
-                                <p class="text-lg font-extrabold text-gray-800">Rs{{ number_format($product->price, 0) }}<span class="ml-1 text-xs font-semibold text-gray-400">/{{ $product->unit ?: 'unit' }}</span></p>
-                                @if($product->mrp && $product->mrp > $product->price)
-                                    <p class="text-xs text-gray-400 line-through">Rs{{ number_format($product->mrp, 0) }}</p>
+                                <p class="text-lg font-extrabold text-gray-800">Rs{{ number_format($product->display_price, 0) }}<span class="ml-1 text-xs font-semibold text-gray-400">{{ $product->display_pack_label }}</span></p>
+                                @if($product->display_mrp && $product->display_mrp > $product->display_price)
+                                    <p class="text-xs text-gray-400 line-through">Rs{{ number_format($product->display_mrp, 0) }}</p>
                                 @endif
                             </div>
                             @if($product->is_active)
@@ -581,9 +595,9 @@
                             </p>
                             <div class="mt-5 flex items-end justify-between gap-4">
                                 <div>
-                                    <p class="text-[20px] font-black text-slate-950">Rs{{ number_format($typeShowcaseLead->price, 0) }}<span class="ml-1 text-xs font-semibold text-slate-400">/{{ $typeShowcaseLead->unit ?: 'unit' }}</span></p>
-                                    @if($typeShowcaseLead->mrp && $typeShowcaseLead->mrp > $typeShowcaseLead->price)
-                                        <p class="text-xs text-slate-400 line-through">Rs{{ number_format($typeShowcaseLead->mrp, 0) }}</p>
+                                    <p class="text-[20px] font-black text-slate-950">Rs{{ number_format($typeShowcaseLead->display_price, 0) }}<span class="ml-1 text-xs font-semibold text-slate-400">{{ $typeShowcaseLead->display_pack_label }}</span></p>
+                                    @if($typeShowcaseLead->display_mrp && $typeShowcaseLead->display_mrp > $typeShowcaseLead->display_price)
+                                        <p class="text-xs text-slate-400 line-through">Rs{{ number_format($typeShowcaseLead->display_mrp, 0) }}</p>
                                     @endif
                                 </div>
                                 @if($typeShowcaseLead->is_active)
@@ -647,7 +661,7 @@
                                     {{ $product->name }}
                                 </a>
                                 <div class="mt-3 flex items-end justify-between gap-3">
-                                    <p class="text-[17px] font-black text-slate-950">Rs{{ number_format($product->price, 0) }}<span class="ml-1 text-[11px] font-semibold text-slate-400">/{{ $product->unit ?: 'unit' }}</span></p>
+                                    <p class="text-[17px] font-black text-slate-950">Rs{{ number_format($product->display_price, 0) }}<span class="ml-1 text-[11px] font-semibold text-slate-400">{{ $product->display_pack_label }}</span></p>
                                     @if($product->is_active)
                                         <button onclick="addToCart({{ $product->id }})" class="rounded-lg border border-[#dbe8d7] bg-[#f8fbf6] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-green-700 transition duration-300 hover:border-green-300 hover:bg-green-50 group-hover:-translate-y-0.5 group-hover:shadow-sm">
                                             + Add
@@ -827,7 +841,6 @@
                 @php
                     $favoriteImage = $product->images && count($product->images) ? asset('storage/' . $product->images[0]) : null;
                     $favoriteLabel = $favoriteLabels[$index % count($favoriteLabels)];
-                    $favoriteUnit = $product->unit ?: 'unit';
                 @endphp
 
                 <article class="favorite-card group min-w-[255px] max-w-[255px] rounded-[28px] p-3">
@@ -871,9 +884,9 @@
 
                         <div class="mt-6 flex items-end justify-between gap-3">
                             <div>
-                                <p class="text-[18px] font-black text-slate-950">Rs{{ number_format($product->price, 0) }}<span class="ml-1 text-[11px] font-semibold text-slate-400">/{{ $favoriteUnit }}</span></p>
-                                @if($product->mrp && $product->mrp > $product->price)
-                                    <p class="text-xs text-slate-400 line-through">Rs{{ number_format($product->mrp, 0) }}</p>
+                                <p class="text-[18px] font-black text-slate-950">Rs{{ number_format($product->display_price, 0) }}<span class="ml-1 text-[11px] font-semibold text-slate-400">{{ $product->display_pack_label }}</span></p>
+                                @if($product->display_mrp && $product->display_mrp > $product->display_price)
+                                    <p class="text-xs text-slate-400 line-through">Rs{{ number_format($product->display_mrp, 0) }}</p>
                                 @endif
                             </div>
                             @if($product->is_active)

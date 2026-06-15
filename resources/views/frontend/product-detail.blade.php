@@ -52,19 +52,21 @@
         $displayUnit = $cleanUnit !== '' ? ($cleanUnit === 'Pc' ? 'Pcs' : $cleanUnit) : 'unit';
 
         if ($cleanQuantity !== '') {
-            return $cleanQuantity . ' /' . $displayUnit;
+            return $cleanQuantity . ' ' . $displayUnit;
         }
 
         if ($cleanPiece !== '' && ! preg_match('/[A-Za-z]/', $cleanPiece)) {
-            return $cleanPiece . ' /' . $displayUnit;
+            return $cleanPiece . ' ' . $displayUnit;
         }
 
-        return '/' . $displayUnit;
+        return $displayUnit;
     };
 
     $variantPayload = $variantCollection->map(function ($variant) use ($formatPriceUnit, $formatVariantLabel) {
         $baseSellingPrice = (float) ($variant['selling_price'] ?? 0);
         $mrp = (float) ($variant['mrp'] ?? $baseSellingPrice);
+        $rawTomorrowPrice = $variant['tomorrow_price'] ?? null;
+        $tomorrowAvailable = $rawTomorrowPrice !== null && $rawTomorrowPrice !== '' && (float) $rawTomorrowPrice > 0;
         $todayPrice = \App\Support\ProductDayPricing::sellingPrice($variant, 'today', $baseSellingPrice);
         $tomorrowPrice = \App\Support\ProductDayPricing::sellingPrice($variant, 'tomorrow', $baseSellingPrice);
 
@@ -78,6 +80,7 @@
             'mrp' => $mrp,
             'today_price' => $todayPrice,
             'tomorrow_price' => $tomorrowPrice,
+            'tomorrow_available' => $tomorrowAvailable,
             'today_offer' => round(\App\Support\ProductDayPricing::saveOfferPercent($variant, 'today', $mrp)),
             'tomorrow_offer' => round(\App\Support\ProductDayPricing::saveOfferPercent($variant, 'tomorrow', $mrp)),
         ];
@@ -262,8 +265,8 @@
     ];
 @endphp
 
-<div class="mx-auto max-w-7xl px-4 py-6 md:px-6 md:py-8">
-    <div class="mb-5 flex flex-wrap items-center justify-between gap-3 text-[11px] font-semibold text-slate-400">
+<div class="mx-auto max-w-7xl px-4 py-8 md:px-6 md:py-8">
+    <div class="mb-5 hidden flex-wrap items-center justify-between gap-3 text-[11px] font-semibold text-slate-400 md:flex">
         <nav class="flex items-center gap-2">
             <a href="{{ route('frontend.home') }}" class="transition hover:text-green-700">Home</a>
             <i class="fa-solid fa-angle-right text-[9px]"></i>
@@ -487,6 +490,8 @@
                 </button>
             </div>
 
+            @include('frontend.partials.similar-products', ['wrapperClass' => 'mt-3 md:hidden'])
+
             <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 @foreach($trustHighlights as $highlight)
                     <div class="rounded-2xl border border-slate-200 bg-white px-4 py-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
@@ -650,50 +655,7 @@
         @endif
     </div>
 
-    @if($similar->count())
-        <div class="mt-10">
-            <div class="mb-5 flex items-center justify-between gap-3">
-                <h2 class="text-[24px] font-black text-slate-900">
-                    Similar <span class="text-[#2f8c43]">Products</span>
-                </h2>
-                <a href="{{ route('frontend.products', ['category' => $product->category->slug ?? null]) }}" class="text-[12px] font-black uppercase tracking-[0.18em] text-[#2d72d3] transition hover:text-[#1f5bb4]">
-                    View All
-                </a>
-            </div>
-
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                @foreach($similar as $item)
-                    <a href="{{ route('frontend.product.show', $item->slug) }}"
-                       class="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-green-200 hover:shadow-[0_18px_35px_rgba(15,23,42,0.1)]">
-                        <div class="relative aspect-[1/0.9] overflow-hidden bg-[#f4f5ef]">
-                            @if(in_array($item->id, $newArrivalProductIds ?? [], true))
-                                <span class="absolute left-3 top-3 z-10 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
-                                    New Arrival
-                                </span>
-                            @endif
-                            @if($item->images && count($item->images))
-                                <img src="{{ asset('storage/' . $item->images[0]) }}" alt="{{ $item->name }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
-                            @else
-                                <div class="flex h-full w-full items-center justify-center text-4xl text-slate-300">
-                                    <i class="fa-solid fa-drumstick-bite"></i>
-                                </div>
-                            @endif
-                        </div>
-                        <div class="p-4">
-                            <div class="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">{{ $item->category->name ?? 'Fresh cut' }}</div>
-                            <div class="mt-2 line-clamp-2 text-[13px] font-black leading-5 text-slate-900">{{ $item->name }}</div>
-                            <div class="mt-3 flex items-center gap-2">
-                                <span class="text-[16px] font-black text-slate-900">Rs{{ number_format($item->price, 0) }}</span>
-                                @if($item->mrp && $item->mrp > $item->price)
-                                    <span class="text-[12px] font-bold text-slate-400 line-through">Rs{{ number_format($item->mrp, 0) }}</span>
-                                @endif
-                            </div>
-                        </div>
-                    </a>
-                @endforeach
-            </div>
-        </div>
-    @endif
+    @include('frontend.partials.similar-products', ['wrapperClass' => 'mt-10 hidden md:block'])
 </div>
 
 @endsection
@@ -802,7 +764,45 @@ function activateDetailTab(tabName) {
 function getVariantDayPrice(variant, pricingDay) {
     if (!variant) return 0;
 
-    return Number(pricingDay === 'tomorrow' ? variant.tomorrow_price : variant.today_price) || Number(variant.selling_price) || 0;
+    const dayPrice = pricingDay === 'tomorrow' ? variant.tomorrow_price : variant.today_price;
+
+    if (dayPrice !== null && dayPrice !== undefined && dayPrice !== '') {
+        return Number(dayPrice);
+    }
+
+    return Number(variant.selling_price) || 0;
+}
+
+function isTomorrowAvailable(variant) {
+    if (!variant) return false;
+
+    return variant.tomorrow_available === true;
+}
+
+function syncPricingDayButtons() {
+    const variant = detailVariants[selectedVariant];
+    const tomorrowButton = document.querySelector('[data-pricing-day="tomorrow"]');
+    const tomorrowAvailable = isTomorrowAvailable(variant);
+
+    if (tomorrowButton) {
+        tomorrowButton.classList.toggle('hidden', !tomorrowAvailable);
+    }
+
+    if (!tomorrowAvailable && selectedPricingDay === 'tomorrow') {
+        selectedPricingDay = 'today';
+    }
+
+    document.querySelectorAll('[data-pricing-day]').forEach((button) => {
+        const isActive = button.dataset.pricingDay === selectedPricingDay;
+        button.classList.toggle('is-active', isActive);
+        button.classList.toggle('border-green-500', isActive);
+        button.classList.toggle('bg-white', isActive);
+        button.classList.toggle('text-green-700', isActive);
+        button.classList.toggle('shadow-sm', isActive);
+        button.classList.toggle('border-transparent', !isActive);
+        button.classList.toggle('bg-white/70', !isActive);
+        button.classList.toggle('text-slate-500', !isActive);
+    });
 }
 
 function getVariantDayOffer(variant, pricingDay) {
@@ -823,18 +823,7 @@ function refreshVariantDayPrices() {
 
 function selectPricingDay(pricingDay) {
     selectedPricingDay = pricingDay === 'tomorrow' ? 'tomorrow' : 'today';
-
-    document.querySelectorAll('[data-pricing-day]').forEach((button) => {
-        const isActive = button.dataset.pricingDay === selectedPricingDay;
-        button.classList.toggle('is-active', isActive);
-        button.classList.toggle('border-green-500', isActive);
-        button.classList.toggle('bg-white', isActive);
-        button.classList.toggle('text-green-700', isActive);
-        button.classList.toggle('shadow-sm', isActive);
-        button.classList.toggle('border-transparent', !isActive);
-        button.classList.toggle('bg-white/70', !isActive);
-        button.classList.toggle('text-slate-500', !isActive);
-    });
+    syncPricingDayButtons();
 
     refreshVariantDayPrices();
     selectVariant(selectedVariant);
@@ -844,6 +833,7 @@ function selectVariant(index) {
     selectedVariant = index;
     const variant = detailVariants[index];
     if (!variant) return;
+    syncPricingDayButtons();
 
     document.querySelectorAll('.variant-card').forEach((card, cardIndex) => {
         const isActive = cardIndex === index;
@@ -865,7 +855,7 @@ function selectVariant(index) {
     const activeOffer = getVariantDayOffer(variant, selectedPricingDay);
 
     if (currentPrice) currentPrice.textContent = Math.round(activePrice || 0);
-    if (currentPriceUnit) currentPriceUnit.textContent = variant.price_unit_label || '/{{ $product->unit ?: 'unit' }}';
+    if (currentPriceUnit) currentPriceUnit.textContent = variant.price_unit_label || '{{ $product->display_pack_label }}';
 
     const canShowDiscount = Number(variant.mrp || 0) > Number(activePrice || 0);
     const saveValue = Math.max(Number(variant.mrp || 0) - Number(activePrice || 0), 0);
@@ -935,5 +925,3 @@ activateDetailTab('{{ $initialDetailTab }}');
 applyProductImageZoom();
 </script>
 @endsection
-
-

@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\AppSetting;
 use DateInterval;
 use DateTimeImmutable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class DeliverySlotManager
@@ -54,6 +55,23 @@ class DeliverySlotManager
         }
 
         return array_values($slots);
+    }
+
+    public static function availableOptions(?Carbon $now = null): array
+    {
+        $now = ($now ?: Carbon::now(self::timezone()))->copy()->timezone(self::timezone());
+
+        return array_values(array_filter(self::options(), function (array $slot) use ($now) {
+            [$start] = array_pad(explode('-', (string) ($slot['value'] ?? ''), 2), 2, null);
+
+            if (! $start) {
+                return false;
+            }
+
+            $slotStart = Carbon::createFromFormat('Y-m-d H:i', $now->toDateString() . ' ' . $start, self::timezone());
+
+            return $slotStart && $slotStart->greaterThan($now);
+        }));
     }
 
     public static function settings(): array
@@ -155,9 +173,19 @@ class DeliverySlotManager
         return array_column(self::options(), 'value');
     }
 
+    public static function availableValues(?Carbon $now = null): array
+    {
+        return array_column(self::availableOptions($now), 'value');
+    }
+
     public static function defaultValue(): ?string
     {
         return self::options()[0]['value'] ?? null;
+    }
+
+    public static function defaultAvailableValue(?Carbon $now = null): ?string
+    {
+        return self::availableOptions($now)[0]['value'] ?? null;
     }
 
     public static function label(?string $value): ?string
@@ -236,5 +264,10 @@ class DeliverySlotManager
         $parsed = DateTimeImmutable::createFromFormat('!H:i', $time);
 
         return $parsed ?: null;
+    }
+
+    private static function timezone(): string
+    {
+        return (string) config('delivery.timezone', 'Asia/Kolkata');
     }
 }

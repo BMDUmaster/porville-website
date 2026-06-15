@@ -469,6 +469,17 @@
 
 @section('scripts')
 <script>
+const productUpdateUrlTemplate = @json(route('dashboard.products.update', ['product' => '__ID__']));
+const storageAssetBaseUrl = @json(rtrim(asset('storage'), '/'));
+
+function storageAssetUrl(path) {
+    return storageAssetBaseUrl + '/' + String(path || '')
+        .replace(/^\/+/, '')
+        .split('/')
+        .map(encodeURIComponent)
+        .join('/');
+}
+
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
 function closeModal(id) {
     document.getElementById(id).classList.add('hidden');
@@ -642,7 +653,7 @@ function openEditModal(source) {
     renderEditCurrentImages(product.images ?? []);
     renderEditVariants(product.variants ?? []);
     loadSubcategories(product.category_id, 'editSubcategoryId', product.subcategory_id);
-    document.getElementById('editProductForm').action = '/products/' + product.id;
+    document.getElementById('editProductForm').action = productUpdateUrlTemplate.replace('__ID__', encodeURIComponent(product.id));
     openModal('editProductModal');
 }
 
@@ -827,7 +838,7 @@ function renderEditCurrentImages(images) {
                         class="absolute right-1 top-1 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-black/70 text-white text-[10px] hover:bg-red-500">
                     &times;
                 </button>
-                <img src="/storage/${imagePath}" alt="Current image ${index + 1}" class="w-full h-full object-cover">
+                <img src="${storageAssetUrl(imagePath)}" alt="Current image ${index + 1}" class="w-full h-full object-cover">
             </div>
         `;
 

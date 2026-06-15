@@ -20,7 +20,12 @@
         <div class="h-1 bg-gradient-to-r from-green-600 to-emerald-400"></div>
         <div class="border-b px-6 py-5">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <h2 class="nunito text-lg font-extrabold text-gray-800">Delivery Slot</h2>
+                <h2 class="nunito text-lg font-extrabold text-gray-800">
+                    Delivery Slot
+                    <span class="ml-2 rounded-full bg-green-50 px-2 py-1 align-middle text-[10px] font-black uppercase tracking-[0.14em] text-green-700">
+                        {{ $deliveryDayLabel ?? 'Today' }}
+                    </span>
+                </h2>
                 <span id="cartDeliverySlotLabel" class="text-[11px] font-bold text-green-700">
                     {{ \App\Support\DeliverySlotManager::label($selectedDeliverySlot) }}
                 </span>
@@ -29,7 +34,7 @@
         </div>
         <div class="px-6 py-5">
             <div class="flex flex-wrap gap-2">
-                @foreach($deliverySlotOptions as $slot)
+                @forelse($deliverySlotOptions as $slot)
                     <button
                         type="button"
                         onclick="updateCartDeliverySlot('{{ $slot['value'] }}')"
@@ -38,7 +43,11 @@
                     >
                         {{ $slot['label'] }}
                     </button>
-                @endforeach
+                @empty
+                    <span class="rounded-full border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] font-bold leading-none text-amber-700">
+                        No slots left for today
+                    </span>
+                @endforelse
             </div>
         </div>
     </div>
@@ -122,11 +131,15 @@
                     </div>
                     <div class="space-y-3 px-6 py-5">
                         <div class="flex justify-between text-sm"><span class="text-gray-500">Subtotal</span><span class="font-semibold">&#8377;{{ number_format($pricing['subtotal'], 2) }}</span></div>
-                        <div class="flex justify-between text-sm"><span class="text-gray-500">Delivery</span><span class="font-semibold text-gray-800">&#8377;{{ number_format($pricing['delivery_charge'], 2) }}</span></div>
+                        @if((float) ($pricing['delivery_charge'] ?? 0) > 0)
+                            <div class="flex justify-between text-sm"><span class="text-gray-500">Delivery</span><span class="font-semibold text-gray-800">&#8377;{{ number_format($pricing['delivery_charge'], 2) }}</span></div>
+                        @endif
+                        @if((float) ($pricing['service_charge'] ?? 0) > 0)
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-500">&#8505;&#65039; Service Charge ({{ rtrim(rtrim(number_format($pricing['service_charge_percent'], 2), '0'), '.') }}%)</span>
                             <span class="font-semibold text-gray-800">&#8377;{{ number_format($pricing['service_charge'], 2) }}</span>
                         </div>
+                        @endif
                         <hr class="border-gray-100">
                         <div class="flex justify-between">
                             <span class="font-bold text-gray-800">Total</span>

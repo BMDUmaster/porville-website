@@ -5,12 +5,26 @@
 @section('content')
 @php
     $statusOptions = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered', 'cancelled'];
+    $dateFilterOptions = [
+        '' => 'All Dates',
+        'today' => 'Today',
+        'last_7_days' => 'Last 7 Days',
+        'last_30_days' => 'Last 30 Days',
+        'custom' => 'Custom Range',
+    ];
+    $pricingDayLabel = fn (?string $day) => $day === 'tomorrow' ? 'Tomorrow' : 'Today';
+    $orderPricingDays = fn ($order) => $order->items
+        ->pluck('pricing_day')
+        ->filter()
+        ->unique()
+        ->map($pricingDayLabel)
+        ->values();
 @endphp
 <div class="p-4 md:p-8 space-y-6">
 
     <form method="GET" class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <h1 class="text-2xl font-bold text-gray-800">Live Orders</h1>
-        <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:justify-end">
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search customer / ID..."
                    class="w-full rounded border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 sm:w-auto">
             <select name="status" class="border rounded px-3 py-1.5 text-sm outline-none">
@@ -21,11 +35,24 @@
                     </option>
                 @endforeach
             </select>
+            <select name="date_filter" id="orderDateFilter" onchange="toggleOrderCustomDates()" class="border rounded px-3 py-1.5 text-sm outline-none">
+                @foreach($dateFilterOptions as $value => $label)
+                    <option value="{{ $value }}" {{ request('date_filter') === $value ? 'selected' : '' }}>{{ $label }}</option>
+                @endforeach
+            </select>
+            <div id="orderCustomDateFields" class="{{ request('date_filter') === 'custom' ? 'flex' : 'hidden' }} flex-col gap-2 sm:flex-row sm:items-center">
+                <input type="date" name="date_from" value="{{ request('date_from') }}"
+                       class="rounded border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                <span class="hidden text-xs font-bold uppercase tracking-[0.14em] text-gray-400 sm:inline">to</span>
+                <input type="date" name="date_to" value="{{ request('date_to') }}"
+                       class="rounded border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
             <button type="submit" class="rounded bg-blue-600 px-4 py-1.5 text-sm text-white">Filter</button>
             <a href="{{ route('dashboard.orders') }}" class="rounded bg-gray-200 px-4 py-1.5 text-sm text-gray-700">Reset</a>
         </div>
     </form>
 
+    <div id="liveOrdersContent" data-live-orders-url="{{ request()->fullUrl() }}" data-live-orders-count="{{ $orders->total() }}">
     <div class="space-y-4 md:hidden">
         @forelse($orders as $order)
             <article class="rounded-2xl border bg-white p-4 shadow-sm">
@@ -55,6 +82,19 @@
                     <div>
                         <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Payment</p>
                         <p class="mt-1 text-sm font-semibold uppercase text-gray-700">{{ $order->payment_method ?? 'COD' }}</p>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Delivery Schedule</p>
+                        <div class="mt-1 flex flex-wrap items-center gap-2">
+                            @forelse($orderPricingDays($order) as $dayLabel)
+                                <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-black text-emerald-700">{{ $dayLabel }}</span>
+                            @empty
+                                <span class="rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-black text-gray-500">Day not set</span>
+                            @endforelse
+                            <span class="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-black text-amber-700">
+                                <i class="fa-regular fa-clock mr-1"></i>{{ $order->delivery_slot_label ?? 'Slot not set' }}
+                            </span>
+                        </div>
                     </div>
                     <div class="sm:col-span-2">
                         <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Delivery Boy</p>
@@ -106,7 +146,7 @@
     </div>
 
     <div class="hidden overflow-x-auto rounded-lg border bg-white shadow-sm md:block">
-        <table class="w-full min-w-[1180px] text-left">
+        <table class="w-full min-w-[1320px] text-left">
             <thead class="border-b bg-gray-50">
                 <tr>
                     <th class="px-4 py-4 text-xs font-bold uppercase text-gray-700">Order ID</th>
@@ -115,6 +155,7 @@
                     <th class="px-4 py-4 text-xs font-bold uppercase text-gray-700">Items</th>
                     <th class="px-4 py-4 text-xs font-bold uppercase text-gray-700">Total</th>
                     <th class="px-4 py-4 text-xs font-bold uppercase text-gray-700">Payment</th>
+                    <th class="px-4 py-4 text-xs font-bold uppercase text-gray-700">Delivery Schedule</th>
                     <th class="px-4 py-4 text-xs font-bold uppercase text-gray-700">Delivery Boy</th>
                     <th class="px-4 py-4 text-xs font-bold uppercase text-gray-700">Status</th>
                     <th class="px-4 py-4 text-center text-xs font-bold uppercase text-gray-700">Action</th>
@@ -132,6 +173,20 @@
                         <td class="px-4 py-4 text-sm text-gray-600">{{ $order->items->count() }} item(s)</td>
                         <td class="px-4 py-4 text-sm font-bold text-gray-900">Rs{{ number_format($order->total, 2) }}</td>
                         <td class="px-4 py-4 text-xs font-semibold uppercase text-gray-600">{{ $order->payment_method ?? 'COD' }}</td>
+                        <td class="px-4 py-4 text-xs">
+                            <div class="flex flex-col gap-1">
+                                <div class="flex flex-wrap gap-1">
+                                    @forelse($orderPricingDays($order) as $dayLabel)
+                                        <span class="rounded-full bg-emerald-50 px-2 py-0.5 font-black text-emerald-700">{{ $dayLabel }}</span>
+                                    @empty
+                                        <span class="rounded-full bg-gray-100 px-2 py-0.5 font-black text-gray-500">Day not set</span>
+                                    @endforelse
+                                </div>
+                                <span class="inline-flex w-fit items-center rounded-full bg-amber-50 px-2 py-0.5 font-black text-amber-700">
+                                    <i class="fa-regular fa-clock mr-1"></i>{{ $order->delivery_slot_label ?? 'Slot not set' }}
+                                </span>
+                            </div>
+                        </td>
                         <td class="px-4 py-4 text-sm text-gray-600">
                             @if($order->deliveryBoy)
                                 <div class="font-bold text-gray-800">{{ $order->deliveryBoy->partner_name }}</div>
@@ -183,7 +238,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="px-4 py-8 text-center text-gray-400">No orders found.</td>
+                        <td colspan="10" class="px-4 py-8 text-center text-gray-400">No orders found.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -191,6 +246,7 @@
     </div>
 
     <div>{{ $orders->withQueryString()->links() }}</div>
+    </div>
 </div>
 @endsection
 
@@ -211,5 +267,70 @@ function toggleDeliveryBoySelect(select, orderId) {
         deliverySelect.value = '';
     }
 }
+
+function toggleOrderCustomDates() {
+    const filter = document.getElementById('orderDateFilter');
+    const customFields = document.getElementById('orderCustomDateFields');
+
+    if (!filter || !customFields) {
+        return;
+    }
+
+    customFields.classList.toggle('hidden', filter.value !== 'custom');
+    customFields.classList.toggle('flex', filter.value === 'custom');
+}
+
+toggleOrderCustomDates();
+
+let liveOrdersTimer = null;
+let liveOrdersLoading = false;
+
+function shouldPauseLiveOrdersRefresh() {
+    const liveContent = document.getElementById('liveOrdersContent');
+    const active = document.activeElement;
+
+    return liveContent && active && liveContent.contains(active) && ['SELECT', 'INPUT', 'BUTTON'].includes(active.tagName);
+}
+
+function refreshLiveOrders() {
+    const liveContent = document.getElementById('liveOrdersContent');
+
+    if (!liveContent || liveOrdersLoading || shouldPauseLiveOrdersRefresh()) {
+        return;
+    }
+
+    liveOrdersLoading = true;
+
+    fetch(liveContent.dataset.liveOrdersUrl || window.location.href, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'text/html',
+        },
+        cache: 'no-store',
+    })
+        .then((response) => response.text())
+        .then((html) => {
+            const parsed = new DOMParser().parseFromString(html, 'text/html');
+            const freshContent = parsed.getElementById('liveOrdersContent');
+
+            if (!freshContent) {
+                return;
+            }
+
+            liveContent.innerHTML = freshContent.innerHTML;
+            liveContent.dataset.liveOrdersCount = freshContent.dataset.liveOrdersCount || liveContent.dataset.liveOrdersCount || '0';
+        })
+        .catch(() => {})
+        .finally(() => {
+            liveOrdersLoading = false;
+        });
+}
+
+liveOrdersTimer = window.setInterval(refreshLiveOrders, 8000);
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+        refreshLiveOrders();
+    }
+});
 </script>
 @endsection

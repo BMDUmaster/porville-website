@@ -19,14 +19,16 @@ class CartController extends Controller
         $items = $this->buildCartItems($cart);
         $subtotal = collect($items)->sum('subtotal');
         $pricing = OrderPricing::summary($subtotal, auth('web_frontend')->user());
-        $deliverySlotOptions = DeliverySlotManager::options();
+        $deliverySlotOptions = $this->deliverySlotOptionsForCart($cart);
         $selectedDeliverySlot = session('selected_delivery_slot');
 
-        if (! in_array($selectedDeliverySlot, DeliverySlotManager::values(), true)) {
-            $selectedDeliverySlot = DeliverySlotManager::defaultValue();
+        if (! in_array($selectedDeliverySlot, array_column($deliverySlotOptions, 'value'), true)) {
+            $selectedDeliverySlot = $deliverySlotOptions[0]['value'] ?? null;
+            session(['selected_delivery_slot' => $selectedDeliverySlot]);
         }
+        $deliveryDayLabel = $this->deliveryDayLabelForCart($cart);
 
-        return view('frontend.cart', compact('items', 'pricing', 'deliverySlotOptions', 'selectedDeliverySlot'));
+        return view('frontend.cart', compact('items', 'pricing', 'deliverySlotOptions', 'selectedDeliverySlot', 'deliveryDayLabel'));
     }
 
     /** POST /cart/add */
@@ -37,13 +39,29 @@ class CartController extends Controller
             'quantity'      => 'integer|min:1',
             'variant_index' => 'nullable|integer|min:0',
             'pricing_day'   => ['nullable', 'string', Rule::in(['today', 'tomorrow'])],
-            'delivery_slot' => ['nullable', 'string', Rule::in(DeliverySlotManager::values())],
+            'delivery_slot' => ['nullable', 'string', Rule::in(DeliverySlotManager::availableValues())],
         ]);
 
         $product      = Product::findOrFail($request->product_id);
         $qty          = $request->get('quantity', 1);
         $variantIndex = $request->get('variant_index');
         $pricingDay   = ProductDayPricing::normalizeDay($request->get('pricing_day'));
+        $variant = ($variantIndex !== null && isset($product->variants[$variantIndex]))
+            ? $product->variants[$variantIndex]
+            : null;
+
+        if (
+            $pricingDay === 'tomorrow'
+            && (
+                ! $variant
+                || ! array_key_exists('tomorrow_price', $variant)
+                || $variant['tomorrow_price'] === null
+                || $variant['tomorrow_price'] === ''
+                || (float) $variant['tomorrow_price'] <= 0
+            )
+        ) {
+            $pricingDay = 'today';
+        }
 
         if (! $product->is_active) {
             $message = 'This product is currently out of stock.';
@@ -64,9 +82,6 @@ class CartController extends Controller
         if (isset($cart[$key])) {
             $cart[$key]['quantity'] += $qty;
         } else {
-            $variant = ($variantIndex !== null && isset($product->variants[$variantIndex]))
-                       ? $product->variants[$variantIndex]
-                       : null;
             $price = $variant
                 ? ProductDayPricing::sellingPrice($variant, $pricingDay, (float) $product->price)
                 : (float) $product->price;
@@ -145,7 +160,7 @@ class CartController extends Controller
     public function updateDeliverySlot(Request $request)
     {
         $data = $request->validate([
-            'delivery_slot' => ['required', 'string', Rule::in(DeliverySlotManager::values())],
+            'delivery_slot' => ['required', 'string', Rule::in(array_column($this->deliverySlotOptionsForCart(session('cart', [])), 'value'))],
         ]);
 
         session(['selected_delivery_slot' => $data['delivery_slot']]);
@@ -186,9 +201,11 @@ class CartController extends Controller
         $subtotal = collect($items)->sum('subtotal');
         $pricing = OrderPricing::summary($subtotal, auth('web_frontend')->user());
         $selectedDeliverySlot = session('selected_delivery_slot');
+        $deliverySlotOptions = $this->deliverySlotOptionsForCart($cart);
 
-        if (! in_array($selectedDeliverySlot, DeliverySlotManager::values(), true)) {
-            $selectedDeliverySlot = DeliverySlotManager::defaultValue();
+        if (! in_array($selectedDeliverySlot, array_column($deliverySlotOptions, 'value'), true)) {
+            $selectedDeliverySlot = $deliverySlotOptions[0]['value'] ?? null;
+            session(['selected_delivery_slot' => $selectedDeliverySlot]);
         }
 
         return response()->json([
@@ -201,6 +218,8 @@ class CartController extends Controller
             'total' => $pricing['total'],
             'selected_delivery_slot' => $selectedDeliverySlot,
             'selected_delivery_slot_label' => DeliverySlotManager::label($selectedDeliverySlot),
+            'delivery_slot_options' => $deliverySlotOptions,
+            'delivery_day_label' => $this->deliveryDayLabelForCart($cart),
         ]);
     }
 
@@ -232,5 +251,27 @@ class CartController extends Controller
         }
 
         return $unit;
+    }
+
+    private function deliverySlotOptionsForCart(array $cart): array
+    {
+        return $this->usesTomorrowDelivery($cart)
+            ? DeliverySlotManager::options()
+            : DeliverySlotManager::availableOptions();
+    }
+
+    private function usesTomorrowDelivery(array $cart): bool
+    {
+        $days = collect($cart)
+            ->pluck('pricing_day')
+            ->filter()
+            ->values();
+
+        return $days->contains('tomorrow') && ! $days->contains('today');
+    }
+
+    private function deliveryDayLabelForCart(array $cart): string
+    {
+        return $this->usesTomorrowDelivery($cart) ? 'Tomorrow' : 'Today';
     }
 }
