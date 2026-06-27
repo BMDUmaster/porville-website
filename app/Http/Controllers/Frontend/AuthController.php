@@ -7,12 +7,16 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use RuntimeException;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class AuthController extends Controller
 {
     private const REGISTER_OTP_TTL_MINUTES = 10;
     private const REGISTER_DEFAULT_OTP = '1111';
+    private const PASSWORD_OTP_TTL_MINUTES = 10;
 
     /** GET /account/login */
     public function showLogin()
@@ -56,6 +60,107 @@ class AuthController extends Controller
             return redirect()->route('frontend.profile');
         }
         return view('frontend.signup');
+    }
+
+    /** GET /account/forgot-password */
+    public function showForgotPassword()
+    {
+        if (Auth::guard('web_frontend')->check()) {
+            return redirect()->route('frontend.profile');
+        }
+
+        $step = session('password_reset_verified')
+            ? 'reset'
+            : (session('password_reset_otp_email') ? 'otp' : 'email');
+
+        return view('frontend.forgot-password', compact('step'));
+    }
+
+    /** POST /account/forgot-password/send-otp */
+    public function sendForgotPasswordOtp(Request $request)
+    {
+        $data = $request->validate([
+            'email' => ['required', 'email', 'exists:users,email'],
+        ]);
+
+        $user = User::where('email', $data['email'])->firstOrFail();
+        $otp = $this->generateOtp();
+
+        try {
+            $this->sendOtpEmail($user->email, $otp, 'password reset', self::PASSWORD_OTP_TTL_MINUTES);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return back()
+                ->withErrors(['email' => 'Could not send OTP email. Please check SMTP settings and try again.'])
+                ->onlyInput('email');
+        }
+
+        session([
+            'password_reset_otp_email' => $user->email,
+            'password_reset_otp_hash' => Hash::make($otp),
+            'password_reset_otp_expires_at' => now()->addMinutes(self::PASSWORD_OTP_TTL_MINUTES)->timestamp,
+        ]);
+        session()->forget('password_reset_verified');
+
+        return redirect()
+            ->route('frontend.password.forgot')
+            ->with('success', 'OTP sent successfully. Please check your email.');
+    }
+
+    /** POST /account/forgot-password/verify-otp */
+    public function verifyForgotPasswordOtp(Request $request)
+    {
+        $request->validate([
+            'email_otp' => ['required', 'digits:4'],
+        ]);
+
+        $otpHash = session('password_reset_otp_hash');
+        $expiresAt = (int) session('password_reset_otp_expires_at', 0);
+
+        if (! $otpHash || $expiresAt < now()->timestamp || ! Hash::check($request->email_otp, $otpHash)) {
+            throw ValidationException::withMessages([
+                'email_otp' => 'Invalid or expired OTP.',
+            ]);
+        }
+
+        session(['password_reset_verified' => true]);
+
+        return redirect()
+            ->route('frontend.password.forgot')
+            ->with('success', 'OTP verified. Create your new password.');
+    }
+
+    /** POST /account/forgot-password/reset */
+    public function resetForgotPassword(Request $request)
+    {
+        $request->validate([
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $email = session('password_reset_otp_email');
+
+        if (! $email || ! session('password_reset_verified')) {
+            throw ValidationException::withMessages([
+                'email' => 'Please verify your email OTP first.',
+            ]);
+        }
+
+        $user = User::where('email', $email)->firstOrFail();
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        session()->forget([
+            'password_reset_otp_email',
+            'password_reset_otp_hash',
+            'password_reset_otp_expires_at',
+            'password_reset_verified',
+        ]);
+
+        return redirect()
+            ->route('frontend.login')
+            ->with('success', 'Password created successfully. Please log in with your new password.');
     }
 
     /** POST /account/register */
@@ -127,5 +232,50 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect()->route('frontend.login');
+    }
+
+    private function generateOtp(): string
+    {
+        return (string) random_int(1000, 9999);
+    }
+
+    private function sendOtpEmail(string $email, string $otp, string $purpose, int $ttlMinutes): void
+    {
+        $this->ensureMailIsConfigured();
+
+        $subject = 'FarmSea OTP for ' . ucwords($purpose);
+        $body = implode("\n", [
+            'Hello,',
+            '',
+            "Your FarmSea OTP for {$purpose} is: {$otp}",
+            '',
+            "This OTP is valid for {$ttlMinutes} minutes.",
+            'If you did not request this, please ignore this email.',
+            '',
+            'Regards,',
+            'FarmSea Team',
+        ]);
+
+        Mail::raw($body, function ($message) use ($email, $subject) {
+            $message->to($email)->subject($subject);
+        });
+    }
+
+    private function ensureMailIsConfigured(): void
+    {
+        if (config('mail.default') !== 'smtp') {
+            throw new RuntimeException('OTP email requires MAIL_MAILER=smtp.');
+        }
+
+        $smtp = config('mail.mailers.smtp', []);
+        $required = ['host', 'port', 'username', 'password'];
+
+        foreach ($required as $key) {
+            $value = $smtp[$key] ?? null;
+
+            if ($value === null || $value === '' || $value === 'null') {
+                throw new RuntimeException("Missing SMTP setting: MAIL_" . strtoupper($key) . '.');
+            }
+        }
     }
 }

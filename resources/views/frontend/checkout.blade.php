@@ -30,67 +30,148 @@
                 </div>
                 @endif
 
-                <div class="overflow-hidden rounded-2xl border bg-white">
-                    <div class="flex items-center gap-2 border-b px-6 py-4">
-                        <div class="flex h-7 w-7 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">1</div>
-                        <h2 class="nunito text-base font-extrabold text-gray-800">Contact Information</h2>
+                <div class="overflow-hidden rounded-[24px] border border-blue-100 bg-white shadow-[0_18px_45px_rgba(30,64,175,0.08)]">
+                    <div class="flex items-center justify-between gap-4 border-b border-blue-100 bg-gradient-to-r from-blue-50 via-white to-emerald-50 px-5 py-5 sm:px-6">
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-700 text-sm font-black text-white shadow-lg shadow-blue-200">
+                                <i class="fa-solid fa-address-card"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-600">Step 1</span>
+                                    <span class="h-1 w-1 rounded-full bg-slate-300"></span>
+                                    <span class="text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-600">Account details</span>
+                                </div>
+                                <h2 class="nunito mt-1 text-lg font-extrabold text-slate-900">Contact Information</h2>
+                            </div>
+                        </div>
+                        <div class="hidden h-9 w-9 items-center justify-center rounded-full border border-emerald-100 bg-white text-emerald-600 sm:flex">
+                            <i class="fa-solid fa-shield-halved text-sm"></i>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-1 gap-4 px-6 py-5 sm:grid-cols-2">
+                    <div class="grid grid-cols-1 gap-5 px-5 py-6 sm:grid-cols-2 sm:px-6">
                         <div>
-                            <label class="mb-1 block text-xs font-semibold text-gray-600">First Name *</label>
+                            <label class="mb-2 block text-xs font-bold text-slate-700">First Name <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
                             <input type="text" name="first_name" value="{{ $checkoutDefaults['first_name'] ?? '' }}" required readonly
-                                   class="w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-500 outline-none">
+                                   class="w-full cursor-not-allowed rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-sm font-semibold text-slate-600 outline-none">
+                            </div>
                         </div>
                         <div>
-                            <label class="mb-1 block text-xs font-semibold text-gray-600">Last Name</label>
+                            <label class="mb-2 block text-xs font-bold text-slate-700">Last Name</label>
+                            <div class="relative">
+                                <i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
                             <input type="text" name="last_name" value="{{ $checkoutDefaults['last_name'] ?? '' }}" readonly
-                                   class="w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-500 outline-none">
+                                   class="w-full cursor-not-allowed rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-sm font-semibold text-slate-600 outline-none">
+                            </div>
                         </div>
                         <div class="sm:col-span-2">
-                            <label class="mb-1 block text-xs font-semibold text-gray-600">Email *</label>
+                            <label class="mb-2 block text-xs font-bold text-slate-700">Email Address <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
                             <input type="email" name="email" value="{{ $checkoutDefaults['email'] ?? '' }}" required readonly
-                                   class="w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-500 outline-none">
+                                   class="w-full cursor-not-allowed rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-sm font-semibold text-slate-600 outline-none">
+                            </div>
                         </div>
                         <div class="sm:col-span-2">
-                            <label class="mb-1 block text-xs font-semibold text-gray-600">Phone *</label>
+                            <label class="mb-2 block text-xs font-bold text-slate-700">Phone Number <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <i class="fa-solid fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-sm text-blue-500"></i>
                             <input type="tel" name="phone" id="checkoutPhoneInput" value="{{ $checkoutDefaults['phone'] ?? '' }}" required
                                    inputmode="numeric" pattern="(?:\d{10}|\d{12})" minlength="10" maxlength="12" autocomplete="off"
                                    title="Phone number must be 10 or 12 digits"
-                                   class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
+                                   class="w-full rounded-2xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-sm font-semibold text-slate-800 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50">
+                            </div>
+                            <p class="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-slate-400">
+                                <i class="fa-solid fa-circle-info text-blue-400"></i>
+                                Delivery updates will be shared on this number.
+                            </p>
                         </div>
                     </div>
                 </div>
 
                 <div class="overflow-hidden rounded-2xl border bg-white">
-                    <div class="flex items-center gap-2 border-b px-6 py-4">
-                        <div class="flex h-7 w-7 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">2</div>
-                        <h2 class="nunito text-base font-extrabold text-gray-800">Shipping Address</h2>
-                    </div>
-                    <div class="space-y-4 px-6 py-5">
-                        <div>
-                            <label class="mb-1 block text-xs font-semibold text-gray-600">Street Address *</label>
-                            <input type="text" name="address" value="{{ old('address', $checkoutDefaults['address'] ?? '') }}" required
-                                   class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
+                    <div class="flex items-center justify-between border-b px-6 py-4">
+                        <div class="flex items-center gap-2">
+                            <div class="flex h-7 w-7 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">2</div>
+                            <h2 class="nunito text-base font-extrabold text-gray-800">Shipping Address</h2>
                         </div>
-                        <div class="grid gap-4 sm:grid-cols-2">
+                        @if(!empty($pastAddresses))
+                            <button type="button" onclick="showNewAddressForm()" id="addNewAddressBtn"
+                                    class="text-xs font-bold text-blue-700 hover:text-blue-800 flex items-center gap-1">
+                                <i class="fa-solid fa-plus text-[10px]"></i> Add New
+                            </button>
+                        @endif
+                    </div>
+                    <div class="px-6 py-5 space-y-4">
+                        @if(!empty($pastAddresses))
+                            <div id="savedAddressesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                                @foreach($pastAddresses as $index => $addr)
+                                    <div class="address-card border rounded-xl p-4 cursor-pointer relative hover:border-blue-500 transition-all duration-200 flex flex-col justify-between"
+                                         data-index="{{ $index }}"
+                                         onclick="selectAddressCard({{ $index }})">
+                                         <div>
+                                             <div class="flex justify-between items-start">
+                                                 <p class="text-sm font-bold text-gray-800">{{ $addr['name'] ?? '' }}</p>
+                                             </div>
+                                             <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">{{ $addr['address'] }}</p>
+                                             <p class="text-xs text-gray-500 leading-relaxed">{{ $addr['city'] }}, {{ $addr['state'] }} - {{ $addr['pincode'] }}</p>
+                                             @if(!empty($addr['phone']))
+                                                 <p class="text-xs text-gray-500 mt-1 leading-relaxed"><i class="fa-solid fa-phone text-[9px] mr-1 text-slate-400"></i>{{ $addr['phone'] }}</p>
+                                             @endif
+                                         </div>
+                                         
+                                         <div class="mt-4 pt-3 border-t border-slate-50 flex items-center justify-between">
+                                             <span class="text-[10px] font-bold text-green-700 select-badge items-center gap-1 hidden">
+                                                 <i class="fa-solid fa-circle-check text-[10px]"></i> Selected
+                                             </span>
+                                             <button type="button" onclick="editAddressCard(event, {{ $index }})" 
+                                                     class="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1 ml-auto">
+                                                 <i class="fa-regular fa-pen-to-square text-[10px]"></i> Edit
+                                             </button>
+                                         </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        {{-- Collapsible/Toggleable Address Input Fields --}}
+                        <div id="addressFormContainer" class="space-y-4 pt-2">
+                            @if(!empty($pastAddresses))
+                                <div class="flex items-center justify-between mb-2">
+                                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider" id="formActionTitle">Add New Address</h3>
+                                    <button type="button" onclick="cancelAddressForm()" class="text-xs text-gray-400 hover:text-gray-600 font-medium">
+                                        Cancel
+                                    </button>
+                                </div>
+                            @endif
+
                             <div>
-                                <label class="mb-1 block text-xs font-semibold text-gray-600">City *</label>
-                                <input type="text" name="city" value="{{ old('city', $checkoutDefaults['city'] ?? '') }}" required
+                                <label class="mb-1 block text-xs font-semibold text-gray-600">Street Address *</label>
+                                <input type="text" name="address" id="shippingAddressInput" required
                                        class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
                             </div>
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label class="mb-1 block text-xs font-semibold text-gray-600">City *</label>
+                                    <input type="text" name="city" id="shippingCityInput" required
+                                           class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label class="mb-1 block text-xs font-semibold text-gray-600">State *</label>
+                                    <input type="text" name="state" id="shippingStateInput" required
+                                           class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
+                                </div>
+                            </div>
                             <div>
-                                <label class="mb-1 block text-xs font-semibold text-gray-600">State *</label>
-                                <input type="text" name="state" value="{{ old('state', $checkoutDefaults['state'] ?? '') }}" required
+                                <label class="mb-1 block text-xs font-semibold text-gray-600">PIN Code *</label>
+                                <input type="text" name="pincode" id="shippingPincodeInput" required
                                        class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
+                                </div>
                             </div>
                         </div>
-                        <div>
-                            <label class="mb-1 block text-xs font-semibold text-gray-600">PIN Code *</label>
-                            <input type="text" name="pincode" value="{{ old('pincode', $checkoutDefaults['pincode'] ?? '') }}" required
-                                   class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
-                        </div>
                     </div>
-                </div>
 
                 <div class="overflow-hidden rounded-2xl border bg-white">
                     <div class="flex items-center gap-2 border-b px-6 py-4">
@@ -162,7 +243,12 @@
                         </div>
                         <div class="min-w-0 flex-1">
                             <p class="truncate text-xs font-semibold text-gray-800">{{ $item['name'] }}</p>
-                            <p class="text-[10px] text-gray-400">Qty: {{ $item['quantity'] }}</p>
+                            <div class="mt-1 flex items-center gap-2">
+                                <span class="text-[10px] text-gray-400">Qty: {{ $item['quantity'] }}</span>
+                                <span class="inline-flex items-center rounded border px-1.5 py-0.5 text-[8px] font-extrabold uppercase tracking-wider {{ ($item['pricing_day'] ?? 'today') === 'tomorrow' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100' }}">
+                                    {{ ($item['pricing_day'] ?? 'today') === 'tomorrow' ? 'Tomorrow' : 'Today' }}
+                                </span>
+                            </div>
                         </div>
                         <span class="flex-shrink-0 text-xs font-bold text-gray-800">&#8377;{{ number_format($item['subtotal'], 2) }}</span>
                     </div>
@@ -312,5 +398,110 @@ function sanitizeCheckoutPhone() {
 
 phoneInput?.addEventListener('input', sanitizeCheckoutPhone);
 sanitizeCheckoutPhone();
+
+// Address Selection Logic
+const pastAddresses = @json($pastAddresses ?? []);
+const hasErrors = @json($errors->has('address') || $errors->has('city') || $errors->has('state') || $errors->has('pincode'));
+let selectedAddressIndex = (pastAddresses.length > 0 && !hasErrors) ? 0 : null;
+
+const addressCards = document.querySelectorAll('.address-card');
+const formContainer = document.getElementById('addressFormContainer');
+const formActionTitle = document.getElementById('formActionTitle');
+const addNewBtn = document.getElementById('addNewAddressBtn');
+
+const streetInput = document.getElementById('shippingAddressInput');
+const cityInput = document.getElementById('shippingCityInput');
+const stateInput = document.getElementById('shippingStateInput');
+const pincodeInput = document.getElementById('shippingPincodeInput');
+
+function updateAddressSelectionUI() {
+    addressCards.forEach((card, idx) => {
+        const isSelected = idx === selectedAddressIndex;
+        card.classList.toggle('border-blue-600', isSelected);
+        card.classList.toggle('bg-blue-50/20', isSelected);
+        card.classList.toggle('border-gray-200', !isSelected);
+        
+        const badge = card.querySelector('.select-badge');
+        if (badge) {
+            badge.classList.toggle('hidden', !isSelected);
+            badge.classList.toggle('inline-flex', isSelected);
+        }
+    });
+
+    if (selectedAddressIndex !== null) {
+        // A saved address is selected, hide the input form and populate values
+        const addr = pastAddresses[selectedAddressIndex];
+        streetInput.value = addr.address || '';
+        cityInput.value = addr.city || '';
+        stateInput.value = addr.state || '';
+        pincodeInput.value = addr.pincode || '';
+        
+        formContainer.classList.add('hidden');
+        addNewBtn?.classList.remove('hidden');
+    } else {
+        // Adding new / custom address, show form
+        formContainer.classList.remove('hidden');
+        addNewBtn?.classList.add('hidden');
+    }
+}
+
+function selectAddressCard(index) {
+    selectedAddressIndex = index;
+    updateAddressSelectionUI();
+}
+
+function showNewAddressForm() {
+    selectedAddressIndex = null;
+    
+    // Clear inputs (except name/phone which are prefilled in contact info)
+    streetInput.value = '';
+    cityInput.value = '';
+    stateInput.value = '';
+    pincodeInput.value = '';
+    
+    if (formActionTitle) {
+        formActionTitle.textContent = 'Add New Address';
+    }
+    
+    updateAddressSelectionUI();
+    streetInput.focus();
+}
+
+function editAddressCard(event, index) {
+    event.stopPropagation(); // Prevent card selection click event from firing
+    selectedAddressIndex = null;
+    
+    // Fill inputs with address details
+    const addr = pastAddresses[index];
+    streetInput.value = addr.address || '';
+    cityInput.value = addr.city || '';
+    stateInput.value = addr.state || '';
+    pincodeInput.value = addr.pincode || '';
+    
+    if (formActionTitle) {
+        formActionTitle.textContent = 'Edit Address';
+    }
+    
+    updateAddressSelectionUI();
+    streetInput.focus();
+}
+
+function cancelAddressForm() {
+    if (pastAddresses.length > 0) {
+        selectedAddressIndex = 0;
+        updateAddressSelectionUI();
+    }
+}
+
+// Initial Call
+if (pastAddresses.length > 0) {
+    updateAddressSelectionUI();
+} else {
+    // If no past addresses, load defaults from checkoutDefaults if any
+    streetInput.value = @json(old('address', $checkoutDefaults['address'] ?? ''));
+    cityInput.value = @json(old('city', $checkoutDefaults['city'] ?? ''));
+    stateInput.value = @json(old('state', $checkoutDefaults['state'] ?? ''));
+    pincodeInput.value = @json(old('pincode', $checkoutDefaults['pincode'] ?? ''));
+}
 </script>
 @endsection

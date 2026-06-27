@@ -12,9 +12,13 @@
         return !empty($product->images[0] ?? null);
     });
 
-    $shopHeroImage = $shopHeroProduct && !empty($shopHeroProduct->images[0] ?? null)
+    $shopHeroFallbackImage = $shopHeroProduct && !empty($shopHeroProduct->images[0] ?? null)
         ? asset('storage/' . $shopHeroProduct->images[0])
         : 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1800&q=80';
+
+    $shopHeroImage = !empty($sharedHeroBanner?->image_url)
+        ? $sharedHeroBanner->image_url
+        : $shopHeroFallbackImage;
 @endphp
 
 <section class="pt-0">
@@ -31,16 +35,24 @@
             <div class="max-w-[620px]">
                 <div class="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.28em] text-white/80">
                     <span class="inline-block h-2 w-2 rounded-full bg-[#9ae16d] shadow-[0_0_16px_rgba(154,225,109,0.7)]"></span>
-                    FarmSea Fresh Marketplace
+                    {{ $sharedHeroBanner?->badge ?: 'FarmSea Fresh Marketplace' }}
                 </div>
 
                 <h1 class="mt-4 text-[34px] font-black leading-[0.95] tracking-[-0.04em] text-white sm:text-[42px] md:text-[64px] lg:text-[74px]">
-                    All <span class="italic text-[#9be278]">Products.</span>
+                    {{ $sharedHeroBanner?->title_1 ?: 'All' }}
+                    <span class="block italic text-[#9be278]">{{ $sharedHeroBanner?->title_2 ?: 'Products.' }}</span>
                 </h1>
 
                 <p class="mt-5 max-w-[520px] text-[16px] leading-8 text-white/82 md:text-[17px]">
-                    Sourced fresh from our farms and coastal waters. Browse our complete range of chicken, mutton, fish, seafood and more delivered chilled to your door.
+                    {{ $sharedHeroBanner?->description ?: 'Sourced fresh from our farms and coastal waters. Browse our complete range of chicken, mutton, fish, seafood and more delivered chilled to your door.' }}
                 </p>
+
+                @if($sharedHeroBanner)
+                    <a href="{{ $sharedHeroBanner->link_url ?: route('frontend.products') }}"
+                       class="mt-6 inline-flex rounded-xl bg-green-600 px-7 py-3 text-[13px] font-black uppercase tracking-[0.16em] text-white shadow-lg transition hover:bg-green-700">
+                        {{ $sharedHeroBanner->button_text ?: 'Shop Now' }}
+                    </a>
+                @endif
             </div>
 
             <div class="flex w-full flex-col gap-4 text-white sm:w-auto sm:flex-row sm:flex-wrap sm:items-stretch sm:gap-5 lg:justify-end">

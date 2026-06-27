@@ -91,7 +91,7 @@ class OrderApiController extends Controller
 
         $orderItems = $this->buildOrderItems($data['items']);
         $subtotal = collect($orderItems)->sum('subtotal');
-        $pricing = OrderPricing::summary($subtotal, $request->user());
+        $pricing = OrderPricing::summary($subtotal, $request->user(), $this->pricingDayForItems($orderItems));
         $paymentMethod = $data['payment_method'] ?? 'COD';
 
         if ($paymentMethod === 'COD' && $subtotal > self::COD_MAX_SUBTOTAL) {
@@ -223,6 +223,16 @@ class OrderApiController extends Controller
         }
 
         return $orderItems;
+    }
+
+    private function pricingDayForItems(array $items): string
+    {
+        $days = collect($items)
+            ->pluck('pricing_day')
+            ->filter()
+            ->values();
+
+        return $days->contains('tomorrow') && ! $days->contains('today') ? 'tomorrow' : 'today';
     }
 
     private function resolveCoupon(?string $couponCode, float $subtotal, bool $lock = false): ?Coupon

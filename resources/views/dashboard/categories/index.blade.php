@@ -20,6 +20,28 @@
 
     {{-- Table --}}
     <div class="bg-white rounded-xl border overflow-x-auto">
+@extends('layouts.dashboard')
+@section('title', 'Categories')
+@section('page_title', 'Category Management')
+
+@section('content')
+<div class="p-4 sm:p-6">
+
+    {{-- Toolbar --}}
+    <div class="bg-white rounded-xl border p-4 mb-4 flex flex-col md:flex-row gap-3 items-center">
+        <form method="GET" class="flex-1 relative w-full">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search categories..."
+                   class="w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm outline-none focus:border-blue-400">
+        </form>
+        <button onclick="openModal('addModal')"
+                class="bg-purple-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 w-full md:w-auto justify-center">
+            <i class="fa-solid fa-plus"></i> Add New Category
+        </button>
+    </div>
+
+    {{-- Table --}}
+    <div class="bg-white rounded-xl border overflow-x-auto">
         <table class="w-full text-left min-w-[700px]">
             <thead style="background: linear-gradient(to right, #7e22ce, #4f46e5); color: white;">
                 <tr>
@@ -28,6 +50,7 @@
                     <th class="px-4 py-3 text-xs uppercase">Category</th>
                     <th class="px-4 py-3 text-xs uppercase">Sub-cats</th>
                     <th class="px-4 py-3 text-xs uppercase">Date</th>
+                    <th class="px-4 py-3 text-xs uppercase">Status</th>
                     <th class="px-4 py-3 text-xs uppercase text-center">Actions</th>
                 </tr>
             </thead>
@@ -50,9 +73,16 @@
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-600">{{ $cat->children->count() }}</td>
                     <td class="px-4 py-3 text-sm text-gray-500">{{ $cat->created_at->format('d M Y') }}</td>
+                    <td class="px-4 py-3 text-sm">
+                        @if($cat->is_active)
+                            <span class="bg-green-100 text-green-800 text-[11px] font-semibold px-2.5 py-1 rounded-full">Active</span>
+                        @else
+                            <span class="bg-red-100 text-red-800 text-[11px] font-semibold px-2.5 py-1 rounded-full">Inactive</span>
+                        @endif
+                    </td>
                     <td class="px-4 py-3 text-center">
                         <div class="flex justify-center gap-2">
-                            <button onclick="openEditModal({{ $cat->id }}, '{{ addslashes($cat->name) }}', '{{ addslashes($cat->description ?? '') }}')"
+                            <button onclick="openEditModal({{ $cat->id }}, '{{ addslashes($cat->name) }}', '{{ addslashes($cat->description ?? '') }}', {{ $cat->is_active ? 1 : 0 }})"
                                     class="p-2 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs">
                                 <i class="fa-regular fa-pen-to-square"></i>
                             </button>
@@ -67,7 +97,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">No categories found.</td></tr>
+                <tr><td colspan="7" class="px-4 py-8 text-center text-gray-400">No categories found.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -99,6 +129,13 @@
                 <label class="block text-sm font-medium mb-1.5 text-gray-600">Description</label>
                 <textarea name="description" rows="5" placeholder="Enter category details..."
                           class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none resize-none"></textarea>
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1.5">Status</label>
+                <select name="is_active" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-purple-500">
+                    <option value="1">Active</option>
+                    <option value="0">Inactive</option>
+                </select>
             </div>
             <div class="flex gap-3 pt-1">
                 <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-medium text-sm">Save Category</button>
@@ -132,6 +169,13 @@
                 <textarea name="description" id="editDesc" rows="5"
                           class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none resize-none"></textarea>
             </div>
+            <div>
+                <label class="block text-sm font-medium mb-1.5">Status</label>
+                <select name="is_active" id="editStatus" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-purple-500">
+                    <option value="1">Active</option>
+                    <option value="0">Inactive</option>
+                </select>
+            </div>
             <div class="flex gap-3 pt-1">
                 <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-medium text-sm">Update Category</button>
                 <button type="button" onclick="closeModal('editModal')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 py-3 rounded-xl font-medium text-sm">Cancel</button>
@@ -153,9 +197,10 @@ function closeModal(id) {
     document.getElementById(id).classList.add('hidden');
     document.getElementById(id).classList.remove('flex');
 }
-function openEditModal(id, name, desc) {
+function openEditModal(id, name, desc, isActive) {
     document.getElementById('editName').value = name;
     document.getElementById('editDesc').value = desc;
+    document.getElementById('editStatus').value = isActive;
     document.getElementById('editForm').action = categoryUpdateUrlTemplate.replace('__ID__', encodeURIComponent(id));
     openModal('editModal');
 }

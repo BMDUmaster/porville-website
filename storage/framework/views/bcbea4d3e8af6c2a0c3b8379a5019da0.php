@@ -1,0 +1,45 @@
+<?php $__env->startSection('title', 'Contact Message'); ?>
+<?php $__env->startSection('page_title', 'Contact Message'); ?>
+
+<?php $__env->startSection('content'); ?>
+<div class="p-4 sm:p-6">
+    <div class="mb-4">
+        <a href="<?php echo e(route('dashboard.contact-messages')); ?>" class="inline-flex items-center gap-2 rounded-xl bg-slate-100 px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-200">
+            <i class="fa-solid fa-arrow-left text-xs"></i> Back
+        </a>
+    </div>
+
+    <div class="rounded-2xl border bg-white p-6 shadow-sm">
+        <div class="flex flex-col gap-4 border-b pb-5 md:flex-row md:items-start md:justify-between">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-[0.18em] text-green-600"><?php echo e($message->department); ?></p>
+                <h2 class="mt-2 text-2xl font-extrabold text-slate-900"><?php echo e($message->name); ?></h2>
+                <a href="mailto:<?php echo e($message->email); ?>" class="mt-1 inline-flex text-sm font-semibold text-blue-600"><?php echo e($message->email); ?></a>
+                <p class="mt-2 text-sm text-slate-400"><?php echo e($message->created_at->format('d M Y, h:i A')); ?></p>
+            </div>
+            <span class="w-fit rounded-full px-3 py-1 text-xs font-bold <?php echo e($message->read_at ? 'bg-slate-100 text-slate-500' : 'bg-green-100 text-green-700'); ?>">
+                <?php echo e($message->read_at ? 'Read' : 'Unread'); ?>
+
+            </span>
+        </div>
+
+        <div class="py-6">
+            <p class="whitespace-pre-line text-[15px] leading-8 text-slate-700"><?php echo e($message->message); ?></p>
+        </div>
+
+        <div class="flex flex-wrap gap-3 border-t pt-5">
+            <a href="mailto:<?php echo e($message->email); ?>" class="rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-700">
+                Reply by Email
+            </a>
+            <form method="POST" action="<?php echo e(route('dashboard.contact-messages.destroy', $message)); ?>" onsubmit="return confirm('Delete this message?')">
+                <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
+                <button type="submit" class="rounded-xl bg-red-50 px-5 py-3 text-sm font-bold text-red-600 hover:bg-red-100">
+                    Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.dashboard', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views\dashboard\contact-messages\show.blade.php ENDPATH**/ ?>

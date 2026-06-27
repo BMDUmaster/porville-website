@@ -23,7 +23,7 @@ class Order extends Model
         'user_id', 'delivery_boy_id', 'order_number', 'status', 'subtotal', 'discount',
         'shipping_cost', 'delivery_charge', 'platform_fee',
         'vendor_total', 'admin_commission', 'tax', 'total',
-        'shipping_address', 'payment_method', 'payment_status', 'delivery_slot',
+        'shipping_address', 'payment_method', 'payment_status', 'delivery_slot', 'delivery_day',
     ];
 
     protected $casts = [

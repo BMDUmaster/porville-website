@@ -135,6 +135,10 @@ html, body { overflow-x: hidden; max-width: 100vw; }
             <i class="fa-solid fa-cart-shopping text-blue-700"></i>
             <span class="nunito font-extrabold text-base">Your Cart</span>
             <span id="cart-badge-drawer" class="bg-blue-700 text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+            <div id="cart-day-tabs" class="hidden items-center rounded-full bg-slate-100 p-1">
+                <button type="button" data-cart-day-tab="today" onclick="selectCartDrawerDay('today')" class="rounded-full px-2.5 py-1 text-[10px] font-black uppercase">Today</button>
+                <button type="button" data-cart-day-tab="tomorrow" onclick="selectCartDrawerDay('tomorrow')" class="rounded-full px-2.5 py-1 text-[10px] font-black uppercase">Tomorrow</button>
+            </div>
         </div>
         <button onclick="closeCart()" class="text-gray-400 hover:text-gray-700 text-xl">&times;</button>
     </div>
@@ -187,7 +191,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
             <span>Total</span>
             <span id="cart-total-drawer">Rs0.00</span>
         </div>
-        <a href="{{ route('frontend.checkout') }}"
+        <a id="cart-checkout-link" href="{{ route('frontend.checkout') }}"
            class="flex items-center justify-center gap-2 w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl text-sm mb-2">
             <i class="fa-solid fa-lock text-xs"></i> Proceed to Checkout
         </a>
@@ -549,6 +553,12 @@ function addToCart(productId, variantIndex, pricingDay = 'today') {
 function formatCartCurrency(amount) {
     return 'Rs' + Number(amount || 0).toFixed(2);
 }
+let selectedCartDrawerDay = 'today';
+
+function selectCartDrawerDay(day) {
+    selectedCartDrawerDay = day === 'tomorrow' ? 'tomorrow' : 'today';
+    refreshCartDrawer();
+}
 function renderCartDrawerItems(items) {
     const container = document.getElementById('cart-items-drawer');
 
@@ -574,9 +584,18 @@ function renderCartDrawerItems(items) {
                             <i class="fa-solid fa-xmark text-xs"></i>
                         </button>
                     </div>
-                    <p class="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-                        ${item.variant_label || item.unit || 'Fresh Cut'}
-                    </p>
+                    <div class="mt-1 flex flex-wrap items-center gap-1.5">
+                        <span class="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+                            ${item.variant_label || item.unit || 'Fresh Cut'}
+                        </span>
+                        <span class="inline-flex items-center rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                            item.pricing_day === 'tomorrow'
+                                ? 'bg-amber-50 text-amber-700 border-amber-100'
+                                : 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                        }">
+                            ${item.pricing_day === 'tomorrow' ? 'Tomorrow' : 'Today'}
+                        </span>
+                    </div>
                     <div class="mt-3 flex items-end justify-between gap-3">
                         <div>
                             <p class="text-sm font-black text-slate-900">${formatCartCurrency(item.price)}</p>
@@ -641,7 +660,7 @@ function updateCartDrawerDeliverySlot(value) {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
             'Accept': 'application/json',
         },
-        body: JSON.stringify({ delivery_slot: value })
+        body: JSON.stringify({ delivery_slot: value, delivery_day: selectedCartDrawerDay })
     })
     .then(r => r.json())
     .then(data => {
@@ -698,14 +717,17 @@ function renderDrawerDeliverySlots(options = [], selectedValue = '') {
 
 // Refresh cart drawer
 function refreshCartDrawer() {
-    fetch('{{ route("frontend.cart.count") }}')
+    fetch('{{ route("frontend.cart.count") }}?delivery_day=' + encodeURIComponent(selectedCartDrawerDay))
         .then(r => r.json())
         .then(data => {
+            selectedCartDrawerDay = data.delivery_day || selectedCartDrawerDay;
             document.getElementById('header-cart-badge').textContent = data.count;
             document.getElementById('cart-badge-drawer').textContent = data.count + ' item' + (data.count !== 1 ? 's' : '');
             document.getElementById('cart-subtotal-drawer').textContent = formatCartCurrency(data.subtotal);
             const chargePercent = Number(data.service_charge_percent || 0);
-            const chargePercentText = chargePercent.toFixed(chargePercent % 1 === 0 ? 0 : 2).replace(/\.?0+$/, '');
+            const chargePercentText = Number.isInteger(chargePercent)
+                ? String(chargePercent)
+                : chargePercent.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
             document.getElementById('cart-delivery-charge-drawer').textContent = formatCartCurrency(data.delivery_charge);
             document.getElementById('cart-service-charge-label').textContent = '\u2139\uFE0F Service Charge (' + chargePercentText + '%)';
             document.getElementById('cart-service-charge-drawer').textContent = formatCartCurrency(data.service_charge);
@@ -719,6 +741,20 @@ function refreshCartDrawer() {
             const drawerDayLabel = document.getElementById('drawer-delivery-day-label');
             if (drawerDayLabel) {
                 drawerDayLabel.textContent = data.delivery_day_label || 'Today';
+            }
+            const availableDays = data.available_days || [];
+            const dayTabs = document.getElementById('cart-day-tabs');
+            dayTabs?.classList.toggle('hidden', availableDays.length < 2);
+            dayTabs?.classList.toggle('flex', availableDays.length >= 2);
+            document.querySelectorAll('[data-cart-day-tab]').forEach((tab) => {
+                const isActive = tab.dataset.cartDayTab === selectedCartDrawerDay;
+                tab.classList.toggle('bg-blue-700', isActive);
+                tab.classList.toggle('text-white', isActive);
+                tab.classList.toggle('text-slate-500', !isActive);
+            });
+            const checkoutLink = document.getElementById('cart-checkout-link');
+            if (checkoutLink) {
+                checkoutLink.href = '{{ route("frontend.checkout") }}?delivery_day=' + encodeURIComponent(selectedCartDrawerDay);
             }
             renderDrawerDeliverySlots(data.delivery_slot_options || [], data.selected_delivery_slot || '');
             document.querySelectorAll('[data-drawer-delivery-slot]').forEach((chip) => {

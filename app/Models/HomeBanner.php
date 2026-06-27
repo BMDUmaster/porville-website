@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class HomeBanner extends Model
 {
@@ -33,6 +32,9 @@ class HomeBanner extends Model
             return $this->image;
         }
 
-        return Storage::url($this->image);
+        // Match the product/category image URLs. On deployments where public
+        // is not the document root, ASSET_URL supplies the required /public
+        // segment while APP_URL remains the clean application URL.
+        return asset('storage/' . ltrim($this->image, '/'));
     }
 }

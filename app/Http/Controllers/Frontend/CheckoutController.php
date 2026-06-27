@@ -21,12 +21,16 @@ class CheckoutController extends Controller
     private const COD_MAX_SUBTOTAL = 2000;
 
     /** GET /checkout */
-    public function index()
+    public function index(Request $request)
     {
         $cart = session('cart', []);
         if (empty($cart)) {
             return redirect()->route('frontend.cart')->with('error', 'Your cart is empty.');
         }
+
+        $checkoutDay = $this->checkoutDay($request, $cart);
+        $cart = $this->cartForDay($cart, $checkoutDay);
+        session(['checkout_delivery_day' => $checkoutDay]);
 
         try {
             $items = $this->buildCartItems($cart);
@@ -36,28 +40,50 @@ class CheckoutController extends Controller
 
         $subtotal = collect($items)->sum('subtotal');
         $checkoutDefaults = $this->checkoutDefaults();
-        $selectedDeliverySlot = old('delivery_slot', session('selected_delivery_slot'));
+        $selectedDeliverySlot = old('delivery_slot', session('selected_delivery_slot_' . $checkoutDay));
         $deliverySlotOptions = $this->deliverySlotOptionsForCart($cart);
 
         if (! in_array($selectedDeliverySlot, array_column($deliverySlotOptions, 'value'), true)) {
             $selectedDeliverySlot = $deliverySlotOptions[0]['value'] ?? null;
-            session(['selected_delivery_slot' => $selectedDeliverySlot]);
+            session(['selected_delivery_slot_' . $checkoutDay => $selectedDeliverySlot]);
         }
 
-        $pricing = OrderPricing::summary($subtotal, auth('web_frontend')->user());
+        $pricing = OrderPricing::summary($subtotal, auth('web_frontend')->user(), $this->pricingDayForCart($cart));
         $availableCoupons = Coupon::valid()
             ->orderBy('min_order_amount')
             ->orderByDesc('value')
             ->limit(8)
             ->get();
 
-        return view('frontend.checkout', compact('items', 'subtotal', 'checkoutDefaults', 'selectedDeliverySlot', 'pricing', 'availableCoupons'));
+        $user = auth('web_frontend')->user();
+        $pastAddresses = [];
+        if ($user) {
+            $pastAddresses = $user->orders()
+                ->whereNotNull('shipping_address')
+                ->latest()
+                ->pluck('shipping_address')
+                ->filter()
+                ->unique(function ($address) {
+                    return strtolower(
+                        trim($address['address'] ?? '') . '|' . 
+                        trim($address['city'] ?? '') . '|' . 
+                        trim($address['state'] ?? '') . '|' . 
+                        trim($address['pincode'] ?? '')
+                    );
+                })
+                ->values()
+                ->all();
+        }
+
+        return view('frontend.checkout', compact('items', 'subtotal', 'checkoutDefaults', 'selectedDeliverySlot', 'pricing', 'availableCoupons', 'pastAddresses'));
     }
 
     /** POST /checkout */
     public function store(Request $request)
     {
-        $cart = session('cart', []);
+        $fullCart = session('cart', []);
+        $checkoutDay = ProductDayPricing::normalizeDay(session('checkout_delivery_day', 'today'));
+        $cart = $this->cartForDay($fullCart, $checkoutDay);
 
         $data = $request->validate([
             'first_name'       => 'required|string|max:60',
@@ -75,7 +101,7 @@ class CheckoutController extends Controller
             'phone.regex' => 'Phone number must be 10 or 12 digits.',
         ]);
 
-        session(['selected_delivery_slot' => $data['delivery_slot']]);
+        session(['selected_delivery_slot_' . $checkoutDay => $data['delivery_slot']]);
 
         if (empty($cart)) {
             return redirect()->route('frontend.cart');
@@ -89,7 +115,7 @@ class CheckoutController extends Controller
         $items = $this->buildCartItems($cart);
         $subtotal = collect($items)->sum('subtotal');
         $user = auth('web_frontend')->user();
-        $pricing = OrderPricing::summary($subtotal, $user);
+        $pricing = OrderPricing::summary($subtotal, $user, $this->pricingDayForCart($cart));
 
         if ($data['payment_method'] === 'COD' && $subtotal > self::COD_MAX_SUBTOTAL) {
             throw ValidationException::withMessages([
@@ -97,7 +123,7 @@ class CheckoutController extends Controller
             ]);
         }
 
-        $order = DB::transaction(function () use ($data, $items, $subtotal, $pricing, $user) {
+        $order = DB::transaction(function () use ($data, $items, $subtotal, $pricing, $user, $checkoutDay) {
             $discount = 0;
             $coupon = $this->resolveCoupon($data['coupon_code'] ?? null, $subtotal, true);
 
@@ -135,6 +161,7 @@ class CheckoutController extends Controller
                 'payment_method'   => $data['payment_method'],
                 'payment_status'   => 'pending',
                 'delivery_slot'    => $data['delivery_slot'],
+                'delivery_day'     => $checkoutDay,
             ]);
 
             foreach ($items as $item) {
@@ -159,7 +186,9 @@ class CheckoutController extends Controller
             return $order;
         });
 
-        session()->forget('cart');
+        $remainingCart = array_diff_key($fullCart, $cart);
+        session(['cart' => $remainingCart]);
+        session()->forget('checkout_delivery_day');
 
         return redirect()->route('frontend.order.success', $order->id);
     }
@@ -392,5 +421,30 @@ class CheckoutController extends Controller
             ->values();
 
         return $days->contains('tomorrow') && ! $days->contains('today');
+    }
+
+    private function pricingDayForCart(array $cart): string
+    {
+        return $this->usesTomorrowDelivery($cart) ? 'tomorrow' : 'today';
+    }
+
+    private function checkoutDay(Request $request, array $cart): string
+    {
+        $requestedDay = ProductDayPricing::normalizeDay($request->query('delivery_day'));
+        $availableDays = collect($cart)
+            ->map(fn ($item) => ProductDayPricing::normalizeDay($item['pricing_day'] ?? 'today'))
+            ->unique();
+
+        return $availableDays->contains($requestedDay)
+            ? $requestedDay
+            : ($availableDays->first() ?? 'today');
+    }
+
+    private function cartForDay(array $cart, string $day): array
+    {
+        return array_filter(
+            $cart,
+            fn ($item) => ProductDayPricing::normalizeDay($item['pricing_day'] ?? 'today') === $day
+        );
     }
 }

@@ -190,7 +190,7 @@
 ?>
 
 <section class="relative bg-[#0a0f1a] px-0 py-0">
-    <div id="home-hero-carousel" class="home-hero-card relative h-[370px] overflow-hidden md:h-[450px]">
+    <div id="home-hero-carousel" class="home-hero-card relative h-[300px] overflow-hidden md:h-[340px]">
         <?php $__currentLoopData = $heroSlides; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $slide): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="home-hero-slide <?php echo e($index === 0 ? 'active' : ''); ?> absolute inset-0" data-home-hero-slide="<?php echo e($index); ?>">
                 <img
@@ -1135,4 +1135,4 @@
 </script>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('frontend.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views/frontend/home.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('frontend.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views\frontend\home.blade.php ENDPATH**/ ?>

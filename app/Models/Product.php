@@ -38,7 +38,16 @@ class Product extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('products.is_active', true)
+            ->whereHas('category', function ($q) {
+                $q->where('is_active', true);
+            })
+            ->where(function ($q) {
+                $q->whereNull('subcategory_id')
+                  ->orWhereHas('subcategory', function ($sq) {
+                      $sq->where('is_active', true);
+                  });
+            });
     }
 
     public function getDisplayPackLabelAttribute(): string

@@ -11,7 +11,8 @@ class ServiceChargeController extends Controller
     public function index()
     {
         return view('dashboard.settings.service-charge', [
-            'serviceChargePercent' => ServiceChargeManager::percentage(),
+            'todayServiceChargePercent' => ServiceChargeManager::percentage('today'),
+            'tomorrowServiceChargePercent' => ServiceChargeManager::percentage('tomorrow'),
             'defaultPercent' => ServiceChargeManager::defaultPercentage(),
         ]);
     }
@@ -19,11 +20,16 @@ class ServiceChargeController extends Controller
     public function update(Request $request)
     {
         $data = $request->validate([
-            'service_charge_percent' => ['required', 'numeric', 'min:0', 'max:100'],
+            'today_service_charge_percent' => ['required', 'numeric', 'min:0', 'max:100'],
+            'tomorrow_service_charge_percent' => ['required', 'numeric', 'min:0', 'max:100'],
         ]);
 
-        $savedPercent = ServiceChargeManager::updatePercentage((float) $data['service_charge_percent']);
+        $todayPercent = ServiceChargeManager::updatePercentage((float) $data['today_service_charge_percent'], 'today');
+        $tomorrowPercent = ServiceChargeManager::updatePercentage((float) $data['tomorrow_service_charge_percent'], 'tomorrow');
 
-        return back()->with('success', 'Service charge updated to ' . rtrim(rtrim(number_format($savedPercent, 2), '0'), '.') . '%.');
+        return back()->with(
+            'success',
+            'Service charge updated. Today: ' . rtrim(rtrim(number_format($todayPercent, 2), '0'), '.') . '%, Tomorrow: ' . rtrim(rtrim(number_format($tomorrowPercent, 2), '0'), '.') . '%.'
+        );
     }
 }

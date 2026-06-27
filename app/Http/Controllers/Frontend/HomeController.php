@@ -12,7 +12,7 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $newArrivalProductIds = Product::query()
+        $newArrivalProductIds = Product::active()
             ->latest('created_at')
             ->latest('id')
             ->take(5)
@@ -23,14 +23,14 @@ class HomeController extends Controller
             ->where('is_active', true)
             ->with(['children' => fn($query) => $query
                 ->where('is_active', true)
-                ->withCount('products')
+                ->withCount(['products' => fn($q) => $q->active()])
                 ->orderBy('name')
             ])
             ->withCount('children')
-            ->withCount('products')
+            ->withCount(['products' => fn($q) => $q->active()])
             ->get();
 
-        $latestProducts = Product::with('category')
+        $latestProducts = Product::active()->with('category')
             ->orderByDesc('created_at')
             ->orderByDesc('id');
 
@@ -39,14 +39,14 @@ class HomeController extends Controller
             ->get();
 
         if ($newArrivals->isEmpty()) {
-            $newArrivals = Product::with('category')
+            $newArrivals = Product::active()->with('category')
                 ->orderByDesc('created_at')
                 ->orderByDesc('id')
                 ->take(8)
                 ->get();
         }
 
-        $featuredProducts = Product::with('category')
+        $featuredProducts = Product::active()->with('category')
             ->inRandomOrder()
             ->take(4)
             ->get();
@@ -55,7 +55,7 @@ class HomeController extends Controller
             $featuredProducts = $newArrivals->take(4)->values();
         }
 
-        $bestSellers = Product::with('category')
+        $bestSellers = Product::active()->with('category')
             ->withSum([
                 'orderItems as ordered_quantity' => fn($query) => $query->whereHas(
                     'order',

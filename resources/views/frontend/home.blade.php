@@ -190,7 +190,7 @@
 @endphp
 
 <section class="relative bg-[#0a0f1a] px-0 py-0">
-    <div id="home-hero-carousel" class="home-hero-card relative h-[370px] overflow-hidden md:h-[450px]">
+    <div id="home-hero-carousel" class="home-hero-card relative h-[300px] overflow-hidden md:h-[340px]">
         @foreach($heroSlides as $index => $slide)
             <div class="home-hero-slide {{ $index === 0 ? 'active' : '' }} absolute inset-0" data-home-hero-slide="{{ $index }}">
                 <img

@@ -233,7 +233,7 @@ function sendRegisterOtp() {
             throw new Error(message);
         }
 
-        setOtpStatus(data.message || 'Use OTP 1111 to continue.', true);
+        setOtpStatus(data.message || 'OTP sent successfully. Please check your email.', true);
         document.getElementById('emailOtp').focus();
     })
     .catch((error) => {

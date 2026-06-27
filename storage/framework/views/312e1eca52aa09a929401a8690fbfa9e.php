@@ -424,4 +424,4 @@
     <?php echo $__env->yieldContent('scripts'); ?>
 </body>
 </html>
-<?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views/layouts/dashboard.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views\layouts\dashboard.blade.php ENDPATH**/ ?>

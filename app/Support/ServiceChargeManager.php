@@ -8,13 +8,17 @@ use Illuminate\Support\Facades\Cache;
 class ServiceChargeManager
 {
     public const SETTING_KEY = 'service_charge_percent';
-    private const CACHE_KEY = 'service_charge_percent';
+    public const TOMORROW_SETTING_KEY = 'service_charge_percent_tomorrow';
+    private const CACHE_KEY_PREFIX = 'service_charge_percent_';
 
-    public static function percentage(): float
+    public static function percentage(?string $day = 'today'): float
     {
-        return Cache::rememberForever(self::CACHE_KEY, function () {
+        $day = self::normalizeDay($day);
+        $settingKey = self::settingKeyForDay($day);
+
+        return Cache::rememberForever(self::cacheKeyForDay($day), function () use ($settingKey) {
             $storedValue = AppSetting::query()
-                ->where('key', self::SETTING_KEY)
+                ->where('key', $settingKey)
                 ->value('value');
 
             if ($storedValue === null || $storedValue === '') {
@@ -25,27 +29,28 @@ class ServiceChargeManager
         });
     }
 
-    public static function updatePercentage(float $percentage): float
+    public static function updatePercentage(float $percentage, ?string $day = 'today'): float
     {
+        $day = self::normalizeDay($day);
         $normalized = self::normalizePercentage($percentage);
 
         AppSetting::query()->updateOrCreate(
-            ['key' => self::SETTING_KEY],
+            ['key' => self::settingKeyForDay($day)],
             ['value' => (string) $normalized]
         );
 
-        Cache::forget(self::CACHE_KEY);
+        Cache::forget(self::cacheKeyForDay($day));
 
         return $normalized;
     }
 
-    public static function calculate(float $subtotal): float
+    public static function calculate(float $subtotal, ?string $day = 'today'): float
     {
         if ($subtotal <= 0) {
             return 0.0;
         }
 
-        return round($subtotal * self::percentage() / 100, 2);
+        return round($subtotal * self::percentage($day) / 100, 2);
     }
 
     public static function defaultPercentage(): float
@@ -56,5 +61,20 @@ class ServiceChargeManager
     private static function normalizePercentage(float $percentage): float
     {
         return round(min(max($percentage, 0), 100), 2);
+    }
+
+    private static function normalizeDay(?string $day): string
+    {
+        return $day === 'tomorrow' ? 'tomorrow' : 'today';
+    }
+
+    private static function settingKeyForDay(string $day): string
+    {
+        return $day === 'tomorrow' ? self::TOMORROW_SETTING_KEY : self::SETTING_KEY;
+    }
+
+    private static function cacheKeyForDay(string $day): string
+    {
+        return self::CACHE_KEY_PREFIX . $day;
     }
 }

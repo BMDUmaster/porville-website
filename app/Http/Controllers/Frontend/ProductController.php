@@ -5,22 +5,24 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Coupon;
+use App\Models\HomeBanner;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $newArrivalProductIds = Product::query()
+        $newArrivalProductIds = Product::active()
             ->latest('created_at')
             ->latest('id')
             ->take(5)
             ->pluck('id')
             ->all();
 
-        $query = Product::with(['category', 'subcategory']);
+        $query = Product::active()->with(['category', 'subcategory']);
 
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
@@ -63,7 +65,7 @@ class ProductController extends Controller
         $categories = Category::parents()
             ->where('is_active', true)
             ->withCount([
-                'products as active_products_count' => fn($productQuery) => $productQuery->where('is_active', true),
+                'products as active_products_count' => fn($productQuery) => $productQuery->active(),
             ])
             ->get();
 
@@ -84,26 +86,35 @@ class ProductController extends Controller
         $sidebarMaxPrice = (int) ceil((Product::max('price') ?? 500) / 50) * 50;
         $sidebarMaxPrice = max($sidebarMaxPrice, 500);
 
+        $sharedHeroBanner = Schema::hasTable('home_banners')
+            ? HomeBanner::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->latest('id')
+                ->first()
+            : null;
+
         return view('frontend.products', compact(
             'products',
             'categories',
             'sidebarBestDeals',
             'sidebarNewArrivals',
             'sidebarMaxPrice',
-            'newArrivalProductIds'
+            'newArrivalProductIds',
+            'sharedHeroBanner'
         ));
     }
 
     public function show($slug)
     {
-        $newArrivalProductIds = Product::query()
+        $newArrivalProductIds = Product::active()
             ->latest('created_at')
             ->latest('id')
             ->take(5)
             ->pluck('id')
             ->all();
 
-        $product = Product::with(['category', 'subcategory'])
+        $product = Product::active()->with(['category', 'subcategory'])
             ->where('slug', $slug)
             ->firstOrFail();
 

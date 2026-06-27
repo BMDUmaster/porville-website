@@ -14,6 +14,12 @@
                 </div>
             @endif
 
+            @if(session('success'))
+                <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
+                    {{ session('success') }}
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('frontend.login.post') }}" class="space-y-4">
                 @csrf
                 <div>
@@ -33,6 +39,9 @@
                         <input type="checkbox" name="remember" class="accent-blue-600">
                         <span class="text-sm text-gray-600">Remember me</span>
                     </label>
+                    <a href="{{ route('frontend.password.forgot') }}" class="text-sm font-semibold text-blue-700 transition hover:text-blue-800 hover:underline">
+                        Forgot password?
+                    </a>
                 </div>
                 <button type="submit"
                         class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl text-sm transition">

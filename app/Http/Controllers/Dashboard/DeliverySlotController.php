@@ -17,7 +17,8 @@ class DeliverySlotController extends Controller
 
         return view('dashboard.settings.delivery-slots', [
             'settings' => $settings,
-            'previewSlots' => DeliverySlotManager::options(),
+            'previewSlots' => DeliverySlotManager::options('today'),
+            'previewTomorrowSlots' => DeliverySlotManager::options('tomorrow'),
             'deliveryCharge' => DeliveryChargeManager::amount(),
             'defaultDeliveryCharge' => DeliveryChargeManager::defaultAmount(),
         ]);
@@ -31,27 +32,54 @@ class DeliverySlotController extends Controller
             'evening_start' => ['nullable', 'date_format:H:i'],
             'last_end' => ['nullable', 'date_format:H:i'],
             'slot_duration_hours' => ['required', 'integer', 'min:1', 'max:6'],
+            
+            'tomorrow_fixed_slots_text' => ['nullable', 'string'],
+            'tomorrow_evening_start' => ['nullable', 'date_format:H:i'],
+            'tomorrow_last_end' => ['nullable', 'date_format:H:i'],
+            'tomorrow_slot_duration_hours' => ['required', 'integer', 'min:1', 'max:6'],
         ]);
 
         $fixedSlots = $this->parseFixedSlots((string) ($data['fixed_slots_text'] ?? ''));
         $eveningStart = $data['evening_start'] ?? null;
         $lastEnd = $data['last_end'] ?? null;
 
+        $tomorrowFixedSlots = $this->parseFixedSlots((string) ($data['tomorrow_fixed_slots_text'] ?? ''));
+        $tomorrowEveningStart = $data['tomorrow_evening_start'] ?? null;
+        $tomorrowLastEnd = $data['tomorrow_last_end'] ?? null;
+
         if (($eveningStart && ! $lastEnd) || (! $eveningStart && $lastEnd)) {
             throw ValidationException::withMessages([
-                'evening_start' => 'Both evening start and last slot end are required together.',
+                'evening_start' => 'Both evening start and last slot end are required together for Today.',
             ]);
         }
 
         if ($eveningStart && $lastEnd && $lastEnd <= $eveningStart) {
             throw ValidationException::withMessages([
-                'last_end' => 'Last slot end must be later than evening start.',
+                'last_end' => 'Last slot end must be later than evening start for Today.',
+            ]);
+        }
+
+        if (($tomorrowEveningStart && ! $tomorrowLastEnd) || (! $tomorrowEveningStart && $tomorrowLastEnd)) {
+            throw ValidationException::withMessages([
+                'tomorrow_evening_start' => 'Both evening start and last slot end are required together for Tomorrow.',
+            ]);
+        }
+
+        if ($tomorrowEveningStart && $tomorrowLastEnd && $tomorrowLastEnd <= $tomorrowEveningStart) {
+            throw ValidationException::withMessages([
+                'tomorrow_last_end' => 'Last slot end must be later than evening start for Tomorrow.',
             ]);
         }
 
         if (empty($fixedSlots) && ! $eveningStart && ! $lastEnd) {
             throw ValidationException::withMessages([
-                'fixed_slots_text' => 'Please keep at least one delivery slot available.',
+                'fixed_slots_text' => 'Please keep at least one delivery slot available for Today.',
+            ]);
+        }
+
+        if (empty($tomorrowFixedSlots) && ! $tomorrowEveningStart && ! $tomorrowLastEnd) {
+            throw ValidationException::withMessages([
+                'tomorrow_fixed_slots_text' => 'Please keep at least one delivery slot available for Tomorrow.',
             ]);
         }
 
@@ -62,6 +90,11 @@ class DeliverySlotController extends Controller
             'evening_start' => $eveningStart,
             'last_end' => $lastEnd,
             'slot_duration_hours' => (int) $data['slot_duration_hours'],
+
+            'tomorrow_fixed_slots' => $tomorrowFixedSlots,
+            'tomorrow_evening_start' => $tomorrowEveningStart,
+            'tomorrow_last_end' => $tomorrowLastEnd,
+            'tomorrow_slot_duration_hours' => (int) $data['tomorrow_slot_duration_hours'],
         ]);
 
         return back()->with('success', 'Delivery slots and delivery charge updated successfully.');

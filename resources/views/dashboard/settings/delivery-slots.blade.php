@@ -55,20 +55,25 @@
                             </div>
                         </div>
 
+                        {{-- Today's Slots --}}
+                        <div class="border-b border-slate-100 pb-3">
+                            <h3 class="text-sm font-bold uppercase tracking-[0.12em] text-blue-700">Today's Delivery Slots</h3>
+                        </div>
+
                         <div class="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
                             <div class="flex items-start gap-3">
                                 <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
                                     <i class="fa-regular fa-clock text-lg"></i>
                                 </div>
                                 <div class="min-w-0">
-                                    <h2 class="text-lg font-black text-slate-900">Fixed Slots</h2>
+                                    <h2 class="text-lg font-black text-slate-900">Today's Fixed Slots</h2>
                                     <p class="mt-1 text-sm text-slate-500">Add one slot per line using <span class="font-semibold text-slate-700">HH:MM-HH:MM</span>. Example: <span class="font-semibold text-slate-700">10:00-12:00</span>.</p>
                                 </div>
                             </div>
 
                             <div class="mt-6">
                                 <label for="fixedSlotsText" class="mb-2 block text-sm font-bold text-slate-700">Fixed Slot Lines</label>
-                                <textarea id="fixedSlotsText" name="fixed_slots_text" rows="6"
+                                <textarea id="fixedSlotsText" name="fixed_slots_text" rows="4"
                                           class="w-full rounded-2xl border border-slate-300 px-5 py-3 text-sm font-medium text-slate-800 outline-none transition focus:border-blue-500">{{ old('fixed_slots_text', $settings['fixed_slots_text']) }}</textarea>
                             </div>
                         </div>
@@ -79,7 +84,7 @@
                                     <i class="fa-solid fa-sliders text-lg"></i>
                                 </div>
                                 <div class="min-w-0">
-                                    <h2 class="text-lg font-black text-slate-900">Evening Slot Generator</h2>
+                                    <h2 class="text-lg font-black text-slate-900">Today's Evening Slot Generator</h2>
                                     <p class="mt-1 text-sm text-slate-500">These controls create repeating evening slots automatically.</p>
                                 </div>
                             </div>
@@ -106,19 +111,92 @@
                                 </div>
                             </div>
                         </div>
+
+                        {{-- Tomorrow's Slots --}}
+                        <div class="border-b border-slate-100 pt-4 pb-3">
+                            <h3 class="text-sm font-bold uppercase tracking-[0.12em] text-teal-700">Tomorrow's Delivery Slots</h3>
+                        </div>
+
+                        <div class="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
+                            <div class="flex items-start gap-3">
+                                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+                                    <i class="fa-regular fa-clock text-lg"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h2 class="text-lg font-black text-slate-900">Tomorrow's Fixed Slots</h2>
+                                    <p class="mt-1 text-sm text-slate-500">Add one slot per line using <span class="font-semibold text-slate-700">HH:MM-HH:MM</span>. Example: <span class="font-semibold text-slate-700">10:00-12:00</span>.</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-6">
+                                <label for="tomorrowFixedSlotsText" class="mb-2 block text-sm font-bold text-slate-700">Fixed Slot Lines</label>
+                                <textarea id="tomorrowFixedSlotsText" name="tomorrow_fixed_slots_text" rows="4"
+                                          class="w-full rounded-2xl border border-slate-300 px-5 py-3 text-sm font-medium text-slate-800 outline-none transition focus:border-blue-500">{{ old('tomorrow_fixed_slots_text', $settings['tomorrow_fixed_slots_text']) }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
+                            <div class="flex items-start gap-3">
+                                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+                                    <i class="fa-solid fa-sliders text-lg"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h2 class="text-lg font-black text-slate-900">Tomorrow's Evening Slot Generator</h2>
+                                    <p class="mt-1 text-sm text-slate-500">These controls create repeating evening slots automatically for Tomorrow.</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 grid gap-4 sm:grid-cols-3">
+                                <div>
+                                    <label for="tomorrowEveningStart" class="mb-2 block text-sm font-bold text-slate-700">Evening Start</label>
+                                    <input type="time" id="tomorrowEveningStart" name="tomorrow_evening_start" value="{{ old('tomorrow_evening_start', $settings['tomorrow_evening_start']) }}"
+                                           class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 outline-none transition focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label for="tomorrowLastEnd" class="mb-2 block text-sm font-bold text-slate-700">Last Slot End</label>
+                                    <input type="time" id="tomorrowLastEnd" name="tomorrow_last_end" value="{{ old('tomorrow_last_end', $settings['tomorrow_last_end']) }}"
+                                           class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 outline-none transition focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label for="tomorrowSlotDurationHours" class="mb-2 block text-sm font-bold text-slate-700">Duration (Hours)</label>
+                                    <select id="tomorrowSlotDurationHours" name="tomorrow_slot_duration_hours"
+                                            class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 outline-none transition focus:border-blue-500">
+                                        @foreach([1, 2, 3, 4, 5, 6] as $hours)
+                                            <option value="{{ $hours }}" {{ (int) old('tomorrow_slot_duration_hours', $settings['tomorrow_slot_duration_hours']) === $hours ? 'selected' : '' }}>{{ $hours }} hour{{ $hours > 1 ? 's' : '' }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-5">
-                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Preview</p>
-                        <div class="mt-4 space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
-                            @forelse($previewSlots as $slot)
-                                <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-sm">
-                                    <span class="font-semibold text-slate-800">{{ $slot['label'] }}</span>
-                                    <span class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">{{ $slot['value'] }}</span>
-                                </div>
-                            @empty
-                                <p class="text-sm text-slate-400">No slots configured yet.</p>
-                            @endforelse
+                    <div class="rounded-[24px] border border-slate-200 bg-slate-50 p-5 space-y-6">
+                        <div>
+                            <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Today's Slots Preview</p>
+                            <div class="mt-4 space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
+                                @forelse($previewSlots as $slot)
+                                    <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-sm">
+                                        <span class="font-semibold text-slate-800">{{ $slot['label'] }}</span>
+                                        <span class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">{{ $slot['value'] }}</span>
+                                    </div>
+                                @empty
+                                    <p class="text-sm text-slate-400">No slots configured yet.</p>
+                                @endforelse
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Tomorrow's Slots Preview</p>
+                            <div class="mt-4 space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
+                                @forelse($previewTomorrowSlots as $slot)
+                                    <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-sm">
+                                        <span class="font-semibold text-slate-800">{{ $slot['label'] }}</span>
+                                        <span class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">{{ $slot['value'] }}</span>
+                                    </div>
+                                @empty
+                                    <p class="text-sm text-slate-400">No slots configured yet.</p>
+                                @endforelse
+                            </div>
                         </div>
 
                         <button type="submit" class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700">

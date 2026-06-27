@@ -3,9 +3,21 @@
 
 @section('content')
 <div class="max-w-6xl mx-auto px-4 py-8">
-    <h1 class="nunito mb-6 text-2xl font-extrabold text-gray-800">
-        Your Cart <span class="text-base font-semibold text-gray-400">({{ count($items) }} items)</span>
-    </h1>
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h1 class="nunito text-2xl font-extrabold text-gray-800">
+            Your Cart <span class="text-base font-semibold text-gray-400">({{ count($items) }} items)</span>
+        </h1>
+        @if(($availableDays ?? collect())->count() > 1)
+            <div class="flex rounded-full bg-slate-100 p-1">
+                @foreach(['today' => 'Today', 'tomorrow' => 'Tomorrow'] as $day => $label)
+                    <a href="{{ route('frontend.cart', ['delivery_day' => $day]) }}"
+                       class="{{ $selectedDay === $day ? 'bg-blue-700 text-white shadow' : 'text-slate-500' }} rounded-full px-4 py-2 text-xs font-black uppercase">
+                        {{ $label }}
+                    </a>
+                @endforeach
+            </div>
+        @endif
+    </div>
 
     @if(empty($items))
         <div class="rounded-2xl border bg-white p-16 text-center">
@@ -91,10 +103,12 @@
                                 @if($item['variant_label'])
                                     <p class="mt-1 text-xs text-gray-400">{{ $item['variant_label'] }}</p>
                                 @endif
-                                @if(!empty($item['pricing_day_label']))
-                                    <p class="mt-1 text-xs font-semibold text-blue-600">{{ $item['pricing_day_label'] }} price</p>
-                                @endif
                                 <p class="mt-1 text-xs text-gray-400">{{ $item['unit'] }}</p>
+                                <div class="mt-1.5">
+                                    <span class="inline-flex items-center rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider {{ ($item['pricing_day'] ?? 'today') === 'tomorrow' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100' }}">
+                                        {{ ($item['pricing_day'] ?? 'today') === 'tomorrow' ? 'Tomorrow\'s Delivery' : 'Today\'s Delivery' }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                         <div class="col-span-2 text-left md:text-center">
@@ -147,7 +161,7 @@
                         </div>
                     </div>
                     <div class="px-6 pb-6">
-                        <a href="{{ route('frontend.checkout') }}"
+                        <a href="{{ route('frontend.checkout', ['delivery_day' => $selectedDay]) }}"
                            class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-700 py-3.5 text-sm font-bold text-white transition hover:bg-blue-800">
                             <i class="fa-solid fa-lock text-xs"></i> Proceed to Checkout
                         </a>
@@ -181,7 +195,7 @@ function updateCartDeliverySlot(value) {
     fetch('{{ route("frontend.cart.delivery-slot") }}', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
-        body: JSON.stringify({ delivery_slot: value })
+        body: JSON.stringify({ delivery_slot: value, delivery_day: @json($selectedDay) })
     }).then(r => r.json()).then(d => {
         if (!d.success) return;
 

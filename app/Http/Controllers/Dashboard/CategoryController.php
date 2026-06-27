@@ -44,9 +44,11 @@ class CategoryController extends Controller
                 'name'        => 'required|string|max:100',
                 'description' => 'nullable|string',
                 'image'       => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,avif|max:5120',
+                'is_active'   => 'nullable|boolean',
             ]);
 
             $data['slug'] = $this->generateUniqueSlug($data['name']);
+            $data['is_active'] = $request->boolean('is_active', true);
 
             if ($request->hasFile('image')) {
                 $data['image'] = WebpImage::store($request->file('image'), 'categories');
@@ -73,9 +75,11 @@ class CategoryController extends Controller
                 'name'        => 'required|string|max:100',
                 'description' => 'nullable|string',
                 'image'       => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,avif|max:5120',
+                'is_active'   => 'nullable|boolean',
             ]);
 
             $data['slug'] = $this->generateUniqueSlug($data['name'], $category->id);
+            $data['is_active'] = $request->boolean('is_active');
 
             if ($request->hasFile('image')) {
                 $data['image'] = WebpImage::store($request->file('image'), 'categories');

@@ -33,7 +33,7 @@ class PageController extends Controller
         $categories = \App\Models\Category::parents()
             ->where('is_active', true)
             ->with(['children' => fn($q) => $q->where('is_active', true)])
-            ->withCount('products')
+            ->withCount(['products' => fn($q) => $q->active()])
             ->get();
         return view('frontend.pages.categories', compact('categories'));
     }
