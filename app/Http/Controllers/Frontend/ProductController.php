@@ -29,18 +29,23 @@ class ProductController extends Controller
         }
 
         if ($request->filled('category')) {
-            $cat = Category::where('slug', $request->category)
-                ->orWhere('name', $request->category)
+            $cat = Category::parents()
+                ->where(function ($q) use ($request) {
+                    $q->where('slug', $request->category)
+                      ->orWhere('name', $request->category);
+                })
                 ->first();
             if ($cat) {
-                $query->where('category_id', $cat->id);
+                $query->where('products.category_id', $cat->id);
             }
         }
 
         if ($request->filled('subcategory')) {
-            $sub = Category::where('slug', $request->subcategory)->first();
+            $sub = Category::subcategories()
+                ->where('slug', $request->subcategory)
+                ->first();
             if ($sub) {
-                $query->where('subcategory_id', $sub->id);
+                $query->where('products.subcategory_id', $sub->id);
             }
         }
 

@@ -40,12 +40,12 @@ class Product extends Model
     {
         return $query->where('products.is_active', true)
             ->whereHas('category', function ($q) {
-                $q->where('is_active', true);
+                $q->where('categories.is_active', true);
             })
             ->where(function ($q) {
-                $q->whereNull('subcategory_id')
+                $q->whereNull('products.subcategory_id')
                   ->orWhereHas('subcategory', function ($sq) {
-                      $sq->where('is_active', true);
+                      $sq->where('categories.is_active', true);
                   });
             });
     }

@@ -574,7 +574,7 @@ function selectCartDrawerDay(day) {
     refreshCartDrawer();
 }
 function applyCartCoupon(code) {
-    fetch('<?php echo e(route("frontend.cart.coupon.apply")); ?>', {
+    fetch('<?php echo e(Route::has("frontend.cart.coupon.apply") ? route("frontend.cart.coupon.apply") : ""); ?>', {
         method: 'POST',
         headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json'},
         body: JSON.stringify({code, delivery_day: selectedCartDrawerDay})
@@ -585,7 +585,7 @@ function applyCartCoupon(code) {
     }).catch(error => alert(error.message));
 }
 function removeCartCoupon() {
-    fetch('<?php echo e(route("frontend.cart.coupon.remove")); ?>', {
+    fetch('<?php echo e(Route::has("frontend.cart.coupon.remove") ? route("frontend.cart.coupon.remove") : ""); ?>', {
         method: 'DELETE',
         headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json'},
         body: JSON.stringify({delivery_day: selectedCartDrawerDay})
