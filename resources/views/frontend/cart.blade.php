@@ -67,12 +67,24 @@
     <div class="flex flex-col gap-6 lg:flex-row">
         <div class="flex-1 space-y-4">
             <div class="rounded-2xl border bg-white p-5">
-                <p class="mb-3 text-sm font-semibold text-gray-700"><i class="fa-solid fa-tag mr-1 text-blue-600"></i>Have a coupon code?</p>
-                <form method="GET" class="flex gap-2">
-                    <input type="text" name="coupon" placeholder="Enter coupon code"
-                           class="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
-                    <button type="submit" class="rounded-xl bg-green-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-green-700">Apply</button>
-                </form>
+                <p class="mb-3 text-sm font-semibold text-gray-700"><i class="fa-solid fa-tag mr-1 text-blue-600"></i>Offers & Coupons</p>
+                @if($couponData['applied'])
+                    <div class="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+                        <div><p class="text-[10px] font-black uppercase text-emerald-600">Applied</p><p class="text-sm font-bold text-slate-800">{{ $couponData['applied']['title'] }}</p></div>
+                        <button type="button" onclick="removeFullCartCoupon()" class="text-xs font-black text-red-500">Remove</button>
+                    </div>
+                @elseif($couponData['available']->isNotEmpty())
+                    <div class="grid gap-2 sm:grid-cols-2">
+                        @foreach($couponData['available'] as $coupon)
+                            <div class="flex items-center justify-between gap-2 rounded-xl border border-blue-100 bg-blue-50/50 p-3">
+                                <div><p class="text-sm font-bold text-slate-800">{{ $coupon['title'] }}</p><p class="text-xs text-slate-500">{{ $coupon['type'] === 'percent' ? rtrim(rtrim(number_format($coupon['value'], 2), '0'), '.') . '%' : 'Rs' . number_format($coupon['value'], 2) }} off</p></div>
+                                <button type="button" onclick='applyFullCartCoupon(@json($coupon["code"]))' class="rounded-lg bg-blue-700 px-3 py-2 text-[10px] font-black text-white">Apply</button>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-xs text-slate-400">Add more eligible items to unlock an offer.</p>
+                @endif
             </div>
 
             <div class="overflow-hidden rounded-2xl border bg-white">
@@ -154,6 +166,9 @@
                             <span class="font-semibold text-gray-800">&#8377;{{ number_format($pricing['service_charge'], 2) }}</span>
                         </div>
                         @endif
+                        @if((float) ($pricing['discount'] ?? 0) > 0)
+                            <div class="flex justify-between text-sm font-bold text-emerald-600"><span>Discount</span><span>-&#8377;{{ number_format($pricing['discount'], 2) }}</span></div>
+                        @endif
                         <hr class="border-gray-100">
                         <div class="flex justify-between">
                             <span class="font-bold text-gray-800">Total</span>
@@ -176,6 +191,20 @@
 
 @section('scripts')
 <script>
+function applyFullCartCoupon(code) {
+    fetch('{{ route("frontend.cart.coupon.apply") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+        body: JSON.stringify({ code, delivery_day: @json($selectedDay) })
+    }).then(async r => { const data = await r.json(); if (!r.ok) throw new Error(data.message); location.reload(); }).catch(e => alert(e.message));
+}
+function removeFullCartCoupon() {
+    fetch('{{ route("frontend.cart.coupon.remove") }}', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+        body: JSON.stringify({ delivery_day: @json($selectedDay) })
+    }).then(() => location.reload());
+}
 function removeCartItem(key) {
     fetch('{{ route("frontend.cart.remove") }}', {
         method: 'POST',

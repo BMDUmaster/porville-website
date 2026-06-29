@@ -147,6 +147,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
         <p class="text-center text-gray-400 py-8">Your cart is empty</p>
     </div>
     <div class="px-5 py-4 border-t bg-white">
+        <div id="cart-coupon-panel" class="mb-3 hidden rounded-2xl border border-blue-100 bg-blue-50/60 p-3"></div>
         <div class="mb-4 rounded-2xl border border-green-100 bg-green-50/60 p-3">
             <div class="mb-2 flex items-center justify-between gap-3">
                 <span class="text-xs font-black uppercase tracking-[0.16em] text-slate-600">
@@ -190,6 +191,10 @@ html, body { overflow-x: hidden; max-width: 100vw; }
         <div id="cart-service-charge-row" class="mb-2 flex justify-between text-xs text-slate-500">
             <span id="cart-service-charge-label">&#8505;&#65039; Service Charge (0%)</span>
             <span id="cart-service-charge-drawer">Rs0.00</span>
+        </div>
+        <div id="cart-discount-row" class="mb-2 hidden justify-between text-xs font-bold text-emerald-600">
+            <span>Discount</span>
+            <span id="cart-discount-drawer">-Rs0.00</span>
         </div>
         <div class="mb-3 flex justify-between text-sm font-bold text-slate-900">
             <span>Total</span>
@@ -568,6 +573,43 @@ function selectCartDrawerDay(day) {
     selectedCartDrawerDay = day === 'tomorrow' ? 'tomorrow' : 'today';
     refreshCartDrawer();
 }
+function applyCartCoupon(code) {
+    fetch('<?php echo e(route("frontend.cart.coupon.apply")); ?>', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json'},
+        body: JSON.stringify({code, delivery_day: selectedCartDrawerDay})
+    }).then(async r => {
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.message || 'Could not apply discount.');
+        refreshCartDrawer();
+    }).catch(error => alert(error.message));
+}
+function removeCartCoupon() {
+    fetch('<?php echo e(route("frontend.cart.coupon.remove")); ?>', {
+        method: 'DELETE',
+        headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json'},
+        body: JSON.stringify({delivery_day: selectedCartDrawerDay})
+    }).then(() => refreshCartDrawer());
+}
+function renderCartCoupons(data) {
+    const panel = document.getElementById('cart-coupon-panel');
+    if (!panel) return;
+    const applied = data.applied_coupon;
+    const available = data.available_coupons || [];
+    panel.classList.toggle('hidden', !applied && !available.length);
+    if (applied) {
+        panel.innerHTML = `<div class="flex items-center justify-between gap-3">
+            <div><p class="text-[10px] font-black uppercase tracking-wider text-emerald-600">Applied</p><p class="text-xs font-bold text-slate-800">${escapeHtml(applied.title)}</p></div>
+            <button type="button" onclick="removeCartCoupon()" class="text-[11px] font-black text-red-500">Remove</button>
+        </div>`;
+        return;
+    }
+    panel.innerHTML = `<p class="mb-2 text-[10px] font-black uppercase tracking-wider text-blue-700">Available offers</p>` +
+        available.map(coupon => `<div class="mb-2 flex items-center justify-between gap-2 rounded-xl bg-white p-2 last:mb-0">
+            <div class="min-w-0"><p class="truncate text-xs font-bold text-slate-800">${escapeHtml(coupon.title)}</p><p class="text-[10px] text-slate-500">${coupon.type === 'percent' ? coupon.value + '%' : 'Rs' + coupon.value} off</p></div>
+            <button type="button" onclick="applyCartCoupon('${escapeHtml(coupon.code)}')" class="rounded-lg bg-blue-700 px-3 py-1.5 text-[10px] font-black text-white">Apply</button>
+        </div>`).join('');
+}
 function renderCartDrawerItems(items) {
     const container = document.getElementById('cart-items-drawer');
 
@@ -742,7 +784,12 @@ function refreshCartDrawer() {
             document.getElementById('cart-service-charge-drawer').textContent = formatCartCurrency(data.service_charge);
             document.getElementById('cart-delivery-charge-row')?.classList.toggle('hidden', Number(data.delivery_charge || 0) <= 0);
             document.getElementById('cart-service-charge-row')?.classList.toggle('hidden', Number(data.service_charge || 0) <= 0);
+            const discountRow = document.getElementById('cart-discount-row');
+            discountRow?.classList.toggle('hidden', Number(data.discount || 0) <= 0);
+            discountRow?.classList.toggle('flex', Number(data.discount || 0) > 0);
+            document.getElementById('cart-discount-drawer').textContent = '-' + formatCartCurrency(data.discount);
             document.getElementById('cart-total-drawer').textContent = formatCartCurrency(data.total);
+            renderCartCoupons(data);
             const drawerSlotLabel = document.getElementById('drawer-delivery-slot-label');
             if (drawerSlotLabel) {
                 drawerSlotLabel.textContent = data.selected_delivery_slot_label || '';

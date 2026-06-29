@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Coupon;
+use App\Models\CouponUserUsage;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -181,6 +182,12 @@ class CheckoutController extends Controller
 
             if ($coupon) {
                 $coupon->increment('used_count');
+                if ($user) {
+                    CouponUserUsage::query()->updateOrCreate(
+                        ['coupon_id' => $coupon->id, 'user_id' => $user->id],
+                        ['usage_count' => $coupon->usageCountFor($user->id) + 1]
+                    );
+                }
             }
 
             return $order;
@@ -188,6 +195,7 @@ class CheckoutController extends Controller
 
         $remainingCart = array_diff_key($fullCart, $cart);
         session(['cart' => $remainingCart]);
+        session()->forget('applied_coupon_' . $checkoutDay);
         session()->forget('checkout_delivery_day');
 
         return redirect()->route('frontend.order.success', $order->id);
@@ -351,6 +359,12 @@ class CheckoutController extends Controller
         if (! $coupon) {
             throw ValidationException::withMessages([
                 'coupon_code' => 'The selected coupon is invalid, expired, or already fully used.',
+            ]);
+        }
+
+        if (! $coupon->canBeUsedBy(auth('web_frontend')->id())) {
+            throw ValidationException::withMessages([
+                'coupon_code' => 'You have reached the usage limit for this coupon or offer.',
             ]);
         }
 

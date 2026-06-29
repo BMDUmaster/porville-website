@@ -12,7 +12,7 @@ class Coupon extends Model
 
     protected $fillable = [
         'entry_type', 'title', 'description', 'code', 'type', 'value',
-        'min_order_amount', 'max_uses', 'used_count', 'expires_at', 'is_active',
+        'min_order_amount', 'max_uses', 'per_user_limit', 'used_count', 'expires_at', 'is_active',
     ];
 
     protected $casts = [
@@ -40,8 +40,7 @@ class Coupon extends Model
 
     public function scopeValid($query)
     {
-        return $query->coupons()
-            ->where('is_active', true)
+        return $query->where('is_active', true)
             ->where(function ($innerQuery) {
                 $innerQuery->whereNull('max_uses')
                     ->orWhereColumn('used_count', '<', 'max_uses');
@@ -50,6 +49,23 @@ class Coupon extends Model
                 $innerQuery->whereNull('expires_at')
                     ->orWhere('expires_at', '>', now());
             });
+    }
+
+    public function usageCountFor(?int $userId): int
+    {
+        if (! $userId) {
+            return 0;
+        }
+
+        return (int) CouponUserUsage::where('coupon_id', $this->id)
+            ->where('user_id', $userId)
+            ->value('usage_count');
+    }
+
+    public function canBeUsedBy(?int $userId): bool
+    {
+        return ! $this->per_user_limit
+            || ($userId && $this->usageCountFor($userId) < $this->per_user_limit);
     }
 
     public function scopeActiveEntries($query)

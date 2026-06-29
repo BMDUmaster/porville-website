@@ -1,3 +1,4 @@
+
 <?php $__env->startSection('title', 'Checkout'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -12,7 +13,7 @@
         $selectedPaymentMethod = array_key_first($paymentOptions);
     }
 
-    $initialCouponCode = old('coupon_code');
+    $initialCouponCode = old('coupon_code', session('applied_coupon_' . session('checkout_delivery_day', 'today')));
 ?>
 <div class="max-w-5xl mx-auto px-4 py-8">
     <h1 class="nunito font-extrabold text-2xl text-gray-800 mb-6">Checkout</h1>
@@ -29,63 +30,33 @@
                 </div>
                 <?php endif; ?>
 
-                <div class="overflow-hidden rounded-[24px] border border-blue-100 bg-white shadow-[0_18px_45px_rgba(30,64,175,0.08)]">
-                    <div class="flex items-center justify-between gap-4 border-b border-blue-100 bg-gradient-to-r from-blue-50 via-white to-emerald-50 px-5 py-5 sm:px-6">
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-700 text-sm font-black text-white shadow-lg shadow-blue-200">
-                                <i class="fa-solid fa-address-card"></i>
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-600">Step 1</span>
-                                    <span class="h-1 w-1 rounded-full bg-slate-300"></span>
-                                    <span class="text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-600">Account details</span>
-                                </div>
-                                <h2 class="nunito mt-1 text-lg font-extrabold text-slate-900">Contact Information</h2>
-                            </div>
-                        </div>
-                        <div class="hidden h-9 w-9 items-center justify-center rounded-full border border-emerald-100 bg-white text-emerald-600 sm:flex">
-                            <i class="fa-solid fa-shield-halved text-sm"></i>
-                        </div>
+                <div class="overflow-hidden rounded-2xl border bg-white">
+                    <div class="flex items-center gap-2 border-b px-6 py-4">
+                        <div class="flex h-7 w-7 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">1</div>
+                        <h2 class="nunito text-base font-extrabold text-gray-800">Contact Information</h2>
                     </div>
-                    <div class="grid grid-cols-1 gap-5 px-5 py-6 sm:grid-cols-2 sm:px-6">
+                    <div class="grid grid-cols-1 gap-4 px-6 py-5 sm:grid-cols-2">
                         <div>
-                            <label class="mb-2 block text-xs font-bold text-slate-700">First Name <span class="text-red-500">*</span></label>
-                            <div class="relative">
-                                <i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
+                            <label class="mb-1 block text-xs font-semibold text-gray-600">First Name *</label>
                             <input type="text" name="first_name" value="<?php echo e($checkoutDefaults['first_name'] ?? ''); ?>" required readonly
-                                   class="w-full cursor-not-allowed rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-sm font-semibold text-slate-600 outline-none">
-                            </div>
+                                   class="w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-500 outline-none">
                         </div>
                         <div>
-                            <label class="mb-2 block text-xs font-bold text-slate-700">Last Name</label>
-                            <div class="relative">
-                                <i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
+                            <label class="mb-1 block text-xs font-semibold text-gray-600">Last Name</label>
                             <input type="text" name="last_name" value="<?php echo e($checkoutDefaults['last_name'] ?? ''); ?>" readonly
-                                   class="w-full cursor-not-allowed rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-sm font-semibold text-slate-600 outline-none">
-                            </div>
+                                   class="w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-500 outline-none">
                         </div>
                         <div class="sm:col-span-2">
-                            <label class="mb-2 block text-xs font-bold text-slate-700">Email Address <span class="text-red-500">*</span></label>
-                            <div class="relative">
-                                <i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
+                            <label class="mb-1 block text-xs font-semibold text-gray-600">Email *</label>
                             <input type="email" name="email" value="<?php echo e($checkoutDefaults['email'] ?? ''); ?>" required readonly
-                                   class="w-full cursor-not-allowed rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-sm font-semibold text-slate-600 outline-none">
-                            </div>
+                                   class="w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-500 outline-none">
                         </div>
                         <div class="sm:col-span-2">
-                            <label class="mb-2 block text-xs font-bold text-slate-700">Phone Number <span class="text-red-500">*</span></label>
-                            <div class="relative">
-                                <i class="fa-solid fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-sm text-blue-500"></i>
+                            <label class="mb-1 block text-xs font-semibold text-gray-600">Phone *</label>
                             <input type="tel" name="phone" id="checkoutPhoneInput" value="<?php echo e($checkoutDefaults['phone'] ?? ''); ?>" required
                                    inputmode="numeric" pattern="(?:\d{10}|\d{12})" minlength="10" maxlength="12" autocomplete="off"
                                    title="Phone number must be 10 or 12 digits"
-                                   class="w-full rounded-2xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-sm font-semibold text-slate-800 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50">
-                            </div>
-                            <p class="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-slate-400">
-                                <i class="fa-solid fa-circle-info text-blue-400"></i>
-                                Delivery updates will be shared on this number.
-                            </p>
+                                   class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
                         </div>
                     </div>
                 </div>
@@ -388,6 +359,9 @@ document.querySelectorAll('.coupon-chip').forEach((button) => {
 });
 
 updateCouponButton();
+if (couponInput?.value.trim()) {
+    applyCoupon();
+}
 
 function sanitizeCheckoutPhone() {
     if (!phoneInput) {

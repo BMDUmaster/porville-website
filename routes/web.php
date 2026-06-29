@@ -156,6 +156,8 @@ Route::get('/cart',          [CartController::class, 'index'])->name('frontend.c
 Route::post('/cart/add',     [CartController::class, 'add'])->name('frontend.cart.add');
 Route::post('/cart/update',  [CartController::class, 'update'])->name('frontend.cart.update');
 Route::post('/cart/delivery-slot', [CartController::class, 'updateDeliverySlot'])->name('frontend.cart.delivery-slot');
+Route::post('/cart/coupon', [CartController::class, 'applyCoupon'])->name('frontend.cart.coupon.apply');
+Route::delete('/cart/coupon', [CartController::class, 'removeCoupon'])->name('frontend.cart.coupon.remove');
 Route::post('/cart/remove',  [CartController::class, 'remove'])->name('frontend.cart.remove');
 Route::get('/cart/count',    [CartController::class, 'count'])->name('frontend.cart.count');
 

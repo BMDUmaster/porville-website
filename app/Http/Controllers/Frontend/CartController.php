@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Coupon;
 use App\Models\Product;
 use App\Support\DeliverySlotManager;
 use App\Support\OrderPricing;
@@ -25,6 +26,9 @@ class CartController extends Controller
         $items = $this->buildCartItems($cart);
         $subtotal = collect($items)->sum('subtotal');
         $pricing = OrderPricing::summary($subtotal, auth('web_frontend')->user(), $selectedDay);
+        $couponData = $this->couponData($subtotal, $selectedDay);
+        $pricing['discount'] = $couponData['discount'];
+        $pricing['total'] = max(0, $pricing['total'] - $couponData['discount']);
         $deliverySlotOptions = $this->deliverySlotOptionsForCart($cart);
         $selectedDeliverySlot = session('selected_delivery_slot_' . $selectedDay);
 
@@ -34,7 +38,7 @@ class CartController extends Controller
         }
         $deliveryDayLabel = $this->deliveryDayLabelForCart($cart);
 
-        return view('frontend.cart', compact('items', 'pricing', 'deliverySlotOptions', 'selectedDeliverySlot', 'deliveryDayLabel', 'availableDays', 'selectedDay'));
+        return view('frontend.cart', compact('items', 'pricing', 'deliverySlotOptions', 'selectedDeliverySlot', 'deliveryDayLabel', 'availableDays', 'selectedDay', 'couponData'));
     }
 
     /** POST /cart/add */
@@ -201,6 +205,33 @@ class CartController extends Controller
         return back()->with('success', 'Item removed.');
     }
 
+    public function applyCoupon(Request $request)
+    {
+        $data = $request->validate([
+            'code' => ['required', 'string'],
+            'delivery_day' => ['required', Rule::in(['today', 'tomorrow'])],
+        ]);
+        $day = ProductDayPricing::normalizeDay($data['delivery_day']);
+        $cart = array_filter(session('cart', []), fn ($item) => ProductDayPricing::normalizeDay($item['pricing_day'] ?? 'today') === $day);
+        $subtotal = collect($this->buildCartItems($cart))->sum('subtotal');
+        $coupon = Coupon::valid()->where('code', strtoupper($data['code']))->first();
+
+        if (! $coupon || $subtotal < (float) ($coupon->min_order_amount ?? 0) || ! $coupon->canBeUsedBy(auth('web_frontend')->id())) {
+            return response()->json(['success' => false, 'message' => 'Coupon is not eligible or its usage limit has been reached.'], 422);
+        }
+
+        session(['applied_coupon_' . $day => $coupon->code]);
+        return response()->json(['success' => true, 'message' => 'Discount applied successfully.']);
+    }
+
+    public function removeCoupon(Request $request)
+    {
+        $day = ProductDayPricing::normalizeDay($request->input('delivery_day'));
+        session()->forget('applied_coupon_' . $day);
+
+        return response()->json(['success' => true]);
+    }
+
     /** GET /cart/count (AJAX) */
     public function count(Request $request)
     {
@@ -214,6 +245,8 @@ class CartController extends Controller
         $items = $this->buildCartItems($dayCart);
         $subtotal = collect($items)->sum('subtotal');
         $pricing = OrderPricing::summary($subtotal, auth('web_frontend')->user(), $selectedDay);
+        $couponData = $this->couponData($subtotal, $selectedDay);
+        $pricing['total'] = max(0, $pricing['total'] - $couponData['discount']);
         $selectedDeliverySlot = session('selected_delivery_slot_' . $selectedDay);
         $deliverySlotOptions = $this->deliverySlotOptionsForDay($selectedDay);
 
@@ -236,6 +269,9 @@ class CartController extends Controller
             'delivery_day' => $selectedDay,
             'delivery_day_label' => ucfirst($selectedDay),
             'available_days' => $availableDays,
+            'discount' => $couponData['discount'],
+            'applied_coupon' => $couponData['applied'],
+            'available_coupons' => $couponData['available'],
         ]);
     }
 
@@ -301,5 +337,37 @@ class CartController extends Controller
     private function pricingDayForCart(array $cart): string
     {
         return $this->usesTomorrowDelivery($cart) ? 'tomorrow' : 'today';
+    }
+
+    private function couponData(float $subtotal, string $day): array
+    {
+        $userId = auth('web_frontend')->id();
+        $available = Coupon::valid()
+            ->where('min_order_amount', '<=', $subtotal)
+            ->orderByDesc('value')
+            ->get()
+            ->filter(fn (Coupon $coupon) => $coupon->canBeUsedBy($userId))
+            ->map(fn (Coupon $coupon) => [
+                'code' => $coupon->code,
+                'title' => $coupon->title ?: $coupon->code,
+                'type' => $coupon->type,
+                'value' => (float) $coupon->value,
+            ])->values();
+
+        $code = session('applied_coupon_' . $day);
+        $coupon = $code ? Coupon::valid()->where('code', $code)->first() : null;
+        if (! $coupon || $subtotal < (float) ($coupon->min_order_amount ?? 0) || ! $coupon->canBeUsedBy($userId)) {
+            session()->forget('applied_coupon_' . $day);
+            $coupon = null;
+        }
+        $discount = $coupon
+            ? ($coupon->type === 'percent' ? round($subtotal * $coupon->value / 100, 2) : min((float) $coupon->value, $subtotal))
+            : 0.0;
+
+        return [
+            'discount' => $discount,
+            'applied' => $coupon ? ['code' => $coupon->code, 'title' => $coupon->title ?: $coupon->code] : null,
+            'available' => $available,
+        ];
     }
 }

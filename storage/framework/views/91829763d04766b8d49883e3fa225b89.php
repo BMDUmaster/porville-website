@@ -70,12 +70,24 @@
     <div class="flex flex-col gap-6 lg:flex-row">
         <div class="flex-1 space-y-4">
             <div class="rounded-2xl border bg-white p-5">
-                <p class="mb-3 text-sm font-semibold text-gray-700"><i class="fa-solid fa-tag mr-1 text-blue-600"></i>Have a coupon code?</p>
-                <form method="GET" class="flex gap-2">
-                    <input type="text" name="coupon" placeholder="Enter coupon code"
-                           class="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
-                    <button type="submit" class="rounded-xl bg-green-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-green-700">Apply</button>
-                </form>
+                <p class="mb-3 text-sm font-semibold text-gray-700"><i class="fa-solid fa-tag mr-1 text-blue-600"></i>Offers & Coupons</p>
+                <?php if($couponData['applied']): ?>
+                    <div class="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+                        <div><p class="text-[10px] font-black uppercase text-emerald-600">Applied</p><p class="text-sm font-bold text-slate-800"><?php echo e($couponData['applied']['title']); ?></p></div>
+                        <button type="button" onclick="removeFullCartCoupon()" class="text-xs font-black text-red-500">Remove</button>
+                    </div>
+                <?php elseif($couponData['available']->isNotEmpty()): ?>
+                    <div class="grid gap-2 sm:grid-cols-2">
+                        <?php $__currentLoopData = $couponData['available']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $coupon): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <div class="flex items-center justify-between gap-2 rounded-xl border border-blue-100 bg-blue-50/50 p-3">
+                                <div><p class="text-sm font-bold text-slate-800"><?php echo e($coupon['title']); ?></p><p class="text-xs text-slate-500"><?php echo e($coupon['type'] === 'percent' ? rtrim(rtrim(number_format($coupon['value'], 2), '0'), '.') . '%' : 'Rs' . number_format($coupon['value'], 2)); ?> off</p></div>
+                                <button type="button" onclick='applyFullCartCoupon(<?php echo json_encode($coupon["code"], 15, 512) ?>)' class="rounded-lg bg-blue-700 px-3 py-2 text-[10px] font-black text-white">Apply</button>
+                            </div>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </div>
+                <?php else: ?>
+                    <p class="text-xs text-slate-400">Add more eligible items to unlock an offer.</p>
+                <?php endif; ?>
             </div>
 
             <div class="overflow-hidden rounded-2xl border bg-white">
@@ -158,6 +170,9 @@
                             <span class="font-semibold text-gray-800">&#8377;<?php echo e(number_format($pricing['service_charge'], 2)); ?></span>
                         </div>
                         <?php endif; ?>
+                        <?php if((float) ($pricing['discount'] ?? 0) > 0): ?>
+                            <div class="flex justify-between text-sm font-bold text-emerald-600"><span>Discount</span><span>-&#8377;<?php echo e(number_format($pricing['discount'], 2)); ?></span></div>
+                        <?php endif; ?>
                         <hr class="border-gray-100">
                         <div class="flex justify-between">
                             <span class="font-bold text-gray-800">Total</span>
@@ -180,6 +195,20 @@
 
 <?php $__env->startSection('scripts'); ?>
 <script>
+function applyFullCartCoupon(code) {
+    fetch('<?php echo e(route("frontend.cart.coupon.apply")); ?>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>', 'Accept': 'application/json' },
+        body: JSON.stringify({ code, delivery_day: <?php echo json_encode($selectedDay, 15, 512) ?> })
+    }).then(async r => { const data = await r.json(); if (!r.ok) throw new Error(data.message); location.reload(); }).catch(e => alert(e.message));
+}
+function removeFullCartCoupon() {
+    fetch('<?php echo e(route("frontend.cart.coupon.remove")); ?>', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>', 'Accept': 'application/json' },
+        body: JSON.stringify({ delivery_day: <?php echo json_encode($selectedDay, 15, 512) ?> })
+    }).then(() => location.reload());
+}
 function removeCartItem(key) {
     fetch('<?php echo e(route("frontend.cart.remove")); ?>', {
         method: 'POST',

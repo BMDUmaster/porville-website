@@ -190,6 +190,7 @@
                                 'value' => $coupon->value,
                                 'min_order_amount' => $coupon->min_order_amount,
                                 'max_uses' => $coupon->max_uses,
+                                'per_user_limit' => $coupon->per_user_limit,
                                 'expires_at' => optional($coupon->expires_at)->format('Y-m-d\TH:i'),
                                 'is_active' => $coupon->is_active ? 1 : 0,
                             ];
@@ -217,7 +218,10 @@
                             </td>
                             <td class="px-6 py-5 font-semibold text-slate-900">
                                 <?php if(($coupon->entry_type ?? 'coupon') === 'offer'): ?>
-                                    Custom Offer
+                                    <?php echo e($coupon->type === 'percent'
+                                        ? rtrim(rtrim(number_format((float) $coupon->value, 2, '.', ''), '0'), '.') . '% OFF'
+                                        : 'Rs' . number_format((float) $coupon->value, 0) . ' OFF'); ?>
+
                                 <?php elseif($coupon->type === 'percent'): ?>
                                     <?php echo e(rtrim(rtrim(number_format((float) $coupon->value, 2, '.', ''), '0'), '.')); ?>% OFF
                                 <?php else: ?>
@@ -357,6 +361,12 @@
                            class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
                 </div>
                 <div>
+                    <label class="mb-1 block text-sm font-bold text-slate-700">Uses Per User</label>
+                    <input type="number" name="per_user_limit" id="couponPerUserLimit" min="1"
+                           class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
+                    <p class="mt-1 text-xs text-slate-400">Blank means unlimited per customer.</p>
+                </div>
+                <div>
                     <label class="mb-1 block text-sm font-bold text-slate-700">Expires At</label>
                     <input type="datetime-local" name="expires_at" id="couponExpiresAt"
                            class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
@@ -398,6 +408,7 @@ function openCouponModal(entry = null) {
     document.getElementById('couponValue').value = entry?.value ?? '';
     document.getElementById('couponMinOrder').value = entry?.min_order_amount ?? '';
     document.getElementById('couponMaxUses').value = entry?.max_uses ?? '';
+    document.getElementById('couponPerUserLimit').value = entry?.per_user_limit ?? '';
     document.getElementById('couponExpiresAt').value = entry?.expires_at ?? '';
     document.getElementById('couponIsActive').checked = Number(entry?.is_active ?? 1) === 1;
 
@@ -416,11 +427,11 @@ function toggleCouponFields() {
     const entryType = document.getElementById('couponEntryType').value;
     const isCoupon = entryType === 'coupon';
 
-    document.getElementById('couponTypeWrap').classList.toggle('hidden', !isCoupon);
-    document.getElementById('couponValueWrap').classList.toggle('hidden', !isCoupon);
+    document.getElementById('couponTypeWrap').classList.remove('hidden');
+    document.getElementById('couponValueWrap').classList.remove('hidden');
 
-    document.getElementById('couponType').required = isCoupon;
-    document.getElementById('couponValue').required = isCoupon;
+    document.getElementById('couponType').required = true;
+    document.getElementById('couponValue').required = true;
     document.getElementById('couponCode').required = false;
 }
 

@@ -1,8 +1,7 @@
-@extends('layouts.dashboard')
-@section('title', 'Coupons & Offers')
-@section('page_title', 'Coupons & Offers')
+<?php $__env->startSection('title', 'Coupons & Offers'); ?>
+<?php $__env->startSection('page_title', 'Coupons & Offers'); ?>
 
-@section('styles')
+<?php $__env->startSection('styles'); ?>
 .coupon-scrollbar::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -11,10 +10,10 @@
     background: rgba(99, 102, 241, 0.28);
     border-radius: 999px;
 }
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
-@php
+<?php $__env->startSection('content'); ?>
+<?php
     $activeSegment = request('segment', 'my_coupons');
 
     $statCards = [
@@ -71,62 +70,62 @@
 
     $rangeBase = collect(request()->except('segment', 'page'))->filter(fn ($value) => $value !== null && $value !== '');
     $tableTitle = $titleBySegment[$activeSegment] ?? 'My Active Coupons';
-@endphp
+?>
 
 <div class="space-y-6 p-4 md:p-8">
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        @foreach($statCards as $card)
+        <?php $__currentLoopData = $statCards; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $card): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="rounded-[22px] border border-slate-200 bg-white p-5 shadow-sm">
                 <div class="flex items-center gap-4">
-                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-{{ $card['color'] }}-100 text-{{ $card['color'] }}-600">
-                        <i class="fa-solid {{ $card['icon'] }} text-lg"></i>
+                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-<?php echo e($card['color']); ?>-100 text-<?php echo e($card['color']); ?>-600">
+                        <i class="fa-solid <?php echo e($card['icon']); ?> text-lg"></i>
                     </div>
                     <div class="min-w-0">
-                        <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{{ $card['label'] }}</p>
-                        <h2 class="mt-1 text-3xl font-black leading-none text-slate-900 sm:text-[38px]">{{ $card['value'] }}</h2>
-                        <p class="mt-1 text-sm font-medium text-{{ $card['color'] }}-600">{{ $card['hint'] }}</p>
+                        <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-400"><?php echo e($card['label']); ?></p>
+                        <h2 class="mt-1 text-3xl font-black leading-none text-slate-900 sm:text-[38px]"><?php echo e($card['value']); ?></h2>
+                        <p class="mt-1 text-sm font-medium text-<?php echo e($card['color']); ?>-600"><?php echo e($card['hint']); ?></p>
                     </div>
                 </div>
             </div>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
 
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        @foreach($quickActions as $action)
+        <?php $__currentLoopData = $quickActions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $action): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <button type="button"
-                    onclick='openCouponModal(@json($action["payload"]))'
+                    onclick='openCouponModal(<?php echo json_encode($action["payload"], 15, 512) ?>)'
                     class="flex items-center gap-4 rounded-[20px] border border-slate-200 bg-white px-5 py-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md">
-                <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-{{ $action['color'] }}-100 text-{{ $action['color'] }}-600">
-                    <i class="fa-solid {{ $action['icon'] }} text-lg"></i>
+                <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-<?php echo e($action['color']); ?>-100 text-<?php echo e($action['color']); ?>-600">
+                    <i class="fa-solid <?php echo e($action['icon']); ?> text-lg"></i>
                 </span>
                 <span class="min-w-0">
-                    <span class="block text-xl font-black leading-tight text-slate-900 sm:text-2xl">{{ $action['title'] }}</span>
-                    <span class="mt-1 block text-sm text-slate-400">{{ $action['subtitle'] }}</span>
+                    <span class="block text-xl font-black leading-tight text-slate-900 sm:text-2xl"><?php echo e($action['title']); ?></span>
+                    <span class="mt-1 block text-sm text-slate-400"><?php echo e($action['subtitle']); ?></span>
                 </span>
             </button>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
 
     <div class="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm">
         <form method="GET" class="grid gap-3 md:grid-cols-2 xl:grid-cols-[1.3fr_1fr_1fr_1.1fr_1.1fr_1.05fr_1.15fr]">
-            <input type="hidden" name="segment" value="{{ $activeSegment }}">
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by code/name"
+            <input type="hidden" name="segment" value="<?php echo e($activeSegment); ?>">
+            <input type="text" name="search" value="<?php echo e(request('search')); ?>" placeholder="Search by code/name"
                    class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500">
             <select name="entry_type" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500">
                 <option value="">All Types</option>
-                <option value="coupon" {{ request('entry_type') === 'coupon' ? 'selected' : '' }}>Coupons</option>
-                <option value="offer" {{ request('entry_type') === 'offer' ? 'selected' : '' }}>Offers</option>
+                <option value="coupon" <?php echo e(request('entry_type') === 'coupon' ? 'selected' : ''); ?>>Coupons</option>
+                <option value="offer" <?php echo e(request('entry_type') === 'offer' ? 'selected' : ''); ?>>Offers</option>
             </select>
             <select name="status" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500">
                 <option value="">All Status</option>
-                <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
-                <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                <option value="active" <?php echo e(request('status') === 'active' ? 'selected' : ''); ?>>Active</option>
+                <option value="inactive" <?php echo e(request('status') === 'inactive' ? 'selected' : ''); ?>>Inactive</option>
             </select>
-            <input type="date" name="date_from" value="{{ request('date_from') }}"
+            <input type="date" name="date_from" value="<?php echo e(request('date_from')); ?>"
                    class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500">
-            <input type="date" name="date_to" value="{{ request('date_to') }}"
+            <input type="date" name="date_to" value="<?php echo e(request('date_to')); ?>"
                    class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500">
-            <a href="{{ route('dashboard.coupons') }}"
+            <a href="<?php echo e(route('dashboard.coupons')); ?>"
                class="inline-flex items-center justify-center rounded-2xl bg-slate-100 px-4 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-200">
                 Reset Filters
             </a>
@@ -139,23 +138,24 @@
 
     <div class="overflow-x-auto pb-1 coupon-scrollbar">
         <div class="flex w-max min-w-full gap-3">
-        @foreach($tabs as $segment => $tab)
-            @php
+        <?php $__currentLoopData = $tabs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $segment => $tab): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php
                 $tabUrl = route('dashboard.coupons', $rangeBase->merge(['segment' => $segment])->all());
                 $isActive = $activeSegment === $segment;
-            @endphp
-            <a href="{{ $tabUrl }}"
-               class="inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-sm font-bold transition {{ $isActive ? 'border-indigo-600 bg-indigo-600 text-white shadow-md' : 'border-slate-200 bg-white text-slate-600 hover:border-indigo-200 hover:text-indigo-600' }}">
-                <i class="fa-solid {{ $tab['icon'] }}"></i>
-                {{ $tab['label'] }}
+            ?>
+            <a href="<?php echo e($tabUrl); ?>"
+               class="inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-sm font-bold transition <?php echo e($isActive ? 'border-indigo-600 bg-indigo-600 text-white shadow-md' : 'border-slate-200 bg-white text-slate-600 hover:border-indigo-200 hover:text-indigo-600'); ?>">
+                <i class="fa-solid <?php echo e($tab['icon']); ?>"></i>
+                <?php echo e($tab['label']); ?>
+
             </a>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
 
     <div class="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
         <div class="flex flex-col gap-4 border-b border-slate-200 px-5 py-5 md:flex-row md:items-center md:justify-between">
-            <h2 class="text-2xl font-black tracking-tight text-slate-900 md:text-[28px]">{{ $tableTitle }}</h2>
+            <h2 class="text-2xl font-black tracking-tight text-slate-900 md:text-[28px]"><?php echo e($tableTitle); ?></h2>
             <button type="button" onclick="openCouponModal()"
                     class="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-indigo-700">
                 <i class="fa-solid fa-circle-plus"></i>
@@ -178,8 +178,8 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-[15px] text-slate-700">
-                    @forelse($coupons as $coupon)
-                        @php
+                    <?php $__empty_1 = true; $__currentLoopData = $coupons; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $coupon): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                        <?php
                             $payload = [
                                 'id' => $coupon->id,
                                 'entry_type' => $coupon->entry_type ?? 'coupon',
@@ -208,62 +208,65 @@
                             $usageLabel = $maxUses > 0 ? $coupon->used_count . '/' . $maxUses : 'Unlimited';
                             $validFrom = optional($coupon->created_at)->format('d M Y');
                             $validTill = $coupon->expires_at?->format('d M Y') ?? '-';
-                        @endphp
+                        ?>
                         <tr class="transition hover:bg-slate-50/60">
                             <td class="px-6 py-5 align-top">
                                 <div class="max-w-[220px]">
-                                    <p class="break-all text-[15px] font-black text-indigo-600">{{ $displayCode }}</p>
-                                    <p class="mt-1 max-h-14 overflow-y-auto break-all pr-2 text-xs leading-5 text-slate-400 coupon-scrollbar">{{ $displaySubtext }}</p>
+                                    <p class="break-all text-[15px] font-black text-indigo-600"><?php echo e($displayCode); ?></p>
+                                    <p class="mt-1 max-h-14 overflow-y-auto break-all pr-2 text-xs leading-5 text-slate-400 coupon-scrollbar"><?php echo e($displaySubtext); ?></p>
                                 </div>
                             </td>
                             <td class="px-6 py-5 font-semibold text-slate-900">
-                                @if(($coupon->entry_type ?? 'coupon') === 'offer')
-                                    {{ $coupon->type === 'percent'
+                                <?php if(($coupon->entry_type ?? 'coupon') === 'offer'): ?>
+                                    <?php echo e($coupon->type === 'percent'
                                         ? rtrim(rtrim(number_format((float) $coupon->value, 2, '.', ''), '0'), '.') . '% OFF'
-                                        : 'Rs' . number_format((float) $coupon->value, 0) . ' OFF' }}
-                                @elseif($coupon->type === 'percent')
-                                    {{ rtrim(rtrim(number_format((float) $coupon->value, 2, '.', ''), '0'), '.') }}% OFF
-                                @else
-                                    &#8377;{{ number_format((float) $coupon->value, 0) }} OFF
-                                @endif
+                                        : 'Rs' . number_format((float) $coupon->value, 0) . ' OFF'); ?>
+
+                                <?php elseif($coupon->type === 'percent'): ?>
+                                    <?php echo e(rtrim(rtrim(number_format((float) $coupon->value, 2, '.', ''), '0'), '.')); ?>% OFF
+                                <?php else: ?>
+                                    &#8377;<?php echo e(number_format((float) $coupon->value, 0)); ?> OFF
+                                <?php endif; ?>
                             </td>
                             <td class="px-6 py-5 font-medium text-slate-900">
-                                {{ $coupon->min_order_amount ? 'Rs' . number_format((float) $coupon->min_order_amount, 0) : '-' }}
+                                <?php echo e($coupon->min_order_amount ? 'Rs' . number_format((float) $coupon->min_order_amount, 0) : '-'); ?>
+
                             </td>
-                            <td class="px-6 py-5 text-slate-900">{{ $validFrom }}</td>
-                            <td class="px-6 py-5 text-slate-900">{{ $validTill }}</td>
+                            <td class="px-6 py-5 text-slate-900"><?php echo e($validFrom); ?></td>
+                            <td class="px-6 py-5 text-slate-900"><?php echo e($validTill); ?></td>
                             <td class="px-6 py-5">
-                                @if($maxUses > 0)
+                                <?php if($maxUses > 0): ?>
                                     <div class="flex items-center gap-3">
-                                        <span class="font-semibold text-slate-900">{{ $usageLabel }}</span>
+                                        <span class="font-semibold text-slate-900"><?php echo e($usageLabel); ?></span>
                                         <div class="h-1.5 w-16 overflow-hidden rounded-full bg-slate-200">
-                                            <div class="h-full rounded-full bg-emerald-500" style="width: {{ $usagePercentage }}%"></div>
+                                            <div class="h-full rounded-full bg-emerald-500" style="width: <?php echo e($usagePercentage); ?>%"></div>
                                         </div>
                                     </div>
-                                @else
+                                <?php else: ?>
                                     <span class="text-slate-400">Unlimited</span>
-                                @endif
+                                <?php endif; ?>
                             </td>
                             <td class="px-6 py-5">
-                                <span class="inline-flex rounded-full px-3 py-1 text-sm font-medium {{ $coupon->is_active ? 'text-slate-900' : 'text-slate-400' }}">
-                                    {{ $coupon->is_active ? 'Active' : 'Inactive' }}
+                                <span class="inline-flex rounded-full px-3 py-1 text-sm font-medium <?php echo e($coupon->is_active ? 'text-slate-900' : 'text-slate-400'); ?>">
+                                    <?php echo e($coupon->is_active ? 'Active' : 'Inactive'); ?>
+
                                 </span>
                             </td>
                             <td class="px-6 py-5">
                                 <div class="flex items-center justify-center gap-4 text-lg">
-                                    <button type="button" onclick='openCouponModal(@json($payload))'
+                                    <button type="button" onclick='openCouponModal(<?php echo json_encode($payload, 15, 512) ?>)'
                                             class="text-indigo-500 transition hover:text-indigo-700">
                                         <i class="fa-solid fa-pen"></i>
                                     </button>
                                     <button type="button"
-                                            onclick='copyCouponCode(@json($coupon->code))'
+                                            onclick='copyCouponCode(<?php echo json_encode($coupon->code, 15, 512) ?>)'
                                             class="text-blue-500 transition hover:text-blue-700">
                                         <i class="fa-regular fa-copy"></i>
                                     </button>
-                                    <form method="POST" action="{{ route('dashboard.coupons.destroy', $coupon) }}"
+                                    <form method="POST" action="<?php echo e(route('dashboard.coupons.destroy', $coupon)); ?>"
                                           onsubmit="return confirm('Delete this entry?')">
-                                        @csrf
-                                        @method('DELETE')
+                                        <?php echo csrf_field(); ?>
+                                        <?php echo method_field('DELETE'); ?>
                                         <button type="submit" class="text-red-500 transition hover:text-red-700">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
@@ -274,11 +277,11 @@
                                 </div>
                             </td>
                         </tr>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
                             <td colspan="8" class="px-6 py-16 text-center text-sm font-semibold text-slate-400">No coupons or offers found.</td>
                         </tr>
-                    @endforelse
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -286,11 +289,11 @@
 
     <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <p class="text-sm text-slate-500">
-            Page {{ $coupons->currentPage() }} of {{ max(1, $coupons->lastPage()) }} —
-            Showing <span class="font-bold text-slate-700">{{ $coupons->firstItem() ?? 0 }}-{{ $coupons->lastItem() ?? 0 }}</span>
-            of <span class="font-bold text-slate-700">{{ $coupons->total() }}</span> entries
+            Page <?php echo e($coupons->currentPage()); ?> of <?php echo e(max(1, $coupons->lastPage())); ?> —
+            Showing <span class="font-bold text-slate-700"><?php echo e($coupons->firstItem() ?? 0); ?>-<?php echo e($coupons->lastItem() ?? 0); ?></span>
+            of <span class="font-bold text-slate-700"><?php echo e($coupons->total()); ?></span> entries
         </p>
-        <div>{{ $coupons->withQueryString()->links() }}</div>
+        <div><?php echo e($coupons->withQueryString()->links()); ?></div>
     </div>
 </div>
 
@@ -301,8 +304,8 @@
             <button type="button" onclick="closeCouponModal()" class="text-2xl leading-none text-slate-400 hover:text-slate-700">&times;</button>
         </div>
 
-        <form id="couponForm" method="POST" action="{{ route('dashboard.coupons.store') }}" class="space-y-4 p-5">
-            @csrf
+        <form id="couponForm" method="POST" action="<?php echo e(route('dashboard.coupons.store')); ?>" class="space-y-4 p-5">
+            <?php echo csrf_field(); ?>
             <input type="hidden" name="_method" id="couponMethod" value="POST">
 
             <div>
@@ -382,12 +385,12 @@
         </form>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
 <script>
-const couponStoreUrl = @json(route('dashboard.coupons.store'));
-const couponUpdateBaseUrl = @json(url('/coupons'));
+const couponStoreUrl = <?php echo json_encode(route('dashboard.coupons.store'), 15, 512) ?>;
+const couponUpdateBaseUrl = <?php echo json_encode(url('/coupons'), 15, 512) ?>;
 
 function openCouponModal(entry = null) {
     const modal = document.getElementById('couponModal');
@@ -440,4 +443,6 @@ function copyCouponCode(code) {
     navigator.clipboard?.writeText(code);
 }
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.dashboard', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views/dashboard/coupons/index.blade.php ENDPATH**/ ?>

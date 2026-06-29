@@ -116,10 +116,11 @@ class CouponController extends Controller
             'title'            => [Rule::requiredIf($entryType === 'offer'), 'nullable', 'string', 'max:120'],
             'description'      => [Rule::requiredIf($entryType === 'offer'), 'nullable', 'string', 'max:500'],
             'code'             => [Rule::requiredIf($entryType === 'coupon'), 'nullable', 'string', 'max:50', Rule::unique('coupons', 'code')->ignore($couponId)],
-            'type'             => [Rule::requiredIf($entryType === 'coupon'), 'nullable', Rule::in(['flat', 'percent'])],
-            'value'            => [Rule::requiredIf($entryType === 'coupon'), 'nullable', 'numeric', 'min:0', 'max:99999999.99'],
+            'type'             => ['required', Rule::in(['flat', 'percent'])],
+            'value'            => ['required', 'numeric', 'min:0.01', 'max:99999999.99'],
             'min_order_amount' => ['nullable', 'numeric', 'min:0'],
             'max_uses'         => ['nullable', 'integer', 'min:1'],
+            'per_user_limit'   => ['nullable', 'integer', 'min:1'],
             'expires_at'       => [$entryType === 'coupon' && !$coupon ? 'required' : 'nullable', 'date'],
             'is_active'        => ['boolean'],
         ]);
@@ -159,10 +160,7 @@ class CouponController extends Controller
 
     private function normalizeEntryPayload(array $data): array
     {
-        if (($data['entry_type'] ?? 'coupon') === 'offer') {
-            $data['type'] = 'flat';
-            $data['value'] = 0;
-        } else {
+        if (($data['entry_type'] ?? 'coupon') !== 'offer') {
             $data['title'] = null;
             $data['description'] = null;
         }
