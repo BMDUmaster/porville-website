@@ -196,14 +196,14 @@
 <?php $__env->startSection('scripts'); ?>
 <script>
 function applyFullCartCoupon(code) {
-    fetch('<?php echo e(route("frontend.cart.coupon.apply")); ?>', {
+    fetch('<?php echo e(url("cart/coupon")); ?>', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>', 'Accept': 'application/json' },
         body: JSON.stringify({ code, delivery_day: <?php echo json_encode($selectedDay, 15, 512) ?> })
     }).then(async r => { const data = await r.json(); if (!r.ok) throw new Error(data.message); location.reload(); }).catch(e => alert(e.message));
 }
 function removeFullCartCoupon() {
-    fetch('<?php echo e(route("frontend.cart.coupon.remove")); ?>', {
+    fetch('<?php echo e(url("cart/coupon")); ?>', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>', 'Accept': 'application/json' },
         body: JSON.stringify({ delivery_day: <?php echo json_encode($selectedDay, 15, 512) ?> })

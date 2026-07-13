@@ -361,6 +361,17 @@
 
         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             @forelse($products as $product)
+            @php
+                $cardVariantIndex = collect($product->variants ?? [])->search(
+                    fn ($variant) => filled($variant['selling_price'] ?? null) || filled($variant['today_price'] ?? null)
+                );
+                $cardVariantIndex = $cardVariantIndex === false ? null : $cardVariantIndex;
+                $cardVariant = $cardVariantIndex !== null ? ($product->variants[$cardVariantIndex] ?? null) : null;
+                $cardTomorrowPrice = $cardVariant && filled($cardVariant['tomorrow_price'] ?? null)
+                    && (float) $cardVariant['tomorrow_price'] > 0
+                        ? (float) $cardVariant['tomorrow_price']
+                        : null;
+            @endphp
             <div class="bg-white rounded-2xl border border-gray-100 hover:border-green-300 hover:shadow-lg transition overflow-hidden flex flex-col">
                 <a href="{{ route('frontend.product.show', $product->slug) }}" class="block aspect-square overflow-hidden bg-gray-50 relative">
                     @if(in_array($product->id, $newArrivalProductIds ?? [], true))
@@ -386,24 +397,40 @@
                 </a>
                 <div class="p-3 flex flex-col flex-1">
                     <a href="{{ route('frontend.product.show', $product->slug) }}"
-                       class="text-sm font-bold text-gray-800 hover:text-green-700 leading-snug line-clamp-2">{{ $product->name }}</a>
+                       class="block min-h-[40px] text-sm font-bold text-gray-800 hover:text-green-700 leading-snug line-clamp-2">{{ $product->name }}</a>
                     <p class="text-[10px] text-gray-400 mt-1">{{ $product->category->name ?? '' }}</p>
-                    <div class="flex items-center justify-between mt-auto pt-3">
-                        <div>
-                            <p class="text-lg font-extrabold text-gray-800">Rs{{ number_format($product->display_price, 0) }}<span class="ml-1 text-xs font-semibold text-gray-400">{{ $product->display_pack_label }}</span></p>
-                            @if($product->display_mrp && $product->display_mrp > $product->display_price)
-                                <p class="text-xs text-gray-400 line-through">Rs{{ number_format($product->display_mrp, 0) }}</p>
+                    <div class="mt-auto pt-1.5">
+                        <div class="flex items-end justify-between gap-2">
+                            <div>
+                                <p class="text-[9px] font-black uppercase tracking-wider text-emerald-600">Today</p>
+                                <p class="text-lg font-extrabold text-gray-800">Rs{{ number_format($product->display_price, 0) }}<span class="ml-1 text-xs font-semibold text-gray-400">{{ $product->display_pack_label }}</span></p>
+                                @if($product->display_mrp && $product->display_mrp > $product->display_price)
+                                    <p class="text-xs text-gray-400 line-through">Rs{{ number_format($product->display_mrp, 0) }}</p>
+                                @endif
+                            </div>
+                            @if($product->is_active)
+                                <button onclick="addToCart({{ $product->id }}, {{ $cardVariantIndex === null ? 'null' : $cardVariantIndex }}, 'today')"
+                                        class="w-9 h-9 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center text-sm transition">
+                                    <i class="fa-solid fa-cart-shopping"></i>
+                                </button>
+                            @else
+                                <span class="inline-flex rounded-lg bg-red-50 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-red-600">
+                                    Sold Out
+                                </span>
                             @endif
                         </div>
-                        @if($product->is_active)
-                            <button onclick="addToCart({{ $product->id }})"
-                                    class="w-9 h-9 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center text-sm transition">
-                                <i class="fa-solid fa-cart-shopping"></i>
-                            </button>
-                        @else
-                            <span class="inline-flex rounded-lg bg-red-50 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-red-600">
-                                Sold Out
-                            </span>
+                        @if($product->is_active && $cardTomorrowPrice !== null)
+                            <div class="mt-1 flex items-end justify-between gap-2 border-t border-dashed border-gray-100 pt-1">
+                                <div>
+                                    <p class="text-[9px] font-black uppercase tracking-wider text-amber-700">Tomorrow</p>
+                                    <p class="text-lg font-extrabold text-gray-800">Rs{{ number_format($cardTomorrowPrice, 0) }}<span class="ml-1 text-xs font-semibold text-gray-400">{{ $product->display_pack_label }}</span></p>
+                                </div>
+                                <button onclick="addToCart({{ $product->id }}, {{ $cardVariantIndex }}, 'tomorrow')"
+                                        class="w-9 h-9 bg-amber-500 hover:bg-amber-600 text-white rounded-lg flex items-center justify-center text-sm transition"
+                                        title="Add for tomorrow">
+                                    <i class="fa-solid fa-cart-shopping"></i>
+                                </button>
+                            </div>
                         @endif
                     </div>
                 </div>

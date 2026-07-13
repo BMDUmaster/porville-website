@@ -1,6 +1,5 @@
-@extends('frontend.layouts.app')
-@section('title', 'Return & Refund Policy')
-@section('content')
+<?php $__env->startSection('title', 'Return & Refund Policy'); ?>
+<?php $__env->startSection('content'); ?>
 <div class="max-w-3xl mx-auto px-6 py-12 md:py-16">
     <div class="bg-white rounded-3xl border border-slate-100 p-6 md:p-10 shadow-sm">
         <h1 class="nunito font-extrabold text-3xl text-slate-900 mb-6 flex items-center gap-2">
@@ -39,4 +38,6 @@
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('frontend.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views/frontend/pages/return-refund-policy.blade.php ENDPATH**/ ?>

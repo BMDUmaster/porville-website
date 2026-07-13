@@ -192,14 +192,14 @@
 @section('scripts')
 <script>
 function applyFullCartCoupon(code) {
-    fetch('{{ route("frontend.cart.coupon.apply") }}', {
+    fetch('{{ url("cart/coupon") }}', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
         body: JSON.stringify({ code, delivery_day: @json($selectedDay) })
     }).then(async r => { const data = await r.json(); if (!r.ok) throw new Error(data.message); location.reload(); }).catch(e => alert(e.message));
 }
 function removeFullCartCoupon() {
-    fetch('{{ route("frontend.cart.coupon.remove") }}', {
+    fetch('{{ url("cart/coupon") }}', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
         body: JSON.stringify({ delivery_day: @json($selectedDay) })

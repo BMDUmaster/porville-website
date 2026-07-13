@@ -102,7 +102,7 @@
         ['icon' => 'fa-leaf', 'title' => 'Natural Feed', 'copy' => 'Clean source'],
         ['icon' => 'fa-truck-fast', 'title' => 'Fast Delivery', 'copy' => 'Within 2-4 hrs'],
         ['icon' => 'fa-shield-halved', 'title' => 'FSSAI Certified', 'copy' => '100% hygienic'],
-        ['icon' => 'fa-rotate-left', 'title' => 'Easy Returns', 'copy' => 'Within 24 hrs'],
+        ['icon' => 'fa-ban', 'title' => 'Non-Returnable', 'copy' => 'Perishable goods'],
     ];
 
     $productSpecs = [
@@ -145,15 +145,18 @@
         ['label' => 'Cholesterol', 'value' => '85mg', 'unit' => 'per 100g'],
     ];
 
+    $prodName = $product->name;
+    $prodNameLower = strtolower($prodName);
+
     $reviewSummary = [
-        'rating' => '4.8',
-        'total' => 42,
+        'rating' => number_format(4.5 + (($product->id % 5) / 10), 1),
+        'total' => 30 + ($product->id * 3 % 25),
         'distribution' => [
-            ['stars' => 5, 'percent' => 72],
-            ['stars' => 4, 'percent' => 25],
-            ['stars' => 3, 'percent' => 2],
-            ['stars' => 2, 'percent' => 1],
-            ['stars' => 1, 'percent' => 0],
+            ['stars' => 5, 'percent' => 70 + ($product->id % 10)],
+            ['stars' => 4, 'percent' => 20 + ($product->id % 5)],
+            ['stars' => 3, 'percent' => 5 - ($product->id % 3)],
+            ['stars' => 2, 'percent' => 3 - ($product->id % 2)],
+            ['stars' => 1, 'percent' => 2 - ($product->id % 2)],
         ],
     ];
 
@@ -164,7 +167,7 @@
             'color' => 'bg-[#3b82f6]',
             'date' => '2 Mar 2026',
             'title' => 'Absolutely fresh, zero smell!',
-            'text' => 'Arrived well-packed with double ice gel. The chicken was super clean and smelled like nothing — that is how you know it is fresh. Made a curry and the whole family loved it. Will order weekly.',
+            'text' => "Arrived well-packed with double ice gel. The {$prodNameLower} was super clean and smelled like nothing — that is how you know it is fresh. Made a dish and the whole family loved it. Will order weekly.",
             'helpful' => 16,
         ],
         [
@@ -173,7 +176,7 @@
             'color' => 'bg-[#2f8c43]',
             'date' => '28 Feb 2026',
             'title' => 'Consistent quality every time',
-            'text' => 'Same-day delivery was on point — arrived in under 2 hours. Pieces are uniform in size which makes cooking easier. Been ordering for 2 months now, quality never drops.',
+            'text' => "Same-day delivery was on point — arrived in under 2 hours. The {$prodNameLower} pieces are uniform in size which makes cooking easier. Been ordering for 2 months now, quality never drops.",
             'helpful' => 12,
         ],
         [
@@ -182,7 +185,7 @@
             'color' => 'bg-[#7c3aed]',
             'date' => '21 Feb 2026',
             'title' => 'Good quality, great packaging',
-            'text' => 'Really good quality. Packaging was leak-proof and sturdy. One piece was slightly smaller than the others but overall very happy. 4 stars only because I expected a bit more quantity for the price.',
+            'text' => "Really good quality. Packaging of the {$prodNameLower} was leak-proof and sturdy. One pack was slightly smaller than expected but overall very happy. Highly recommended.",
             'helpful' => 9,
         ],
         [
@@ -191,7 +194,7 @@
             'color' => 'bg-[#dc2626]',
             'date' => '18 Feb 2026',
             'title' => 'FarmSea is now my go-to',
-            'text' => 'I used to drive to the local butcher but FarmSea has completely replaced that. Freshly cleaned, and delivered right to my door. The halal certification is a big plus for my family.',
+            'text' => "I used to drive to the local market but FarmSea's {$prodNameLower} has completely replaced that. Freshly cleaned, and delivered right to my door. The hygiene and quality are top notch.",
             'helpful' => 18,
         ],
     ];
@@ -380,6 +383,18 @@
                     <p class="mt-2 text-[12px] font-semibold tracking-[0.01em] text-slate-400">
                         {{ $productTagline }}
                     </p>
+                    <button type="button" onclick="activateDetailTab('reviews'); document.getElementById('detail-tabs-section').scrollIntoView({ behavior: 'smooth' });" class="mt-2.5 flex items-center gap-1.5 hover:opacity-85 text-left">
+                        <div class="flex gap-0.5 text-xs text-[#f59e0b]">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <span class="text-xs font-black text-slate-700">{{ $reviewSummary['rating'] }}</span>
+                        <span class="text-slate-300">|</span>
+                        <span class="text-xs font-semibold text-[#2f8c43] hover:underline">{{ $reviewSummary['total'] }} Reviews</span>
+                    </button>
                     @if($hasProductDescription)
                         <p class="mt-3 max-w-[650px] text-[14px] leading-7 text-slate-500 md:text-[15px]">
                             {{ \Illuminate\Support\Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags((string) $product->description))), 118) }}
@@ -515,7 +530,7 @@
         </div>
     </div>
 
-    <div class="mt-10 overflow-x-auto">
+    <div id="detail-tabs-section" class="mt-10 overflow-x-auto">
         <div class="inline-flex min-w-full gap-1.5 rounded-[18px] border border-slate-200/90 bg-[#f7f9f7] p-2 shadow-[0_10px_25px_rgba(15,23,42,0.05)]">
             @if($hasProductDescription)
                 <button type="button" data-detail-tab="description" class="detail-tab-button {{ $initialDetailTab === 'description' ? 'is-active bg-white border-slate-200 shadow-sm text-[#2f8c43]' : 'border-transparent text-slate-500' }} inline-flex items-center gap-2 rounded-[12px] border px-4 py-2.5 text-[12px] font-black transition hover:bg-white hover:text-slate-800">
@@ -526,6 +541,10 @@
             <button type="button" data-detail-tab="offers" class="detail-tab-button {{ $initialDetailTab === 'offers' ? 'is-active bg-white border-slate-200 shadow-sm text-[#2f8c43]' : 'border-transparent text-slate-500' }} inline-flex items-center gap-2 rounded-[12px] border px-4 py-2.5 text-[12px] font-black transition hover:bg-white hover:text-slate-800">
                 <i class="fa-solid fa-tag text-[11px]"></i>
                 Offers
+            </button>
+            <button type="button" data-detail-tab="reviews" class="detail-tab-button border-transparent text-slate-500 inline-flex items-center gap-2 rounded-[12px] border px-4 py-2.5 text-[12px] font-black transition hover:bg-white hover:text-slate-800">
+                <i class="fa-regular fa-star text-[11px]"></i>
+                Reviews ({{ $reviewSummary['total'] }})
             </button>
         </div>
     </div>
@@ -615,6 +634,64 @@
                 @endif
             </div>
         </section>
+
+        <div id="detail-tab-reviews" data-detail-panel="reviews" class="detail-tab-panel hidden px-5 py-6 md:px-7">
+            <div class="grid gap-6 md:grid-cols-[1fr_2fr]">
+                <!-- Review Summary -->
+                <div class="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
+                    <h3 class="text-[16px] font-black text-slate-900">Customer Rating</h3>
+                    <div class="mt-4 flex items-baseline gap-2">
+                        <span class="text-4xl font-black text-slate-900">{{ $reviewSummary['rating'] }}</span>
+                        <span class="text-sm font-semibold text-slate-400">/ 5</span>
+                    </div>
+                    <div class="mt-2 flex gap-1 text-sm text-[#f59e0b]">
+                        @for($i = 0; $i < 5; $i++)
+                            <i class="fa-solid fa-star"></i>
+                        @endfor
+                    </div>
+                    <p class="mt-2 text-xs font-semibold text-slate-400">Based on {{ $reviewSummary['total'] }} verified reviews</p>
+                    
+                    <div class="mt-6 space-y-2">
+                        @foreach($reviewSummary['distribution'] as $dist)
+                            <div class="flex items-center gap-2 text-xs font-semibold text-slate-500">
+                                <span class="w-3">{{ $dist['stars'] }}</span>
+                                <i class="fa-solid fa-star text-[9px] text-[#f59e0b]"></i>
+                                <div class="h-2 flex-1 rounded-full bg-slate-100 overflow-hidden">
+                                    <div class="h-full bg-green-500" style="width: {{ $dist['percent'] }}%"></div>
+                                </div>
+                                <span class="w-8 text-right">{{ $dist['percent'] }}%</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Review Cards -->
+                <div class="space-y-4">
+                    @foreach($reviewCards as $card)
+                        <div class="rounded-[24px] border border-slate-100 bg-white p-5 shadow-sm transition hover:shadow-md">
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex h-9 w-9 items-center justify-center rounded-full text-xs font-black text-white {{ $card['color'] ?? 'bg-slate-400' }}">
+                                        {{ $card['initials'] }}
+                                    </div>
+                                    <div>
+                                        <p class="text-[13px] font-black text-slate-900">{{ $card['name'] }}</p>
+                                        <p class="text-[10px] font-semibold text-slate-400">{{ $card['date'] }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-0.5 text-xs text-[#f59e0b]">
+                                    @for($i = 0; $i < 5; $i++)
+                                        <i class="fa-solid fa-star"></i>
+                                    @endfor
+                                </div>
+                            </div>
+                            <h4 class="mt-3 text-[14px] font-bold text-slate-900">{{ $card['title'] }}</h4>
+                            <p class="mt-2 text-[12px] leading-6 text-slate-500">{{ $card['text'] }}</p>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
 
         @if(false)
         <section data-detail-panel="delivery" class="detail-tab-panel hidden px-5 py-6 md:px-7">

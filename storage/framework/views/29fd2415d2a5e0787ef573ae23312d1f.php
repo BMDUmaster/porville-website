@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title><?php echo $__env->yieldContent('title', 'FarmSea'); ?> — Fresh Meat & Seafood</title>
 <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+<link rel="icon" type="image/webp" href="<?php echo e($brandLogoUrl); ?>">
+<link rel="shortcut icon" href="<?php echo e($brandLogoUrl); ?>">
+<link rel="apple-touch-icon" href="<?php echo e($brandLogoUrl); ?>">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
@@ -223,7 +226,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
         <a href="<?php echo e(route('frontend.home')); ?>" class="flex-shrink-0 md:ml-[100px] flex items-center">
             <img src="<?php echo e($brandLogoUrl); ?>"
                  alt="FarmSea"
-                 class="h-10 w-auto object-contain"
+                 class="h-10 w-auto object-contain md:h-16"
                  onerror="this.style.display='none'; document.getElementById('header-logo-fallback').style.display='inline-flex'">
             <span id="header-logo-fallback" class="hidden text-xl font-extrabold text-green-700">FarmSea</span>
         </a>
@@ -352,7 +355,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
     </div>
 </header>
 
-<div class="pt-[74px] md:pt-[138px]">
+<div class="pt-[74px] md:pt-[162px]">
     <!-- Flash Messages -->
     <?php if(session('success')): ?>
         <div data-auto-dismiss="3000" class="mx-4 mt-3 flex items-center gap-2 rounded-lg bg-green-100 p-3 text-sm text-green-700 transition-all duration-500">
@@ -574,7 +577,7 @@ function selectCartDrawerDay(day) {
     refreshCartDrawer();
 }
 function applyCartCoupon(code) {
-    fetch('<?php echo e(route("frontend.cart.coupon.apply")); ?>', {
+    fetch('<?php echo e(url("cart/coupon")); ?>', {
         method: 'POST',
         headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json'},
         body: JSON.stringify({code, delivery_day: selectedCartDrawerDay})
@@ -585,7 +588,7 @@ function applyCartCoupon(code) {
     }).catch(error => alert(error.message));
 }
 function removeCartCoupon() {
-    fetch('<?php echo e(route("frontend.cart.coupon.remove")); ?>', {
+    fetch('<?php echo e(url("cart/coupon")); ?>', {
         method: 'DELETE',
         headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json'},
         body: JSON.stringify({delivery_day: selectedCartDrawerDay})
@@ -619,27 +622,27 @@ function renderCartDrawerItems(items) {
     }
 
     container.innerHTML = items.map((item) => `
-        <div class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
-            <div class="flex gap-3">
-                <a href="${item.product_url}" class="h-20 w-20 overflow-hidden rounded-xl bg-gray-100 flex-shrink-0">
+        <div class="rounded-xl border border-gray-100 bg-white p-2 shadow-sm">
+            <div class="flex gap-2">
+                <a href="${item.product_url}" class="h-16 w-16 overflow-hidden rounded-lg bg-gray-100 flex-shrink-0">
                     ${item.image_url
                         ? `<img src="${item.image_url}" alt="${item.name}" class="h-full w-full object-cover">`
-                        : '<div class="flex h-full w-full items-center justify-center text-2xl text-gray-300"><i class="fa-solid fa-drumstick-bite"></i></div>'}
+                        : '<div class="flex h-full w-full items-center justify-center text-xl text-gray-300"><i class="fa-solid fa-drumstick-bite"></i></div>'}
                 </a>
                 <div class="min-w-0 flex-1">
-                    <div class="flex items-start justify-between gap-3">
-                        <a href="${item.product_url}" class="line-clamp-2 text-sm font-bold leading-5 text-slate-900 hover:text-blue-700">
+                    <div class="flex items-start justify-between gap-2">
+                        <a href="${item.product_url}" class="line-clamp-2 text-[13px] font-bold leading-4 text-slate-900 hover:text-blue-700">
                             ${item.name}
                         </a>
-                        <button onclick="removeCartDrawerItem('${item.key}')" class="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 transition hover:bg-red-50 hover:text-red-500">
-                            <i class="fa-solid fa-xmark text-xs"></i>
+                        <button onclick="removeCartDrawerItem('${item.key}')" class="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition hover:bg-red-50 hover:text-red-500">
+                            <i class="fa-solid fa-xmark text-[11px]"></i>
                         </button>
                     </div>
-                    <div class="mt-1 flex flex-wrap items-center gap-1.5">
-                        <span class="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+                    <div class="mt-0.5 flex flex-wrap items-center gap-1">
+                        <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
                             ${item.variant_label || item.unit || 'Fresh Cut'}
                         </span>
-                        <span class="inline-flex items-center rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                        <span class="inline-flex items-center rounded border px-1 py-0.5 text-[8px] font-bold uppercase tracking-wider ${
                             item.pricing_day === 'tomorrow'
                                 ? 'bg-amber-50 text-amber-700 border-amber-100'
                                 : 'bg-emerald-50 text-emerald-700 border-emerald-100'
@@ -647,22 +650,22 @@ function renderCartDrawerItems(items) {
                             ${item.pricing_day === 'tomorrow' ? 'Tomorrow' : 'Today'}
                         </span>
                     </div>
-                    <div class="mt-3 flex items-end justify-between gap-3">
+                    <div class="mt-2 flex items-end justify-between gap-2">
                         <div>
-                            <p class="text-sm font-black text-slate-900">${formatCartCurrency(item.price)}</p>
-                            <div class="mt-2 inline-flex items-center overflow-hidden rounded-lg border border-gray-200 bg-white">
-                                <button onclick="updateCartDrawerQty('${item.key}', ${item.quantity - 1})" class="flex h-8 w-8 items-center justify-center text-gray-500 transition hover:bg-gray-50 hover:text-red-500">
-                                    <i class="fa-solid fa-minus text-[10px]"></i>
+                            <p class="text-xs font-black text-slate-900">${formatCartCurrency(item.price)}</p>
+                            <div class="mt-1 inline-flex items-center overflow-hidden rounded-md border border-gray-200 bg-white">
+                                <button onclick="updateCartDrawerQty('${item.key}', ${item.quantity - 1})" class="flex h-7 w-7 items-center justify-center text-gray-500 transition hover:bg-gray-50 hover:text-red-500">
+                                    <i class="fa-solid fa-minus text-[8px]"></i>
                                 </button>
-                                <span class="flex h-8 min-w-[34px] items-center justify-center border-x border-gray-200 px-2 text-xs font-bold text-slate-700">
+                                <span class="flex h-7 min-w-[28px] items-center justify-center border-x border-gray-200 px-1.5 text-[11px] font-bold text-slate-700">
                                     ${item.quantity}
                                 </span>
-                                <button onclick="updateCartDrawerQty('${item.key}', ${item.quantity + 1})" class="flex h-8 w-8 items-center justify-center text-gray-500 transition hover:bg-gray-50 hover:text-green-600">
-                                    <i class="fa-solid fa-plus text-[10px]"></i>
+                                <button onclick="updateCartDrawerQty('${item.key}', ${item.quantity + 1})" class="flex h-7 w-7 items-center justify-center text-gray-500 transition hover:bg-gray-50 hover:text-green-600">
+                                    <i class="fa-solid fa-plus text-[8px]"></i>
                                 </button>
                             </div>
                         </div>
-                        <p class="text-sm font-extrabold text-blue-700">${formatCartCurrency(item.subtotal)}</p>
+                        <p class="text-xs font-extrabold text-blue-700">${formatCartCurrency(item.subtotal)}</p>
                     </div>
                 </div>
             </div>

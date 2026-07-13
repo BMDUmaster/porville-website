@@ -37,6 +37,14 @@ use App\Http\Controllers\ServerDiagnosticsController;
 // Public server diagnostics (no login) — use this URL on live hosting
 Route::get('/server-check', ServerDiagnosticsController::class)->name('server-check');
 
+// Utility to clear route, view and application cache from browser
+Route::get('/clear-cache', function () {
+    \Illuminate\Support\Facades\Artisan::call('route:clear');
+    \Illuminate\Support\Facades\Artisan::call('view:clear');
+    \Illuminate\Support\Facades\Artisan::call('cache:clear');
+    return 'Route, view, and application cache cleared successfully!';
+});
+
 // ── Frontend Controllers 
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\ProductController as FrontProductController;

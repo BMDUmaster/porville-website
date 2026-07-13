@@ -1,7 +1,6 @@
-@extends('frontend.layouts.app')
-@section('title', 'About Us')
+<?php $__env->startSection('title', 'About Us'); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <section class="bg-white py-12 md:py-16">
     <div class="mx-auto max-w-6xl px-4">
         <div class="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
@@ -13,7 +12,7 @@
                     FarmSea brings you fresh vegetables, fruits, meat, and seafood directly from trusted farms and suppliers.
                     Quality, hygiene, and freshness delivered at your doorstep.
                 </p>
-                <a href="{{ route('frontend.products') }}" class="mt-7 inline-flex rounded-xl bg-green-600 px-6 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-green-700 hover:shadow-lg">
+                <a href="<?php echo e(route('frontend.products')); ?>" class="mt-7 inline-flex rounded-xl bg-green-600 px-6 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-green-700 hover:shadow-lg">
                     Shop Now
                 </a>
             </div>
@@ -146,4 +145,6 @@
         </div>
     </div>
 </section>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('frontend.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views/frontend/pages/about-us.blade.php ENDPATH**/ ?>
