@@ -86,6 +86,9 @@
                                                  <p class="text-sm font-bold text-gray-800">{{ $addr['name'] ?? '' }}</p>
                                              </div>
                                              <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">{{ $addr['address'] }}</p>
+                                             @if(!empty($addr['sector']))
+                                                 <p class="text-xs text-gray-500 leading-relaxed">Sector: {{ $addr['sector'] }}</p>
+                                             @endif
                                              <p class="text-xs text-gray-500 leading-relaxed">{{ $addr['city'] }}, {{ $addr['state'] }} - {{ $addr['pincode'] }}</p>
                                              @if(!empty($addr['phone']))
                                                  <p class="text-xs text-gray-500 mt-1 leading-relaxed"><i class="fa-solid fa-phone text-[9px] mr-1 text-slate-400"></i>{{ $addr['phone'] }}</p>
@@ -106,7 +109,6 @@
                             </div>
                         @endif
 
-                        {{-- Collapsible/Toggleable Address Input Fields --}}
                         <div id="addressFormContainer" class="space-y-4 pt-2">
                             @if(!empty($pastAddresses))
                                 <div class="flex items-center justify-between mb-2">
@@ -134,14 +136,28 @@
                                            class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
                                 </div>
                             </div>
-                            <div>
-                                <label class="mb-1 block text-xs font-semibold text-gray-600">PIN Code *</label>
-                                <input type="text" name="pincode" id="shippingPincodeInput" required
-                                       class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label class="mb-1 block text-xs font-semibold text-gray-600">PIN Code *</label>
+                                    <select name="pincode" id="shippingPincodeInput" required
+                                            class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
+                                        <option value="">Select PIN Code</option>
+                                        @foreach($pinSectors as $pinCode => $sectors)
+                                            <option value="{{ $pinCode }}">{{ $pinCode }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="mb-1 block text-xs font-semibold text-gray-600">Sector *</label>
+                                    <select name="sector" id="shippingSectorInput" required
+                                            class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
+                                        <option value="">Select PIN Code First</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
                 <div class="overflow-hidden rounded-2xl border bg-white">
                     <div class="flex items-center gap-2 border-b px-6 py-4">
@@ -374,7 +390,7 @@ sanitizeCheckoutPhone();
 
 // Address Selection Logic
 const pastAddresses = @json($pastAddresses ?? []);
-const hasErrors = @json($errors->has('address') || $errors->has('city') || $errors->has('state') || $errors->has('pincode'));
+const hasErrors = @json($errors->has('address') || $errors->has('city') || $errors->has('state') || $errors->has('pincode') || $errors->has('sector'));
 let selectedAddressIndex = (pastAddresses.length > 0 && !hasErrors) ? 0 : null;
 
 const addressCards = document.querySelectorAll('.address-card');
@@ -386,6 +402,27 @@ const streetInput = document.getElementById('shippingAddressInput');
 const cityInput = document.getElementById('shippingCityInput');
 const stateInput = document.getElementById('shippingStateInput');
 const pincodeInput = document.getElementById('shippingPincodeInput');
+const sectorInput = document.getElementById('shippingSectorInput');
+
+const pinToSectors = @json($pinSectors);
+
+function populateSectors(pincode) {
+    if (!sectorInput) return;
+    sectorInput.innerHTML = '<option value="">Select Sector</option>';
+
+    if (!pincode || !pinToSectors[pincode]) {
+        sectorInput.innerHTML = '<option value="">Select PIN Code First</option>';
+        return;
+    }
+
+    const sectors = pinToSectors[pincode];
+    sectors.forEach(sector => {
+        const opt = document.createElement('option');
+        opt.value = sector;
+        opt.textContent = sector;
+        sectorInput.appendChild(opt);
+    });
+}
 
 function updateAddressSelectionUI() {
     addressCards.forEach((card, idx) => {
@@ -408,6 +445,8 @@ function updateAddressSelectionUI() {
         cityInput.value = addr.city || '';
         stateInput.value = addr.state || '';
         pincodeInput.value = addr.pincode || '';
+        populateSectors(addr.pincode || '');
+        sectorInput.value = addr.sector || '';
         
         formContainer.classList.add('hidden');
         addNewBtn?.classList.remove('hidden');
@@ -431,6 +470,8 @@ function showNewAddressForm() {
     cityInput.value = '';
     stateInput.value = '';
     pincodeInput.value = '';
+    populateSectors('');
+    sectorInput.value = '';
     
     if (formActionTitle) {
         formActionTitle.textContent = 'Add New Address';
@@ -450,6 +491,8 @@ function editAddressCard(event, index) {
     cityInput.value = addr.city || '';
     stateInput.value = addr.state || '';
     pincodeInput.value = addr.pincode || '';
+    populateSectors(addr.pincode || '');
+    sectorInput.value = addr.sector || '';
     
     if (formActionTitle) {
         formActionTitle.textContent = 'Edit Address';
@@ -466,6 +509,20 @@ function cancelAddressForm() {
     }
 }
 
+// Pincode change event listener for dynamic sectors and City/State population
+pincodeInput?.addEventListener('change', (e) => {
+    const pin = e.target.value;
+    populateSectors(pin);
+    if (pin) {
+        if (pin === '201318') {
+            cityInput.value = 'Greater Noida';
+        } else {
+            cityInput.value = 'Noida';
+        }
+        stateInput.value = 'Uttar Pradesh';
+    }
+});
+
 // Initial Call
 if (pastAddresses.length > 0) {
     updateAddressSelectionUI();
@@ -474,7 +531,10 @@ if (pastAddresses.length > 0) {
     streetInput.value = @json(old('address', $checkoutDefaults['address'] ?? ''));
     cityInput.value = @json(old('city', $checkoutDefaults['city'] ?? ''));
     stateInput.value = @json(old('state', $checkoutDefaults['state'] ?? ''));
-    pincodeInput.value = @json(old('pincode', $checkoutDefaults['pincode'] ?? ''));
+    const defaultPin = @json(old('pincode', $checkoutDefaults['pincode'] ?? ''));
+    pincodeInput.value = defaultPin;
+    populateSectors(defaultPin);
+    sectorInput.value = @json(old('sector', $checkoutDefaults['sector'] ?? ''));
 }
 </script>
 @endsection

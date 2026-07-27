@@ -95,7 +95,7 @@
             <h2 class="mb-2 text-sm font-semibold text-gray-700">Shipping Address</h2>
             @if(is_array($order->shipping_address))
                 <p class="text-sm text-gray-600">{{ $order->shipping_address['name'] ?? '' }}</p>
-                <p class="text-sm text-gray-600">{{ $order->shipping_address['address'] ?? '' }}, {{ $order->shipping_address['city'] ?? '' }}</p>
+                <p class="text-sm text-gray-600">{{ $order->shipping_address['address'] ?? '' }}{{ !empty($order->shipping_address['sector']) ? ', ' . $order->shipping_address['sector'] : '' }}, {{ $order->shipping_address['city'] ?? '' }}</p>
                 <p class="text-sm text-gray-600">{{ $order->shipping_address['state'] ?? '' }} - {{ $order->shipping_address['pincode'] ?? '' }}</p>
             @else
                 <p class="text-sm text-gray-600">{{ $order->shipping_address }}</p>

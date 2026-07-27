@@ -9,6 +9,7 @@
     $customerPhone = $shipping['phone'] ?? (optional($order->user)->phone ?: '0');
     $customerAddress = trim(collect([
         $shipping['address'] ?? null,
+        $shipping['sector'] ?? null,
         $shipping['city'] ?? null,
         $shipping['state'] ?? null,
         $shipping['pincode'] ?? null,

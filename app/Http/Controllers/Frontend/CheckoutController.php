@@ -41,6 +41,7 @@ class CheckoutController extends Controller
 
         $subtotal = collect($items)->sum('subtotal');
         $checkoutDefaults = $this->checkoutDefaults();
+        $pinSectors = self::pinSectors();
         $selectedDeliverySlot = old('delivery_slot', session('selected_delivery_slot_' . $checkoutDay));
         $deliverySlotOptions = $this->deliverySlotOptionsForCart($cart);
 
@@ -69,14 +70,15 @@ class CheckoutController extends Controller
                         trim($address['address'] ?? '') . '|' . 
                         trim($address['city'] ?? '') . '|' . 
                         trim($address['state'] ?? '') . '|' . 
-                        trim($address['pincode'] ?? '')
+                        trim($address['pincode'] ?? '') . '|' .
+                        trim($address['sector'] ?? '')
                     );
                 })
                 ->values()
                 ->all();
         }
 
-        return view('frontend.checkout', compact('items', 'subtotal', 'checkoutDefaults', 'selectedDeliverySlot', 'pricing', 'availableCoupons', 'pastAddresses'));
+        return view('frontend.checkout', compact('items', 'subtotal', 'checkoutDefaults', 'selectedDeliverySlot', 'pricing', 'availableCoupons', 'pastAddresses', 'pinSectors'));
     }
 
     /** POST /checkout */
@@ -86,6 +88,9 @@ class CheckoutController extends Controller
         $checkoutDay = ProductDayPricing::normalizeDay(session('checkout_delivery_day', 'today'));
         $cart = $this->cartForDay($fullCart, $checkoutDay);
 
+        $pinSectors = self::pinSectors();
+        $allowedPins = array_keys($pinSectors);
+
         $data = $request->validate([
             'first_name'       => 'required|string|max:60',
             'last_name'        => 'nullable|string|max:60',
@@ -94,7 +99,21 @@ class CheckoutController extends Controller
             'address'          => 'required|string',
             'city'             => 'required|string',
             'state'            => 'required|string',
-            'pincode'          => 'required|string',
+            'pincode'          => ['required', 'string', Rule::in($allowedPins)],
+            'sector'           => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) use ($request, $pinSectors) {
+                    $pin = $request->input('pincode');
+                    if ($pin && isset($pinSectors[$pin])) {
+                        if (!in_array($value, $pinSectors[$pin], true)) {
+                            $fail('The selected sector is invalid for the chosen PIN Code.');
+                        }
+                    } else {
+                        $fail('Please select a valid PIN Code first.');
+                    }
+                }
+            ],
             'delivery_slot'    => ['required', 'string', Rule::in(array_column($this->deliverySlotOptionsForCart($cart), 'value'))],
             'payment_method'   => 'required|in:COD,online,upi',
             'coupon_code'      => 'nullable|string',
@@ -158,6 +177,7 @@ class CheckoutController extends Controller
                     'city'    => $data['city'],
                     'state'   => $data['state'],
                     'pincode' => $data['pincode'],
+                    'sector'  => $data['sector'],
                 ],
                 'payment_method'   => $data['payment_method'],
                 'payment_status'   => 'pending',
@@ -310,6 +330,7 @@ class CheckoutController extends Controller
                 'city' => '',
                 'state' => '',
                 'pincode' => '',
+                'sector' => '',
             ];
         }
 
@@ -330,6 +351,7 @@ class CheckoutController extends Controller
             'city' => $latestAddress['city'] ?? '',
             'state' => $latestAddress['state'] ?? '',
             'pincode' => $latestAddress['pincode'] ?? '',
+            'sector' => $latestAddress['sector'] ?? '',
         ];
     }
 
@@ -460,5 +482,43 @@ class CheckoutController extends Controller
             $cart,
             fn ($item) => ProductDayPricing::normalizeDay($item['pricing_day'] ?? 'today') === $day
         );
+    }
+
+    public static function pinSectors(): array
+    {
+        return [
+            '201301' => [
+                'Sector 1', 'Sector 2', 'Sector 3', 'Sector 4', 'Sector 5', 'Sector 6', 'Sector 7', 'Sector 8', 'Sector 9', 'Sector 10',
+                'Sector 11', 'Sector 12', 'Sector 13', 'Sector 14', 'Sector 15', 'Sector 16', 'Sector 17', 'Sector 18', 'Sector 19', 'Sector 20',
+                'Sector 21', 'Sector 22', 'Sector 23', 'Sector 24', 'Sector 25', 'Sector 26', 'Sector 27', 'Sector 28', 'Sector 29', 'Sector 30',
+                'Sector 31', 'Sector 32', 'Sector 33', 'Sector 34', 'Sector 35', 'Sector 36', 'Sector 37',
+                'Sector 39', 'Sector 40', 'Sector 41',
+                'Sector 50', 'Sector 51'
+            ],
+            '201303' => [
+                'Sector 44', 'Sector 45', 'Sector 46', 'Sector 47', 'Sector 48',
+                'Sector 96',
+                'Sector 98'
+            ],
+            '201304' => [
+                'Sector 74', 'Sector 75', 'Sector 76', 'Sector 77', 'Sector 78',
+                'Sector 92', 'Sector 93'
+            ],
+            '201305' => [
+                'Sector 80', 'Sector 81', 'Sector 82', 'Sector 83', 'Sector 84', 'Sector 85',
+                'Sector 137',
+                'Sector 142', 'Sector 143',
+                'Sector 150', 'Sector 151', 'Sector 152'
+            ],
+            '201307' => [
+                'Sector 55', 'Sector 56', 'Sector 61'
+            ],
+            '201309' => [
+                'Sector 62', 'Sector 63', 'Sector 64', 'Sector 65'
+            ],
+            '201318' => [
+                'Gaur City', 'Sector 1', 'Sector 4', 'Sector 10', 'Sector 12'
+            ]
+        ];
     }
 }
