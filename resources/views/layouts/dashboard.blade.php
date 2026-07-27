@@ -208,6 +208,14 @@
                 <span id="contactSidebarUnreadBadge" class="ml-auto hidden min-w-5 rounded-full bg-red-500 px-1.5 py-0.5 text-center text-[10px] font-bold text-white"></span>
             </a>
 
+            <a href="{{ route('dashboard.reviews') }}"
+               class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
+                      hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
+                      {{ request()->routeIs('dashboard.reviews*') ? 'active-link' : 'text-slate-700' }}">
+                <i class="fa-solid fa-star w-5 text-green-700"></i>
+                <span>Reviews</span>
+            </a>
+
             <a href="{{ route('dashboard.users') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white

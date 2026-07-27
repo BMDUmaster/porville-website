@@ -74,6 +74,25 @@
         /* Prevent icon overflow in cards */
         .stat-card { overflow: hidden; }
         .stat-card .icon-box { flex-shrink: 0; }
+        @media print {
+            #main-sidebar,
+            header,
+            #sidebar-overlay,
+            .print\:hidden {
+                display: none !important;
+            }
+            .lg\:ml-72 {
+                margin-left: 0 !important;
+            }
+            main {
+                margin-top: 0 !important;
+                padding-top: 0 !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+            }
+        }
         <?php echo $__env->yieldContent('styles'); ?>
     </style>
 </head>
@@ -85,15 +104,15 @@
 
     <!--SIDEBAr -->
     <aside id="main-sidebar"
-           class="fixed top-0 left-0 w-72 bg-green-100 h-screen overflow-y-auto custom-scrollbar z-50
+           class="fixed top-0 left-0 w-72 bg-white border-r border-slate-200 h-screen overflow-y-auto custom-scrollbar z-50
                   transform transition-transform duration-300 lg:translate-x-0 -translate-x-full">
 
         <!-- Logo -->
-        <div class="p-4 border-b border-green-200 bg-green-400 flex items-center justify-between">
+        <div class="p-4 border-b border-slate-200 bg-white flex items-center justify-between">
             <a href="<?php echo e(route('dashboard.home')); ?>" class="flex items-center">
                 <img src="<?php echo e($brandLogoUrl); ?>"
                      alt="FarmSea"
-                     class="h-14 w-auto object-contain"
+                     class="h-20 w-auto max-w-full object-contain"
                      onerror="this.remove(); document.getElementById('logo-fallback').style.display='flex'">
                 <span id="logo-fallback" class="hidden items-center gap-2 text-xl font-extrabold text-green-700 tracking-tight">
                     🌿 FarmSea
@@ -188,6 +207,14 @@
                 <i class="fa-regular fa-envelope w-5 text-green-700"></i>
                 <span>Contact Us</span>
                 <span id="contactSidebarUnreadBadge" class="ml-auto hidden min-w-5 rounded-full bg-red-500 px-1.5 py-0.5 text-center text-[10px] font-bold text-white"></span>
+            </a>
+
+            <a href="<?php echo e(route('dashboard.reviews')); ?>"
+               class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
+                      hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
+                      <?php echo e(request()->routeIs('dashboard.reviews*') ? 'active-link' : 'text-slate-700'); ?>">
+                <i class="fa-solid fa-star w-5 text-green-700"></i>
+                <span>Reviews</span>
             </a>
 
             <a href="<?php echo e(route('dashboard.users')); ?>"

@@ -85,9 +85,13 @@ class OrderController extends Controller
             unset($validated['delivery_boy_id']);
         }
 
+        $oldStatus = $order->status;
         $order->update($validated);
+        $order->refresh();
 
-        return back()->with('success', 'Order status updated.');
+        \App\Services\OrderStatusNotificationService::notifyStatusChange($order, $oldStatus);
+
+        return back()->with('success', 'Order status updated and notification sent to customer.');
     }
 
     public function history(Request $request)

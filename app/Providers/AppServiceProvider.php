@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\Category;
+use App\Models\Coupon;
+use App\Models\Product;
 use App\Support\MediaUrl;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\URL;
@@ -32,11 +34,19 @@ class AppServiceProvider extends ServiceProvider
                     ->with(['children' => fn ($query) => $query->where('is_active', true)->orderBy('name')])
                     ->orderBy('name')
                     ->get();
+                $tickerProduct = Product::active()->latest('created_at')->latest('id')->first();
+                $tickerOffer = Coupon::offers()->activeEntries()->latest('id')->first();
             } catch (Throwable) {
                 $categories = collect();
+                $tickerProduct = null;
+                $tickerOffer = null;
             }
 
-            $view->with('frontendNavCategories', $categories);
+            $view->with([
+                'frontendNavCategories' => $categories,
+                'frontendTickerProduct' => $tickerProduct,
+                'frontendTickerOffer' => $tickerOffer,
+            ]);
         });
     }
 

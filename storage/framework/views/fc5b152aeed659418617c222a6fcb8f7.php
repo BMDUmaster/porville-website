@@ -91,18 +91,13 @@
     $defaultDisplayedPrice = (float) ($defaultVariant['today_price'] ?? $defaultVariant['selling_price'] ?? $product->price);
     $selectedSaveAmount = max(($defaultVariant['mrp'] ?? 0) - $defaultDisplayedPrice, 0);
     $hasProductDescription = filled(trim(strip_tags((string) ($product->description ?? ''))));
+    $productDescriptionText = trim(preg_replace('/\s+/', ' ', strip_tags((string) ($product->description ?? ''))));
+    $hasLongProductDescription = \Illuminate\Support\Str::length($productDescriptionText) > 105;
     $initialDetailTab = $hasProductDescription ? 'description' : 'offers';
     $productOrigin = $product->subcategory->name ?? $product->category->name ?? 'FarmSea Farms';
     $productCategory = $product->category->name ?? 'Fresh Cuts';
     $productTagline = 'Pasture-Raised • Grain-Fed • Air-Chilled';
     $isProductAvailable = (bool) $product->is_active;
-
-    $trustHighlights = [
-        ['icon' => 'fa-leaf', 'title' => 'Natural Feed', 'copy' => 'Clean source'],
-        ['icon' => 'fa-truck-fast', 'title' => 'Fast Delivery', 'copy' => 'Within 2-4 hrs'],
-        ['icon' => 'fa-shield-halved', 'title' => 'FSSAI Certified', 'copy' => '100% hygienic'],
-        ['icon' => 'fa-rotate-left', 'title' => 'Easy Returns', 'copy' => 'Within 24 hrs'],
-    ];
 
     $productSpecs = [
         'Origin' => $productOrigin,
@@ -144,15 +139,18 @@
         ['label' => 'Cholesterol', 'value' => '85mg', 'unit' => 'per 100g'],
     ];
 
+    $prodName = $product->name;
+    $prodNameLower = strtolower($prodName);
+
     $reviewSummary = [
-        'rating' => '4.8',
-        'total' => 42,
+        'rating' => number_format(4.5 + (($product->id % 5) / 10), 1),
+        'total' => 30 + ($product->id * 3 % 25),
         'distribution' => [
-            ['stars' => 5, 'percent' => 72],
-            ['stars' => 4, 'percent' => 25],
-            ['stars' => 3, 'percent' => 2],
-            ['stars' => 2, 'percent' => 1],
-            ['stars' => 1, 'percent' => 0],
+            ['stars' => 5, 'percent' => 70 + ($product->id % 10)],
+            ['stars' => 4, 'percent' => 20 + ($product->id % 5)],
+            ['stars' => 3, 'percent' => 5 - ($product->id % 3)],
+            ['stars' => 2, 'percent' => 3 - ($product->id % 2)],
+            ['stars' => 1, 'percent' => 2 - ($product->id % 2)],
         ],
     ];
 
@@ -163,7 +161,7 @@
             'color' => 'bg-[#3b82f6]',
             'date' => '2 Mar 2026',
             'title' => 'Absolutely fresh, zero smell!',
-            'text' => 'Arrived well-packed with double ice gel. The chicken was super clean and smelled like nothing — that is how you know it is fresh. Made a curry and the whole family loved it. Will order weekly.',
+            'text' => "Arrived well-packed with double ice gel. The {$prodNameLower} was super clean and smelled like nothing — that is how you know it is fresh. Made a dish and the whole family loved it. Will order weekly.",
             'helpful' => 16,
         ],
         [
@@ -172,7 +170,7 @@
             'color' => 'bg-[#2f8c43]',
             'date' => '28 Feb 2026',
             'title' => 'Consistent quality every time',
-            'text' => 'Same-day delivery was on point — arrived in under 2 hours. Pieces are uniform in size which makes cooking easier. Been ordering for 2 months now, quality never drops.',
+            'text' => "Same-day delivery was on point — arrived in under 2 hours. The {$prodNameLower} pieces are uniform in size which makes cooking easier. Been ordering for 2 months now, quality never drops.",
             'helpful' => 12,
         ],
         [
@@ -181,7 +179,7 @@
             'color' => 'bg-[#7c3aed]',
             'date' => '21 Feb 2026',
             'title' => 'Good quality, great packaging',
-            'text' => 'Really good quality. Packaging was leak-proof and sturdy. One piece was slightly smaller than the others but overall very happy. 4 stars only because I expected a bit more quantity for the price.',
+            'text' => "Really good quality. Packaging of the {$prodNameLower} was leak-proof and sturdy. One pack was slightly smaller than expected but overall very happy. Highly recommended.",
             'helpful' => 9,
         ],
         [
@@ -190,10 +188,34 @@
             'color' => 'bg-[#dc2626]',
             'date' => '18 Feb 2026',
             'title' => 'FarmSea is now my go-to',
-            'text' => 'I used to drive to the local butcher but FarmSea has completely replaced that. Freshly cleaned, and delivered right to my door. The halal certification is a big plus for my family.',
+            'text' => "I used to drive to the local market but FarmSea's {$prodNameLower} has completely replaced that. Freshly cleaned, and delivered right to my door. The hygiene and quality are top notch.",
             'helpful' => 18,
         ],
     ];
+
+    // Use only approved reviews that the admin selected for this product page.
+    $verifiedProductReviews = $productReviews ?? collect();
+    $verifiedReviewTotal = $verifiedProductReviews->count();
+    $reviewSummary = [
+        'rating' => $verifiedReviewTotal ? number_format($verifiedProductReviews->avg('rating'), 1) : '0.0',
+        'total' => $verifiedReviewTotal,
+        'distribution' => collect(range(5, 1))->map(function ($stars) use ($verifiedProductReviews, $verifiedReviewTotal) {
+            $count = $verifiedProductReviews->where('rating', $stars)->count();
+            return ['stars' => $stars, 'percent' => $verifiedReviewTotal ? (int) round(($count / $verifiedReviewTotal) * 100) : 0];
+        })->all(),
+    ];
+    $reviewCards = $verifiedProductReviews->map(function ($review) {
+        $name = $review->user?->name ?? 'Verified Customer';
+        return [
+            'name' => $name,
+            'initials' => collect(explode(' ', $name))->take(2)->map(fn($part) => strtoupper(substr($part, 0, 1)))->join('') ?: 'VC',
+            'color' => 'bg-[#2f8c43]',
+            'date' => optional($review->reviewed_at ?? $review->created_at)->format('d M Y'),
+            'title' => 'Verified purchase',
+            'text' => $review->comment ?: 'Great product and delivery experience.',
+            'rating' => $review->rating,
+        ];
+    })->all();
 
     $offerBullets = [
         'Use code FRESH30 on eligible orders to unlock extra savings.',
@@ -288,6 +310,16 @@
         <div>
             <div class="overflow-hidden rounded-[28px] border border-[#dce5d9] bg-white shadow-[0_22px_60px_rgba(15,23,42,0.08)]">
                 <div class="relative aspect-[1/0.94] overflow-hidden bg-[#f4f5ef]">
+                    <?php
+                        $isInWishlist = in_array($product->id, session('wishlist', []), true);
+                    ?>
+                    <button onclick="toggleWishlist(<?php echo e($product->id); ?>, this)" 
+                            class="wishlist-btn absolute left-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-lg backdrop-blur-sm transition hover:scale-110 <?php echo e($isInWishlist ? 'active' : ''); ?>"
+                            data-product-id="<?php echo e($product->id); ?>"
+                            title="<?php echo e($isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'); ?>">
+                        <i class="<?php echo e($isInWishlist ? 'fa-solid fa-heart text-xl text-red-500' : 'fa-regular fa-heart text-xl text-slate-600 hover:text-red-500'); ?>"></i>
+                    </button>
+
                     <?php if(in_array($product->id, $newArrivalProductIds ?? [], true)): ?>
                         <span class="absolute right-4 top-4 z-20 inline-flex items-center rounded-full bg-blue-600 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white shadow-lg">
                             New Arrival
@@ -381,21 +413,59 @@
                         <?php echo e($productTagline); ?>
 
                     </p>
+                    <button type="button" onclick="activateDetailTab('reviews'); document.getElementById('detail-tabs-section').scrollIntoView({ behavior: 'smooth' });" class="mt-2.5 flex items-center gap-1.5 hover:opacity-85 text-left">
+                        <div class="flex gap-0.5 text-xs text-[#f59e0b]">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <span class="text-xs font-black text-slate-700"><?php echo e($reviewSummary['rating']); ?></span>
+                        <span class="text-slate-300">|</span>
+                        <span class="text-xs font-semibold text-[#2f8c43] hover:underline"><?php echo e($reviewSummary['total']); ?> Reviews</span>
+                    </button>
                     <?php if($hasProductDescription): ?>
-                        <p class="mt-3 max-w-[650px] text-[14px] leading-7 text-slate-500 md:text-[15px]">
-                            <?php echo e(\Illuminate\Support\Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags((string) $product->description))), 118)); ?>
-
-                        </p>
+                        <div class="relative mt-3 max-w-[650px] overflow-hidden text-[14px] leading-7 text-slate-500 md:text-[15px]">
+                            <p class="line-clamp-2 <?php echo e($hasLongProductDescription ? 'pr-[92px]' : ''); ?>"><?php echo e($productDescriptionText); ?></p>
+                            <?php if($hasLongProductDescription): ?>
+                                <button type="button"
+                                        onclick="activateDetailTab('description'); document.getElementById('detail-tabs-section').scrollIntoView({ behavior: 'smooth', block: 'start' });"
+                                        class="absolute bottom-0 right-0 bg-[#f5f6fa] pl-2 text-[13px] font-black text-green-700 hover:underline md:text-[14px]">
+                                    ... See more
+                                </button>
+                            <?php endif; ?>
+                        </div>
                     <?php endif; ?>
                 </div>
 
-                <div class="hidden items-center gap-2 sm:flex">
+                <div class="flex flex-shrink-0 items-center gap-2">
                     <button type="button" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-green-200 hover:text-green-700">
                         <i class="fa-regular fa-heart text-sm"></i>
                     </button>
-                    <button type="button" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-green-200 hover:text-green-700">
-                        <i class="fa-solid fa-share-nodes text-sm"></i>
-                    </button>
+                    <div class="relative">
+                        <button type="button" onclick="toggleProductShare(event)" aria-label="Share this product" aria-expanded="false" id="productShareButton" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-green-200 hover:text-green-700">
+                            <i class="fa-solid fa-share-nodes text-sm"></i>
+                        </button>
+                        <div id="productShareMenu" class="hidden absolute right-0 top-11 z-50 w-52 overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl">
+                            <p class="px-3 pb-2 pt-1 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Share product</p>
+                            <a href="https://wa.me/?text=<?php echo e(urlencode($product->name . ' - ' . url()->current())); ?>" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 hover:bg-green-50 hover:text-green-700">
+                                <i class="fa-brands fa-whatsapp w-5 text-lg text-green-500"></i> WhatsApp
+                            </a>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo e(urlencode(url()->current())); ?>" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-700">
+                                <i class="fa-brands fa-facebook w-5 text-lg text-blue-600"></i> Facebook
+                            </a>
+                            <button type="button" onclick="shareProductToInstagram(this)" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-slate-700 hover:bg-pink-50 hover:text-pink-700">
+                                <i class="fa-brands fa-instagram w-5 text-lg text-pink-600"></i> <span>Instagram</span>
+                            </button>
+                            <button type="button" onclick="shareProductNative()" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-slate-700 hover:bg-purple-50 hover:text-purple-700">
+                                <i class="fa-solid fa-mobile-screen-button w-5 text-purple-600"></i> More apps
+                            </button>
+                            <button type="button" onclick="copyProductLink(this)" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-slate-700 hover:bg-slate-100">
+                                <i class="fa-regular fa-copy w-5 text-slate-500"></i> <span>Copy link</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -496,18 +566,6 @@
 
             <?php echo $__env->make('frontend.partials.similar-products', ['wrapperClass' => 'mt-3 md:hidden'], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-            <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                <?php $__currentLoopData = $trustHighlights; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $highlight): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <div class="rounded-2xl border border-slate-200 bg-white px-4 py-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                        <div class="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-[#f2fbf3] text-[#2f8c43]">
-                            <i class="fa-solid <?php echo e($highlight['icon']); ?>"></i>
-                        </div>
-                        <div class="mt-3 text-[12px] font-black text-slate-800"><?php echo e($highlight['title']); ?></div>
-                        <div class="mt-1 text-[10px] font-semibold text-slate-400"><?php echo e($highlight['copy']); ?></div>
-                    </div>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-            </div>
-
             <div class="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
                 <?php $__currentLoopData = $productSpecs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $label => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="grid grid-cols-[140px_minmax(0,1fr)] gap-4 border-b border-slate-100 px-4 py-3 last:border-b-0">
@@ -519,7 +577,7 @@
         </div>
     </div>
 
-    <div class="mt-10 overflow-x-auto">
+    <div id="detail-tabs-section" class="mt-10 overflow-x-auto">
         <div class="inline-flex min-w-full gap-1.5 rounded-[18px] border border-slate-200/90 bg-[#f7f9f7] p-2 shadow-[0_10px_25px_rgba(15,23,42,0.05)]">
             <?php if($hasProductDescription): ?>
                 <button type="button" data-detail-tab="description" class="detail-tab-button <?php echo e($initialDetailTab === 'description' ? 'is-active bg-white border-slate-200 shadow-sm text-[#2f8c43]' : 'border-transparent text-slate-500'); ?> inline-flex items-center gap-2 rounded-[12px] border px-4 py-2.5 text-[12px] font-black transition hover:bg-white hover:text-slate-800">
@@ -530,6 +588,10 @@
             <button type="button" data-detail-tab="offers" class="detail-tab-button <?php echo e($initialDetailTab === 'offers' ? 'is-active bg-white border-slate-200 shadow-sm text-[#2f8c43]' : 'border-transparent text-slate-500'); ?> inline-flex items-center gap-2 rounded-[12px] border px-4 py-2.5 text-[12px] font-black transition hover:bg-white hover:text-slate-800">
                 <i class="fa-solid fa-tag text-[11px]"></i>
                 Offers
+            </button>
+            <button type="button" data-detail-tab="reviews" class="detail-tab-button border-transparent text-slate-500 inline-flex items-center gap-2 rounded-[12px] border px-4 py-2.5 text-[12px] font-black transition hover:bg-white hover:text-slate-800">
+                <i class="fa-regular fa-star text-[11px]"></i>
+                Reviews (<?php echo e($reviewSummary['total']); ?>)
             </button>
         </div>
     </div>
@@ -624,6 +686,70 @@
                 <?php endif; ?>
             </div>
         </section>
+
+        <div id="detail-tab-reviews" data-detail-panel="reviews" class="detail-tab-panel hidden px-5 py-6 md:px-7">
+            <div class="grid gap-6 md:grid-cols-[1fr_2fr]">
+                <!-- Review Summary -->
+                <div class="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
+                    <h3 class="text-[16px] font-black text-slate-900">Customer Rating</h3>
+                    <div class="mt-4 flex items-baseline gap-2">
+                        <span class="text-4xl font-black text-slate-900"><?php echo e($reviewSummary['rating']); ?></span>
+                        <span class="text-sm font-semibold text-slate-400">/ 5</span>
+                    </div>
+                    <div class="mt-2 flex gap-1 text-sm text-[#f59e0b]">
+                        <?php for($i = 0; $i < 5; $i++): ?>
+                            <i class="fa-solid fa-star"></i>
+                        <?php endfor; ?>
+                    </div>
+                    <p class="mt-2 text-xs font-semibold text-slate-400">Based on <?php echo e($reviewSummary['total']); ?> verified reviews</p>
+                    
+                    <div class="mt-6 space-y-2">
+                        <?php $__currentLoopData = $reviewSummary['distribution']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dist): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <div class="flex items-center gap-2 text-xs font-semibold text-slate-500">
+                                <span class="w-3"><?php echo e($dist['stars']); ?></span>
+                                <i class="fa-solid fa-star text-[9px] text-[#f59e0b]"></i>
+                                <div class="h-2 flex-1 rounded-full bg-slate-100 overflow-hidden">
+                                    <div class="h-full bg-green-500" style="width: <?php echo e($dist['percent']); ?>%"></div>
+                                </div>
+                                <span class="w-8 text-right"><?php echo e($dist['percent']); ?>%</span>
+                            </div>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </div>
+                </div>
+
+                <!-- Review Cards -->
+                <div class="space-y-4">
+                    <?php $__currentLoopData = $reviewCards; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $card): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="rounded-[24px] border border-slate-100 bg-white p-5 shadow-sm transition hover:shadow-md">
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex h-9 w-9 items-center justify-center rounded-full text-xs font-black text-white <?php echo e($card['color'] ?? 'bg-slate-400'); ?>">
+                                        <?php echo e($card['initials']); ?>
+
+                                    </div>
+                                    <div>
+                                        <p class="text-[13px] font-black text-slate-900"><?php echo e($card['name']); ?></p>
+                                        <p class="text-[10px] font-semibold text-slate-400"><?php echo e($card['date']); ?></p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-0.5 text-xs text-[#f59e0b]">
+                                    <?php for($i = 1; $i <= 5; $i++): ?>
+                                        <i class="fa-solid fa-star <?php echo e($i > ($card['rating'] ?? 5) ? 'text-slate-200' : ''); ?>"></i>
+                                    <?php endfor; ?>
+                                </div>
+                            </div>
+                            <h4 class="mt-3 text-[14px] font-bold text-slate-900"><?php echo e($card['title']); ?></h4>
+                            <p class="mt-2 text-[12px] leading-6 text-slate-500"><?php echo e($card['text']); ?></p>
+                        </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php if(empty($reviewCards)): ?>
+                        <div class="rounded-[24px] border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-400">
+                            No approved reviews for this product yet.
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
 
         <?php if(false): ?>
         <section data-detail-panel="delivery" class="detail-tab-panel hidden px-5 py-6 md:px-7">
@@ -921,6 +1047,49 @@ function addToCartWithQty(productId) {
 function buyNowWithQty(productId) {
     sendCartRequest(productId, true);
 }
+
+function toggleProductShare(event) {
+    event.stopPropagation();
+    const menu = document.getElementById('productShareMenu');
+    const button = document.getElementById('productShareButton');
+    const willOpen = menu.classList.contains('hidden');
+    menu.classList.toggle('hidden', !willOpen);
+    button.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+}
+
+async function shareProductNative() {
+    const shareData = { title: <?php echo json_encode($product->name, 15, 512) ?>, text: <?php echo json_encode('Check out ' . $product->name . ' on FarmSea', 15, 512) ?>, url: window.location.href };
+    if (navigator.share) {
+        await navigator.share(shareData).catch(() => {});
+    } else {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Product link copied.');
+    }
+    document.getElementById('productShareMenu').classList.add('hidden');
+}
+
+async function copyProductLink(button) {
+    await navigator.clipboard.writeText(window.location.href);
+    const label = button.querySelector('span');
+    label.textContent = 'Copied!';
+    setTimeout(() => { label.textContent = 'Copy link'; }, 1600);
+}
+
+async function shareProductToInstagram(button) {
+    await navigator.clipboard.writeText(<?php echo json_encode($product->name . ' - ', 15, 512) ?> + window.location.href);
+    const label = button.querySelector('span');
+    label.textContent = 'Link copied!';
+    window.open('https://www.instagram.com/', '_blank', 'noopener');
+    setTimeout(() => { label.textContent = 'Instagram'; }, 1600);
+}
+
+document.addEventListener('click', (event) => {
+    const menu = document.getElementById('productShareMenu');
+    if (menu && !menu.contains(event.target)) {
+        menu.classList.add('hidden');
+        document.getElementById('productShareButton')?.setAttribute('aria-expanded', 'false');
+    }
+});
 
 document.querySelectorAll('[data-detail-tab]').forEach((button) => {
     button.addEventListener('click', () => activateDetailTab(button.dataset.detailTab));

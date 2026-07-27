@@ -24,6 +24,9 @@
 /* Mobile responsive fixes */
 @media (max-width: 640px) {
     .container { padding-left: 12px !important; padding-right: 12px !important; }
+    #cart-drawer { width: 100%; max-width: 100vw; }
+    #cart-drawer > div { padding-left: 14px; padding-right: 14px; }
+    #accountMenu { position: fixed; top: 64px; right: 10px; width: min(14rem, calc(100vw - 20px)); }
 }
 @media (min-width: 1024px) {
     #mobile-sidebar { display: none !important; }
@@ -56,6 +59,19 @@ html, body { overflow-x: hidden; max-width: 100vw; }
     visibility: visible;
     pointer-events: auto;
     transform: translateY(0);
+}
+.announcement-track {
+    display: flex;
+    width: max-content;
+    animation: announcement-scroll 24s linear infinite;
+}
+.announcement-track:hover { animation-play-state: paused; }
+@keyframes announcement-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .announcement-track { animation: none; }
 }
 </style>
 <?php echo $__env->yieldContent('styles'); ?>
@@ -192,7 +208,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
             <span id="cart-delivery-charge-drawer">Rs0.00</span>
         </div>
         <div id="cart-service-charge-row" class="mb-2 flex justify-between text-xs text-slate-500">
-            <span id="cart-service-charge-label">&#8505;&#65039; Service Charge (0%)</span>
+            <span id="cart-service-charge-label">&#8505;&#65039; Service Charge</span>
             <span id="cart-service-charge-drawer">Rs0.00</span>
         </div>
         <div id="cart-discount-row" class="mb-2 hidden justify-between text-xs font-bold text-emerald-600">
@@ -216,17 +232,36 @@ html, body { overflow-x: hidden; max-width: 100vw; }
 
 <!-- Header -->
 <header class="fixed inset-x-0 top-0 z-[9997] bg-white shadow-sm">
-    <div class="hidden md:flex bg-blue-900 text-white text-xs py-2 px-8 items-center justify-center font-medium h-8 text-center">
-        <span>FarmSea Premium Meat & Seafood</span>
+    <div class="hidden h-8 overflow-hidden bg-blue-900 text-white md:flex md:items-center">
+        <div class="announcement-track items-center whitespace-nowrap text-[11px] font-bold">
+            <?php for($copy = 0; $copy < 2; $copy++): ?>
+                <div class="flex items-center gap-10 pr-10">
+                    <span><i class="fa-solid fa-leaf mr-2 text-green-300"></i>Farm Fresh. Ocean Fresh. Delivered to Your Door.</span>
+                    <?php if($frontendTickerOffer ?? null): ?>
+                        <a href="<?php echo e(route('frontend.products', ['offer' => 'flash_deal'])); ?>" class="text-yellow-300 hover:text-yellow-200">
+                            <i class="fa-solid fa-bolt mr-2"></i><?php echo e($frontendTickerOffer->title ?: $frontendTickerOffer->description ?: 'Special offer available now'); ?>
+
+                        </a>
+                    <?php else: ?>
+                        <span class="text-yellow-300"><i class="fa-solid fa-bolt mr-2"></i>Fresh deals available every day</span>
+                    <?php endif; ?>
+                    <?php if($frontendTickerProduct ?? null): ?>
+                        <a href="<?php echo e(route('frontend.product.show', $frontendTickerProduct->slug)); ?>" class="hover:text-green-200">
+                            <i class="fa-solid fa-star mr-2 text-yellow-300"></i>New Arrival: <?php echo e($frontendTickerProduct->name); ?> — Shop Now
+                        </a>
+                    <?php endif; ?>
+                </div>
+            <?php endfor; ?>
+        </div>
     </div>
-    <div class="w-full px-2 sm:px-3 md:px-4 py-3 flex items-center justify-between gap-4">
-        <button onclick="toggleSidebar()" class="text-gray-700 text-xl lg:hidden">
+    <div class="w-full px-3 py-2.5 sm:px-3 md:px-4 md:py-3 flex items-center justify-between gap-2 md:gap-4">
+        <button onclick="toggleSidebar()" aria-label="Open menu" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-gray-700 text-lg lg:hidden">
             <i class="fa-solid fa-bars"></i>
         </button>
         <a href="<?php echo e(route('frontend.home')); ?>" class="flex-shrink-0 md:ml-[100px] flex items-center">
             <img src="<?php echo e($brandLogoUrl); ?>"
                  alt="FarmSea"
-                 class="h-10 w-auto object-contain md:h-16"
+                 class="h-10 w-auto object-contain sm:h-12 md:h-20"
                  onerror="this.style.display='none'; document.getElementById('header-logo-fallback').style.display='inline-flex'">
             <span id="header-logo-fallback" class="hidden text-xl font-extrabold text-green-700">FarmSea</span>
         </a>
@@ -237,7 +272,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
         </form>
-        <div class="flex items-center gap-4 pr-4 md:pr-7">
+        <div class="flex items-center gap-3 md:gap-4 md:pr-7">
             <!-- Account -->
             <div class="relative">
                 <?php if(auth()->guard('web_frontend')->check()): ?>
@@ -302,6 +337,22 @@ html, body { overflow-x: hidden; max-width: 100vw; }
                     <?php endif; ?>
                 </div>
             </div>
+            <!-- Wishlist -->
+            <?php
+                $initialWishlist = session('wishlist', []);
+                $initialWishlistCount = count($initialWishlist);
+            ?>
+            <a href="<?php echo e(route('frontend.wishlist')); ?>" class="text-gray-700 relative flex flex-col items-center group transition hover:text-red-500">
+                <div class="relative">
+                    <i class="fa-regular fa-heart text-xl group-hover:text-red-500 transition"></i>
+                    <span id="header-wishlist-badge"
+                          class="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-black border border-white <?php echo e($initialWishlistCount > 0 ? '' : 'hidden'); ?>">
+                        <?php echo e($initialWishlistCount); ?>
+
+                    </span>
+                </div>
+                <span class="text-[10px] font-bold mt-0.5 hidden md:block">Wishlist</span>
+            </a>
             <!-- Cart -->
             <button onclick="openCart()" class="text-blue-700 relative flex flex-col items-center group">
                 <div class="relative">
@@ -313,10 +364,10 @@ html, body { overflow-x: hidden; max-width: 100vw; }
             </button>
         </div>
     </div>
-    <div class="px-3 pb-3 md:hidden">
+    <div class="px-3 pb-2.5 md:hidden">
         <form action="<?php echo e(route('frontend.products')); ?>" method="GET" class="relative">
             <input type="text" name="search" placeholder="Search fresh items"
-                   class="w-full rounded-xl border border-gray-200 px-4 py-2.5 pr-11 text-sm focus:border-green-500 focus:outline-none transition">
+                   class="w-full rounded-xl border border-gray-200 px-3.5 py-2 pr-10 text-xs focus:border-green-500 focus:outline-none transition">
             <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-600">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
@@ -348,14 +399,14 @@ html, body { overflow-x: hidden; max-width: 100vw; }
             <span class="ml-auto"></span>
             <a href="<?php echo e(route('frontend.orders')); ?>" class="inline-flex items-center gap-2 px-3 py-1.5 font-extrabold text-green-700 whitespace-nowrap rounded-md transition hover:bg-green-50">
                 <i class="fa-solid fa-rotate-left text-[13px]"></i>
-                Reorder
+                view order
             </a>
-            <a href="<?php echo e(route('frontend.products')); ?>" class="px-3 py-1.5 text-slate-700 font-semibold whitespace-nowrap rounded-md transition hover:bg-slate-100">Recommended</a>
+            <a href="<?php echo e(route('frontend.products', ['sort' => 'latest'])); ?>" class="px-3 py-1.5 text-slate-700 font-semibold whitespace-nowrap rounded-md transition hover:bg-slate-100">Latest</a>
         </div>
     </div>
 </header>
 
-<div class="pt-[74px] md:pt-[162px]">
+<div class="pt-[103px] md:pt-[178px]">
     <!-- Flash Messages -->
     <?php if(session('success')): ?>
         <div data-auto-dismiss="3000" class="mx-4 mt-3 flex items-center gap-2 rounded-lg bg-green-100 p-3 text-sm text-green-700 transition-all duration-500">
@@ -395,7 +446,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
                 <ul class="space-y-3.5">
                     <li><a href="<?php echo e(route('frontend.about')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">About Us</a></li>
                     <li><a href="<?php echo e(route('frontend.contact')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Contact Us</a></li>
-                    <li><a href="<?php echo e(route('frontend.farms')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Our Farms</a></li>
+                    <li><a href="<?php echo e(route('frontend.about')); ?>#faq" class="text-[14px] text-[#9bb0cf] transition hover:text-white">FAQ</a></li>
                 </ul>
             </div>
 
@@ -404,6 +455,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
                 <ul class="space-y-3.5">
                     <li><a href="<?php echo e(route('frontend.contact')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Help Center</a></li>
                     <li><a href="<?php echo e(route('frontend.shipping')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Shipping Info</a></li>
+                    <li><a href="<?php echo e(route('frontend.returns')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Return Policy</a></li>
                 </ul>
             </div>
 
@@ -446,7 +498,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
                     <span class="font-sans text-[18px] font-black italic leading-none tracking-[-0.02em] text-[#1434cb]">VISA</span>
                 </span>
                 <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" class="block h-6 w-[78px] object-contain opacity-80" alt="Mastercard">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="block h-6 w-[72px] object-contain opacity-80" alt="PayPal">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" class="block h-6 w-[72px] object-contain opacity-90" alt="Google Pay">
             </div>
         </div>
     </div>
@@ -783,7 +835,7 @@ function refreshCartDrawer() {
                 ? String(chargePercent)
                 : chargePercent.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
             document.getElementById('cart-delivery-charge-drawer').textContent = formatCartCurrency(data.delivery_charge);
-            document.getElementById('cart-service-charge-label').textContent = '\u2139\uFE0F Service Charge (' + chargePercentText + '%)';
+            document.getElementById('cart-service-charge-label').textContent = '\u2139\uFE0F Service Charge';
             document.getElementById('cart-service-charge-drawer').textContent = formatCartCurrency(data.service_charge);
             document.getElementById('cart-delivery-charge-row')?.classList.toggle('hidden', Number(data.delivery_charge || 0) <= 0);
             document.getElementById('cart-service-charge-row')?.classList.toggle('hidden', Number(data.service_charge || 0) <= 0);
@@ -829,6 +881,78 @@ function refreshCartDrawer() {
             renderCartDrawerItems(data.items || []);
         });
 }
+// Wishlist helper functions
+function toggleWishlist(productId, btnElement) {
+    fetch('<?php echo e(route("frontend.wishlist.toggle")); ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ product_id: productId })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            const badge = document.getElementById('header-wishlist-badge');
+            if (badge) {
+                badge.textContent = data.count;
+                if (data.count > 0) {
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+
+            document.querySelectorAll(`.wishlist-btn[data-product-id="${productId}"]`).forEach(btn => {
+                const icon = btn.querySelector('i');
+                if (icon) {
+                    if (data.action === 'added') {
+                        icon.className = 'fa-solid fa-heart text-lg text-red-500';
+                        btn.classList.add('active');
+                    } else {
+                        icon.className = 'fa-regular fa-heart text-lg text-slate-500 hover:text-red-500';
+                        btn.classList.remove('active');
+                    }
+                }
+            });
+
+            const wishlistItem = document.getElementById(`wishlist-item-${productId}`);
+            if (wishlistItem && data.action === 'removed') {
+                wishlistItem.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                wishlistItem.style.opacity = '0';
+                wishlistItem.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    wishlistItem.remove();
+                    if (document.querySelectorAll('[id^="wishlist-item-"]').length === 0) {
+                        location.reload();
+                    }
+                }, 300);
+            }
+
+            showToast(data.message, data.action === 'added' ? 'success' : 'info');
+        }
+    })
+    .catch(err => {
+        console.error('Wishlist error:', err);
+    });
+}
+
+function showToast(msg, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `fixed bottom-5 right-5 z-[9999] flex items-center gap-2.5 rounded-2xl px-5 py-3.5 text-xs font-bold text-white shadow-2xl transition-all duration-300 transform translate-y-5 opacity-0 ${type === 'success' ? 'bg-slate-900 border border-red-500/40 shadow-red-500/10' : 'bg-slate-800'}`;
+    toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-heart text-red-500 text-sm' : 'fa-circle-info text-blue-400 text-sm'}"></i> <span>${msg}</span>`;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.classList.remove('translate-y-5', 'opacity-0');
+    }, 10);
+    setTimeout(() => {
+        toast.classList.add('translate-y-5', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
 // Init badge
 refreshCartDrawer();
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });

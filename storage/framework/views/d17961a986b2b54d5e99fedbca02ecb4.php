@@ -134,6 +134,32 @@
             transform: rotate(360deg);
         }
     }
+
+    @media (max-width: 640px) {
+        main section h2 { font-size: 24px !important; line-height: 1.15; }
+        .home-hero-content { align-items: flex-start; padding: 22px 16px 34px; }
+        .home-hero-content > div { padding: 0; }
+        .home-hero-content h1 { font-size: 23px; line-height: 1.08; }
+        .home-hero-content p { margin-top: 10px; max-width: 290px; font-size: 11px; line-height: 1.55; }
+        .home-hero-content span { margin-bottom: 10px; padding: 5px 10px; font-size: 8px; }
+        .home-hero-content > div > div { margin-top: 14px; }
+        .home-hero-content a { padding: 9px 14px; border-radius: 9px; font-size: 10px; }
+        #home-category-scroller > a { min-width: 156px; max-width: 156px; }
+        #home-category-scroller > a > div:first-child { height: 150px; }
+        #home-new-arrivals-scroller > div { min-width: 184px; max-width: 184px; }
+        #home-type-scroller > article { min-width: 210px; max-width: 210px; padding: 12px; }
+        #home-favorites-scroller > article { min-width: 205px; max-width: 205px; padding: 8px; }
+        #home-favorites-scroller > article > div { padding: 10px; }
+        #home-favorites-scroller img { height: 145px; aspect-ratio: auto; }
+        .type-showcase-card { border-radius: 18px; }
+        .type-showcase-card .type-showcase-image { max-height: 260px; }
+        .favorite-hero-banner { border-radius: 20px; }
+        .favorite-hero-banner img { height: 250px; }
+        .favorite-hero-copy { padding: 20px 16px; }
+        .favorite-hero-copy h2 { font-size: 23px; }
+        .favorite-hero-copy p { margin-top: 10px; font-size: 11px; line-height: 1.55; }
+        .favorite-hero-copy .mt-6 { margin-top: 14px; }
+    }
 </style>
 <?php $__env->stopSection(); ?>
 
@@ -190,7 +216,7 @@
 ?>
 
 <section class="relative bg-[#0a0f1a] px-0 py-0">
-    <div id="home-hero-carousel" class="home-hero-card relative h-[300px] overflow-hidden md:h-[340px]">
+    <div id="home-hero-carousel" class="home-hero-card relative h-[270px] overflow-hidden md:h-[340px]">
         <?php $__currentLoopData = $heroSlides; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $slide): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="home-hero-slide <?php echo e($index === 0 ? 'active' : ''); ?> absolute inset-0" data-home-hero-slide="<?php echo e($index); ?>">
                 <img
@@ -260,10 +286,10 @@
 
 
 <div class="border-b border-gray-100 bg-white py-4">
-    <div class="mx-auto grid max-w-6xl grid-cols-2 gap-4 px-4 md:grid-cols-4">
+    <div class="mx-auto grid max-w-6xl grid-cols-2 gap-x-3 gap-y-3 px-3 sm:px-4 md:grid-cols-4 md:gap-4">
         <?php $__currentLoopData = [['fa-leaf','100% Natural','No hormones or chemicals'],['fa-snowflake','Cold Chain Delivery','Fresh at every step'],['fa-bolt','Same Day Delivery','Order before 10 AM'],['fa-shield-halved','FSSAI Certified','Quality you can trust']]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as [$icon,$title,$sub]): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-green-600 text-sm text-white">
+                <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-green-600 text-xs text-white sm:h-10 sm:w-10 sm:text-sm">
                     <i class="fa-solid <?php echo e($icon); ?>"></i>
                 </div>
                 <div>
@@ -276,7 +302,7 @@
 </div>
 
 
-<section class="bg-white py-5 md:py-6">
+<section class="bg-white pb-2 pt-5 md:py-6">
     <div class="mx-auto max-w-7xl px-4">
         <?php
             $categoryLabels = ['Best Seller', 'Lean Protein', 'Juicy Cuts', 'Ready to Cook', 'Fresh Choice', 'Chef Pick', 'Daily Fresh', 'Top Rated'];
@@ -365,30 +391,11 @@
             <?php endif; ?>
         </div>
 
-        <div class="mt-5 flex items-center justify-center gap-3">
-            <button
-                type="button"
-                aria-label="Scroll categories left"
-                onclick="document.getElementById('home-category-scroller').scrollBy({ left: -360, behavior: 'smooth' })"
-                class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
-            >
-                <i class="fa-solid fa-arrow-left"></i>
-            </button>
-            <button
-                type="button"
-                aria-label="Scroll categories right"
-                onclick="document.getElementById('home-category-scroller').scrollBy({ left: 360, behavior: 'smooth' })"
-                class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
-            >
-                <i class="fa-solid fa-arrow-right"></i>
-            </button>
-        </div>
-
     </div>
 </section>
 
 
-<section class="bg-gray-50 py-5 md:py-6">
+<section class="bg-gray-50 pb-2 pt-2 md:py-6">
     <div class="mx-auto max-w-7xl px-4">
         <div class="mb-6 flex items-end justify-between">
             <div>
@@ -397,7 +404,7 @@
             </div>
             <a href="<?php echo e(route('frontend.products')); ?>" class="text-xs font-bold uppercase tracking-wider text-blue-600 hover:underline">See All</a>
         </div>
-        <div id="home-new-arrivals-scroller" class="scrollbar-hide flex gap-5 overflow-x-auto scroll-smooth pb-3">
+        <div id="home-new-arrivals-scroller" class="scrollbar-hide flex gap-3 overflow-x-auto scroll-smooth pb-3 md:gap-5">
             <?php $__empty_1 = true; $__currentLoopData = $newArrivals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
             <div class="flex min-w-[260px] max-w-[260px] flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition hover:border-green-300 hover:shadow-lg">
                     <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="relative block aspect-square overflow-hidden bg-gray-50">
@@ -444,7 +451,7 @@
 </section>
 
 
-<section class="bg-white py-6 md:py-7">
+<section class="bg-white pb-6 pt-2 md:py-7">
     <div class="mx-auto max-w-7xl px-4">
         <div class="relative mb-6 flex items-center justify-center gap-4">
             <div class="text-center">
@@ -676,8 +683,9 @@
                                 <div class="mt-3 flex items-end justify-between gap-3">
                                     <p class="text-[17px] font-black text-slate-950">Rs<?php echo e(number_format($product->display_price, 0)); ?><span class="ml-1 text-[11px] font-semibold text-slate-400"><?php echo e($product->display_pack_label); ?></span></p>
                                     <?php if($product->is_active): ?>
-                                        <button onclick="addToCart(<?php echo e($product->id); ?>)" class="rounded-lg border border-[#dbe8d7] bg-[#f8fbf6] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-green-700 transition duration-300 hover:border-green-300 hover:bg-green-50 group-hover:-translate-y-0.5 group-hover:shadow-sm">
-                                            + Add
+                                        <button onclick="addToCart(<?php echo e($product->id); ?>)" class="inline-flex min-h-[42px] flex-shrink-0 items-center justify-center gap-2.5 rounded-xl border border-[#dbe8d7] bg-[#f8fbf6] px-4 py-2 text-[12px] font-extrabold uppercase tracking-[0.12em] text-green-700 transition duration-300 hover:border-green-300 hover:bg-green-50 group-hover:-translate-y-0.5 group-hover:shadow-sm">
+                                            <i class="fa-solid fa-cart-plus text-[20px] leading-none" aria-hidden="true"></i>
+                                            <span>Add</span>
                                         </button>
                                     <?php else: ?>
                                         <span class="rounded-lg bg-red-50 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-red-600">
@@ -787,7 +795,7 @@
 </section>
 
 
-<section class="bg-[#f7faf7] py-12 md:py-14">
+<section class="bg-[#f7faf7] py-7 md:py-14">
     <div class="mx-auto max-w-7xl px-4">
         <div class="favorite-hero-banner mb-8 rounded-[30px] border border-[#d7e7d5] shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <img
@@ -861,11 +869,6 @@
                     <div class="rounded-[22px] border border-[#e5efe4] bg-white p-3">
                         <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="block">
                             <div class="relative overflow-hidden rounded-[20px] bg-slate-100">
-                                <?php if(in_array($product->id, $newArrivalProductIds ?? [], true)): ?>
-                                    <span class="absolute right-3 top-3 z-10 rounded-lg bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
-                                        New Arrival
-                                    </span>
-                                <?php endif; ?>
                                 <?php if($favoriteImage): ?>
                                     <img
                                         src="<?php echo e($favoriteImage); ?>"
@@ -885,7 +888,7 @@
                             </div>
                         </a>
 
-                        <div class="mt-3 flex min-h-[100px] flex-col">
+                        <div class="mt-2 flex min-h-0 flex-col sm:mt-3 sm:min-h-[100px]">
                             <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="text-slate-900 transition hover:text-green-700">
                                 <span class="block text-[18px] font-extrabold leading-[1.15]"><?php echo e($product->name); ?></span>
                             </a>
@@ -898,7 +901,7 @@
                             </p>
                         </div>
 
-                        <div class="mt-6 flex items-end justify-between gap-3">
+                        <div class="mt-3 flex items-end justify-between gap-3 sm:mt-6">
                             <div>
                                 <p class="text-[18px] font-black text-slate-950">Rs<?php echo e(number_format($product->display_price, 0)); ?><span class="ml-1 text-[11px] font-semibold text-slate-400"><?php echo e($product->display_pack_label); ?></span></p>
                                 <?php if($product->display_mrp && $product->display_mrp > $product->display_price): ?>
@@ -906,8 +909,8 @@
                                 <?php endif; ?>
                             </div>
                             <?php if($product->is_active): ?>
-                                <button onclick="addToCart(<?php echo e($product->id); ?>)" class="rounded-xl bg-green-700 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-green-800">
-                                    Add To Cart
+                                <button onclick="addToCart(<?php echo e($product->id); ?>)" aria-label="Add <?php echo e($product->name); ?> to cart" title="Add to cart" class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-green-700 text-white transition hover:bg-green-800">
+                                    <i class="fa-solid fa-cart-shopping text-[18px]" aria-hidden="true"></i>
                                 </button>
                             <?php else: ?>
                                 <span class="inline-flex items-center rounded-xl bg-red-50 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-red-600">
@@ -930,7 +933,50 @@
 </section>
 
 
-<section class="bg-white py-14 md:py-16">
+<?php if(($homeReviews ?? collect())->isNotEmpty()): ?>
+<section class="bg-white py-8 md:py-14">
+    <div class="mx-auto max-w-7xl px-4">
+        <div class="mb-6 flex items-end justify-between gap-4">
+            <div>
+                <p class="mb-2 text-[11px] font-extrabold uppercase tracking-[0.3em] text-green-600">Verified Reviews</p>
+                <h2 class="text-3xl font-extrabold text-slate-900 md:text-4xl">What Customers Say</h2>
+            </div>
+            <span class="text-xs font-bold text-slate-400">Swipe to explore</span>
+        </div>
+        <div class="scrollbar-hide flex gap-4 overflow-x-auto scroll-smooth pb-4" id="home-reviews-scroller">
+            <?php $__currentLoopData = $homeReviews; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $review): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php
+                    $reviewName = $review->user?->name ?? 'Verified Customer';
+                    $reviewInitials = collect(explode(' ', $reviewName))->take(2)->map(fn($part) => strtoupper(substr($part, 0, 1)))->join('');
+                ?>
+                <article class="flex min-h-[235px] min-w-[280px] max-w-[280px] flex-col rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:min-w-[350px] md:max-w-[350px]">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex gap-1 text-yellow-400">
+                            <?php for($star = 1; $star <= 5; $star++): ?>
+                                <i class="fa-solid fa-star <?php echo e($star > $review->rating ? 'text-slate-200' : ''); ?>"></i>
+                            <?php endfor; ?>
+                        </div>
+                        <span class="rounded-full bg-green-50 px-2.5 py-1 text-[9px] font-black uppercase text-green-700">Verified</span>
+                    </div>
+                    <p class="mt-5 line-clamp-4 text-sm leading-7 text-slate-600">“<?php echo e($review->comment ?: 'Great freshness, packaging and delivery experience.'); ?>”</p>
+                    <div class="mt-auto flex items-center gap-3 pt-5">
+                        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-xs font-black text-white"><?php echo e($reviewInitials ?: 'VC'); ?></span>
+                        <div class="min-w-0">
+                            <p class="truncate text-sm font-black text-slate-900"><?php echo e($reviewName); ?></p>
+                            <p class="truncate text-[11px] font-semibold text-slate-400"><?php echo e($review->product?->name ?? 'FarmSea Order'); ?></p>
+                        </div>
+                    </div>
+                </article>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+
+<?php if(false): ?>
+
+<section class="bg-white py-8 md:py-16">
     <div class="mx-auto max-w-7xl px-4">
         <div class="mb-8 flex flex-col gap-6 md:mb-10 md:flex-row md:items-start md:justify-between">
             <div>
@@ -1067,6 +1113,7 @@
         </div>
     </div>
 </section>
+<?php endif; ?>
 
 <?php $__env->stopSection(); ?>
 

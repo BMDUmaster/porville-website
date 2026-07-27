@@ -162,7 +162,7 @@
                         @endif
                         @if((float) ($pricing['service_charge'] ?? 0) > 0)
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-500">&#8505;&#65039; Service Charge ({{ rtrim(rtrim(number_format($pricing['service_charge_percent'], 2), '0'), '.') }}%)</span>
+                            <span class="text-gray-500">&#8505;&#65039; Service Charge</span>
                             <span class="font-semibold text-gray-800">&#8377;{{ number_format($pricing['service_charge'], 2) }}</span>
                         </div>
                         @endif

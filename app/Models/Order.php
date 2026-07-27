@@ -45,6 +45,11 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function review()
+    {
+        return $this->hasOne(Review::class);
+    }
+
     public function getStatusLabelAttribute(): string
     {
         return ucwords(str_replace('_', ' ', $this->status));

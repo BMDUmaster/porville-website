@@ -14,6 +14,16 @@
 .profile-soft-shadow {
     box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
 }
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+@media (max-width: 640px) {
+    .profile-shell .profile-card { padding: 14px; border-radius: 20px; }
+    .profile-shell .profile-info-row { padding: 12px; }
+}
 </style>
 <?php $__env->stopSection(); ?>
 
@@ -25,7 +35,7 @@
 ?>
 
 <div class="profile-shell min-h-screen">
-    <div class="mx-auto max-w-[1280px] px-4 py-6 md:px-6 md:py-8">
+    <div class="mx-auto w-full max-w-[1280px] px-3 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8">
         <div class="overflow-hidden rounded-[30px] border border-white/60 bg-gradient-to-r from-[#257a2f] via-[#257b57] to-[#2567b8] text-white profile-soft-shadow">
             <div class="flex flex-col gap-6 px-5 py-6 md:px-8 md:py-7 lg:flex-row lg:items-start lg:justify-between">
                 <div class="flex items-start gap-4">
@@ -92,53 +102,53 @@
             </div>
         </div>
 
-        <div class="mt-5 grid gap-5 lg:grid-cols-[1.95fr_0.98fr]">
-            <div class="space-y-5">
-                <div class="rounded-[24px] border border-slate-200/80 bg-white p-4 profile-soft-shadow md:p-5">
-                    <div class="mb-4 flex items-center justify-between gap-3">
-                        <div>
+        <div class="mt-5 grid min-w-0 gap-5 lg:grid-cols-[1.95fr_0.98fr]">
+            <div class="min-w-0 space-y-5">
+                <div class="profile-card min-w-0 overflow-hidden rounded-[24px] border border-slate-200/80 bg-white p-4 profile-soft-shadow md:p-5">
+                    <div class="mb-4 flex min-w-0 items-start justify-between gap-3">
+                        <div class="min-w-0">
                             <h2 class="text-sm font-extrabold text-slate-900">
                                 <i class="fa-solid fa-circle-user mr-2 text-blue-600"></i>
                                 Personal Information
                             </h2>
                             <p class="mt-1 text-xs text-slate-400">Your main account details in one place.</p>
                         </div>
-                        <a href="#profile-edit" class="text-[11px] font-bold uppercase tracking-[0.18em] text-blue-600">Edit</a>
+                        <a href="#profile-edit" class="flex-shrink-0 text-[11px] font-bold uppercase tracking-[0.18em] text-blue-600">Edit</a>
                     </div>
 
                     <div class="space-y-3">
-                        <div class="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+                        <div class="profile-info-row min-w-0 rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
                             <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Full Name</p>
                             <div class="mt-1 flex items-center justify-between gap-3">
                                 <p class="text-sm font-semibold text-slate-900"><?php echo e($user->name); ?></p>
                                 <i class="fa-solid fa-pen text-xs text-slate-400"></i>
                             </div>
                         </div>
-                        <div class="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+                        <div class="profile-info-row min-w-0 rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
                             <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Email Address</p>
-                            <div class="mt-1 flex items-center justify-between gap-3">
-                                <p class="text-sm font-semibold text-slate-900"><?php echo e($user->email); ?></p>
-                                <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-600">
+                            <div class="mt-1 flex min-w-0 items-center justify-between gap-2">
+                                <p class="min-w-0 break-all text-sm font-semibold text-slate-900"><?php echo e($user->email); ?></p>
+                                <span class="flex-shrink-0 rounded-full bg-emerald-50 px-2 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-emerald-600 sm:px-2.5 sm:text-[10px] sm:tracking-[0.18em]">
                                     <?php echo e($user->email_verified_at ? 'Verified' : 'Primary'); ?>
 
                                 </span>
                             </div>
                         </div>
-                        <div class="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+                        <div class="profile-info-row min-w-0 rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
                             <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Phone Number</p>
                             <div class="mt-1 flex items-center justify-between gap-3">
                                 <p class="text-sm font-semibold text-slate-900"><?php echo e($user->phone ?: 'Add your phone number'); ?></p>
                                 <i class="fa-solid fa-phone text-xs text-slate-400"></i>
                             </div>
                         </div>
-                        <div class="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+                        <div class="profile-info-row min-w-0 rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
                             <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Date of Birth</p>
                             <div class="mt-1 flex items-center justify-between gap-3">
                                 <p class="text-sm font-semibold text-slate-900">Add this later</p>
                                 <i class="fa-solid fa-cake-candles text-xs text-slate-400"></i>
                             </div>
                         </div>
-                        <div class="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+                        <div class="profile-info-row min-w-0 rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
                             <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Gender</p>
                             <div class="mt-1 flex items-center justify-between gap-3">
                                 <p class="text-sm font-semibold text-slate-900">Not set</p>
@@ -254,7 +264,7 @@
                 </div>
             </div>
 
-            <div class="space-y-5">
+            <div class="min-w-0 space-y-5">
                 <div class="overflow-hidden rounded-[24px] border border-slate-200/80 bg-white profile-soft-shadow">
                     <div class="bg-gradient-to-r from-[#257a2f] to-[#2567b8] px-5 py-5 text-white">
                         <p class="nunito text-4xl font-extrabold leading-none"><?php echo e($stats['loyalty_points']); ?></p>
@@ -299,17 +309,17 @@
                     </div>
 
                     <?php if(($userNotifications ?? collect())->count()): ?>
-                        <div class="space-y-3">
+                        <div class="max-h-[302px] space-y-3 overflow-y-auto overscroll-contain pr-2 custom-scrollbar">
                             <?php $__currentLoopData = $userNotifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $notification): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <div class="rounded-2xl border <?php echo e($notification->read_at ? 'border-slate-200 bg-slate-50/70' : 'border-blue-100 bg-blue-50/70'); ?> px-4 py-3">
+                                <div class="flex min-h-[145px] flex-col rounded-2xl border <?php echo e($notification->read_at ? 'border-slate-200 bg-slate-50/70' : 'border-blue-100 bg-blue-50/70'); ?> px-4 py-3">
                                     <div class="flex items-start justify-between gap-3">
-                                        <p class="text-sm font-bold text-slate-900"><?php echo e($notification->subject); ?></p>
+                                        <p class="line-clamp-2 text-sm font-bold text-slate-900"><?php echo e($notification->subject); ?></p>
                                         <?php if(! $notification->read_at && $notification->recipient_id): ?>
                                             <span class="rounded-full bg-blue-600 px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.12em] text-white">New</span>
                                         <?php endif; ?>
                                     </div>
-                                    <p class="mt-2 text-sm leading-6 text-slate-600"><?php echo e($notification->message); ?></p>
-                                    <p class="mt-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                                    <p class="mt-2 line-clamp-3 text-sm leading-6 text-slate-600"><?php echo e($notification->message); ?></p>
+                                    <p class="mt-auto pt-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
                                         <?php echo e($notification->created_at->format('d M Y, h:i A')); ?>
 
                                     </p>

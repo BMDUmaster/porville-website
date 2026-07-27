@@ -31,42 +31,42 @@
         <div class="absolute inset-0 bg-black/55"></div>
         <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.74)_0%,rgba(0,0,0,0.52)_34%,rgba(0,0,0,0.18)_58%,rgba(0,0,0,0.62)_100%)]"></div>
 
-        <div class="relative z-10 mx-auto flex min-h-[300px] max-w-7xl flex-col justify-between gap-8 px-5 py-8 md:min-h-[340px] md:px-8 md:py-10 lg:flex-row lg:items-center lg:px-10">
+        <div class="relative z-10 mx-auto flex min-h-[230px] max-w-7xl flex-col justify-between gap-4 px-4 py-5 sm:min-h-[270px] sm:px-5 sm:py-7 md:min-h-[340px] md:gap-8 md:px-8 md:py-10 lg:flex-row lg:items-center lg:px-10">
             <div class="max-w-[620px]">
-                <div class="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.28em] text-white/80">
+                <div class="flex items-center gap-2 text-[9px] font-extrabold uppercase tracking-[0.22em] text-white/80 sm:text-[11px] sm:tracking-[0.28em]">
                     <span class="inline-block h-2 w-2 rounded-full bg-[#9ae16d] shadow-[0_0_16px_rgba(154,225,109,0.7)]"></span>
                     <?php echo e($sharedHeroBanner?->badge ?: 'FarmSea Fresh Marketplace'); ?>
 
                 </div>
 
-                <h1 class="mt-4 text-[34px] font-black leading-[0.95] tracking-[-0.04em] text-white sm:text-[42px] md:text-[64px] lg:text-[74px]">
+                <h1 class="mt-2.5 text-[27px] font-black leading-[0.98] tracking-[-0.04em] text-white sm:mt-4 sm:text-[42px] md:text-[64px] lg:text-[74px]">
                     <?php echo e($sharedHeroBanner?->title_1 ?: 'All'); ?>
 
                     <span class="block italic text-[#9be278]"><?php echo e($sharedHeroBanner?->title_2 ?: 'Products.'); ?></span>
                 </h1>
 
-                <p class="mt-5 max-w-[520px] text-[16px] leading-8 text-white/82 md:text-[17px]">
+                <p class="mt-2.5 max-w-[520px] text-[11px] leading-5 text-white/82 sm:mt-5 sm:text-[16px] sm:leading-8 md:text-[17px]">
                     <?php echo e($sharedHeroBanner?->description ?: 'Sourced fresh from our farms and coastal waters. Browse our complete range of chicken, mutton, fish, seafood and more delivered chilled to your door.'); ?>
 
                 </p>
 
                 <?php if($sharedHeroBanner): ?>
                     <a href="<?php echo e($sharedHeroBanner->link_url ?: route('frontend.products')); ?>"
-                       class="mt-6 inline-flex rounded-xl bg-green-600 px-7 py-3 text-[13px] font-black uppercase tracking-[0.16em] text-white shadow-lg transition hover:bg-green-700">
+                       class="mt-3 inline-flex rounded-lg bg-green-600 px-4 py-2 text-[10px] font-black uppercase tracking-[0.14em] text-white shadow-lg transition hover:bg-green-700 sm:mt-6 sm:rounded-xl sm:px-7 sm:py-3 sm:text-[13px] sm:tracking-[0.16em]">
                         <?php echo e($sharedHeroBanner->button_text ?: 'Shop Now'); ?>
 
                     </a>
                 <?php endif; ?>
             </div>
 
-            <div class="flex w-full flex-col gap-4 text-white sm:w-auto sm:flex-row sm:flex-wrap sm:items-stretch sm:gap-5 lg:justify-end">
-                <div class="w-full border-t border-white/15 pt-4 sm:w-auto sm:min-w-[120px] sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0">
-                    <div class="text-[46px] font-black leading-none md:text-[56px]"><?php echo e($products->total()); ?>+</div>
-                    <div class="mt-2 text-[11px] font-extrabold uppercase tracking-[0.28em] text-white/65">Fresh Products</div>
+            <div class="flex w-full flex-row gap-5 border-t border-white/15 pt-3 text-white sm:w-auto sm:flex-wrap sm:items-stretch sm:gap-5 sm:border-0 sm:pt-0 lg:justify-end">
+                <div class="min-w-0 flex-1 sm:w-auto sm:min-w-[120px] sm:flex-none sm:border-l sm:pl-5">
+                    <div class="text-[24px] font-black leading-none sm:text-[46px] md:text-[56px]"><?php echo e($products->total()); ?>+</div>
+                    <div class="mt-1.5 text-[8px] font-extrabold uppercase tracking-[0.2em] text-white/65 sm:mt-2 sm:text-[11px] sm:tracking-[0.28em]">Fresh Products</div>
                 </div>
-                <div class="w-full border-t border-white/15 pt-4 sm:w-auto sm:min-w-[150px] sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0">
-                    <div class="text-[46px] font-black leading-none md:text-[56px]">Daily</div>
-                    <div class="mt-2 text-[11px] font-extrabold uppercase tracking-[0.28em] text-white/65">Fresh Sourcing</div>
+                <div class="min-w-0 flex-1 border-l border-white/15 pl-5 sm:w-auto sm:min-w-[150px] sm:flex-none">
+                    <div class="text-[24px] font-black leading-none sm:text-[46px] md:text-[56px]">Daily</div>
+                    <div class="mt-1.5 text-[8px] font-extrabold uppercase tracking-[0.2em] text-white/65 sm:mt-2 sm:text-[11px] sm:tracking-[0.28em]">Fresh Sourcing</div>
                 </div>
             </div>
         </div>
@@ -85,6 +85,10 @@
         'name' => 'Name A-Z',
     ];
     $packWeights = ['250g', '500g', '1 kg', '1.5 kg'];
+    $isFlashDealActive = request()->boolean('flash_deal') || request()->filled('flash_deal') || request('offer') === 'flash_deal';
+    $flashDealToggleUrl = $isFlashDealActive
+        ? route('frontend.products', request()->except(['flash_deal', 'offer', 'page']))
+        : route('frontend.products', array_merge(request()->except('page'), ['flash_deal' => '1']));
 ?>
 
 <div id="mobileFilterModal" class="fixed inset-0 z-[10000] hidden bg-black/50 p-4 backdrop-blur-sm lg:hidden">
@@ -344,25 +348,59 @@
                     Contact Now
                 </a>
             </div>
+            <a href="<?php echo e($flashDealToggleUrl); ?>"
+               id="flashDealCard"
+               class="group relative block overflow-hidden rounded-[28px] bg-[#18213a] p-5 text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)] transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:border-amber-400/50 border-2 cursor-pointer <?php echo e($isFlashDealActive ? 'border-amber-400 ring-4 ring-amber-400/30 bg-[#141b30]' : 'border-transparent'); ?>">
+                
+                <?php if($isFlashDealActive): ?>
+                    <div class="mb-3 flex items-center justify-between rounded-xl bg-amber-400/20 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-amber-300">
+                        <span class="flex items-center gap-1.5">
+                            <span class="h-2 w-2 rounded-full bg-amber-400 animate-ping"></span>
+                            ⚡ Filter Active
+                        </span>
+                        <span class="hover:underline text-[11px]">Clear ✕</span>
+                    </div>
+                <?php endif; ?>
 
-            <div class="overflow-hidden rounded-[28px] bg-[#18213a] p-5 text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)]">
                 <div class="flex items-start justify-between gap-3">
                     <div>
-                        <span class="inline-flex rounded-full bg-white/8 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-[#90a5d9]">Flash Deal</span>
-                        <div class="mt-4 text-[42px] font-black leading-none text-white">20%</div>
+                        <span class="inline-flex rounded-full <?php echo e($isFlashDealActive ? 'bg-amber-400 text-slate-950 font-black' : 'bg-white/8 text-[#90a5d9]'); ?> px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em]">
+                            Flash Deal
+                        </span>
+                        <div class="mt-4 text-[42px] font-black leading-none text-white flex items-baseline gap-1">
+                            20%
+                            <span class="text-sm font-bold text-amber-300">OFF</span>
+                        </div>
                         <p class="mt-2 text-[11px] font-black uppercase tracking-[0.18em] text-[#8ea0c7]">Product Discount Today</p>
                     </div>
-                    <i class="fa-solid fa-bolt text-[34px] text-[#39466d]"></i>
+                    <i class="fa-solid fa-bolt text-[34px] transition-transform duration-300 group-hover:scale-125 <?php echo e($isFlashDealActive ? 'text-amber-400 animate-bounce' : 'text-[#39466d] group-hover:text-amber-400'); ?>"></i>
                 </div>
-                <p class="mt-5 text-[12px] font-bold uppercase tracking-[0.22em] text-[#7d8fbf]">FRESH30</p>
-            </div>
+                
+                <div class="mt-5 flex items-center justify-between border-t border-white/10 pt-3">
+                    <p class="text-[12px] font-bold uppercase tracking-[0.22em] text-[#7d8fbf]">FRESH30</p>
+                    <span class="text-[11px] font-bold text-amber-300 group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                        <?php echo e($isFlashDealActive ? 'Show All Products' : 'View Offer Products →'); ?>
+
+                    </span>
+                </div>
+            </a>
         </div>
     </aside>
 
     
     <div class="flex-1">
-        <div class="mb-4 flex items-center justify-between gap-3">
-            <p class="text-sm text-gray-500 font-semibold"><?php echo e($products->total()); ?> products found</p>
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <p class="text-sm text-gray-500 font-semibold"><?php echo e($products->total()); ?> products found</p>
+                <?php if($isFlashDealActive): ?>
+                    <a href="<?php echo e(route('frontend.products', request()->except(['flash_deal', 'offer', 'page']))); ?>" 
+                       class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900 border border-amber-300 hover:bg-amber-200 transition shadow-sm">
+                        <i class="fa-solid fa-bolt text-amber-600"></i>
+                        <span>20% Off Offers (FRESH30)</span>
+                        <span class="ml-1 text-amber-700 font-extrabold">✕</span>
+                    </a>
+                <?php endif; ?>
+            </div>
             <button type="button" onclick="openMobileFilter()" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-white lg:hidden">
                 <i class="fa-solid fa-sliders"></i>
                 Filter
@@ -382,7 +420,16 @@
                         ? (float) $cardVariant['tomorrow_price']
                         : null;
             ?>
-            <div class="bg-white rounded-2xl border border-gray-100 hover:border-green-300 hover:shadow-lg transition overflow-hidden flex flex-col">
+            <?php
+                $isInWishlist = in_array($product->id, session('wishlist', []), true);
+            ?>
+            <div class="relative bg-white rounded-2xl border border-gray-100 hover:border-green-300 hover:shadow-lg transition overflow-hidden flex flex-col group">
+                <button onclick="toggleWishlist(<?php echo e($product->id); ?>, this)" 
+                        class="wishlist-btn absolute right-2.5 top-2.5 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-md backdrop-blur-sm transition hover:scale-110 <?php echo e($isInWishlist ? 'active' : ''); ?>"
+                        data-product-id="<?php echo e($product->id); ?>"
+                        title="<?php echo e($isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'); ?>">
+                    <i class="<?php echo e($isInWishlist ? 'fa-solid fa-heart text-base text-red-500' : 'fa-regular fa-heart text-base text-slate-500 hover:text-red-500'); ?>"></i>
+                </button>
                 <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="block aspect-square overflow-hidden bg-gray-50 relative">
                     <?php if(in_array($product->id, $newArrivalProductIds ?? [], true)): ?>
                         <span class="absolute left-2 top-2 z-10 rounded-full bg-blue-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white shadow">
@@ -400,7 +447,7 @@
                         </span>
                     <?php endif; ?>
                     <?php if($product->mrp && $product->mrp > $product->price): ?>
-                        <span class="absolute top-2 right-2 bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded">
+                        <span class="absolute bottom-2 right-2 bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded shadow">
                             -<?php echo e(round((($product->mrp - $product->price) / $product->mrp) * 100)); ?>%
                         </span>
                     <?php endif; ?>
@@ -420,8 +467,9 @@
                             </div>
                             <?php if($product->is_active): ?>
                                 <button onclick="addToCart(<?php echo e($product->id); ?>, <?php echo e($cardVariantIndex === null ? 'null' : $cardVariantIndex); ?>, 'today')"
-                                        class="w-9 h-9 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center text-sm transition">
-                                    <i class="fa-solid fa-cart-shopping"></i>
+                                        class="flex h-9 items-center justify-center rounded-lg bg-blue-600 px-3 text-[10px] font-extrabold uppercase tracking-[0.1em] text-white transition hover:bg-blue-700 sm:w-9 sm:px-0 sm:text-sm">
+                                    <span class="sm:hidden">Add to Cart</span>
+                                    <i class="fa-solid fa-cart-shopping hidden sm:inline" aria-hidden="true"></i>
                                 </button>
                             <?php else: ?>
                                 <span class="inline-flex rounded-lg bg-red-50 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-red-600">
@@ -436,9 +484,10 @@
                                     <p class="text-lg font-extrabold text-gray-800">Rs<?php echo e(number_format($cardTomorrowPrice, 0)); ?><span class="ml-1 text-xs font-semibold text-gray-400"><?php echo e($product->display_pack_label); ?></span></p>
                                 </div>
                                 <button onclick="addToCart(<?php echo e($product->id); ?>, <?php echo e($cardVariantIndex); ?>, 'tomorrow')"
-                                        class="w-9 h-9 bg-amber-500 hover:bg-amber-600 text-white rounded-lg flex items-center justify-center text-sm transition"
+                                        class="flex h-9 items-center justify-center rounded-lg bg-amber-500 px-3 text-[10px] font-extrabold uppercase tracking-[0.1em] text-white transition hover:bg-amber-600 sm:w-9 sm:px-0 sm:text-sm"
                                         title="Add for tomorrow">
-                                    <i class="fa-solid fa-cart-shopping"></i>
+                                    <span class="sm:hidden">Add to Cart</span>
+                                    <i class="fa-solid fa-cart-shopping hidden sm:inline" aria-hidden="true"></i>
                                 </button>
                             </div>
                         <?php endif; ?>
@@ -447,9 +496,15 @@
             </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <div class="col-span-4 text-center py-16 text-gray-400">
-                <i class="fa-solid fa-box-open text-5xl mb-4 block"></i>
-                <p class="font-semibold">No products found.</p>
-                <a href="<?php echo e(route('frontend.products')); ?>" class="text-blue-600 text-sm mt-2 inline-block hover:underline">Clear filters</a>
+                <?php if($isFlashDealActive): ?>
+                    <i class="fa-solid fa-bolt-slash text-5xl mb-4 text-amber-400 block"></i>
+                    <p class="font-semibold text-slate-700">No products with 20% Flash Deal offers found at the moment.</p>
+                    <a href="<?php echo e(route('frontend.products', request()->except(['flash_deal', 'offer', 'page']))); ?>" class="text-blue-600 font-bold text-sm mt-3 inline-block hover:underline">Show All Products</a>
+                <?php else: ?>
+                    <i class="fa-solid fa-box-open text-5xl mb-4 block"></i>
+                    <p class="font-semibold">No products found.</p>
+                    <a href="<?php echo e(route('frontend.products')); ?>" class="text-blue-600 text-sm mt-2 inline-block hover:underline">Clear filters</a>
+                <?php endif; ?>
             </div>
             <?php endif; ?>
         </div>
@@ -457,6 +512,39 @@
         <div class="mt-8"><?php echo e($products->links()); ?></div>
 
         <div class="mt-8 space-y-5 lg:hidden">
+            <a href="<?php echo e($flashDealToggleUrl); ?>"
+               class="group relative block overflow-hidden rounded-[28px] bg-[#18213a] p-5 text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)] transition-all duration-300 border-2 cursor-pointer <?php echo e($isFlashDealActive ? 'border-amber-400 ring-4 ring-amber-400/30 bg-[#141b30]' : 'border-transparent'); ?>">
+                <?php if($isFlashDealActive): ?>
+                    <div class="mb-3 flex items-center justify-between rounded-xl bg-amber-400/20 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-amber-300">
+                        <span class="flex items-center gap-1.5">
+                            <span class="h-2 w-2 rounded-full bg-amber-400 animate-ping"></span>
+                            ⚡ Filter Active
+                        </span>
+                        <span class="hover:underline text-[11px]">Clear ✕</span>
+                    </div>
+                <?php endif; ?>
+                <div class="flex items-start justify-between gap-3">
+                    <div>
+                        <span class="inline-flex rounded-full <?php echo e($isFlashDealActive ? 'bg-amber-400 text-slate-950 font-black' : 'bg-white/8 text-[#90a5d9]'); ?> px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em]">
+                            Flash Deal
+                        </span>
+                        <div class="mt-4 text-[38px] font-black leading-none text-white flex items-baseline gap-1">
+                            20%
+                            <span class="text-sm font-bold text-amber-300">OFF</span>
+                        </div>
+                        <p class="mt-2 text-[11px] font-black uppercase tracking-[0.18em] text-[#8ea0c7]">Product Discount Today</p>
+                    </div>
+                    <i class="fa-solid fa-bolt text-[34px] <?php echo e($isFlashDealActive ? 'text-amber-400 animate-bounce' : 'text-[#39466d]'); ?>"></i>
+                </div>
+                <div class="mt-5 flex items-center justify-between border-t border-white/10 pt-3">
+                    <p class="text-[12px] font-bold uppercase tracking-[0.22em] text-[#7d8fbf]">FRESH30</p>
+                    <span class="text-[11px] font-bold text-amber-300 flex items-center gap-1">
+                        <?php echo e($isFlashDealActive ? 'Show All Products' : 'View Offer Products →'); ?>
+
+                    </span>
+                </div>
+            </a>
+
             <div class="overflow-hidden rounded-[28px] border border-slate-200 bg-white p-4 shadow-[0_20px_45px_rgba(15,23,42,0.06)]">
                 <div class="mb-4 flex items-center justify-between">
                     <h4 class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">Best Deals</h4>

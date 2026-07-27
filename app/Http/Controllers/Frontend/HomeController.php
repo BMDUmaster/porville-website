@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\HomeBanner;
 use App\Models\Product;
+use App\Models\Review;
 use Illuminate\Support\Facades\Schema;
 
 class HomeController extends Controller
@@ -76,6 +77,15 @@ class HomeController extends Controller
                 ->get()
             : collect();
 
-        return view('frontend.home', compact('categories', 'newArrivals', 'featuredProducts', 'bestSellers', 'newArrivalProductIds', 'homeBanners'));
+        $homeReviews = Schema::hasTable('reviews')
+            ? Review::with(['user', 'product'])
+                ->where('status', 'approved')
+                ->where('display_on', 'home')
+                ->latest('reviewed_at')
+                ->take(20)
+                ->get()
+            : collect();
+
+        return view('frontend.home', compact('categories', 'newArrivals', 'featuredProducts', 'bestSellers', 'newArrivalProductIds', 'homeBanners', 'homeReviews'));
     }
 }

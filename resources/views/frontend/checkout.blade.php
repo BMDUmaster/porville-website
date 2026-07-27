@@ -18,6 +18,35 @@
 <div class="max-w-5xl mx-auto px-4 py-8">
     <h1 class="nunito font-extrabold text-2xl text-gray-800 mb-6">Checkout</h1>
 
+    {{-- Noida Delivery Notice Banner --}}
+    <div class="mb-6 overflow-hidden rounded-2xl border border-amber-300/60 bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 p-5 text-white shadow-xl relative">
+        <div class="absolute -right-6 -top-6 h-28 w-28 rounded-full bg-amber-400/10 blur-xl"></div>
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
+            <div class="flex items-start gap-3.5">
+                <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-amber-400 text-slate-950 shadow-lg text-lg">
+                    <i class="fa-solid fa-truck-fast"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-amber-300 border border-amber-400/30">
+                            <span class="h-2 w-2 rounded-full bg-amber-400 animate-ping"></span>
+                            Noida Delivery Only
+                        </span>
+                    </div>
+                    <h3 class="mt-1 text-base font-extrabold text-white">Abhi Delivery Exclusively Noida Me Available Hai</h3>
+                    <p class="mt-1 text-xs text-slate-300 leading-relaxed max-w-2xl">
+                        Hum filhal <strong>Noida</strong> me hi fresh delivery kar rahe hain. Bohot hi jaldi aapke paas bhi apni nayi branch open karenge! Thank you for choosing FarmSea. 💚
+                    </p>
+                </div>
+            </div>
+            <div class="flex-shrink-0 self-end sm:self-center">
+                <span class="inline-flex rounded-xl bg-white/10 px-3.5 py-2 text-xs font-bold text-amber-300 backdrop-blur-md border border-white/10">
+                    🚀 Expanding Soon
+                </span>
+            </div>
+        </div>
+    </div>
+
     <div class="flex flex-col gap-6 lg:flex-row">
         <div class="flex-1 space-y-5">
             <form method="POST" action="{{ route('frontend.checkout.store') }}" id="checkoutForm">
@@ -127,13 +156,13 @@
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div>
                                     <label class="mb-1 block text-xs font-semibold text-gray-600">City *</label>
-                                    <input type="text" name="city" id="shippingCityInput" required
-                                           class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
+                                    <input type="text" name="city" id="shippingCityInput" value="Noida" required readonly
+                                           class="w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm font-semibold text-gray-700 outline-none">
                                 </div>
                                 <div>
                                     <label class="mb-1 block text-xs font-semibold text-gray-600">State *</label>
-                                    <input type="text" name="state" id="shippingStateInput" required
-                                           class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
+                                    <input type="text" name="state" id="shippingStateInput" value="UP" required readonly
+                                           class="w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm font-semibold text-gray-700 outline-none">
                                 </div>
                             </div>
                             <div class="grid gap-4 sm:grid-cols-2">
@@ -247,7 +276,7 @@
                     @endif
                     @if((float) ($pricing['service_charge'] ?? 0) > 0)
                     <div class="flex justify-between">
-                        <span class="text-gray-500">&#8505;&#65039; Service Charge ({{ rtrim(rtrim(number_format($pricing['service_charge_percent'], 2), '0'), '.') }}%)</span>
+                        <span class="text-gray-500">&#8505;&#65039; Service Charge</span>
                         <span>&#8377;{{ number_format($pricing['service_charge'], 2) }}</span>
                     </div>
                     @endif
@@ -467,8 +496,8 @@ function showNewAddressForm() {
     
     // Clear inputs (except name/phone which are prefilled in contact info)
     streetInput.value = '';
-    cityInput.value = '';
-    stateInput.value = '';
+    cityInput.value = 'Noida';
+    stateInput.value = 'UP';
     pincodeInput.value = '';
     populateSectors('');
     sectorInput.value = '';
@@ -488,8 +517,8 @@ function editAddressCard(event, index) {
     // Fill inputs with address details
     const addr = pastAddresses[index];
     streetInput.value = addr.address || '';
-    cityInput.value = addr.city || '';
-    stateInput.value = addr.state || '';
+    cityInput.value = addr.city || 'Noida';
+    stateInput.value = addr.state || 'UP';
     pincodeInput.value = addr.pincode || '';
     populateSectors(addr.pincode || '');
     sectorInput.value = addr.sector || '';
@@ -513,24 +542,18 @@ function cancelAddressForm() {
 pincodeInput?.addEventListener('change', (e) => {
     const pin = e.target.value;
     populateSectors(pin);
-    if (pin) {
-        if (pin === '201318') {
-            cityInput.value = 'Greater Noida';
-        } else {
-            cityInput.value = 'Noida';
-        }
-        stateInput.value = 'Uttar Pradesh';
-    }
+    cityInput.value = 'Noida';
+    stateInput.value = 'UP';
 });
 
 // Initial Call
 if (pastAddresses.length > 0) {
     updateAddressSelectionUI();
 } else {
-    // If no past addresses, load defaults from checkoutDefaults if any
+    // If no past addresses, load defaults
     streetInput.value = @json(old('address', $checkoutDefaults['address'] ?? ''));
-    cityInput.value = @json(old('city', $checkoutDefaults['city'] ?? ''));
-    stateInput.value = @json(old('state', $checkoutDefaults['state'] ?? ''));
+    cityInput.value = 'Noida';
+    stateInput.value = 'UP';
     const defaultPin = @json(old('pincode', $checkoutDefaults['pincode'] ?? ''));
     pincodeInput.value = defaultPin;
     populateSectors(defaultPin);

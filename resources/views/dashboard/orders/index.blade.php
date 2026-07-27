@@ -5,6 +5,44 @@
 @section('content')
 @php
     $statusOptions = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered', 'cancelled'];
+    $allowedStatusOptions = function (string $currentStatus) {
+        return match ($currentStatus) {
+            'pending' => [
+                'confirmed' => 'Confirmed',
+                'processing' => 'Processing',
+                'out_for_delivery' => 'Out For Delivery',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+            'confirmed' => [
+                'processing' => 'Processing',
+                'out_for_delivery' => 'Out For Delivery',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+            'processing' => [
+                'confirmed' => 'Confirmed',
+                'out_for_delivery' => 'Out For Delivery',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+            'out_for_delivery' => [
+                'processing' => 'Processing',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+            'delivered' => [],
+            'cancelled' => [],
+            default => [
+                'pending' => 'Pending',
+                'confirmed' => 'Confirmed',
+                'processing' => 'Processing',
+                'out_for_delivery' => 'Out For Delivery',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+        };
+    };
     $dateFilterOptions = [
         '' => 'All Dates',
         'today' => 'Today',
@@ -113,31 +151,37 @@
                         <i class="fa-solid fa-eye"></i> View
                     </a>
 
-                    <form method="POST" action="{{ route('dashboard.orders.status', $order) }}" class="space-y-2 rounded-xl border border-gray-200 bg-gray-50 p-3">
-                        @csrf
-                        @method('PATCH')
-                        <select name="status" onchange="toggleDeliveryBoySelect(this, '{{ $order->id }}')" class="w-full rounded border px-3 py-2 text-xs outline-none">
-                            @foreach($statusOptions as $status)
-                                <option value="{{ $status }}" {{ $order->status === $status ? 'selected' : '' }}>
-                                    {{ ucwords(str_replace('_', ' ', $status)) }}
-                                </option>
-                            @endforeach
-                        </select>
+                    @php
+                        $mobileAllowedOptions = $allowedStatusOptions($order->status);
+                    @endphp
+                    @if(count($mobileAllowedOptions) > 0)
+                        <form method="POST" action="{{ route('dashboard.orders.status', $order) }}" class="space-y-2 rounded-xl border border-gray-200 bg-gray-50 p-3">
+                            @csrf
+                            @method('PATCH')
+                            <select name="status" onchange="toggleDeliveryBoySelect(this, '{{ $order->id }}')" class="w-full rounded border px-3 py-2 text-xs font-semibold outline-none bg-white">
+                                <option value="" disabled selected>Change Status...</option>
+                                @foreach($mobileAllowedOptions as $val => $label)
+                                    <option value="{{ $val }}">
+                                        {{ $label }}
+                                    </option>
+                                @endforeach
+                            </select>
 
-                        <select name="delivery_boy_id" data-delivery-boy-select
-                                class="w-full rounded border px-3 py-2 text-xs outline-none {{ $order->status === 'out_for_delivery' ? '' : 'hidden' }}">
-                            <option value="">Choose delivery boy</option>
-                            @foreach($deliveryBoysByOrder[$order->id] ?? [] as $deliveryBoy)
-                                <option value="{{ $deliveryBoy->id }}" {{ $order->delivery_boy_id === $deliveryBoy->id ? 'selected' : '' }}>
-                                    {{ $deliveryBoy->partner_name }} | {{ $deliveryBoy->phone_number }} | {{ $deliveryBoy->area }}
-                                </option>
-                            @endforeach
-                        </select>
+                            <select name="delivery_boy_id" data-delivery-boy-select
+                                    class="w-full rounded border px-3 py-2 text-xs outline-none hidden">
+                                <option value="">Choose delivery boy</option>
+                                @foreach($deliveryBoysByOrder[$order->id] ?? [] as $deliveryBoy)
+                                    <option value="{{ $deliveryBoy->id }}" {{ $order->delivery_boy_id === $deliveryBoy->id ? 'selected' : '' }}>
+                                        {{ $deliveryBoy->partner_name }} | {{ $deliveryBoy->phone_number }} | {{ $deliveryBoy->area }}
+                                    </option>
+                                @endforeach
+                            </select>
 
-                        <button type="submit" class="w-full rounded bg-blue-600 px-3 py-2 text-[11px] font-bold text-white hover:bg-blue-700">
-                            Save
-                        </button>
-                    </form>
+                            <button type="submit" class="w-full rounded bg-blue-600 px-3 py-2 text-[11px] font-bold text-white hover:bg-blue-700">
+                                Save Status
+                            </button>
+                        </form>
+                    @endif
                 </div>
             </article>
         @empty
@@ -202,37 +246,43 @@
                             </span>
                         </td>
                         <td class="px-4 py-4">
-                            <div class="flex items-start justify-center gap-2">
+                            @php
+                                $desktopAllowedOptions = $allowedStatusOptions($order->status);
+                            @endphp
+                            <div class="flex items-center justify-center gap-2">
                                 <a href="{{ route('dashboard.orders.show', $order) }}"
-                                   class="mt-[28px] rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-100">
+                                   class="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-100">
                                     <i class="fa-solid fa-eye"></i> View
                                 </a>
 
-                                <form method="POST" action="{{ route('dashboard.orders.status', $order) }}" class="inline-flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50 p-2">
-                                    @csrf
-                                    @method('PATCH')
-                                    <select name="status" onchange="toggleDeliveryBoySelect(this, '{{ $order->id }}')" class="border rounded px-2 py-1 text-xs outline-none">
-                                        @foreach($statusOptions as $status)
-                                            <option value="{{ $status }}" {{ $order->status === $status ? 'selected' : '' }}>
-                                                {{ ucwords(str_replace('_', ' ', $status)) }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                @if(count($desktopAllowedOptions) > 0)
+                                    <form method="POST" action="{{ route('dashboard.orders.status', $order) }}" class="inline-flex flex-col gap-1.5 rounded-lg border border-gray-200 bg-gray-50 p-2">
+                                        @csrf
+                                        @method('PATCH')
+                                        <select name="status" onchange="toggleDeliveryBoySelect(this, '{{ $order->id }}')" class="border rounded px-2 py-1 text-xs outline-none bg-white font-semibold">
+                                            <option value="" disabled selected>Change Status...</option>
+                                            @foreach($desktopAllowedOptions as $val => $label)
+                                                <option value="{{ $val }}">
+                                                    {{ $label }}
+                                                </option>
+                                            @endforeach
+                                        </select>
 
-                                    <select name="delivery_boy_id" data-delivery-boy-select
-                                            class="border rounded px-2 py-1 text-xs outline-none {{ $order->status === 'out_for_delivery' ? '' : 'hidden' }}">
-                                        <option value="">Choose delivery boy</option>
-                                        @foreach($deliveryBoysByOrder[$order->id] ?? [] as $deliveryBoy)
-                                            <option value="{{ $deliveryBoy->id }}" {{ $order->delivery_boy_id === $deliveryBoy->id ? 'selected' : '' }}>
-                                                {{ $deliveryBoy->partner_name }} | {{ $deliveryBoy->phone_number }} | {{ $deliveryBoy->area }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                        <select name="delivery_boy_id" data-delivery-boy-select
+                                                class="border rounded px-2 py-1 text-xs outline-none hidden">
+                                            <option value="">Choose delivery boy</option>
+                                            @foreach($deliveryBoysByOrder[$order->id] ?? [] as $deliveryBoy)
+                                                <option value="{{ $deliveryBoy->id }}" {{ $order->delivery_boy_id === $deliveryBoy->id ? 'selected' : '' }}>
+                                                    {{ $deliveryBoy->partner_name }} | {{ $deliveryBoy->phone_number }} | {{ $deliveryBoy->area }}
+                                                </option>
+                                            @endforeach
+                                        </select>
 
-                                    <button type="submit" class="rounded bg-blue-600 px-3 py-1 text-[11px] font-bold text-white hover:bg-blue-700">
-                                        Save
-                                    </button>
-                                </form>
+                                        <button type="submit" class="rounded bg-blue-600 px-3 py-1 text-[11px] font-bold text-white hover:bg-blue-700">
+                                            Save
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </td>
                     </tr>

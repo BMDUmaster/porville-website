@@ -163,15 +163,28 @@ class AuthController extends Controller
             ->with('success', 'Password created successfully. Please log in with your new password.');
     }
 
-    /** POST /account/register */
+    /** POST /account/register/send-otp */
     public function sendRegisterOtp(Request $request)
     {
         $data = $request->validate([
             'email' => ['required', 'email', 'unique:users,email'],
         ]);
 
-        $otp = self::REGISTER_DEFAULT_OTP;
         $email = strtolower($data['email']);
+        $otp = $this->generateOtp();
+
+        try {
+            $this->sendOtpEmail($email, $otp, 'registration', self::REGISTER_OTP_TTL_MINUTES);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            $errorMsg = 'Could not send OTP email. ' . $exception->getMessage();
+
+            return response()->json([
+                'success' => false,
+                'message' => $errorMsg,
+            ], 422);
+        }
 
         session([
             'register_otp_email' => $email,
@@ -181,17 +194,17 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Use OTP 1111 to continue.',
+            'message' => 'OTP sent successfully. Please check your email inbox.',
         ]);
     }
 
     public function register(Request $request)
     {
         $request->validate([
-            'name'     => 'required|string|max:100',
-            'email'    => 'required|email|unique:users,email',
+            'name'      => 'required|string|max:100',
+            'email'     => 'required|email|unique:users,email',
             'email_otp' => ['required', 'digits:4'],
-            'password' => 'required|string|min:8',
+            'password'  => 'required|string|min:8',
         ]);
 
         $email = strtolower($request->email);
@@ -225,6 +238,7 @@ class AuthController extends Controller
 
         return redirect()->intended(route('frontend.profile'))->with('success', 'Account created successfully! Welcome to FarmSea.');
     }
+
     /** POST /account/logout */
     public function logout(Request $request)
     {
@@ -263,8 +277,14 @@ class AuthController extends Controller
 
     private function ensureMailIsConfigured(): void
     {
-        if (config('mail.default') !== 'smtp') {
-            throw new RuntimeException('OTP email requires MAIL_MAILER=smtp.');
+        $driver = config('mail.default');
+
+        if ($driver === 'log') {
+            return;
+        }
+
+        if ($driver !== 'smtp') {
+            throw new RuntimeException('OTP email requires MAIL_MAILER=smtp or MAIL_MAILER=log.');
         }
 
         $smtp = config('mail.mailers.smtp', []);
@@ -274,7 +294,7 @@ class AuthController extends Controller
             $value = $smtp[$key] ?? null;
 
             if ($value === null || $value === '' || $value === 'null') {
-                throw new RuntimeException("Missing SMTP setting: MAIL_" . strtoupper($key) . '.');
+                throw new RuntimeException("Missing SMTP setting in .env: MAIL_" . strtoupper($key) . '. Please configure your email credentials.');
             }
         }
     }

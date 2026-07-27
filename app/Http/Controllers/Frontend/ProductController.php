@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\HomeBanner;
 use App\Models\Product;
+use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -55,6 +56,11 @@ class ProductController extends Controller
 
         if ($request->filled('max_price')) {
             $query->where('price', '<=', $request->max_price);
+        }
+
+        if ($request->boolean('flash_deal') || $request->filled('flash_deal') || $request->get('offer') === 'flash_deal') {
+            $query->whereNotNull('products.mrp')
+                ->whereColumn('products.mrp', '>', 'products.price');
         }
 
         $sort = $request->get('sort', 'latest');
@@ -130,6 +136,15 @@ class ProductController extends Controller
             ->take(4)
             ->get();
 
+        $productReviews = Schema::hasTable('reviews')
+            ? Review::with('user')
+                ->where('product_id', $product->id)
+                ->where('status', 'approved')
+                ->where('display_on', 'product')
+                ->latest('reviewed_at')
+                ->get()
+            : collect();
+
         $palette = [
             ['icon' => 'fa-tag', 'icon_bg' => 'bg-[#e9f7ec]', 'icon_color' => 'text-[#2f8c43]', 'code_bg' => 'bg-[#edf8ef]', 'code_text' => 'text-[#2f8c43]'],
             ['icon' => 'fa-truck-fast', 'icon_bg' => 'bg-[#ebf4ff]', 'icon_color' => 'text-[#2d72d3]', 'code_bg' => 'bg-[#ebf4ff]', 'code_text' => 'text-[#2d72d3]'],
@@ -158,6 +173,6 @@ class ProductController extends Controller
             })
             ->all();
 
-        return view('frontend.product-detail', compact('product', 'similar', 'frontendOfferCards', 'newArrivalProductIds'));
+        return view('frontend.product-detail', compact('product', 'similar', 'frontendOfferCards', 'newArrivalProductIds', 'productReviews'));
     }
 }

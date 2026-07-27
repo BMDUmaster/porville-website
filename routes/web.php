@@ -32,6 +32,7 @@ use App\Http\Controllers\Dashboard\DeliverySlotController;
 use App\Http\Controllers\Dashboard\SystemCheckController;
 use App\Http\Controllers\Dashboard\HomeBannerController;
 use App\Http\Controllers\Dashboard\ContactMessageController;
+use App\Http\Controllers\Dashboard\ReviewController as DashboardReviewController;
 use App\Http\Controllers\ServerDiagnosticsController;
 
 // Public server diagnostics (no login) — use this URL on live hosting
@@ -49,11 +50,13 @@ Route::get('/clear-cache', function () {
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\ProductController as FrontProductController;
 use App\Http\Controllers\Frontend\CartController;
+use App\Http\Controllers\Frontend\WishlistController;
 use App\Http\Controllers\Frontend\CheckoutController;
 use App\Http\Controllers\Frontend\AuthController as FrontAuthController;
 use App\Http\Controllers\Frontend\ProfileController as FrontProfileController;
 use App\Http\Controllers\Frontend\OrderController as FrontOrderController;
 use App\Http\Controllers\Frontend\PageController;
+use App\Http\Controllers\Frontend\ReviewController as FrontReviewController;
 
 
 // ROOT
@@ -88,6 +91,11 @@ Route::middleware('admin')->group(function () {
     Route::get('/contact-messages/{message}',          [ContactMessageController::class, 'show'])->name('dashboard.contact-messages.show');
     Route::patch('/contact-messages/{message}/read',   [ContactMessageController::class, 'markRead'])->name('dashboard.contact-messages.read');
     Route::delete('/contact-messages/{message}',       [ContactMessageController::class, 'destroy'])->name('dashboard.contact-messages.destroy');
+
+    // Customer Reviews
+    Route::get('/reviews', [DashboardReviewController::class, 'index'])->name('dashboard.reviews');
+    Route::patch('/reviews/{review}', [DashboardReviewController::class, 'update'])->name('dashboard.reviews.update');
+    Route::delete('/reviews/{review}', [DashboardReviewController::class, 'destroy'])->name('dashboard.reviews.destroy');
 
     // Categories
     Route::get('/categories',               [CategoryController::class, 'index'])->name('dashboard.categories');
@@ -159,6 +167,10 @@ Route::middleware('admin')->group(function () {
 
 Route::get('/home', [HomeController::class, 'index'])->name('frontend.home');
 
+// Signed links sent after delivery; customer login is not required.
+Route::get('/review/order/{order}', [FrontReviewController::class, 'create'])->name('frontend.review.create');
+Route::post('/review/order/{order}', [FrontReviewController::class, 'store'])->name('frontend.review.store');
+
 // ── Cart (public)
 Route::get('/cart',          [CartController::class, 'index'])->name('frontend.cart');
 Route::post('/cart/add',     [CartController::class, 'add'])->name('frontend.cart.add');
@@ -168,6 +180,11 @@ Route::post('/cart/coupon', [CartController::class, 'applyCoupon'])->name('front
 Route::delete('/cart/coupon', [CartController::class, 'removeCoupon'])->name('frontend.cart.coupon.remove');
 Route::post('/cart/remove',  [CartController::class, 'remove'])->name('frontend.cart.remove');
 Route::get('/cart/count',    [CartController::class, 'count'])->name('frontend.cart.count');
+
+// ── Wishlist (public)
+Route::get('/wishlist',        [WishlistController::class, 'index'])->name('frontend.wishlist');
+Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('frontend.wishlist.toggle');
+Route::get('/wishlist/count',  [WishlistController::class, 'count'])->name('frontend.wishlist.count');
 
 // ── Shop — specific routes BEFORE wildcard
 Route::get('/shop',            [FrontProductController::class, 'index'])->name('frontend.products');

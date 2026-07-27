@@ -4,6 +4,44 @@
 <?php $__env->startSection('content'); ?>
 <?php
     $statusOptions = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered', 'cancelled'];
+    $allowedStatusOptions = function (string $currentStatus) {
+        return match ($currentStatus) {
+            'pending' => [
+                'confirmed' => 'Confirmed',
+                'processing' => 'Processing',
+                'out_for_delivery' => 'Out For Delivery',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+            'confirmed' => [
+                'processing' => 'Processing',
+                'out_for_delivery' => 'Out For Delivery',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+            'processing' => [
+                'confirmed' => 'Confirmed',
+                'out_for_delivery' => 'Out For Delivery',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+            'out_for_delivery' => [
+                'processing' => 'Processing',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+            'delivered' => [],
+            'cancelled' => [],
+            default => [
+                'pending' => 'Pending',
+                'confirmed' => 'Confirmed',
+                'processing' => 'Processing',
+                'out_for_delivery' => 'Out For Delivery',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+        };
+    };
     $dateFilterOptions = [
         '' => 'All Dates',
         'today' => 'Today',
@@ -115,33 +153,39 @@
                         <i class="fa-solid fa-eye"></i> View
                     </a>
 
-                    <form method="POST" action="<?php echo e(route('dashboard.orders.status', $order)); ?>" class="space-y-2 rounded-xl border border-gray-200 bg-gray-50 p-3">
-                        <?php echo csrf_field(); ?>
-                        <?php echo method_field('PATCH'); ?>
-                        <select name="status" onchange="toggleDeliveryBoySelect(this, '<?php echo e($order->id); ?>')" class="w-full rounded border px-3 py-2 text-xs outline-none">
-                            <?php $__currentLoopData = $statusOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <option value="<?php echo e($status); ?>" <?php echo e($order->status === $status ? 'selected' : ''); ?>>
-                                    <?php echo e(ucwords(str_replace('_', ' ', $status))); ?>
+                    <?php
+                        $mobileAllowedOptions = $allowedStatusOptions($order->status);
+                    ?>
+                    <?php if(count($mobileAllowedOptions) > 0): ?>
+                        <form method="POST" action="<?php echo e(route('dashboard.orders.status', $order)); ?>" class="space-y-2 rounded-xl border border-gray-200 bg-gray-50 p-3">
+                            <?php echo csrf_field(); ?>
+                            <?php echo method_field('PATCH'); ?>
+                            <select name="status" onchange="toggleDeliveryBoySelect(this, '<?php echo e($order->id); ?>')" class="w-full rounded border px-3 py-2 text-xs font-semibold outline-none bg-white">
+                                <option value="" disabled selected>Change Status...</option>
+                                <?php $__currentLoopData = $mobileAllowedOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($val); ?>">
+                                        <?php echo e($label); ?>
 
-                                </option>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                        </select>
+                                    </option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </select>
 
-                        <select name="delivery_boy_id" data-delivery-boy-select
-                                class="w-full rounded border px-3 py-2 text-xs outline-none <?php echo e($order->status === 'out_for_delivery' ? '' : 'hidden'); ?>">
-                            <option value="">Choose delivery boy</option>
-                            <?php $__currentLoopData = $deliveryBoysByOrder[$order->id] ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $deliveryBoy): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <option value="<?php echo e($deliveryBoy->id); ?>" <?php echo e($order->delivery_boy_id === $deliveryBoy->id ? 'selected' : ''); ?>>
-                                    <?php echo e($deliveryBoy->partner_name); ?> | <?php echo e($deliveryBoy->phone_number); ?> | <?php echo e($deliveryBoy->area); ?>
+                            <select name="delivery_boy_id" data-delivery-boy-select
+                                    class="w-full rounded border px-3 py-2 text-xs outline-none hidden">
+                                <option value="">Choose delivery boy</option>
+                                <?php $__currentLoopData = $deliveryBoysByOrder[$order->id] ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $deliveryBoy): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($deliveryBoy->id); ?>" <?php echo e($order->delivery_boy_id === $deliveryBoy->id ? 'selected' : ''); ?>>
+                                        <?php echo e($deliveryBoy->partner_name); ?> | <?php echo e($deliveryBoy->phone_number); ?> | <?php echo e($deliveryBoy->area); ?>
 
-                                </option>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                        </select>
+                                    </option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </select>
 
-                        <button type="submit" class="w-full rounded bg-blue-600 px-3 py-2 text-[11px] font-bold text-white hover:bg-blue-700">
-                            Save
-                        </button>
-                    </form>
+                            <button type="submit" class="w-full rounded bg-blue-600 px-3 py-2 text-[11px] font-bold text-white hover:bg-blue-700">
+                                Save Status
+                            </button>
+                        </form>
+                    <?php endif; ?>
                 </div>
             </article>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
@@ -208,39 +252,45 @@
                             </span>
                         </td>
                         <td class="px-4 py-4">
-                            <div class="flex items-start justify-center gap-2">
+                            <?php
+                                $desktopAllowedOptions = $allowedStatusOptions($order->status);
+                            ?>
+                            <div class="flex items-center justify-center gap-2">
                                 <a href="<?php echo e(route('dashboard.orders.show', $order)); ?>"
-                                   class="mt-[28px] rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-100">
+                                   class="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-100">
                                     <i class="fa-solid fa-eye"></i> View
                                 </a>
 
-                                <form method="POST" action="<?php echo e(route('dashboard.orders.status', $order)); ?>" class="inline-flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50 p-2">
-                                    <?php echo csrf_field(); ?>
-                                    <?php echo method_field('PATCH'); ?>
-                                    <select name="status" onchange="toggleDeliveryBoySelect(this, '<?php echo e($order->id); ?>')" class="border rounded px-2 py-1 text-xs outline-none">
-                                        <?php $__currentLoopData = $statusOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <option value="<?php echo e($status); ?>" <?php echo e($order->status === $status ? 'selected' : ''); ?>>
-                                                <?php echo e(ucwords(str_replace('_', ' ', $status))); ?>
+                                <?php if(count($desktopAllowedOptions) > 0): ?>
+                                    <form method="POST" action="<?php echo e(route('dashboard.orders.status', $order)); ?>" class="inline-flex flex-col gap-1.5 rounded-lg border border-gray-200 bg-gray-50 p-2">
+                                        <?php echo csrf_field(); ?>
+                                        <?php echo method_field('PATCH'); ?>
+                                        <select name="status" onchange="toggleDeliveryBoySelect(this, '<?php echo e($order->id); ?>')" class="border rounded px-2 py-1 text-xs outline-none bg-white font-semibold">
+                                            <option value="" disabled selected>Change Status...</option>
+                                            <?php $__currentLoopData = $desktopAllowedOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <option value="<?php echo e($val); ?>">
+                                                    <?php echo e($label); ?>
 
-                                            </option>
-                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                    </select>
+                                                </option>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        </select>
 
-                                    <select name="delivery_boy_id" data-delivery-boy-select
-                                            class="border rounded px-2 py-1 text-xs outline-none <?php echo e($order->status === 'out_for_delivery' ? '' : 'hidden'); ?>">
-                                        <option value="">Choose delivery boy</option>
-                                        <?php $__currentLoopData = $deliveryBoysByOrder[$order->id] ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $deliveryBoy): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <option value="<?php echo e($deliveryBoy->id); ?>" <?php echo e($order->delivery_boy_id === $deliveryBoy->id ? 'selected' : ''); ?>>
-                                                <?php echo e($deliveryBoy->partner_name); ?> | <?php echo e($deliveryBoy->phone_number); ?> | <?php echo e($deliveryBoy->area); ?>
+                                        <select name="delivery_boy_id" data-delivery-boy-select
+                                                class="border rounded px-2 py-1 text-xs outline-none hidden">
+                                            <option value="">Choose delivery boy</option>
+                                            <?php $__currentLoopData = $deliveryBoysByOrder[$order->id] ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $deliveryBoy): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <option value="<?php echo e($deliveryBoy->id); ?>" <?php echo e($order->delivery_boy_id === $deliveryBoy->id ? 'selected' : ''); ?>>
+                                                    <?php echo e($deliveryBoy->partner_name); ?> | <?php echo e($deliveryBoy->phone_number); ?> | <?php echo e($deliveryBoy->area); ?>
 
-                                            </option>
-                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                    </select>
+                                                </option>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        </select>
 
-                                    <button type="submit" class="rounded bg-blue-600 px-3 py-1 text-[11px] font-bold text-white hover:bg-blue-700">
-                                        Save
-                                    </button>
-                                </form>
+                                        <button type="submit" class="rounded bg-blue-600 px-3 py-1 text-[11px] font-bold text-white hover:bg-blue-700">
+                                            Save
+                                        </button>
+                                    </form>
+                                <?php endif; ?>
                             </div>
                         </td>
                     </tr>

@@ -8,6 +8,7 @@
     $customerPhone = $shipping['phone'] ?? (optional($order->user)->phone ?: '0');
     $customerAddress = trim(collect([
         $shipping['address'] ?? null,
+        $shipping['sector'] ?? null,
         $shipping['city'] ?? null,
         $shipping['state'] ?? null,
         $shipping['pincode'] ?? null,
@@ -78,7 +79,6 @@ body > footer {
                         <img src="<?php echo e($brandLogoUrl); ?>" alt="FarmSea" class="h-10 w-10 object-contain">
                     </div>
                     <div>
-                        <p class="text-[10px] font-bold uppercase tracking-[0.28em] text-white/70">Tax Invoice</p>
                         <h1 class="mt-1 text-xl font-black tracking-[-0.03em] md:text-2xl">FarmSea Invoice</h1>
                         <p class="mt-1 text-xs text-white/80">Order invoice</p>
                     </div>
@@ -94,10 +94,6 @@ body > footer {
                         <p class="mt-1 text-xs font-bold"><?php echo e($invoiceDate); ?></p>
                     </div>
                     <div class="rounded-xl bg-white/10 px-3 py-2">
-                        <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-white/65">Status</p>
-                        <p class="mt-1 text-xs font-bold"><?php echo e($order->status_label); ?></p>
-                    </div>
-                    <div class="rounded-xl bg-white/10 px-3 py-2">
                         <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-white/65">Payment</p>
                         <p class="mt-1 text-xs font-bold uppercase"><?php echo e($order->payment_method ?: '0'); ?></p>
                     </div>
@@ -105,16 +101,7 @@ body > footer {
             </div>
         </div>
 
-        <div class="grid gap-3 border-b border-slate-200 px-5 py-4 md:grid-cols-3">
-            <div class="rounded-xl bg-slate-50 px-3 py-3">
-                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Seller</p>
-                <p class="mt-2 text-sm font-black text-slate-900">FarmSea</p>
-                <p class="mt-1 text-xs leading-5 text-slate-600">Address: 0</p>
-                <p class="text-xs leading-5 text-slate-600">Phone: 0</p>
-                <p class="text-xs leading-5 text-slate-600">Email: admin@farmsea.in</p>
-                <p class="text-xs leading-5 text-slate-600">GSTIN: 0</p>
-            </div>
-
+        <div class="grid gap-3 border-b border-slate-200 px-5 py-4 md:grid-cols-2">
             <div class="rounded-xl bg-slate-50 px-3 py-3">
                 <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Bill To</p>
                 <p class="mt-2 text-sm font-black text-slate-900"><?php echo e($customerName); ?></p>
@@ -127,8 +114,6 @@ body > footer {
                 <p class="mt-2 text-xs leading-5 text-slate-600">Customer ID: <?php echo e($order->user_id ?: '0'); ?></p>
                 <p class="text-xs leading-5 text-slate-600">Place of Supply: <?php echo e($placeOfSupply); ?></p>
                 <p class="text-xs leading-5 text-slate-600">Delivery Slot: <?php echo e($order->delivery_slot_label ?: '0'); ?></p>
-                <p class="text-xs leading-5 text-slate-600">Reference No: 0</p>
-                <p class="text-xs leading-5 text-slate-600">HSN/SAC: 0</p>
             </div>
         </div>
 

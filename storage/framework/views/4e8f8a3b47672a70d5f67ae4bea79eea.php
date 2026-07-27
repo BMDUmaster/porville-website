@@ -97,7 +97,7 @@
             <h2 class="mb-2 text-sm font-semibold text-gray-700">Shipping Address</h2>
             <?php if(is_array($order->shipping_address)): ?>
                 <p class="text-sm text-gray-600"><?php echo e($order->shipping_address['name'] ?? ''); ?></p>
-                <p class="text-sm text-gray-600"><?php echo e($order->shipping_address['address'] ?? ''); ?>, <?php echo e($order->shipping_address['city'] ?? ''); ?></p>
+                <p class="text-sm text-gray-600"><?php echo e($order->shipping_address['address'] ?? ''); ?><?php echo e(!empty($order->shipping_address['sector']) ? ', ' . $order->shipping_address['sector'] : ''); ?>, <?php echo e($order->shipping_address['city'] ?? ''); ?></p>
                 <p class="text-sm text-gray-600"><?php echo e($order->shipping_address['state'] ?? ''); ?> - <?php echo e($order->shipping_address['pincode'] ?? ''); ?></p>
             <?php else: ?>
                 <p class="text-sm text-gray-600"><?php echo e($order->shipping_address); ?></p>

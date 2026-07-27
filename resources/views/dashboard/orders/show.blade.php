@@ -5,6 +5,44 @@
 @section('content')
 @php
     $statusOptions = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered', 'cancelled'];
+    $allowedStatusOptions = function (string $currentStatus) {
+        return match ($currentStatus) {
+            'pending' => [
+                'confirmed' => 'Confirmed',
+                'processing' => 'Processing',
+                'out_for_delivery' => 'Out For Delivery',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+            'confirmed' => [
+                'processing' => 'Processing',
+                'out_for_delivery' => 'Out For Delivery',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+            'processing' => [
+                'confirmed' => 'Confirmed',
+                'out_for_delivery' => 'Out For Delivery',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+            'out_for_delivery' => [
+                'processing' => 'Processing',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+            'delivered' => [],
+            'cancelled' => [],
+            default => [
+                'pending' => 'Pending',
+                'confirmed' => 'Confirmed',
+                'processing' => 'Processing',
+                'out_for_delivery' => 'Out For Delivery',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+        };
+    };
     $pricingDayLabel = fn (?string $day) => $day === 'tomorrow' ? 'Tomorrow' : 'Today';
     $orderPricingDays = $order->items
         ->pluck('pricing_day')
@@ -215,31 +253,37 @@
                 </div>
             </div>
 
-            <div class="bg-gray-50 px-5 py-4 print:hidden">
-                <form method="POST" action="{{ route('dashboard.orders.status', $order) }}" class="flex flex-wrap items-center gap-3">
-                    @csrf
-                    @method('PATCH')
-                    <label class="text-sm font-semibold text-gray-700">Update Status:</label>
-                    <select name="status" id="detailOrderStatus" onchange="toggleDetailDeliveryBoy()" class="rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-400">
-                        @foreach($statusOptions as $status)
-                            <option value="{{ $status }}" {{ $order->status === $status ? 'selected' : '' }}>
-                                {{ ucwords(str_replace('_', ' ', $status)) }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <select name="delivery_boy_id" id="detailDeliveryBoy" class="rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-400 {{ $order->status === 'out_for_delivery' ? '' : 'hidden' }}">
-                        <option value="">Choose delivery boy</option>
-                        @foreach($deliveryBoys as $deliveryBoy)
-                            <option value="{{ $deliveryBoy->id }}" {{ $order->delivery_boy_id === $deliveryBoy->id ? 'selected' : '' }}>
-                                {{ $deliveryBoy->partner_name }} | {{ $deliveryBoy->phone_number }} | {{ $deliveryBoy->area }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <button type="submit" class="rounded bg-blue-600 px-5 py-2 text-sm font-bold text-white hover:bg-blue-700">
-                        Update
-                    </button>
-                </form>
-            </div>
+            @php
+                $detailAllowedOptions = $allowedStatusOptions($order->status);
+            @endphp
+            @if(count($detailAllowedOptions) > 0)
+                <div class="bg-gray-50 px-5 py-4 print:hidden border-t">
+                    <form method="POST" action="{{ route('dashboard.orders.status', $order) }}" class="flex flex-wrap items-center gap-3">
+                        @csrf
+                        @method('PATCH')
+                        <label class="text-sm font-semibold text-gray-700">Update Status:</label>
+                        <select name="status" id="detailOrderStatus" onchange="toggleDetailDeliveryBoy()" class="rounded border border-gray-300 px-3 py-2 text-sm font-semibold outline-none focus:border-blue-400 bg-white">
+                            <option value="" disabled selected>Change Status...</option>
+                            @foreach($detailAllowedOptions as $val => $label)
+                                <option value="{{ $val }}">
+                                    {{ $label }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <select name="delivery_boy_id" id="detailDeliveryBoy" class="rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-400 hidden">
+                            <option value="">Choose delivery boy</option>
+                            @foreach($deliveryBoys as $deliveryBoy)
+                                <option value="{{ $deliveryBoy->id }}" {{ $order->delivery_boy_id === $deliveryBoy->id ? 'selected' : '' }}>
+                                    {{ $deliveryBoy->partner_name }} | {{ $deliveryBoy->phone_number }} | {{ $deliveryBoy->area }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <button type="submit" class="rounded bg-blue-600 px-5 py-2 text-sm font-bold text-white hover:bg-blue-700">
+                            Update
+                        </button>
+                    </form>
+                </div>
+            @endif
         </div>
     </div>
 </div>

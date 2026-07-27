@@ -213,6 +213,8 @@ class CheckoutController extends Controller
             return $order;
         });
 
+        \App\Services\OrderStatusNotificationService::notifyStatusChange($order);
+
         $remainingCart = array_diff_key($fullCart, $cart);
         session(['cart' => $remainingCart]);
         session()->forget('applied_coupon_' . $checkoutDay);

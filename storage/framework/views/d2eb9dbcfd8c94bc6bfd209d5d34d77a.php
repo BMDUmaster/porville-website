@@ -4,6 +4,44 @@
 <?php $__env->startSection('content'); ?>
 <?php
     $statusOptions = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered', 'cancelled'];
+    $allowedStatusOptions = function (string $currentStatus) {
+        return match ($currentStatus) {
+            'pending' => [
+                'confirmed' => 'Confirmed',
+                'processing' => 'Processing',
+                'out_for_delivery' => 'Out For Delivery',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+            'confirmed' => [
+                'processing' => 'Processing',
+                'out_for_delivery' => 'Out For Delivery',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+            'processing' => [
+                'confirmed' => 'Confirmed',
+                'out_for_delivery' => 'Out For Delivery',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+            'out_for_delivery' => [
+                'processing' => 'Processing',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+            'delivered' => [],
+            'cancelled' => [],
+            default => [
+                'pending' => 'Pending',
+                'confirmed' => 'Confirmed',
+                'processing' => 'Processing',
+                'out_for_delivery' => 'Out For Delivery',
+                'delivered' => 'Delivered',
+                'cancelled' => 'Cancelled',
+            ],
+        };
+    };
     $pricingDayLabel = fn (?string $day) => $day === 'tomorrow' ? 'Tomorrow' : 'Today';
     $orderPricingDays = $order->items
         ->pluck('pricing_day')
@@ -13,7 +51,7 @@
         ->values();
 ?>
 <div class="p-4 md:p-6">
-    <div class="mb-4 flex items-center justify-between">
+    <div class="mb-4 flex items-center justify-between print:hidden">
         <a href="<?php echo e(route('dashboard.orders')); ?>" class="flex items-center gap-1 text-sm text-blue-600 hover:underline">
             <i class="fa-solid fa-arrow-left text-xs"></i> Back
         </a>
@@ -35,7 +73,7 @@
             <i class="fa-solid fa-circle-check text-blue-500"></i> Order Details
         </h2>
 
-        <div class="mb-4 flex justify-end">
+        <div class="mb-4 flex justify-end print:hidden">
             <div class="flex items-center gap-2 text-sm">
                 <span class="font-medium text-gray-600">Search:</span>
                 <input type="text" id="orderSearch" class="w-48 rounded border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-400">
@@ -52,7 +90,7 @@
 
                     </span>
                 </div>
-                <a href="#" onclick="window.print()" class="flex items-center gap-1.5 rounded border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50">
+                <a href="#" onclick="window.print()" class="flex items-center gap-1.5 rounded border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 print:hidden">
                     <i class="fa-solid fa-download text-xs"></i> Download PDF
                 </a>
             </div>
@@ -223,33 +261,39 @@
                 </div>
             </div>
 
-            <div class="bg-gray-50 px-5 py-4">
-                <form method="POST" action="<?php echo e(route('dashboard.orders.status', $order)); ?>" class="flex flex-wrap items-center gap-3">
-                    <?php echo csrf_field(); ?>
-                    <?php echo method_field('PATCH'); ?>
-                    <label class="text-sm font-semibold text-gray-700">Update Status:</label>
-                    <select name="status" id="detailOrderStatus" onchange="toggleDetailDeliveryBoy()" class="rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-400">
-                        <?php $__currentLoopData = $statusOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($status); ?>" <?php echo e($order->status === $status ? 'selected' : ''); ?>>
-                                <?php echo e(ucwords(str_replace('_', ' ', $status))); ?>
+            <?php
+                $detailAllowedOptions = $allowedStatusOptions($order->status);
+            ?>
+            <?php if(count($detailAllowedOptions) > 0): ?>
+                <div class="bg-gray-50 px-5 py-4 print:hidden border-t">
+                    <form method="POST" action="<?php echo e(route('dashboard.orders.status', $order)); ?>" class="flex flex-wrap items-center gap-3">
+                        <?php echo csrf_field(); ?>
+                        <?php echo method_field('PATCH'); ?>
+                        <label class="text-sm font-semibold text-gray-700">Update Status:</label>
+                        <select name="status" id="detailOrderStatus" onchange="toggleDetailDeliveryBoy()" class="rounded border border-gray-300 px-3 py-2 text-sm font-semibold outline-none focus:border-blue-400 bg-white">
+                            <option value="" disabled selected>Change Status...</option>
+                            <?php $__currentLoopData = $detailAllowedOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($val); ?>">
+                                    <?php echo e($label); ?>
 
-                            </option>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </select>
-                    <select name="delivery_boy_id" id="detailDeliveryBoy" class="rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-400 <?php echo e($order->status === 'out_for_delivery' ? '' : 'hidden'); ?>">
-                        <option value="">Choose delivery boy</option>
-                        <?php $__currentLoopData = $deliveryBoys; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $deliveryBoy): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($deliveryBoy->id); ?>" <?php echo e($order->delivery_boy_id === $deliveryBoy->id ? 'selected' : ''); ?>>
-                                <?php echo e($deliveryBoy->partner_name); ?> | <?php echo e($deliveryBoy->phone_number); ?> | <?php echo e($deliveryBoy->area); ?>
+                                </option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </select>
+                        <select name="delivery_boy_id" id="detailDeliveryBoy" class="rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-400 hidden">
+                            <option value="">Choose delivery boy</option>
+                            <?php $__currentLoopData = $deliveryBoys; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $deliveryBoy): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($deliveryBoy->id); ?>" <?php echo e($order->delivery_boy_id === $deliveryBoy->id ? 'selected' : ''); ?>>
+                                    <?php echo e($deliveryBoy->partner_name); ?> | <?php echo e($deliveryBoy->phone_number); ?> | <?php echo e($deliveryBoy->area); ?>
 
-                            </option>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </select>
-                    <button type="submit" class="rounded bg-blue-600 px-5 py-2 text-sm font-bold text-white hover:bg-blue-700">
-                        Update
-                    </button>
-                </form>
-            </div>
+                                </option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </select>
+                        <button type="submit" class="rounded bg-blue-600 px-5 py-2 text-sm font-bold text-white hover:bg-blue-700">
+                            Update
+                        </button>
+                    </form>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

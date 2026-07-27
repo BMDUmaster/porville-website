@@ -18,6 +18,35 @@
 <div class="max-w-5xl mx-auto px-4 py-8">
     <h1 class="nunito font-extrabold text-2xl text-gray-800 mb-6">Checkout</h1>
 
+    
+    <div class="mb-6 overflow-hidden rounded-2xl border border-amber-300/60 bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 p-5 text-white shadow-xl relative">
+        <div class="absolute -right-6 -top-6 h-28 w-28 rounded-full bg-amber-400/10 blur-xl"></div>
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
+            <div class="flex items-start gap-3.5">
+                <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-amber-400 text-slate-950 shadow-lg text-lg">
+                    <i class="fa-solid fa-truck-fast"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-amber-300 border border-amber-400/30">
+                            <span class="h-2 w-2 rounded-full bg-amber-400 animate-ping"></span>
+                            Noida Delivery Only
+                        </span>
+                    </div>
+                    <h3 class="mt-1 text-base font-extrabold text-white">Abhi Delivery Exclusively Noida Me Available Hai</h3>
+                    <p class="mt-1 text-xs text-slate-300 leading-relaxed max-w-2xl">
+                        Hum filhal <strong>Noida</strong> me hi fresh delivery kar rahe hain. Bohot hi jaldi aapke paas bhi apni nayi branch open karenge! Thank you for choosing FarmSea. 💚
+                    </p>
+                </div>
+            </div>
+            <div class="flex-shrink-0 self-end sm:self-center">
+                <span class="inline-flex rounded-xl bg-white/10 px-3.5 py-2 text-xs font-bold text-amber-300 backdrop-blur-md border border-white/10">
+                    🚀 Expanding Soon
+                </span>
+            </div>
+        </div>
+    </div>
+
     <div class="flex flex-col gap-6 lg:flex-row">
         <div class="flex-1 space-y-5">
             <form method="POST" action="<?php echo e(route('frontend.checkout.store')); ?>" id="checkoutForm">
@@ -86,6 +115,9 @@
                                                  <p class="text-sm font-bold text-gray-800"><?php echo e($addr['name'] ?? ''); ?></p>
                                              </div>
                                              <p class="text-xs text-gray-500 mt-1.5 leading-relaxed"><?php echo e($addr['address']); ?></p>
+                                             <?php if(!empty($addr['sector'])): ?>
+                                                 <p class="text-xs text-gray-500 leading-relaxed">Sector: <?php echo e($addr['sector']); ?></p>
+                                             <?php endif; ?>
                                              <p class="text-xs text-gray-500 leading-relaxed"><?php echo e($addr['city']); ?>, <?php echo e($addr['state']); ?> - <?php echo e($addr['pincode']); ?></p>
                                              <?php if(!empty($addr['phone'])): ?>
                                                  <p class="text-xs text-gray-500 mt-1 leading-relaxed"><i class="fa-solid fa-phone text-[9px] mr-1 text-slate-400"></i><?php echo e($addr['phone']); ?></p>
@@ -106,7 +138,6 @@
                             </div>
                         <?php endif; ?>
 
-                        
                         <div id="addressFormContainer" class="space-y-4 pt-2">
                             <?php if(!empty($pastAddresses)): ?>
                                 <div class="flex items-center justify-between mb-2">
@@ -125,23 +156,37 @@
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div>
                                     <label class="mb-1 block text-xs font-semibold text-gray-600">City *</label>
-                                    <input type="text" name="city" id="shippingCityInput" required
-                                           class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
+                                    <input type="text" name="city" id="shippingCityInput" value="Noida" required readonly
+                                           class="w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm font-semibold text-gray-700 outline-none">
                                 </div>
                                 <div>
                                     <label class="mb-1 block text-xs font-semibold text-gray-600">State *</label>
-                                    <input type="text" name="state" id="shippingStateInput" required
-                                           class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
+                                    <input type="text" name="state" id="shippingStateInput" value="UP" required readonly
+                                           class="w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm font-semibold text-gray-700 outline-none">
                                 </div>
                             </div>
-                            <div>
-                                <label class="mb-1 block text-xs font-semibold text-gray-600">PIN Code *</label>
-                                <input type="text" name="pincode" id="shippingPincodeInput" required
-                                       class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label class="mb-1 block text-xs font-semibold text-gray-600">PIN Code *</label>
+                                    <select name="pincode" id="shippingPincodeInput" required
+                                            class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
+                                        <option value="">Select PIN Code</option>
+                                        <?php $__currentLoopData = $pinSectors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pinCode => $sectors): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <option value="<?php echo e($pinCode); ?>"><?php echo e($pinCode); ?></option>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="mb-1 block text-xs font-semibold text-gray-600">Sector *</label>
+                                    <select name="sector" id="shippingSectorInput" required
+                                            class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
+                                        <option value="">Select PIN Code First</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
                 <div class="overflow-hidden rounded-2xl border bg-white">
                     <div class="flex items-center gap-2 border-b px-6 py-4">
@@ -233,7 +278,7 @@
                     <?php endif; ?>
                     <?php if((float) ($pricing['service_charge'] ?? 0) > 0): ?>
                     <div class="flex justify-between">
-                        <span class="text-gray-500">&#8505;&#65039; Service Charge (<?php echo e(rtrim(rtrim(number_format($pricing['service_charge_percent'], 2), '0'), '.')); ?>%)</span>
+                        <span class="text-gray-500">&#8505;&#65039; Service Charge</span>
                         <span>&#8377;<?php echo e(number_format($pricing['service_charge'], 2)); ?></span>
                     </div>
                     <?php endif; ?>
@@ -376,7 +421,7 @@ sanitizeCheckoutPhone();
 
 // Address Selection Logic
 const pastAddresses = <?php echo json_encode($pastAddresses ?? [], 15, 512) ?>;
-const hasErrors = <?php echo json_encode($errors->has('address') || $errors->has('city') || $errors->has('state') || $errors->has('pincode'), 15, 512) ?>;
+const hasErrors = <?php echo json_encode($errors->has('address') || $errors->has('city') || $errors->has('state') || $errors->has('pincode') || $errors->has('sector'), 15, 512) ?>;
 let selectedAddressIndex = (pastAddresses.length > 0 && !hasErrors) ? 0 : null;
 
 const addressCards = document.querySelectorAll('.address-card');
@@ -388,6 +433,27 @@ const streetInput = document.getElementById('shippingAddressInput');
 const cityInput = document.getElementById('shippingCityInput');
 const stateInput = document.getElementById('shippingStateInput');
 const pincodeInput = document.getElementById('shippingPincodeInput');
+const sectorInput = document.getElementById('shippingSectorInput');
+
+const pinToSectors = <?php echo json_encode($pinSectors, 15, 512) ?>;
+
+function populateSectors(pincode) {
+    if (!sectorInput) return;
+    sectorInput.innerHTML = '<option value="">Select Sector</option>';
+
+    if (!pincode || !pinToSectors[pincode]) {
+        sectorInput.innerHTML = '<option value="">Select PIN Code First</option>';
+        return;
+    }
+
+    const sectors = pinToSectors[pincode];
+    sectors.forEach(sector => {
+        const opt = document.createElement('option');
+        opt.value = sector;
+        opt.textContent = sector;
+        sectorInput.appendChild(opt);
+    });
+}
 
 function updateAddressSelectionUI() {
     addressCards.forEach((card, idx) => {
@@ -410,6 +476,8 @@ function updateAddressSelectionUI() {
         cityInput.value = addr.city || '';
         stateInput.value = addr.state || '';
         pincodeInput.value = addr.pincode || '';
+        populateSectors(addr.pincode || '');
+        sectorInput.value = addr.sector || '';
         
         formContainer.classList.add('hidden');
         addNewBtn?.classList.remove('hidden');
@@ -430,9 +498,11 @@ function showNewAddressForm() {
     
     // Clear inputs (except name/phone which are prefilled in contact info)
     streetInput.value = '';
-    cityInput.value = '';
-    stateInput.value = '';
+    cityInput.value = 'Noida';
+    stateInput.value = 'UP';
     pincodeInput.value = '';
+    populateSectors('');
+    sectorInput.value = '';
     
     if (formActionTitle) {
         formActionTitle.textContent = 'Add New Address';
@@ -449,9 +519,11 @@ function editAddressCard(event, index) {
     // Fill inputs with address details
     const addr = pastAddresses[index];
     streetInput.value = addr.address || '';
-    cityInput.value = addr.city || '';
-    stateInput.value = addr.state || '';
+    cityInput.value = addr.city || 'Noida';
+    stateInput.value = addr.state || 'UP';
     pincodeInput.value = addr.pincode || '';
+    populateSectors(addr.pincode || '');
+    sectorInput.value = addr.sector || '';
     
     if (formActionTitle) {
         formActionTitle.textContent = 'Edit Address';
@@ -468,15 +540,26 @@ function cancelAddressForm() {
     }
 }
 
+// Pincode change event listener for dynamic sectors and City/State population
+pincodeInput?.addEventListener('change', (e) => {
+    const pin = e.target.value;
+    populateSectors(pin);
+    cityInput.value = 'Noida';
+    stateInput.value = 'UP';
+});
+
 // Initial Call
 if (pastAddresses.length > 0) {
     updateAddressSelectionUI();
 } else {
-    // If no past addresses, load defaults from checkoutDefaults if any
+    // If no past addresses, load defaults
     streetInput.value = <?php echo json_encode(old('address', $checkoutDefaults['address'] ?? ''), 512) ?>;
-    cityInput.value = <?php echo json_encode(old('city', $checkoutDefaults['city'] ?? ''), 512) ?>;
-    stateInput.value = <?php echo json_encode(old('state', $checkoutDefaults['state'] ?? ''), 512) ?>;
-    pincodeInput.value = <?php echo json_encode(old('pincode', $checkoutDefaults['pincode'] ?? ''), 512) ?>;
+    cityInput.value = 'Noida';
+    stateInput.value = 'UP';
+    const defaultPin = <?php echo json_encode(old('pincode', $checkoutDefaults['pincode'] ?? ''), 512) ?>;
+    pincodeInput.value = defaultPin;
+    populateSectors(defaultPin);
+    sectorInput.value = <?php echo json_encode(old('sector', $checkoutDefaults['sector'] ?? ''), 512) ?>;
 }
 </script>
 <?php $__env->stopSection(); ?>

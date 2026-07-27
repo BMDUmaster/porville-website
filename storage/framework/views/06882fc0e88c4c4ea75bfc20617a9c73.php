@@ -106,7 +106,7 @@
     </div>
 </section>
 
-<section class="bg-white py-14 md:py-16">
+<section id="faq" class="bg-white py-14 md:py-16">
     <div class="mx-auto max-w-4xl px-4">
         <div class="mb-8 text-center">
             <h2 class="nunito text-3xl font-extrabold text-slate-900 md:text-4xl">FAQs</h2>
