@@ -435,13 +435,13 @@
 {{-- Shop By Type --}}
 <section class="bg-white pb-6 pt-2 md:py-7">
     <div class="mx-auto max-w-7xl px-4">
-        <div class="relative mb-6 flex items-center justify-center gap-4">
-            <div class="text-center">
+        <div class="mb-6 flex items-center justify-between gap-4">
+            <div class="text-left">
                 <h2 class="text-3xl font-extrabold text-slate-900 md:text-4xl">
                     Shop By <span class="text-blue-600">Type</span>
                 </h2>
             </div>
-            <div class="hidden items-center gap-3 md:absolute md:right-0 md:top-1/2 md:flex md:-translate-y-1/2">
+            <div class="hidden items-center gap-3 md:flex">
                 <button
                     type="button"
                     aria-label="Scroll types left"

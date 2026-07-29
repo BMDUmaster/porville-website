@@ -439,9 +439,6 @@
                 </div>
 
                 <div class="flex flex-shrink-0 items-center gap-1.5 sm:gap-2">
-                    <button type="button" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-green-200 hover:text-green-700">
-                        <i class="fa-regular fa-heart text-sm"></i>
-                    </button>
                     <div class="relative">
                         <button type="button" onclick="toggleProductShare(event)" aria-label="Share this product" aria-expanded="false" id="productShareButton" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-green-200 hover:text-green-700">
                             <i class="fa-solid fa-share-nodes text-sm"></i>
@@ -555,10 +552,6 @@
                     </div>
                 @endif
 
-                <button type="button"
-                        class="hidden h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-green-200 hover:text-green-700 sm:flex">
-                    <i class="fa-regular fa-heart"></i>
-                </button>
             </div>
 
             @include('frontend.partials.similar-products', ['wrapperClass' => 'mt-3 md:hidden'])
