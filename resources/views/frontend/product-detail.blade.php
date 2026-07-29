@@ -287,7 +287,7 @@
     ];
 @endphp
 
-<div class="mx-auto max-w-7xl px-4 py-8 md:px-6 md:py-8">
+<div class="mx-auto w-full max-w-7xl px-3 py-5 sm:px-4 md:px-6 md:py-8">
     <div class="mb-5 hidden flex-wrap items-center justify-between gap-3 text-[11px] font-semibold text-slate-400 md:flex">
         <nav class="flex items-center gap-2">
             <a href="{{ route('frontend.home') }}" class="transition hover:text-green-700">Home</a>
@@ -307,8 +307,8 @@
         </a>
     </div>
 
-    <div class="grid gap-8 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)] lg:items-start">
-        <div>
+    <div class="grid min-w-0 gap-5 md:gap-8 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)] lg:items-start">
+        <div class="min-w-0">
             <div class="overflow-hidden rounded-[28px] border border-[#dce5d9] bg-white shadow-[0_22px_60px_rgba(15,23,42,0.08)]">
                 <div class="relative aspect-[1/0.94] overflow-hidden bg-[#f4f5ef]">
                     @php
@@ -398,15 +398,15 @@
             @endif
         </div>
 
-        <div class="space-y-4">
-            <div class="flex items-start justify-between gap-4">
-                <div>
+        <div class="min-w-0 space-y-4">
+            <div class="flex min-w-0 items-start justify-between gap-3 sm:gap-4">
+                <div class="min-w-0 flex-1">
                     <div class="mb-2 flex flex-wrap items-center gap-2">
                         <span class="inline-flex rounded-md bg-[#e9f4ea] px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-[#2f8c43]">
                             Best Seller
                         </span>
                     </div>
-                    <h1 class="text-[26px] font-black leading-[1.06] tracking-[-0.02em] text-slate-900 md:text-[32px]">
+                    <h1 class="break-words text-[25px] font-black leading-[1.12] tracking-[-0.02em] text-slate-900 md:text-[32px] md:leading-[1.06]">
                         {{ $product->name }}
                     </h1>
                     <p class="mt-2 text-[12px] font-semibold tracking-[0.01em] text-slate-400">
@@ -438,7 +438,7 @@
                     @endif
                 </div>
 
-                <div class="flex flex-shrink-0 items-center gap-2">
+                <div class="flex flex-shrink-0 items-center gap-1.5 sm:gap-2">
                     <button type="button" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-green-200 hover:text-green-700">
                         <i class="fa-regular fa-heart text-sm"></i>
                     </button>
@@ -468,7 +468,7 @@
                 </div>
             </div>
 
-            <div class="rounded-[24px] border border-[#bce8c3] bg-[#f2fbf3] p-5 shadow-[0_18px_45px_rgba(47,140,67,0.08)]">
+            <div class="min-w-0 rounded-[24px] border border-[#bce8c3] bg-[#f2fbf3] p-4 shadow-[0_18px_45px_rgba(47,140,67,0.08)] sm:p-5">
                 <div class="mb-4 flex flex-wrap items-center gap-2">
                     <span class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Choose Day</span>
                     <button type="button" data-pricing-day="today" class="pricing-day-button is-active rounded-full border border-green-500 bg-white px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-green-700 shadow-sm transition hover:border-green-400">
@@ -478,8 +478,8 @@
                         Tomorrow
                     </button>
                 </div>
-                <div class="flex flex-wrap items-end gap-3">
-                    <span class="text-[40px] font-black leading-none text-slate-900 md:text-[46px]">
+                <div class="flex min-w-0 flex-wrap items-end gap-2 sm:gap-3">
+                    <span class="max-w-full break-words text-[36px] font-black leading-none text-slate-900 sm:text-[40px] md:text-[46px]">
                         Rs<span id="detailCurrentPrice">{{ number_format($defaultDisplayedPrice, 0) }}</span>
                         <span id="detailCurrentPriceUnit" class="ml-1 text-[14px] font-bold text-slate-400 md:text-[16px]">{{ $defaultVariant['price_unit_label'] ?? $formatPriceUnit($product->weight ?? null, $product->unit ?? null) }}</span>
                     </span>
@@ -527,24 +527,24 @@
                 </div>
             </div>
 
-            <div class="flex flex-wrap items-stretch gap-3">
+            <div class="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1.55fr)] gap-3 sm:flex sm:flex-wrap sm:items-stretch">
                 @if($isProductAvailable)
-                    <div class="flex items-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                        <button type="button" onclick="changeQty(-1)" class="flex h-12 w-11 items-center justify-center text-slate-500 transition hover:bg-slate-50 hover:text-slate-800">-</button>
-                        <span id="qty-display" class="flex h-12 min-w-[48px] items-center justify-center border-x border-slate-200 px-3 text-[15px] font-black text-slate-800">1</span>
-                        <button type="button" onclick="changeQty(1)" class="flex h-12 w-11 items-center justify-center text-slate-500 transition hover:bg-slate-50 hover:text-slate-800">+</button>
+                    <div class="grid min-w-0 grid-cols-3 items-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm sm:flex">
+                        <button type="button" onclick="changeQty(-1)" class="flex h-12 min-w-0 items-center justify-center text-slate-500 transition hover:bg-slate-50 hover:text-slate-800 sm:w-11">-</button>
+                        <span id="qty-display" class="flex h-12 min-w-0 items-center justify-center border-x border-slate-200 px-2 text-[15px] font-black text-slate-800 sm:min-w-[48px] sm:px-3">1</span>
+                        <button type="button" onclick="changeQty(1)" class="flex h-12 min-w-0 items-center justify-center text-slate-500 transition hover:bg-slate-50 hover:text-slate-800 sm:w-11">+</button>
                     </div>
                 @endif
 
                 @if($isProductAvailable)
                     <button type="button" onclick="addToCartWithQty({{ $product->id }})"
-                            class="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#1f9d47] px-5 py-3 text-[13px] font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_rgba(31,157,71,0.22)] transition hover:-translate-y-0.5 hover:bg-[#18823a]">
+                            class="inline-flex min-w-0 items-center justify-center gap-2 rounded-2xl bg-[#1f9d47] px-3 py-3 text-[12px] font-black uppercase tracking-[0.1em] text-white shadow-[0_14px_30px_rgba(31,157,71,0.22)] transition hover:-translate-y-0.5 hover:bg-[#18823a] sm:flex-1 sm:px-5 sm:text-[13px] sm:tracking-[0.14em]">
                         <i class="fa-solid fa-cart-shopping text-[12px]"></i>
                         Add To Cart
                     </button>
 
                     <button type="button" onclick="buyNowWithQty({{ $product->id }})"
-                            class="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#1f5ea8] px-5 py-3 text-[13px] font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_rgba(31,94,168,0.24)] transition hover:-translate-y-0.5 hover:bg-[#174c89]">
+                            class="col-span-2 inline-flex min-w-0 items-center justify-center gap-2 rounded-2xl bg-[#1f5ea8] px-5 py-3 text-[13px] font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_rgba(31,94,168,0.24)] transition hover:-translate-y-0.5 hover:bg-[#174c89] sm:flex-1">
                         <i class="fa-solid fa-bolt text-[12px]"></i>
                         Buy Now
                     </button>
@@ -565,7 +565,7 @@
 
             <div class="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
                 @foreach($productSpecs as $label => $value)
-                    <div class="grid grid-cols-[140px_minmax(0,1fr)] gap-4 border-b border-slate-100 px-4 py-3 last:border-b-0">
+                    <div class="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-3 border-b border-slate-100 px-4 py-3 last:border-b-0 sm:grid-cols-[140px_minmax(0,1fr)] sm:gap-4">
                         <div class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">{{ $label }}</div>
                         <div class="text-[13px] font-semibold text-slate-700">{{ $value }}</div>
                     </div>
