@@ -249,25 +249,25 @@ html, body { overflow-x: hidden; max-width: 100vw; }
             @endfor
         </div>
     </div>
-    <div class="w-full px-3 py-2.5 sm:px-3 md:px-4 md:py-3 flex items-center justify-between gap-2 md:gap-4">
+    <div class="w-full px-3 py-2.5 sm:px-3 md:px-4 lg:py-3 flex items-center justify-between gap-2 lg:gap-4">
         <button onclick="toggleSidebar()" aria-label="Open menu" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-gray-700 text-lg lg:hidden">
             <i class="fa-solid fa-bars"></i>
         </button>
-        <a href="{{ route('frontend.home') }}" class="flex-shrink-0 md:ml-[100px] flex items-center">
+        <a href="{{ route('frontend.home') }}" class="flex flex-shrink-0 items-center lg:ml-[100px]">
             <img src="{{ $brandLogoUrl }}"
                  alt="FarmSea"
-                 class="h-10 w-auto object-contain sm:h-12 md:h-20"
+                 class="h-10 w-auto object-contain sm:h-12 md:h-14 lg:h-20"
                  onerror="this.style.display='none'; document.getElementById('header-logo-fallback').style.display='inline-flex'">
             <span id="header-logo-fallback" class="hidden text-xl font-extrabold text-green-700">FarmSea</span>
         </a>
-        <form action="{{ route('frontend.products') }}" method="GET" class="hidden md:flex flex-grow max-w-lg mx-4 relative">
+        <form action="{{ route('frontend.products') }}" method="GET" class="relative mx-2 hidden max-w-lg flex-grow md:flex lg:mx-4">
             <input type="text" name="search" placeholder="Search Ready to Cook Items"
                    class="w-full border border-gray-200 rounded-xl px-5 py-2.5 text-sm focus:outline-none focus:border-green-500 transition">
             <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-600">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
         </form>
-        <div class="flex items-center gap-3 md:gap-4 md:pr-7">
+        <div class="flex items-center gap-3 md:gap-3 lg:gap-4 lg:pr-7">
             <!-- Account -->
             <div class="relative">
                 @auth('web_frontend')
@@ -397,7 +397,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
     </div>
 </header>
 
-<div class="pt-[135px] md:pt-[178px]">
+<div class="pt-[135px] md:pt-[154px] lg:pt-[178px]">
     <!-- Flash Messages -->
     @if(session('success'))
         <div data-auto-dismiss="3000" class="mx-4 mt-3 flex items-center gap-2 rounded-lg bg-green-100 p-3 text-sm text-green-700 transition-all duration-500">
