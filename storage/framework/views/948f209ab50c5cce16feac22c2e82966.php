@@ -69,4 +69,4 @@
            class="h-4 w-4 rounded border-gray-300 text-green-600">
     <span class="text-sm font-semibold text-slate-700">Active on home page</span>
 </label>
-<?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views\dashboard\banners\partials\form.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views/dashboard/banners/partials/form.blade.php ENDPATH**/ ?>

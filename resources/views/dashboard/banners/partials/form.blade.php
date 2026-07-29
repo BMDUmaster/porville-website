@@ -3,11 +3,19 @@
     $requiredImage = $mode === 'add';
 @endphp
 
-<div>
-    <label class="mb-1.5 block text-sm font-medium">Banner Image {{ $requiredImage ? '*' : '' }}</label>
-    <input type="file" name="image" accept="image/*" {{ $requiredImage ? 'required' : '' }}
-           class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm">
-    <p class="mt-1 text-xs text-slate-400">Recommended size: 1800 x 700 or wider landscape image.</p>
+<div class="grid gap-4 md:grid-cols-2">
+    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <label class="mb-1.5 block text-sm font-bold text-slate-800">Desktop Banner {{ $requiredImage ? '*' : '' }}</label>
+        <input type="file" name="image" accept="image/*" {{ $requiredImage ? 'required' : '' }}
+               class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm">
+        <p class="mt-2 text-xs text-slate-400">Recommended: 1800 × 700 landscape.</p>
+    </div>
+    <div class="rounded-2xl border border-purple-200 bg-purple-50/60 p-4">
+        <label class="mb-1.5 block text-sm font-bold text-purple-900">Mobile Banner Image</label>
+        <input type="file" name="mobile_image" accept="image/*"
+               class="w-full rounded-xl border border-purple-200 bg-white px-4 py-3 text-sm">
+        <p class="mt-2 text-xs text-purple-500">Recommended: 750 × 900 portrait. Optional; desktop image is fallback.</p>
+    </div>
 </div>
 
 <div class="grid gap-4 md:grid-cols-2">

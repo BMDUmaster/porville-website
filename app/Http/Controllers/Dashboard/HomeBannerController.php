@@ -35,6 +35,9 @@ class HomeBannerController extends Controller
         $data['sort_order'] = (int) ($data['sort_order'] ?? 0);
         $data['button_text'] = $data['button_text'] ?: 'Shop Now';
         $data['image'] = WebpImage::store($request->file('image'), 'home-banners');
+        if ($request->hasFile('mobile_image')) {
+            $data['mobile_image'] = WebpImage::store($request->file('mobile_image'), 'home-banners/mobile');
+        }
 
         HomeBanner::create($data);
 
@@ -51,6 +54,9 @@ class HomeBannerController extends Controller
 
         if ($request->hasFile('image')) {
             $data['image'] = WebpImage::store($request->file('image'), 'home-banners');
+        }
+        if ($request->hasFile('mobile_image')) {
+            $data['mobile_image'] = WebpImage::store($request->file('mobile_image'), 'home-banners/mobile');
         }
 
         $banner->update($data);
@@ -69,6 +75,7 @@ class HomeBannerController extends Controller
     {
         return [
             'image' => [$imageRequired ? 'required' : 'nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp,avif', 'max:5120'],
+            'mobile_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp,avif', 'max:5120'],
             'badge' => ['nullable', 'string', 'max:80'],
             'title_1' => ['required', 'string', 'max:120'],
             'title_2' => ['nullable', 'string', 'max:120'],

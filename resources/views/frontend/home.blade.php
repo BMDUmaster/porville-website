@@ -202,6 +202,7 @@
 
     $heroSlides = ($homeBanners ?? collect())->map(fn ($banner) => [
         'image' => $banner->image_url,
+        'mobile_image' => $banner->mobile_image_url,
         'badge' => $banner->badge,
         'title_1' => $banner->title_1,
         'title_2' => $banner->title_2,
@@ -219,11 +220,16 @@
     <div id="home-hero-carousel" class="home-hero-card relative h-[270px] overflow-hidden md:h-[340px]">
         @foreach($heroSlides as $index => $slide)
             <div class="home-hero-slide {{ $index === 0 ? 'active' : '' }} absolute inset-0" data-home-hero-slide="{{ $index }}">
-                <img
-                    src="{{ $slide['image'] }}"
-                    alt="{{ $slide['title_1'] }} {{ $slide['title_2'] }}"
-                    class="absolute inset-0 h-full w-full object-cover"
-                >
+                <picture>
+                    @if(!empty($slide['mobile_image']))
+                        <source media="(max-width: 767px)" srcset="{{ $slide['mobile_image'] }}">
+                    @endif
+                    <img
+                        src="{{ $slide['image'] }}"
+                        alt="{{ $slide['title_1'] }} {{ $slide['title_2'] }}"
+                        class="absolute inset-0 h-full w-full object-cover"
+                    >
+                </picture>
                 <div class="absolute inset-0 bg-black/45"></div>
                 <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-black/10"></div>
 
@@ -279,23 +285,6 @@
         </div>
     </div>
 </section>
-
-{{-- Trust Bar --}}
-<div class="border-b border-gray-100 bg-white py-4">
-    <div class="mx-auto grid max-w-6xl grid-cols-2 gap-x-3 gap-y-3 px-3 sm:px-4 md:grid-cols-4 md:gap-4">
-        @foreach([['fa-leaf','100% Natural','No hormones or chemicals'],['fa-snowflake','Cold Chain Delivery','Fresh at every step'],['fa-bolt','Same Day Delivery','Order before 10 AM'],['fa-shield-halved','FSSAI Certified','Quality you can trust']] as [$icon,$title,$sub])
-            <div class="flex items-center gap-3">
-                <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-green-600 text-xs text-white sm:h-10 sm:w-10 sm:text-sm">
-                    <i class="fa-solid {{ $icon }}"></i>
-                </div>
-                <div>
-                    <p class="text-xs font-bold text-gray-800">{{ $title }}</p>
-                    <p class="text-[10px] text-gray-500">{{ $sub }}</p>
-                </div>
-            </div>
-        @endforeach
-    </div>
-</div>
 
 {{-- Shop By Category --}}
 <section class="bg-white pb-2 pt-5 md:py-6">

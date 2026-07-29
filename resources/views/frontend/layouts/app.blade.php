@@ -228,8 +228,8 @@ html, body { overflow-x: hidden; max-width: 100vw; }
 
 <!-- Header -->
 <header class="fixed inset-x-0 top-0 z-[9997] bg-white shadow-sm">
-    <div class="hidden h-8 overflow-hidden bg-blue-900 text-white md:flex md:items-center">
-        <div class="announcement-track items-center whitespace-nowrap text-[11px] font-bold">
+    <div class="flex h-8 items-center overflow-hidden bg-blue-900 text-white">
+        <div class="announcement-track items-center whitespace-nowrap text-[10px] font-bold sm:text-[11px]">
             @for($copy = 0; $copy < 2; $copy++)
                 <div class="flex items-center gap-10 pr-10">
                     <span><i class="fa-solid fa-leaf mr-2 text-green-300"></i>Farm Fresh. Ocean Fresh. Delivered to Your Door.</span>
@@ -397,7 +397,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
     </div>
 </header>
 
-<div class="pt-[103px] md:pt-[178px]">
+<div class="pt-[135px] md:pt-[178px]">
     <!-- Flash Messages -->
     @if(session('success'))
         <div data-auto-dismiss="3000" class="mx-4 mt-3 flex items-center gap-2 rounded-lg bg-green-100 p-3 text-sm text-green-700 transition-all duration-500">

@@ -34,8 +34,18 @@
                     <tr class="transition hover:bg-gray-50">
                         <td class="px-4 py-3 text-sm text-gray-500">{{ $banners->firstItem() + $index }}</td>
                         <td class="px-4 py-3">
-                            <img src="{{ $banner->image_url }}" alt="{{ $banner->title_1 }}"
-                                 class="h-20 w-36 rounded-lg object-cover">
+                            <div class="flex items-end gap-2">
+                                <div>
+                                    <p class="mb-1 text-[9px] font-bold uppercase text-slate-400">Desktop</p>
+                                    <img src="{{ $banner->image_url }}" alt="{{ $banner->title_1 }} desktop banner" class="h-20 w-36 rounded-lg object-cover">
+                                </div>
+                                @if($banner->mobile_image_url)
+                                    <div>
+                                        <p class="mb-1 text-[9px] font-bold uppercase text-purple-500">Mobile</p>
+                                        <img src="{{ $banner->mobile_image_url }}" alt="{{ $banner->title_1 }} mobile banner" class="h-20 w-14 rounded-lg border border-purple-200 object-cover">
+                                    </div>
+                                @endif
+                            </div>
                         </td>
                         <td class="px-4 py-3">
                             <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-green-600">{{ $banner->badge ?: 'No badge' }}</p>

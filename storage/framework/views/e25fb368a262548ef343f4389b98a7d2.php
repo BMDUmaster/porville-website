@@ -1,27 +1,26 @@
-@extends('layouts.dashboard')
-@section('title', 'Categories')
-@section('page_title', 'Category Management')
+<?php $__env->startSection('title', 'Categories'); ?>
+<?php $__env->startSection('page_title', 'Category Management'); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="p-4 sm:p-6">
 
-    {{-- Toolbar --}}
+    
    
 
-    {{-- Table --}}
+    
     <div class="bg-white rounded-xl border overflow-x-auto">
-@extends('layouts.dashboard')
-@section('title', 'Categories')
-@section('page_title', 'Category Management')
 
-@section('content')
+<?php $__env->startSection('title', 'Categories'); ?>
+<?php $__env->startSection('page_title', 'Category Management'); ?>
+
+<?php $__env->startSection('content'); ?>
 <div class="p-4 sm:p-6">
 
-    {{-- Toolbar --}}
+    
     <div class="bg-white rounded-xl border p-4 mb-4 flex flex-col md:flex-row gap-3 items-center">
         <form method="GET" class="flex-1 relative w-full">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search categories..."
+            <input type="text" name="search" value="<?php echo e(request('search')); ?>" placeholder="Search categories..."
                    class="w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm outline-none focus:border-blue-400">
         </form>
         <button onclick="openModal('addModal')"
@@ -30,7 +29,7 @@
         </button>
     </div>
 
-    {{-- Table --}}
+    
     <div class="bg-white rounded-xl border overflow-x-auto">
         <table class="w-full text-left min-w-[700px]">
             <thead style="background: linear-gradient(to right, #7e22ce, #4f46e5); color: white;">
@@ -45,40 +44,40 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-                @forelse($categories as $i => $cat)
+                <?php $__empty_1 = true; $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <tr class="hover:bg-gray-50 transition">
-                    <td class="px-4 py-3 text-sm text-gray-500">{{ $categories->firstItem() + $i }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-500"><?php echo e($categories->firstItem() + $i); ?></td>
                     <td class="px-4 py-3">
-                        @if($cat->image)
-                            <img src="{{ asset('storage/'.$cat->image) }}" class="w-12 h-12 rounded-lg object-cover">
-                        @else
+                        <?php if($cat->image): ?>
+                            <img src="<?php echo e(asset('storage/'.$cat->image)); ?>" class="w-12 h-12 rounded-lg object-cover">
+                        <?php else: ?>
                             <div class="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
                                 <i class="fa-regular fa-image"></i>
                             </div>
-                        @endif
+                        <?php endif; ?>
                     </td>
                     <td class="px-4 py-3">
-                        <p class="font-semibold text-sm text-gray-800">{{ $cat->name }}</p>
-                        <p class="text-xs text-gray-400 truncate max-w-[200px]">{{ $cat->description ?? 'No description' }}</p>
+                        <p class="font-semibold text-sm text-gray-800"><?php echo e($cat->name); ?></p>
+                        <p class="text-xs text-gray-400 truncate max-w-[200px]"><?php echo e($cat->description ?? 'No description'); ?></p>
                     </td>
-                    <td class="px-4 py-3 text-sm text-gray-600">{{ $cat->children->count() }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-500">{{ $cat->created_at->format('d M Y') }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600"><?php echo e($cat->children->count()); ?></td>
+                    <td class="px-4 py-3 text-sm text-gray-500"><?php echo e($cat->created_at->format('d M Y')); ?></td>
                     <td class="px-4 py-3 text-sm">
-                        @if($cat->is_active)
+                        <?php if($cat->is_active): ?>
                             <span class="bg-green-100 text-green-800 text-[11px] font-semibold px-2.5 py-1 rounded-full">Active</span>
-                        @else
+                        <?php else: ?>
                             <span class="bg-red-100 text-red-800 text-[11px] font-semibold px-2.5 py-1 rounded-full">Inactive</span>
-                        @endif
+                        <?php endif; ?>
                     </td>
                     <td class="px-4 py-3 text-center">
                         <div class="flex justify-center gap-2">
-                            <button onclick="openEditModal({{ $cat->id }}, '{{ addslashes($cat->name) }}', '{{ addslashes($cat->description ?? '') }}', {{ $cat->is_active ? 1 : 0 }})"
+                            <button onclick="openEditModal(<?php echo e($cat->id); ?>, '<?php echo e(addslashes($cat->name)); ?>', '<?php echo e(addslashes($cat->description ?? '')); ?>', <?php echo e($cat->is_active ? 1 : 0); ?>)"
                                     class="p-2 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs">
                                 <i class="fa-regular fa-pen-to-square"></i>
                             </button>
-                            <form method="POST" action="{{ route('dashboard.categories.destroy', $cat) }}"
+                            <form method="POST" action="<?php echo e(route('dashboard.categories.destroy', $cat)); ?>"
                                   onsubmit="return confirm('Delete this category?')">
-                                @csrf @method('DELETE')
+                                <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
                                 <button type="submit" class="p-2 hover:bg-red-100 text-red-500 rounded-lg text-xs">
                                     <i class="fa-regular fa-trash-can"></i>
                                 </button>
@@ -86,25 +85,25 @@
                         </div>
                     </td>
                 </tr>
-                @empty
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <tr><td colspan="7" class="px-4 py-8 text-center text-gray-400">No categories found.</td></tr>
-                @endforelse
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
 
-    <div class="mt-4">{{ $categories->withQueryString()->links() }}</div>
+    <div class="mt-4"><?php echo e($categories->withQueryString()->links()); ?></div>
 </div>
 
-{{-- Add Modal --}}
+
 <div id="addModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
     <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl">
         <div class="px-7 py-5 border-b flex justify-between items-center">
             <h2 class="text-xl font-semibold">Add Category</h2>
             <button onclick="closeModal('addModal')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
         </div>
-        <form method="POST" action="{{ route('dashboard.categories.store') }}" enctype="multipart/form-data" class="px-7 py-6 space-y-5">
-            @csrf
+        <form method="POST" action="<?php echo e(route('dashboard.categories.store')); ?>" enctype="multipart/form-data" class="px-7 py-6 space-y-5">
+            <?php echo csrf_field(); ?>
             <div>
                 <label class="block text-sm font-medium mb-1.5">Category Image</label>
                 <input type="file" name="image" accept="image/*"
@@ -135,7 +134,7 @@
     </div>
 </div>
 
-{{-- Edit Modal --}}
+
 <div id="editModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
     <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl">
         <div class="px-7 py-5 border-b flex justify-between items-center">
@@ -143,7 +142,7 @@
             <button onclick="closeModal('editModal')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
         </div>
         <form id="editForm" method="POST" enctype="multipart/form-data" class="px-7 py-6 space-y-5">
-            @csrf @method('PUT')
+            <?php echo csrf_field(); ?> <?php echo method_field('PUT'); ?>
             <div>
                 <label class="block text-sm font-medium mb-1.5">Update Image</label>
                 <input type="file" name="image" accept="image/*"
@@ -173,11 +172,11 @@
         </form>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
 <script>
-const categoryUpdateUrlTemplate = @json(route('dashboard.categories.update', ['category' => '__ID__']));
+const categoryUpdateUrlTemplate = <?php echo json_encode(route('dashboard.categories.update', ['category' => '__ID__']), 512) ?>;
 
 function openModal(id) {
     document.getElementById(id).classList.remove('hidden');
@@ -195,4 +194,7 @@ function openEditModal(id, name, desc, isActive) {
     openModal('editModal');
 }
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.dashboard', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+<?php echo $__env->make('layouts.dashboard', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views/dashboard/categories/index.blade.php ENDPATH**/ ?>

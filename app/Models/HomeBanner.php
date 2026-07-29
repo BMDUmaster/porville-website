@@ -11,6 +11,7 @@ class HomeBanner extends Model
 
     protected $fillable = [
         'image',
+        'mobile_image',
         'badge',
         'title_1',
         'title_2',
@@ -36,5 +37,18 @@ class HomeBanner extends Model
         // is not the document root, ASSET_URL supplies the required /public
         // segment while APP_URL remains the clean application URL.
         return asset('storage/' . ltrim($this->image, '/'));
+    }
+
+    public function getMobileImageUrlAttribute(): ?string
+    {
+        if (! $this->mobile_image) {
+            return null;
+        }
+
+        if (str_starts_with($this->mobile_image, 'http://') || str_starts_with($this->mobile_image, 'https://')) {
+            return $this->mobile_image;
+        }
+
+        return asset('storage/' . ltrim($this->mobile_image, '/'));
     }
 }
