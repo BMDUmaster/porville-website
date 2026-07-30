@@ -1,7 +1,7 @@
-@extends('frontend.layouts.app')
-@section('title', 'Shipping Policy')
 
-@section('styles')
+<?php $__env->startSection('title', 'Shipping Policy'); ?>
+
+<?php $__env->startSection('styles'); ?>
 <style>
     html {
         scroll-behavior: smooth;
@@ -9,6 +9,8 @@
 
     :root {
         --policy-nav-offset: 150px;
+        --policy-desktop-left: 0px;
+        --policy-desktop-width: 250px;
     }
 
     .policy-anchor {
@@ -46,18 +48,12 @@
     }
 
     .policy-desktop-nav {
-        max-height: calc(100vh - var(--policy-nav-offset) - 36px);
+        position: fixed;
+        top: calc(var(--policy-nav-offset) + 140px);
+        left: calc(var(--policy-desktop-left) + 12px);
+        width: var(--policy-desktop-width);
+        max-height: calc(100vh - var(--policy-nav-offset) - 158px);
         overflow-y: auto;
-    }
-
-    @media (min-width: 1024px) {
-        .policy-desktop-wrapper {
-            position: -webkit-sticky;
-            position: sticky;
-            top: calc(var(--policy-nav-offset) + 18px);
-            align-self: start;
-            z-index: 20;
-        }
     }
 
     .policy-mobile-nav,
@@ -66,10 +62,10 @@
         scrollbar-width: none;
     }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
-@php
+<?php $__env->startSection('content'); ?>
+<?php
     $effectiveDate = 'April 24, 2026';
 
     $sections = [
@@ -212,13 +208,13 @@
         'warn' => 'border-amber-100 bg-amber-50 text-amber-900',
         'danger' => 'border-rose-100 bg-rose-50 text-rose-900',
     ];
-@endphp
+?>
 
-<section id="top" class="relative bg-[linear-gradient(180deg,#eef4ff_0%,#f9fbff_42%,#ffffff_100%)]">
+<section id="top" class="relative overflow-x-hidden bg-[linear-gradient(180deg,#eef4ff_0%,#f9fbff_42%,#ffffff_100%)]">
     <div class="absolute inset-x-0 top-0 h-56 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_52%),radial-gradient(circle_at_top_right,rgba(34,197,94,0.12),transparent_44%)]"></div>
 
     <div class="relative mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-14">
-        <div class="rounded-[28px] border border-blue-100 bg-white/90 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] md:p-8 lg:p-10">
+        <div class="rounded-[28px] border border-blue-100 bg-white/90 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur md:p-8 lg:p-10">
             <div class="flex flex-col gap-6 border-b border-slate-100 pb-8 lg:flex-row lg:items-end lg:justify-between">
                 <div class="max-w-2xl">
                     <span class="inline-flex rounded-full bg-blue-600 px-4 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.2em] text-white shadow-sm">
@@ -236,7 +232,7 @@
                 <div class="grid gap-3 sm:grid-cols-3 lg:min-w-[360px]">
                     <div class="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-4">
                         <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Effective Date</p>
-                        <p class="mt-2 text-sm font-extrabold text-slate-900">{{ $effectiveDate }}</p>
+                        <p class="mt-2 text-sm font-extrabold text-slate-900"><?php echo e($effectiveDate); ?></p>
                     </div>
                     <div class="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-4">
                         <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Support Email</p>
@@ -244,7 +240,7 @@
                     </div>
                     <div class="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-4">
                         <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Quick Help</p>
-                        <a href="{{ route('frontend.track') }}" class="mt-2 inline-flex text-sm font-extrabold text-blue-700 transition hover:text-blue-900">
+                        <a href="<?php echo e(route('frontend.track')); ?>" class="mt-2 inline-flex text-sm font-extrabold text-blue-700 transition hover:text-blue-900">
                             Track Your Order
                         </a>
                     </div>
@@ -253,55 +249,59 @@
 
             <div class="mt-6 h-[70px] lg:hidden"></div>
             <div class="policy-mobile-nav z-30 flex gap-2 overflow-x-auto rounded-[22px] border border-slate-100 bg-white/95 p-2 shadow-[0_16px_32px_rgba(15,23,42,0.08)] backdrop-blur lg:hidden">
-                @foreach($sections as $section)
+                <?php $__currentLoopData = $sections; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $section): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <a
-                        href="#{{ $section['id'] }}"
-                        data-policy-mobile-link="{{ $section['id'] }}"
+                        href="#<?php echo e($section['id']); ?>"
+                        data-policy-mobile-link="<?php echo e($section['id']); ?>"
                         class="policy-mobile-link whitespace-nowrap rounded-full border border-slate-200 bg-white px-4 py-2 text-[11px] font-extrabold uppercase tracking-[0.14em] text-slate-700 shadow-sm transition"
                     >
-                        {{ $section['title'] }}
+                        <?php echo e($section['title']); ?>
+
                     </a>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
 
             <div class="mt-8 grid gap-8 lg:grid-cols-[250px_minmax(0,1fr)]">
-                <aside class="policy-desktop-wrapper hidden lg:block" data-policy-desktop-wrapper>
+                <aside class="hidden lg:block" data-policy-desktop-wrapper>
                     <div class="policy-desktop-nav rounded-[24px] border border-slate-100 bg-[#f8fbff] p-4 shadow-[0_14px_40px_rgba(15,23,42,0.06)]">
                         <p class="px-2 text-[11px] font-extrabold uppercase tracking-[0.26em] text-slate-400">On This Page</p>
                         <div class="mt-4 space-y-2">
-                            @foreach($sections as $section)
+                            <?php $__currentLoopData = $sections; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $section): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <a
-                                    href="#{{ $section['id'] }}"
-                                    data-policy-link="{{ $section['id'] }}"
+                                    href="#<?php echo e($section['id']); ?>"
+                                    data-policy-link="<?php echo e($section['id']); ?>"
                                     class="policy-side-link flex rounded-2xl border border-transparent px-3 py-3 text-[13px] font-bold text-slate-700 hover:border-blue-100 hover:bg-white hover:text-blue-700"
                                 >
-                                    {{ $section['title'] }}
+                                    <?php echo e($section['title']); ?>
+
                                 </a>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                     </div>
                 </aside>
 
                 <div class="space-y-5">
-                    @foreach($sections as $index => $section)
+                    <?php $__currentLoopData = $sections; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $section): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <section
-                            id="{{ $section['id'] }}"
-                            data-policy-section="{{ $section['id'] }}"
+                            id="<?php echo e($section['id']); ?>"
+                            data-policy-section="<?php echo e($section['id']); ?>"
                             class="policy-anchor rounded-[26px] border border-slate-100 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.05)] md:p-7"
                         >
                             <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                                 <div class="max-w-2xl">
                                     <div class="flex items-center gap-3">
                                         <span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-sm font-extrabold text-blue-700">
-                                            {{ str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT) }}
+                                            <?php echo e(str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT)); ?>
+
                                         </span>
                                         <div>
                                             <p class="text-[11px] font-extrabold uppercase tracking-[0.24em] text-slate-400">Shipping Section</p>
-                                            <h2 class="mt-1 text-2xl font-extrabold text-slate-950 md:text-[30px]">{{ $section['title'] }}</h2>
+                                            <h2 class="mt-1 text-2xl font-extrabold text-slate-950 md:text-[30px]"><?php echo e($section['title']); ?></h2>
                                         </div>
                                     </div>
                                     <p class="mt-5 text-[15px] leading-7 text-slate-600">
-                                        {{ $section['summary'] }}
+                                        <?php echo e($section['summary']); ?>
+
                                     </p>
                                 </div>
 
@@ -315,31 +315,32 @@
                             </div>
 
                             <div class="mt-6 grid gap-3">
-                                @foreach($section['points'] as $point)
+                                <?php $__currentLoopData = $section['points']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $point): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <div class="flex gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-4">
                                         <span class="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-white text-[11px] text-green-700 shadow-sm">
                                             <i class="fa-solid fa-check"></i>
                                         </span>
-                                        <p class="text-[14px] leading-6 text-slate-700">{{ $point }}</p>
+                                        <p class="text-[14px] leading-6 text-slate-700"><?php echo e($point); ?></p>
                                     </div>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
 
-                            <div class="mt-5 rounded-2xl border px-4 py-4 {{ $noteStyles[$section['note']['type']] }}">
+                            <div class="mt-5 rounded-2xl border px-4 py-4 <?php echo e($noteStyles[$section['note']['type']]); ?>">
                                 <p class="text-[13px] font-semibold leading-6">
-                                    {{ $section['note']['text'] }}
+                                    <?php echo e($section['note']['text']); ?>
+
                                 </p>
                             </div>
                         </section>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </div>
         </div>
     </div>
 </section>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const header = document.querySelector('header');
@@ -392,9 +393,7 @@
                 event.preventDefault();
                 setActive(id);
                 scrollToSection(id);
-                if (link.dataset.policyMobileLink) {
-                    link.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-                }
+                link.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
             });
         });
 
@@ -420,4 +419,6 @@
         setActive(sections[0].dataset.policySection);
     });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('frontend.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views/frontend/pages/shipping-policy.blade.php ENDPATH**/ ?>

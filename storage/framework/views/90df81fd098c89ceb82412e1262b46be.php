@@ -1,7 +1,6 @@
-@extends('frontend.layouts.app')
-@section('title', 'Privacy Policy')
+<?php $__env->startSection('title', 'Privacy Policy'); ?>
 
-@section('styles')
+<?php $__env->startSection('styles'); ?>
 <style>
     html { scroll-behavior: smooth; }
     .privacy-anchor { scroll-margin-top: 205px; }
@@ -18,10 +17,10 @@
         }
     }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
-@php
+<?php $__env->startSection('content'); ?>
+<?php
     $effectiveDate = 'July 30, 2026';
     $sections = [
         ['id' => 'information', 'icon' => 'fa-database', 'title' => 'Information We Collect'],
@@ -34,7 +33,7 @@
         ['id' => 'children', 'icon' => 'fa-child-reaching', 'title' => "Children's Privacy"],
         ['id' => 'updates', 'icon' => 'fa-rotate', 'title' => 'Policy Updates & Contact'],
     ];
-@endphp
+?>
 
 <section id="privacy-top" class="relative bg-[linear-gradient(180deg,#eff6ff_0%,#f8fafc_40%,#ffffff_100%)]">
     <div class="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-[radial-gradient(circle_at_12%_10%,rgba(37,99,235,0.15),transparent_34%),radial-gradient(circle_at_88%_18%,rgba(34,197,94,0.14),transparent_32%)]"></div>
@@ -59,7 +58,7 @@
                     <div class="grid gap-3 sm:grid-cols-2 lg:min-w-[390px]">
                         <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
                             <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Effective date</p>
-                            <p class="mt-2 text-sm font-extrabold text-slate-900">{{ $effectiveDate }}</p>
+                            <p class="mt-2 text-sm font-extrabold text-slate-900"><?php echo e($effectiveDate); ?></p>
                         </div>
                         <div class="rounded-2xl border border-green-100 bg-green-50 p-4">
                             <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-green-600">Privacy support</p>
@@ -74,12 +73,13 @@
                     <div class="rounded-[24px] border border-slate-100 bg-slate-50 p-4 shadow-[0_12px_30px_rgba(15,23,42,0.05)]">
                         <p class="px-2 text-[10px] font-extrabold uppercase tracking-[0.24em] text-slate-400">On this page</p>
                         <nav class="mt-3 grid grid-cols-1 gap-1 sm:grid-cols-2 lg:grid-cols-1">
-                            @foreach($sections as $section)
-                                <a href="#{{ $section['id'] }}" class="privacy-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-[12px] font-bold text-slate-600 hover:bg-white hover:text-blue-700">
-                                    <i class="fa-solid {{ $section['icon'] }} w-4 text-center text-blue-500"></i>
-                                    {{ $section['title'] }}
+                            <?php $__currentLoopData = $sections; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $section): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <a href="#<?php echo e($section['id']); ?>" class="privacy-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-[12px] font-bold text-slate-600 hover:bg-white hover:text-blue-700">
+                                    <i class="fa-solid <?php echo e($section['icon']); ?> w-4 text-center text-blue-500"></i>
+                                    <?php echo e($section['title']); ?>
+
                                 </a>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </nav>
                     </div>
                 </aside>
@@ -93,17 +93,17 @@
                         <h2 class="text-2xl font-extrabold text-slate-950">1. Information We Collect</h2>
                         <p class="mt-4">We collect only the information reasonably required to provide and improve FarmSea services. Depending on how you use the platform, this may include:</p>
                         <div class="mt-5 grid gap-3 md:grid-cols-2">
-                            @foreach([
+                            <?php $__currentLoopData = [
                                 ['Account details', 'Your name, mobile number, email address, login credentials, and saved profile details.'],
                                 ['Order & delivery details', 'Products ordered, delivery address, pin code, sector, delivery slot, recipient details, order history, coupons, and special instructions.'],
                                 ['Support & feedback', 'Messages, reviews, enquiries, complaint details, photographs you submit, and records needed to resolve your request.'],
                                 ['Technical information', 'IP address, browser and device type, pages visited, access time, referral source, session activity, and diagnostic logs.'],
-                            ] as [$label, $text])
+                            ]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as [$label, $text]): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <div class="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                                    <h3 class="font-extrabold text-slate-900">{{ $label }}</h3>
-                                    <p class="mt-1 text-[13px] leading-6">{{ $text }}</p>
+                                    <h3 class="font-extrabold text-slate-900"><?php echo e($label); ?></h3>
+                                    <p class="mt-1 text-[13px] leading-6"><?php echo e($text); ?></p>
                                 </div>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                         <p class="mt-5">If you order for another person, you are responsible for ensuring that they agree to FarmSea using their contact and address details for order fulfilment.</p>
                     </article>
@@ -112,9 +112,9 @@
                         <h2 class="text-2xl font-extrabold text-slate-950">2. How We Use Information</h2>
                         <p class="mt-4">We use information to operate FarmSea and serve you, including to:</p>
                         <ul class="mt-4 grid gap-3 md:grid-cols-2">
-                            @foreach(['Create and manage your account.', 'Confirm, prepare, deliver, track, cancel, or refund orders.', 'Verify delivery availability, addresses, and payment status.', 'Send service messages, invoices, order updates, and support responses.', 'Apply coupons, prevent misuse, and detect suspicious activity.', 'Improve product selection, website performance, safety, and customer experience.', 'Show relevant products or offers where permitted.', 'Meet tax, accounting, fraud-prevention, and other legal obligations.'] as $point)
-                                <li class="flex gap-3 rounded-xl bg-blue-50/60 px-4 py-3 text-[13px] text-slate-700"><i class="fa-solid fa-check mt-1 text-green-600"></i><span>{{ $point }}</span></li>
-                            @endforeach
+                            <?php $__currentLoopData = ['Create and manage your account.', 'Confirm, prepare, deliver, track, cancel, or refund orders.', 'Verify delivery availability, addresses, and payment status.', 'Send service messages, invoices, order updates, and support responses.', 'Apply coupons, prevent misuse, and detect suspicious activity.', 'Improve product selection, website performance, safety, and customer experience.', 'Show relevant products or offers where permitted.', 'Meet tax, accounting, fraud-prevention, and other legal obligations.']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $point): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <li class="flex gap-3 rounded-xl bg-blue-50/60 px-4 py-3 text-[13px] text-slate-700"><i class="fa-solid fa-check mt-1 text-green-600"></i><span><?php echo e($point); ?></span></li>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </ul>
                     </article>
 
@@ -171,4 +171,6 @@
         </div>
     </div>
 </section>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('frontend.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views/frontend/pages/privacy-policy.blade.php ENDPATH**/ ?>

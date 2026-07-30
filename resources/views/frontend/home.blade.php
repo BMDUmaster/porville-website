@@ -238,7 +238,7 @@
                         <span class="mb-4 inline-flex w-fit rounded-md bg-blue-600 px-4 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.16em] text-white shadow-lg">
                             {{ $slide['badge'] }}
                         </span>
-                        <h1 class="max-w-[390px] text-[28px] font-extrabold leading-[1.02] text-white md:text-[44px]">
+                        <h1 class="max-w-[390px] text-[24px] font-extrabold leading-[1.08] text-white md:text-[36px]">
                             {{ $slide['title_1'] }}
                             <span class="block text-green-400">{{ $slide['title_2'] }}</span>
                         </h1>
@@ -486,7 +486,7 @@
                     )
                 )
                 ->unique('id')
-                ->take(4)
+                ->take(6)
                 ->values();
             $typeShowcaseCategories = $categories->take(5)->values();
             $typeShowcaseLeadCategory = $typeShowcaseCategories->first();
@@ -576,28 +576,28 @@
         </div>
 
         @if($typeShowcaseLead)
-            <div class="mt-8 grid gap-4 lg:grid-cols-[1.12fr_0.96fr] lg:gap-5">
-                <article class="type-showcase-card overflow-hidden rounded-[26px] border border-[#d8ead5] bg-[#f7fbf5]">
-                    <div class="flex h-full flex-col">
-                        <div class="p-5 pb-4 md:p-6 md:pb-5">
+            <div class="mt-8 grid gap-4 lg:grid-cols-[0.82fr_1.18fr] lg:gap-5">
+                <article class="type-showcase-card self-start overflow-hidden rounded-[22px] border border-[#d8ead5] bg-[#f7fbf5]">
+                    <div class="flex flex-col">
+                        <div class="p-4 pb-3 md:min-h-[175px] md:p-5 md:pb-4">
                             <span class="inline-flex rounded-full bg-green-700 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
                                 Chef's Selection
                             </span>
-                            <h3 class="mt-4 max-w-[340px] text-[28px] font-extrabold leading-[1.08] text-slate-900 md:text-[38px]">
+                            <h3 class="mt-3 max-w-[320px] text-[23px] font-extrabold leading-[1.1] text-slate-900 md:text-[30px]">
                                 {{ $typeShowcaseLead->name }}
                             </h3>
-                            <p class="mt-3 max-w-[360px] text-[13px] leading-6 text-slate-500">
+                            <p class="mt-2 max-w-[340px] text-[12px] leading-5 text-slate-500">
                                 {{ \Illuminate\Support\Str::limit($typeShowcaseLead->description ?: 'Raised and packed fresh for everyday home cooking.', 110) }}
                             </p>
-                            <div class="mt-5 flex items-end justify-between gap-4">
+                            <div class="mt-4 flex items-end justify-between gap-4">
                                 <div>
-                                    <p class="text-[20px] font-black text-slate-950">Rs{{ number_format($typeShowcaseLead->display_price, 0) }}<span class="ml-1 text-xs font-semibold text-slate-400">{{ $typeShowcaseLead->display_pack_label }}</span></p>
+                                    <p class="text-[18px] font-black text-slate-950">Rs{{ number_format($typeShowcaseLead->display_price, 0) }}<span class="ml-1 text-[11px] font-semibold text-slate-400">{{ $typeShowcaseLead->display_pack_label }}</span></p>
                                     @if($typeShowcaseLead->display_mrp && $typeShowcaseLead->display_mrp > $typeShowcaseLead->display_price)
                                         <p class="text-xs text-slate-400 line-through">Rs{{ number_format($typeShowcaseLead->display_mrp, 0) }}</p>
                                     @endif
                                 </div>
                                 @if($typeShowcaseLead->is_active)
-                                    <button onclick="addToCart({{ $typeShowcaseLead->id }})" class="inline-flex items-center gap-2 rounded-xl bg-green-700 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-green-800">
+                                    <button onclick="addToCart({{ $typeShowcaseLead->id }})" class="inline-flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-green-800">
                                         <i class="fa-solid fa-cart-plus text-[11px]"></i>
                                         Add
                                     </button>
@@ -609,7 +609,7 @@
                             </div>
                         </div>
 
-                        <a href="{{ route('frontend.product.show', $typeShowcaseLead->slug) }}" class="relative mt-auto block overflow-hidden">
+                        <a href="{{ route('frontend.product.show', $typeShowcaseLead->slug) }}" class="relative block overflow-hidden">
                             @if(in_array($typeShowcaseLead->id, $newArrivalProductIds ?? [], true))
                                 <span class="absolute left-5 top-5 z-10 inline-flex rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
                                     New Arrival
@@ -619,10 +619,10 @@
                                 <img
                                     src="{{ asset('storage/' . $typeShowcaseLead->images[0]) }}"
                                     alt="{{ $typeShowcaseLead->name }}"
-                                    class="type-showcase-image h-[320px] w-full object-cover object-center md:h-[390px]"
+                                    class="type-showcase-image h-[240px] w-full object-cover object-center md:h-[285px]"
                                 >
                             @else
-                                <div class="flex h-[320px] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-6xl text-slate-400 md:h-[390px]">
+                                <div class="flex h-[240px] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-5xl text-slate-400 md:h-[285px]">
                                     <i class="fa-solid fa-drumstick-bite"></i>
                                 </div>
                             @endif
@@ -630,10 +630,10 @@
                     </div>
                 </article>
 
-                <div class="grid gap-4 sm:grid-cols-2">
+                <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:self-start">
                     @foreach($typeShowcaseGrid as $product)
-                        <article class="type-showcase-card group overflow-hidden rounded-[22px] border border-slate-200 bg-white p-3 shadow-[0_10px_30px_rgba(15,23,43,0.05)]">
-                            <a href="{{ route('frontend.product.show', $product->slug) }}" class="relative block overflow-hidden rounded-[16px]">
+                        <article class="type-showcase-card group overflow-hidden rounded-[19px] border border-slate-200 bg-white p-3 shadow-[0_10px_30px_rgba(15,23,43,0.05)]">
+                            <a href="{{ route('frontend.product.show', $product->slug) }}" class="relative block overflow-hidden rounded-[13px]">
                                 @if(in_array($product->id, $newArrivalProductIds ?? [], true))
                                     <span class="absolute left-3 top-3 z-10 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
                                         New Arrival
@@ -643,24 +643,24 @@
                                     <img
                                         src="{{ asset('storage/' . $product->images[0]) }}"
                                         alt="{{ $product->name }}"
-                                        class="type-showcase-image aspect-[1.05] w-full object-cover"
+                                        class="type-showcase-image aspect-[1.12] w-full object-cover"
                                     >
                                 @else
-                                    <div class="flex aspect-[1.05] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-5xl text-slate-400">
+                                    <div class="flex aspect-[1.12] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-4xl text-slate-400">
                                         <i class="fa-solid fa-fish-fins"></i>
                                     </div>
                                 @endif
                             </a>
 
-                            <div class="pt-3">
-                                <a href="{{ route('frontend.product.show', $product->slug) }}" class="block text-[14px] font-extrabold leading-[1.3] text-slate-900 transition hover:text-green-700">
+                            <div class="pt-2.5">
+                                <a href="{{ route('frontend.product.show', $product->slug) }}" class="block text-[12px] font-extrabold leading-[1.3] text-slate-900 transition hover:text-green-700">
                                     {{ $product->name }}
                                 </a>
-                                <div class="mt-3 flex items-end justify-between gap-3">
-                                    <p class="text-[17px] font-black text-slate-950">Rs{{ number_format($product->display_price, 0) }}<span class="ml-1 text-[11px] font-semibold text-slate-400">{{ $product->display_pack_label }}</span></p>
+                                <div class="mt-2.5 flex items-end justify-between gap-2">
+                                    <p class="text-[14px] font-black text-slate-950">Rs{{ number_format($product->display_price, 0) }}<span class="ml-1 text-[9px] font-semibold text-slate-400">{{ $product->display_pack_label }}</span></p>
                                     @if($product->is_active)
-                                        <button onclick="addToCart({{ $product->id }})" class="inline-flex min-h-[42px] flex-shrink-0 items-center justify-center gap-2.5 rounded-xl border border-[#dbe8d7] bg-[#f8fbf6] px-4 py-2 text-[12px] font-extrabold uppercase tracking-[0.12em] text-green-700 transition duration-300 hover:border-green-300 hover:bg-green-50 group-hover:-translate-y-0.5 group-hover:shadow-sm">
-                                            <i class="fa-solid fa-cart-plus text-[20px] leading-none" aria-hidden="true"></i>
+                                        <button onclick="addToCart({{ $product->id }})" class="inline-flex min-h-[34px] flex-shrink-0 items-center justify-center gap-1.5 rounded-lg border border-[#dbe8d7] bg-[#f8fbf6] px-2.5 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.1em] text-green-700 transition duration-300 hover:border-green-300 hover:bg-green-50 group-hover:-translate-y-0.5 group-hover:shadow-sm">
+                                            <i class="fa-solid fa-cart-plus text-[14px] leading-none" aria-hidden="true"></i>
                                             <span>Add</span>
                                         </button>
                                     @else
@@ -672,6 +672,19 @@
                             </div>
                         </article>
                     @endforeach
+
+                    @for($slot = $typeShowcaseGrid->count(); $slot < 6; $slot++)
+                        <article class="type-showcase-card flex min-h-[245px] flex-col items-center justify-center rounded-[19px] border border-dashed border-green-200 bg-[linear-gradient(145deg,#f7fbf5,#eff8ec)] p-5 text-center shadow-[0_10px_30px_rgba(15,23,43,0.035)]">
+                            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-lg text-green-600 shadow-sm">
+                                <i class="fa-solid fa-basket-shopping"></i>
+                            </span>
+                            <p class="mt-4 text-[12px] font-extrabold uppercase tracking-[0.12em] text-slate-800">More Fresh Picks</p>
+                            <p class="mt-1 text-[10px] leading-5 text-slate-500">New products coming soon</p>
+                            <a href="{{ route('frontend.products') }}" class="mt-4 inline-flex rounded-lg border border-green-200 bg-white px-3 py-2 text-[9px] font-extrabold uppercase tracking-[0.12em] text-green-700 transition hover:border-green-300 hover:bg-green-50">
+                                View All
+                            </a>
+                        </article>
+                    @endfor
                 </div>
             </div>
         @elseif($typeShowcaseLeadCategory)
