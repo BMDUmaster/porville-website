@@ -136,7 +136,8 @@
     }
 
     @media (max-width: 640px) {
-        main section h2 { font-size: 24px !important; line-height: 1.15; }
+        main section h2 { font-size: 20px !important; line-height: 1.15; }
+        .home-category-heading { white-space: nowrap; }
         .home-hero-content { align-items: flex-start; padding: 22px 16px 34px; }
         .home-hero-content > div { padding: 0; }
         .home-hero-content h1 { font-size: 23px; line-height: 1.08; }
@@ -316,7 +317,7 @@
 
         <div class="mb-6 flex items-end justify-between gap-4">
             <div>
-                <h2 class="text-3xl font-extrabold text-slate-900 md:text-4xl">
+                <h2 class="home-category-heading text-3xl font-extrabold text-slate-900 md:text-4xl">
                     Shop by <span class="text-blue-600">Category</span>
                 </h2>
                 <p class="mt-2 text-sm text-slate-500">Farm-to-table freshness across every cut and kind.</p>
