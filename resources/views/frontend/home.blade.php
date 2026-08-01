@@ -321,6 +321,13 @@
                 </h2>
                 <p class="mt-2 text-sm text-slate-500">Farm-to-table freshness across every cut and kind.</p>
             </div>
+            <a
+                href="{{ route('frontend.categories') }}"
+                class="inline-flex shrink-0 items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-blue-700 transition hover:border-blue-600 hover:bg-blue-600 hover:text-white sm:px-5"
+            >
+                See All
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
         </div>
 
         <div
