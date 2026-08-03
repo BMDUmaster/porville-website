@@ -154,6 +154,10 @@ class ProductController extends Controller
 
         $frontendOfferCards = Coupon::offers()
             ->activeEntries()
+            ->where(function ($query) use ($product) {
+                $query->whereNull('product_id')
+                    ->orWhere('product_id', $product->id);
+            })
             ->latest()
             ->take(6)
             ->get()
@@ -166,6 +170,10 @@ class ProductController extends Controller
                     'badge' => $index === 0 ? 'Top Offer' : 'Live Offer',
                     'title' => $offer->title ?: 'Special Offer',
                     'text' => $offer->description ?: 'Exclusive savings available for a limited time.',
+                    'discount' => $offer->type === 'percent'
+                        ? rtrim(rtrim(number_format((float) $offer->value, 2, '.', ''), '0'), '.') . '% OFF'
+                        : 'Rs' . number_format((float) $offer->value, 0) . ' OFF',
+                    'scope' => $offer->product_id ? 'For this product' : 'All products',
                     'code' => $code,
                     'min_order_amount' => $offer->min_order_amount,
                     'expires_at' => optional($offer->expires_at)->format('d M Y, h:i A'),

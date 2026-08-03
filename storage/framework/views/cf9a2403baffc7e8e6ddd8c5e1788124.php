@@ -218,7 +218,7 @@
 ?>
 
 <section class="relative bg-[#0a0f1a] px-0 py-0">
-    <div id="home-hero-carousel" class="home-hero-card relative h-[270px] overflow-hidden md:h-[340px]">
+    <div id="home-hero-carousel" class="home-hero-card relative h-[235px] overflow-hidden md:h-[340px]">
         <?php $__currentLoopData = $heroSlides; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $slide): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="home-hero-slide <?php echo e($index === 0 ? 'active' : ''); ?> absolute inset-0" data-home-hero-slide="<?php echo e($index); ?>">
                 <picture>
@@ -838,7 +838,6 @@
 
         <div class="mb-7 flex items-end justify-between gap-4">
             <div>
-                <p class="mb-2 text-[11px] font-extrabold uppercase tracking-[0.34em] text-green-600">Best Sellers</p>
                 <h2 class="text-3xl font-extrabold text-slate-900 md:text-4xl">
                     Best <span class="text-slate-300">Sellers</span>
                 </h2>
@@ -873,6 +872,15 @@
                 <?php
                     $favoriteImage = $product->images && count($product->images) ? asset('storage/' . $product->images[0]) : null;
                     $favoriteLabel = $favoriteLabels[$index % count($favoriteLabels)];
+                    $favoriteVariantIndex = collect($product->variants ?? [])->search(
+                        fn ($variant) => filled($variant['selling_price'] ?? null) || filled($variant['today_price'] ?? null)
+                    );
+                    $favoriteVariantIndex = $favoriteVariantIndex === false ? null : $favoriteVariantIndex;
+                    $favoriteVariant = $favoriteVariantIndex !== null ? ($product->variants[$favoriteVariantIndex] ?? null) : null;
+                    $favoriteTomorrowPrice = $favoriteVariant && filled($favoriteVariant['tomorrow_price'] ?? null)
+                        && (float) $favoriteVariant['tomorrow_price'] > 0
+                            ? (float) $favoriteVariant['tomorrow_price']
+                            : null;
                 ?>
 
                 <article class="favorite-card group min-w-[255px] max-w-[255px] rounded-[28px] p-3">
@@ -898,7 +906,7 @@
                             </div>
                         </a>
 
-                        <div class="mt-2 flex min-h-0 flex-col sm:mt-3 sm:min-h-[100px]">
+                        <div class="mt-2 flex flex-col sm:mt-3">
                             <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="text-slate-900 transition hover:text-green-700">
                                 <span class="block text-[18px] font-extrabold leading-[1.15]"><?php echo e($product->name); ?></span>
                             </a>
@@ -911,21 +919,34 @@
                             </p>
                         </div>
 
-                        <div class="mt-3 flex items-end justify-between gap-3 sm:mt-6">
-                            <div>
-                                <p class="text-[18px] font-black text-slate-950">Rs<?php echo e(number_format($product->display_price, 0)); ?><span class="ml-1 text-[11px] font-semibold text-slate-400"><?php echo e($product->display_pack_label); ?></span></p>
+                        <div class="mt-3 border-t border-dashed border-slate-100 pt-3">
+                            <div class="flex items-end justify-between gap-3">
+                                <div>
+                                    <p class="text-[9px] font-black uppercase tracking-wider text-emerald-600">Today</p>
+                                    <p class="text-[18px] font-black text-slate-950">Rs<?php echo e(number_format($product->display_price, 0)); ?><span class="ml-1 text-[11px] font-semibold text-slate-400"><?php echo e($product->display_pack_label); ?></span></p>
                                 <?php if($product->display_mrp && $product->display_mrp > $product->display_price): ?>
                                     <p class="text-xs text-slate-400 line-through">Rs<?php echo e(number_format($product->display_mrp, 0)); ?></p>
                                 <?php endif; ?>
+                                </div>
+                                <?php if($product->is_active): ?>
+                                    <button onclick="addToCart(<?php echo e($product->id); ?>, <?php echo e($favoriteVariantIndex === null ? 'null' : $favoriteVariantIndex); ?>, 'today')" aria-label="Add <?php echo e($product->name); ?> for today" title="Add for today" class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-green-700 text-white transition hover:bg-green-800">
+                                        <i class="fa-solid fa-cart-shopping text-[18px]" aria-hidden="true"></i>
+                                    </button>
+                                <?php else: ?>
+                                    <span class="inline-flex items-center rounded-xl bg-red-50 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-red-600">Out of Stock</span>
+                                <?php endif; ?>
                             </div>
-                            <?php if($product->is_active): ?>
-                                <button onclick="addToCart(<?php echo e($product->id); ?>)" aria-label="Add <?php echo e($product->name); ?> to cart" title="Add to cart" class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-green-700 text-white transition hover:bg-green-800">
-                                    <i class="fa-solid fa-cart-shopping text-[18px]" aria-hidden="true"></i>
-                                </button>
-                            <?php else: ?>
-                                <span class="inline-flex items-center rounded-xl bg-red-50 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-red-600">
-                                    Out of Stock
-                                </span>
+
+                            <?php if($product->is_active && $favoriteTomorrowPrice !== null): ?>
+                                <div class="mt-2 flex items-end justify-between gap-3 border-t border-dashed border-slate-100 pt-2">
+                                    <div>
+                                        <p class="text-[9px] font-black uppercase tracking-wider text-amber-700">Tomorrow</p>
+                                        <p class="text-[18px] font-black text-slate-950">Rs<?php echo e(number_format($favoriteTomorrowPrice, 0)); ?><span class="ml-1 text-[11px] font-semibold text-slate-400"><?php echo e($product->display_pack_label); ?></span></p>
+                                    </div>
+                                    <button onclick="addToCart(<?php echo e($product->id); ?>, <?php echo e($favoriteVariantIndex); ?>, 'tomorrow')" aria-label="Add <?php echo e($product->name); ?> for tomorrow" title="Add for tomorrow" class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white transition hover:bg-amber-600">
+                                        <i class="fa-solid fa-cart-shopping text-[18px]" aria-hidden="true"></i>
+                                    </button>
+                                </div>
                             <?php endif; ?>
                         </div>
                     </div>

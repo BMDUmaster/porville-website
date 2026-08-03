@@ -11,11 +11,12 @@ class Coupon extends Model
     use HasFactory;
 
     protected $fillable = [
-        'entry_type', 'title', 'description', 'code', 'type', 'value',
-        'min_order_amount', 'max_uses', 'per_user_limit', 'used_count', 'expires_at', 'is_active',
+        'entry_type', 'title', 'description', 'product_id', 'code', 'type', 'value',
+        'min_order_amount', 'max_uses', 'per_user_limit', 'used_count', 'starts_at', 'expires_at', 'is_active',
     ];
 
     protected $casts = [
+        'starts_at'  => 'datetime',
         'expires_at' => 'datetime',
         'is_active'  => 'boolean',
     ];
@@ -72,8 +73,17 @@ class Coupon extends Model
     {
         return $query->where('is_active', true)
             ->where(function ($innerQuery) {
+                $innerQuery->whereNull('starts_at')
+                    ->orWhere('starts_at', '<=', now());
+            })
+            ->where(function ($innerQuery) {
                 $innerQuery->whereNull('expires_at')
                     ->orWhere('expires_at', '>', now());
             });
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
     }
 }

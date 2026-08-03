@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\ContactMessage;
+use App\Models\Coupon;
 use Illuminate\Http\Request;
 
 class PageController extends Controller
@@ -29,6 +30,25 @@ class PageController extends Controller
     public function shipping()     { return view('frontend.pages.shipping-policy'); }
     public function returns()      { return view('frontend.pages.return-refund-policy'); }
     public function cookies()      { return view('frontend.pages.cookie-policy'); }
+    public function deals()
+    {
+        $coupons = Coupon::coupons()
+            ->valid()
+            ->latest()
+            ->get();
+
+        $offers = Coupon::offers()
+            ->with('product')
+            ->activeEntries()
+            ->where(function ($query) {
+                $query->whereNull('max_uses')
+                    ->orWhereColumn('used_count', '<', 'max_uses');
+            })
+            ->latest()
+            ->get();
+
+        return view('frontend.pages.deals', compact('coupons', 'offers'));
+    }
     public function categories()   {
         $categories = \App\Models\Category::parents()
             ->where('is_active', true)

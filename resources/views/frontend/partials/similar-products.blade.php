@@ -11,9 +11,31 @@
 
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             @foreach($similar as $item)
-                <a href="{{ route('frontend.product.show', $item->slug) }}"
-                   class="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-green-200 hover:shadow-[0_18px_35px_rgba(15,23,42,0.1)]">
-                    <div class="relative aspect-[1/0.9] overflow-hidden bg-[#f4f5ef]">
+                @php
+                    $similarVariantIndex = collect($item->variants ?? [])->search(
+                        fn ($variant) => filled($variant['selling_price'] ?? null) || filled($variant['today_price'] ?? null)
+                    );
+                    $similarVariantIndex = $similarVariantIndex === false ? null : $similarVariantIndex;
+                    $similarVariant = $similarVariantIndex !== null ? ($item->variants[$similarVariantIndex] ?? null) : null;
+                    $similarTomorrowPrice = $similarVariant && filled($similarVariant['tomorrow_price'] ?? null)
+                        && (float) $similarVariant['tomorrow_price'] > 0
+                            ? (float) $similarVariant['tomorrow_price']
+                            : null;
+                    $similarInWishlist = in_array($item->id, session('wishlist', []), true);
+                @endphp
+                <article class="group relative flex flex-col overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-green-200 hover:shadow-[0_18px_35px_rgba(15,23,42,0.1)]">
+                    <button
+                        type="button"
+                        onclick="toggleWishlist({{ $item->id }}, this)"
+                        data-product-id="{{ $item->id }}"
+                        aria-label="{{ $similarInWishlist ? 'Remove from wishlist' : 'Add to wishlist' }}"
+                        title="{{ $similarInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}"
+                        class="wishlist-btn {{ $similarInWishlist ? 'active' : '' }} absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white/95 shadow-md backdrop-blur-sm transition hover:scale-110"
+                    >
+                        <i class="{{ $similarInWishlist ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart text-slate-600' }}"></i>
+                    </button>
+
+                    <a href="{{ route('frontend.product.show', $item->slug) }}" class="relative block aspect-[1/0.9] overflow-hidden bg-[#f4f5ef]">
                         @if(in_array($item->id, $newArrivalProductIds ?? [], true))
                             <span class="absolute left-3 top-3 z-10 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
                                 New Arrival
@@ -26,19 +48,43 @@
                                 <i class="fa-solid fa-drumstick-bite"></i>
                             </div>
                         @endif
-                    </div>
-                    <div class="p-4">
+                    </a>
+                    <div class="flex flex-1 flex-col p-4">
                         <div class="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">{{ $item->category->name ?? 'Fresh cut' }}</div>
-                        <div class="mt-2 line-clamp-2 text-[13px] font-black leading-5 text-slate-900">{{ $item->name }}</div>
-                        <div class="mt-3 flex flex-wrap items-center gap-2">
-                            <span class="text-[16px] font-black text-slate-900">Rs{{ number_format($item->display_price, 0) }}</span>
-                            <span class="text-[11px] font-semibold text-slate-400">{{ $item->display_pack_label }}</span>
-                            @if($item->display_mrp && $item->display_mrp > $item->display_price)
-                                <span class="text-[12px] font-bold text-slate-400 line-through">Rs{{ number_format($item->display_mrp, 0) }}</span>
+                        <a href="{{ route('frontend.product.show', $item->slug) }}" class="mt-2 line-clamp-2 min-h-[40px] text-[13px] font-black leading-5 text-slate-900 transition hover:text-green-700">{{ $item->name }}</a>
+
+                        <div class="mt-auto pt-3">
+                            <div class="flex items-end justify-between gap-2 border-t border-dashed border-slate-100 pt-3">
+                                <div>
+                                    <p class="text-[9px] font-black uppercase tracking-wider text-emerald-600">Today</p>
+                                    <p class="text-[16px] font-black text-slate-900">Rs{{ number_format($item->display_price, 0) }}<span class="ml-1 text-[11px] font-semibold text-slate-400">{{ $item->display_pack_label }}</span></p>
+                                    @if($item->display_mrp && $item->display_mrp > $item->display_price)
+                                        <p class="text-[11px] font-bold text-slate-400 line-through">Rs{{ number_format($item->display_mrp, 0) }}</p>
+                                    @endif
+                                </div>
+                                @if($item->is_active)
+                                    <button type="button" onclick="addToCart({{ $item->id }}, {{ $similarVariantIndex === null ? 'null' : $similarVariantIndex }}, 'today')" aria-label="Add {{ $item->name }} for today" title="Add for today" class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-green-700 text-white transition hover:bg-green-800">
+                                        <i class="fa-solid fa-cart-shopping"></i>
+                                    </button>
+                                @endif
+                            </div>
+
+                            @if($item->is_active && $similarTomorrowPrice !== null)
+                                <div class="mt-2 flex items-end justify-between gap-2 border-t border-dashed border-slate-100 pt-2">
+                                    <div>
+                                        <p class="text-[9px] font-black uppercase tracking-wider text-amber-700">Tomorrow</p>
+                                        <p class="text-[16px] font-black text-slate-900">Rs{{ number_format($similarTomorrowPrice, 0) }}<span class="ml-1 text-[11px] font-semibold text-slate-400">{{ $item->display_pack_label }}</span></p>
+                                    </div>
+                                    <button type="button" onclick="addToCart({{ $item->id }}, {{ $similarVariantIndex }}, 'tomorrow')" aria-label="Add {{ $item->name }} for tomorrow" title="Add for tomorrow" class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white transition hover:bg-amber-600">
+                                        <i class="fa-solid fa-cart-shopping"></i>
+                                    </button>
+                                </div>
+                            @elseif(!$item->is_active)
+                                <span class="mt-3 inline-flex w-fit rounded-lg bg-red-50 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-red-600">Out of Stock</span>
                             @endif
                         </div>
                     </div>
-                </a>
+                </article>
             @endforeach
         </div>
     </div>

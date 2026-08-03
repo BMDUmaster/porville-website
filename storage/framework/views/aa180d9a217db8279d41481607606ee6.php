@@ -185,12 +185,14 @@
                                 'entry_type' => $coupon->entry_type ?? 'coupon',
                                 'title' => $coupon->title,
                                 'description' => $coupon->description,
+                                'product_id' => $coupon->product_id,
                                 'code' => $coupon->code,
                                 'type' => $coupon->type,
                                 'value' => $coupon->value,
                                 'min_order_amount' => $coupon->min_order_amount,
                                 'max_uses' => $coupon->max_uses,
                                 'per_user_limit' => $coupon->per_user_limit,
+                                'starts_at' => optional($coupon->starts_at)->format('Y-m-d'),
                                 'expires_at' => optional($coupon->expires_at)->format('Y-m-d\TH:i'),
                                 'is_active' => $coupon->is_active ? 1 : 0,
                             ];
@@ -200,7 +202,7 @@
                                 : $coupon->code;
 
                             $displaySubtext = ($coupon->entry_type ?? 'coupon') === 'offer'
-                                ? ($coupon->description ?: 'No description added.')
+                                ? (($coupon->description ?: 'No description added.') . ' | Applies to: ' . ($coupon->product?->name ?: 'All Products'))
                                 : ('Code: ' . $coupon->code);
 
                             $maxUses = (int) ($coupon->max_uses ?? 0);
@@ -297,14 +299,20 @@
     </div>
 </div>
 
-<div id="couponModal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-    <div class="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
-        <div class="flex items-center justify-between border-b px-5 py-4">
-            <h2 id="couponModalTitle" class="text-lg font-black text-slate-800">Create Coupon</h2>
-            <button type="button" onclick="closeCouponModal()" class="text-2xl leading-none text-slate-400 hover:text-slate-700">&times;</button>
+<div id="couponModal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
+    <div class="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-[28px] bg-white shadow-2xl coupon-scrollbar">
+        <div id="couponModalHeader" class="flex items-center justify-between border-b border-slate-100 bg-gradient-to-r from-indigo-50 to-white px-6 py-5">
+            <div class="flex items-center gap-3">
+                <span id="couponModalIcon" class="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-200"><i class="fa-solid fa-tags"></i></span>
+                <div>
+                    <h2 id="couponModalTitle" class="text-xl font-black text-slate-900">Create Coupon</h2>
+                    <p id="couponModalSubtitle" class="mt-0.5 text-xs font-semibold text-slate-400">Create a new customer discount</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeCouponModal()" class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-2xl leading-none text-slate-400 shadow-sm transition hover:text-slate-700">&times;</button>
         </div>
 
-        <form id="couponForm" method="POST" action="<?php echo e(route('dashboard.coupons.store')); ?>" class="space-y-4 p-5">
+        <form id="couponForm" method="POST" action="<?php echo e(route('dashboard.coupons.store')); ?>" class="space-y-5 p-6">
             <?php echo csrf_field(); ?>
             <input type="hidden" name="_method" id="couponMethod" value="POST">
 
@@ -328,10 +336,28 @@
                     <textarea name="description" id="couponDescription" rows="3" maxlength="500"
                               class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500"></textarea>
                 </div>
+                <div class="md:col-span-2 rounded-2xl border border-amber-100 bg-amber-50/60 p-4">
+                    <label class="mb-2 block text-sm font-black text-slate-700">Related Product</label>
+                    <select name="product_id" id="couponProductId" class="w-full rounded-xl border border-amber-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:border-amber-500">
+                        <option value="">All Products</option>
+                        <?php $__currentLoopData = $offerProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $offerProduct): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($offerProduct->id); ?>"><?php echo e($offerProduct->name); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </select>
+                    <p class="mt-2 text-xs font-medium text-amber-700"><i class="fa-solid fa-circle-info mr-1"></i>Select one product, or keep “All Products” to show this offer everywhere.</p>
+                </div>
+                <div>
+                    <label class="mb-1 block text-sm font-bold text-slate-700">Start Date</label>
+                    <input type="date" name="starts_at" id="couponStartsAt" class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="mb-1 block text-sm font-bold text-slate-700">End Date</label>
+                    <input type="date" id="offerExpiresAt" class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-amber-500">
+                </div>
             </div>
 
             <div class="grid gap-4 md:grid-cols-2">
-                <div>
+                <div id="couponCodeWrap">
                     <label class="mb-1 block text-sm font-bold text-slate-700">Code</label>
                     <input type="text" name="code" id="couponCode" maxlength="50"
                            class="w-full rounded-xl border px-4 py-2.5 text-sm uppercase outline-none focus:border-indigo-500">
@@ -350,36 +376,36 @@
                     <input type="number" name="value" id="couponValue" min="0" step="0.01"
                            class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
                 </div>
-                <div>
+                <div id="couponMinOrderWrap">
                     <label class="mb-1 block text-sm font-bold text-slate-700">Min Order Amount</label>
                     <input type="number" name="min_order_amount" id="couponMinOrder" min="0" step="0.01"
                            class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
                 </div>
-                <div>
+                <div id="couponMaxUsesWrap">
                     <label class="mb-1 block text-sm font-bold text-slate-700">Max Uses</label>
                     <input type="number" name="max_uses" id="couponMaxUses" min="1"
                            class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
                 </div>
-                <div>
+                <div id="couponPerUserWrap">
                     <label class="mb-1 block text-sm font-bold text-slate-700">Uses Per User</label>
                     <input type="number" name="per_user_limit" id="couponPerUserLimit" min="1"
                            class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
                     <p class="mt-1 text-xs text-slate-400">Blank means unlimited per customer.</p>
                 </div>
-                <div>
+                <div id="couponExpiresWrap">
                     <label class="mb-1 block text-sm font-bold text-slate-700">Expires At</label>
                     <input type="datetime-local" name="expires_at" id="couponExpiresAt"
                            class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
                 </div>
             </div>
 
-            <label class="flex items-center gap-2 text-sm font-bold text-slate-700">
-                <input type="checkbox" name="is_active" id="couponIsActive" value="1" class="h-4 w-4 accent-indigo-600" checked>
-                Active
+            <label class="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700">
+                <span><i class="fa-solid fa-toggle-on mr-2 text-emerald-500"></i>Status</span>
+                <span class="flex items-center gap-2"><input type="checkbox" name="is_active" id="couponIsActive" value="1" class="h-5 w-5 accent-indigo-600" checked> Active</span>
             </label>
 
             <div class="flex flex-col gap-3 pt-2 sm:flex-row">
-                <button type="submit" class="flex-1 rounded-xl bg-indigo-600 py-3 text-sm font-bold text-white">Save Entry</button>
+                <button id="couponSubmitButton" type="submit" class="flex-1 rounded-xl bg-indigo-600 py-3 text-sm font-bold text-white transition hover:bg-indigo-700">Save Entry</button>
                 <button type="button" onclick="closeCouponModal()" class="flex-1 rounded-xl bg-slate-100 py-3 text-sm font-bold text-slate-600">Cancel</button>
             </div>
         </form>
@@ -396,20 +422,22 @@ function openCouponModal(entry = null) {
     const modal = document.getElementById('couponModal');
     const form = document.getElementById('couponForm');
 
-    document.getElementById('couponModalTitle').textContent = entry?.id ? 'Edit Entry' : 'Create Coupon';
     document.getElementById('couponMethod').value = entry?.id ? 'PUT' : 'POST';
     form.action = entry?.id ? `${couponUpdateBaseUrl}/${entry.id}` : couponStoreUrl;
 
     document.getElementById('couponEntryType').value = entry?.entry_type ?? 'coupon';
     document.getElementById('couponTitle').value = entry?.title ?? '';
     document.getElementById('couponDescription').value = entry?.description ?? '';
+    document.getElementById('couponProductId').value = entry?.product_id ?? '';
     document.getElementById('couponCode').value = entry?.code ?? '';
     document.getElementById('couponType').value = entry?.type ?? 'percent';
     document.getElementById('couponValue').value = entry?.value ?? '';
     document.getElementById('couponMinOrder').value = entry?.min_order_amount ?? '';
     document.getElementById('couponMaxUses').value = entry?.max_uses ?? '';
     document.getElementById('couponPerUserLimit').value = entry?.per_user_limit ?? '';
+    document.getElementById('couponStartsAt').value = entry?.starts_at ?? '';
     document.getElementById('couponExpiresAt').value = entry?.expires_at ?? '';
+    document.getElementById('offerExpiresAt').value = (entry?.expires_at ?? '').slice(0, 10);
     document.getElementById('couponIsActive').checked = Number(entry?.is_active ?? 1) === 1;
 
     toggleCouponFields();
@@ -427,12 +455,41 @@ function toggleCouponFields() {
     const entryType = document.getElementById('couponEntryType').value;
     const isCoupon = entryType === 'coupon';
 
-    document.getElementById('couponTypeWrap').classList.remove('hidden');
-    document.getElementById('couponValueWrap').classList.remove('hidden');
+    const offerFields = document.getElementById('offerFields');
+    const couponOnlyIds = ['couponCodeWrap', 'couponMinOrderWrap', 'couponMaxUsesWrap', 'couponPerUserWrap', 'couponExpiresWrap'];
+    const couponExpiresAt = document.getElementById('couponExpiresAt');
+    const offerExpiresAt = document.getElementById('offerExpiresAt');
+
+    offerFields.classList.toggle('hidden', isCoupon);
+    couponOnlyIds.forEach(id => document.getElementById(id).classList.toggle('hidden', !isCoupon));
+    document.getElementById('couponTitle').required = !isCoupon;
+    document.getElementById('couponDescription').required = !isCoupon;
+    document.getElementById('couponStartsAt').required = !isCoupon;
+    document.getElementById('couponStartsAt').disabled = isCoupon;
+    document.getElementById('couponProductId').disabled = isCoupon;
+
+    couponExpiresAt.disabled = !isCoupon;
+    couponExpiresAt.name = isCoupon ? 'expires_at' : '';
+    offerExpiresAt.disabled = isCoupon;
+    offerExpiresAt.required = !isCoupon;
+    offerExpiresAt.name = isCoupon ? '' : 'expires_at';
 
     document.getElementById('couponType').required = true;
     document.getElementById('couponValue').required = true;
-    document.getElementById('couponCode').required = false;
+    document.getElementById('couponCode').required = isCoupon;
+
+    const title = document.getElementById('couponModalTitle');
+    const subtitle = document.getElementById('couponModalSubtitle');
+    const icon = document.getElementById('couponModalIcon');
+    const submit = document.getElementById('couponSubmitButton');
+    const editing = document.getElementById('couponMethod').value === 'PUT';
+
+    title.textContent = editing ? (isCoupon ? 'Edit Coupon' : 'Edit Offer') : (isCoupon ? 'Add New Coupon' : 'Add New Offer');
+    subtitle.textContent = isCoupon ? 'Create a customer coupon code' : 'Choose where and when this offer will appear';
+    submit.textContent = editing ? (isCoupon ? 'Update Coupon' : 'Update Offer') : (isCoupon ? 'Save Coupon' : 'Save Offer');
+    submit.className = `flex-1 rounded-xl py-3 text-sm font-bold text-white transition ${isCoupon ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-amber-500 hover:bg-amber-600'}`;
+    icon.className = `flex h-11 w-11 items-center justify-center rounded-2xl text-white shadow-lg ${isCoupon ? 'bg-indigo-600 shadow-indigo-200' : 'bg-amber-500 shadow-amber-200'}`;
+    icon.innerHTML = `<i class="fa-solid ${isCoupon ? 'fa-tags' : 'fa-bolt'}"></i>`;
 }
 
 function copyCouponCode(code) {

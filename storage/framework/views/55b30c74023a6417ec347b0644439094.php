@@ -1,5 +1,20 @@
-
 <?php $__env->startSection('title', 'Checkout'); ?>
+
+<?php $__env->startSection('styles'); ?>
+@media (max-width: 639px) {
+    .checkout-page h1 { font-size: 1.2rem !important; line-height: 1.45 !important; }
+    .checkout-page h2 { font-size: .88rem !important; line-height: 1.4 !important; }
+    .checkout-page h3 { font-size: .76rem !important; line-height: 1.4 !important; }
+}
+@media (min-width: 1024px) {
+    .checkout-summary-sticky {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 178px;
+        z-index: 20;
+    }
+}
+<?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
 <?php
@@ -15,7 +30,7 @@
 
     $initialCouponCode = old('coupon_code', session('applied_coupon_' . session('checkout_delivery_day', 'today')));
 ?>
-<div class="max-w-5xl mx-auto px-4 py-8">
+<div class="checkout-page max-w-5xl mx-auto px-4 py-8">
     <h1 class="nunito font-extrabold text-2xl text-gray-800 mb-6">Checkout</h1>
 
     
@@ -47,7 +62,7 @@
         </div>
     </div>
 
-    <div class="flex flex-col gap-6 lg:flex-row">
+    <div id="checkoutGrid" class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div class="flex-1 space-y-5">
             <form method="POST" action="<?php echo e(route('frontend.checkout.store')); ?>" id="checkoutForm">
                 <?php echo csrf_field(); ?>
@@ -208,7 +223,7 @@
                     </div>
                 </div>
 
-                <div class="rounded-2xl border bg-white p-5">
+                <div id="checkoutCouponSection" class="rounded-2xl border bg-white p-5">
                     <label class="mb-2 block text-xs font-semibold text-gray-600">Coupon Code (optional)</label>
                     <div class="flex flex-col gap-2 sm:flex-row">
                         <input type="text" name="coupon_code" id="couponCodeInput" value="<?php echo e($initialCouponCode); ?>" placeholder="Enter coupon code"
@@ -241,13 +256,132 @@
             </form>
         </div>
 
-        <div class="w-full flex-shrink-0 lg:w-80">
-            <div class="sticky top-24 overflow-hidden rounded-2xl border bg-white">
+        <aside id="checkoutSideColumn" class="w-full lg:self-stretch">
+            <div id="checkoutPromoCard" class="group relative overflow-hidden rounded-[24px] border border-emerald-100 bg-white shadow-md">
+                <img src="<?php echo e(asset('images/checkout/fresh-delivery-banner.png')); ?>" alt="Fresh meat and seafood packed for delivery" class="h-48 w-full object-cover transition duration-700 group-hover:scale-105">
+                <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 via-slate-900/55 to-transparent px-5 pb-4 pt-12 text-white">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-300">FarmSea Fresh Promise</p>
+                    <h3 class="mt-1 text-lg font-black">Freshness packed with care</h3>
+                    <p class="mt-1 text-[11px] font-semibold text-slate-200">Temperature-controlled packing &amp; safe doorstep delivery.</p>
+                </div>
+            </div>
+
+            <?php if(($checkoutNewArrivals ?? collect())->isNotEmpty()): ?>
+                <div id="checkoutNewArrivals" class="mt-6 rounded-[22px] border border-slate-200 bg-white p-3 shadow-sm">
+                    <div class="mb-3 flex items-center justify-between px-1">
+                        <div>
+                            <p class="text-[9px] font-black uppercase tracking-[0.18em] text-blue-600">Just In</p>
+                            <h3 class="text-sm font-black text-slate-900">New Arrivals</h3>
+                        </div>
+                        <a href="<?php echo e(route('frontend.products', ['sort' => 'latest'])); ?>" class="text-[9px] font-black uppercase tracking-wider text-blue-600 hover:underline">View All</a>
+                    </div>
+
+                    <div class="space-y-2.5">
+                        <?php $__currentLoopData = $checkoutNewArrivals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $arrival): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php
+                                $arrivalVariantIndex = collect($arrival->variants ?? [])->search(
+                                    fn ($variant) => filled($variant['selling_price'] ?? null) || filled($variant['today_price'] ?? null)
+                                );
+                                $arrivalVariantIndex = $arrivalVariantIndex === false ? null : $arrivalVariantIndex;
+                                $arrivalImage = $arrival->images && count($arrival->images) ? asset('storage/' . $arrival->images[0]) : null;
+                            ?>
+                            <article class="group/item flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50/70 p-2 transition hover:border-green-200 hover:bg-green-50/50">
+                                <a href="<?php echo e(route('frontend.product.show', $arrival->slug)); ?>" class="h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-white">
+                                    <?php if($arrivalImage): ?>
+                                        <img src="<?php echo e($arrivalImage); ?>" alt="<?php echo e($arrival->name); ?>" class="h-full w-full object-cover transition duration-300 group-hover/item:scale-105">
+                                    <?php else: ?>
+                                        <span class="flex h-full w-full items-center justify-center text-slate-300"><i class="fa-solid fa-basket-shopping"></i></span>
+                                    <?php endif; ?>
+                                </a>
+                                <div class="min-w-0 flex-1">
+                                    <p class="truncate text-[9px] font-black uppercase tracking-wider text-emerald-600"><?php echo e($arrival->category->name ?? 'Fresh'); ?></p>
+                                    <a href="<?php echo e(route('frontend.product.show', $arrival->slug)); ?>" class="mt-0.5 block truncate text-[11px] font-black text-slate-900 hover:text-green-700"><?php echo e($arrival->name); ?></a>
+                                    <p class="mt-1 text-xs font-black text-slate-900">Rs<?php echo e(number_format($arrival->display_price, 0)); ?> <span class="text-[9px] font-semibold text-slate-400"><?php echo e($arrival->display_pack_label); ?></span></p>
+                                </div>
+                                <button type="button" onclick="addToCart(<?php echo e($arrival->id); ?>, <?php echo e($arrivalVariantIndex === null ? 'null' : $arrivalVariantIndex); ?>, 'today')" aria-label="Add <?php echo e($arrival->name); ?> to cart" title="Add to cart" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-green-700 text-white shadow-sm transition hover:bg-green-800">
+                                    <i class="fa-solid fa-cart-plus text-xs"></i>
+                                </button>
+                            </article>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <a id="checkoutMealBanner" href="<?php echo e(route('frontend.products')); ?>" class="group relative mt-6 block overflow-hidden rounded-[22px] border border-amber-100 bg-white shadow-md">
+                <img src="<?php echo e(asset('images/checkout/ready-to-cook-meal-banner.png')); ?>" alt="Fresh ready-to-cook fish and chicken meal" class="h-40 w-full object-cover transition duration-700 group-hover:scale-105">
+                <div class="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-900/30 to-transparent"></div>
+                <div class="absolute inset-y-0 left-0 flex max-w-[72%] flex-col justify-center px-4 text-white">
+                    <p class="text-[9px] font-black uppercase tracking-[0.18em] text-amber-300">Cook Something Fresh</p>
+                    <h3 class="mt-1 text-base font-black leading-tight">Dinner inspiration, delivered fresh</h3>
+                    <span class="mt-3 inline-flex w-fit items-center gap-1.5 rounded-lg bg-white/95 px-3 py-1.5 text-[9px] font-black uppercase tracking-wider text-slate-900">Shop Now <i class="fa-solid fa-arrow-right"></i></span>
+                </div>
+            </a>
+
+            <div id="checkoutTrustCard" class="mt-6 overflow-hidden rounded-[22px] border border-emerald-100 bg-white shadow-sm">
+                <div class="bg-gradient-to-r from-emerald-700 to-green-600 px-4 py-3 text-white">
+                    <p class="text-[9px] font-black uppercase tracking-[0.18em] text-emerald-100">Shop With Confidence</p>
+                    <h3 class="mt-0.5 text-sm font-black">Why customers trust FarmSea</h3>
+                </div>
+                <div class="divide-y divide-slate-100 px-3">
+                    <div class="flex items-center gap-3 py-3">
+                        <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600"><i class="fa-solid fa-shield-halved text-xs"></i></span>
+                        <div><p class="text-[11px] font-black text-slate-900">Safe &amp; secure checkout</p><p class="mt-0.5 text-[9px] font-semibold text-slate-400">Your order details stay protected</p></div>
+                    </div>
+                    <div class="flex items-center gap-3 py-3">
+                        <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600"><i class="fa-solid fa-headset text-xs"></i></span>
+                        <div class="min-w-0 flex-1"><p class="text-[11px] font-black text-slate-900">Need checkout help?</p><p class="mt-0.5 text-[9px] font-semibold text-slate-400">Our support team is ready</p></div>
+                        <a href="<?php echo e(route('frontend.contact')); ?>" class="rounded-lg bg-slate-900 px-2.5 py-1.5 text-[8px] font-black uppercase tracking-wider text-white transition hover:bg-emerald-700">Get Help</a>
+                    </div>
+                </div>
+            </div>
+
+            <?php if(($checkoutSimilarProducts ?? collect())->isNotEmpty()): ?>
+                <div id="checkoutSimilarProducts" class="mt-6 rounded-[22px] border border-violet-100 bg-white p-3 shadow-sm">
+                    <div class="mb-3 flex items-center justify-between px-1">
+                        <div>
+                            <p class="text-[9px] font-black uppercase tracking-[0.18em] text-violet-600">You May Also Like</p>
+                            <h3 class="text-sm font-black text-slate-900">Similar Products</h3>
+                        </div>
+                        <a href="<?php echo e(route('frontend.products')); ?>" class="text-[9px] font-black uppercase tracking-wider text-violet-600 hover:underline">View All</a>
+                    </div>
+
+                    <div class="space-y-2.5">
+                        <?php $__currentLoopData = $checkoutSimilarProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $similarProduct): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php
+                                $similarVariantIndex = collect($similarProduct->variants ?? [])->search(
+                                    fn ($variant) => filled($variant['selling_price'] ?? null) || filled($variant['today_price'] ?? null)
+                                );
+                                $similarVariantIndex = $similarVariantIndex === false ? null : $similarVariantIndex;
+                                $similarImage = $similarProduct->images && count($similarProduct->images) ? asset('storage/' . $similarProduct->images[0]) : null;
+                            ?>
+                            <article class="group/similar flex items-center gap-3 rounded-2xl border border-violet-50 bg-violet-50/45 p-2 transition hover:border-violet-200 hover:bg-violet-50">
+                                <a href="<?php echo e(route('frontend.product.show', $similarProduct->slug)); ?>" class="h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-white">
+                                    <?php if($similarImage): ?>
+                                        <img src="<?php echo e($similarImage); ?>" alt="<?php echo e($similarProduct->name); ?>" class="h-full w-full object-cover transition duration-300 group-hover/similar:scale-105">
+                                    <?php else: ?>
+                                        <span class="flex h-full w-full items-center justify-center text-violet-200"><i class="fa-solid fa-basket-shopping"></i></span>
+                                    <?php endif; ?>
+                                </a>
+                                <div class="min-w-0 flex-1">
+                                    <p class="truncate text-[9px] font-black uppercase tracking-wider text-violet-600"><?php echo e($similarProduct->category->name ?? 'Recommended'); ?></p>
+                                    <a href="<?php echo e(route('frontend.product.show', $similarProduct->slug)); ?>" class="mt-0.5 block truncate text-[11px] font-black text-slate-900 hover:text-violet-700"><?php echo e($similarProduct->name); ?></a>
+                                    <p class="mt-1 text-xs font-black text-slate-900">Rs<?php echo e(number_format($similarProduct->display_price, 0)); ?> <span class="text-[9px] font-semibold text-slate-400"><?php echo e($similarProduct->display_pack_label); ?></span></p>
+                                </div>
+                                <button type="button" onclick="addToCart(<?php echo e($similarProduct->id); ?>, <?php echo e($similarVariantIndex === null ? 'null' : $similarVariantIndex); ?>, 'today')" aria-label="Add <?php echo e($similarProduct->name); ?> to cart" title="Add to cart" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-violet-600 text-white shadow-sm transition hover:bg-violet-700">
+                                    <i class="fa-solid fa-cart-plus text-xs"></i>
+                                </button>
+                            </article>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <div id="checkoutSummarySticky" class="checkout-summary-sticky mt-6 overflow-hidden rounded-2xl border bg-white shadow-sm lg:max-h-[calc(100vh-194px)]">
                 <div class="h-1 bg-gradient-to-r from-blue-700 to-orange-400"></div>
                 <div class="border-b px-5 py-4">
                     <h2 class="nunito text-base font-extrabold text-gray-800">Order Summary</h2>
                 </div>
-                <div class="max-h-64 space-y-3 overflow-y-auto border-b px-5 py-4">
+                <div class="max-h-64 space-y-3 overflow-y-auto border-b px-5 py-4 lg:max-h-[calc(100vh-430px)]">
                     <?php $__currentLoopData = $items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="flex items-center gap-3">
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-100">
@@ -293,11 +427,40 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </aside>
     </div>
 </div>
 
 <script>
+function alignCheckoutSummaryWithCoupon() {
+    const grid = document.getElementById('checkoutGrid');
+    const coupon = document.getElementById('checkoutCouponSection');
+    const promo = document.getElementById('checkoutPromoCard');
+    const arrivals = document.getElementById('checkoutNewArrivals');
+    const mealBanner = document.getElementById('checkoutMealBanner');
+    const trustCard = document.getElementById('checkoutTrustCard');
+    const similarProducts = document.getElementById('checkoutSimilarProducts');
+    const summary = document.getElementById('checkoutSummarySticky');
+
+    if (!grid || !coupon || !promo || !summary) return;
+
+    if (window.innerWidth < 1024) {
+        summary.style.marginTop = '';
+        return;
+    }
+
+    const couponOffset = coupon.getBoundingClientRect().top - grid.getBoundingClientRect().top;
+    const arrivalsHeight = arrivals ? arrivals.offsetHeight + 24 : 0;
+    const mealBannerHeight = mealBanner ? mealBanner.offsetHeight + 24 : 0;
+    const trustCardHeight = trustCard ? trustCard.offsetHeight + 24 : 0;
+    const similarHeight = similarProducts ? similarProducts.offsetHeight + 24 : 0;
+    const gapAfterPromo = Math.max(24, couponOffset - promo.offsetHeight - arrivalsHeight - mealBannerHeight - trustCardHeight - similarHeight - 70);
+    summary.style.marginTop = `${gapAfterPromo}px`;
+}
+
+window.addEventListener('load', alignCheckoutSummaryWithCoupon);
+window.addEventListener('resize', alignCheckoutSummaryWithCoupon);
+
 const checkoutPricing = {
     subtotal: Number(<?php echo json_encode((float) ($pricing['subtotal'] ?? 0), 15, 512) ?>),
     total: Number(<?php echo json_encode((float) ($pricing['total'] ?? 0), 15, 512) ?>),

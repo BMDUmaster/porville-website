@@ -51,11 +51,51 @@ class CheckoutController extends Controller
         }
 
         $pricing = OrderPricing::summary($subtotal, auth('web_frontend')->user(), $this->pricingDayForCart($cart));
-        $availableCoupons = Coupon::valid()
+        $availableCoupons = Coupon::coupons()
+            ->valid()
             ->orderBy('min_order_amount')
             ->orderByDesc('value')
             ->limit(8)
             ->get();
+
+        $cartProductIds = collect($items)->pluck('product_id')->filter()->unique();
+        $checkoutNewArrivals = Product::active()
+            ->with('category')
+            ->when($cartProductIds->isNotEmpty(), fn ($query) => $query->whereNotIn('id', $cartProductIds))
+            ->latest()
+            ->take(3)
+            ->get();
+
+        $cartCategoryIds = Product::query()
+            ->whereIn('id', $cartProductIds)
+            ->pluck('category_id')
+            ->filter()
+            ->unique();
+        $excludedRecommendationIds = $cartProductIds
+            ->merge($checkoutNewArrivals->pluck('id'))
+            ->unique();
+        $checkoutSimilarProducts = Product::active()
+            ->with('category')
+            ->when($cartCategoryIds->isNotEmpty(), fn ($query) => $query->whereIn('category_id', $cartCategoryIds))
+            ->when($excludedRecommendationIds->isNotEmpty(), fn ($query) => $query->whereNotIn('id', $excludedRecommendationIds))
+            ->latest()
+            ->take(3)
+            ->get();
+
+        if ($checkoutSimilarProducts->count() < 3) {
+            $fallbackExcludedIds = $excludedRecommendationIds
+                ->merge($checkoutSimilarProducts->pluck('id'))
+                ->unique();
+            $fallbackProducts = Product::active()
+                ->with('category')
+                ->when($fallbackExcludedIds->isNotEmpty(), fn ($query) => $query->whereNotIn('id', $fallbackExcludedIds))
+                ->latest()
+                ->take(3 - $checkoutSimilarProducts->count())
+                ->get();
+            $checkoutSimilarProducts = $checkoutSimilarProducts
+                ->concat($fallbackProducts)
+                ->values();
+        }
 
         $user = auth('web_frontend')->user();
         $pastAddresses = [];
@@ -78,7 +118,7 @@ class CheckoutController extends Controller
                 ->all();
         }
 
-        return view('frontend.checkout', compact('items', 'subtotal', 'checkoutDefaults', 'selectedDeliverySlot', 'pricing', 'availableCoupons', 'pastAddresses', 'pinSectors'));
+        return view('frontend.checkout', compact('items', 'subtotal', 'checkoutDefaults', 'selectedDeliverySlot', 'pricing', 'availableCoupons', 'pastAddresses', 'pinSectors', 'checkoutNewArrivals', 'checkoutSimilarProducts'));
     }
 
     /** POST /checkout */

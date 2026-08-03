@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Coupon;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
@@ -13,7 +14,7 @@ class CouponController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Coupon::query();
+        $query = Coupon::query()->with('product');
         $segment = $request->input('segment', 'my_coupons');
 
         if ($request->filled('search')) {
@@ -69,7 +70,9 @@ class CouponController extends Controller
             'redeemed_growth_text' => ($redeemedGrowth >= 0 ? '↑ ' : '↓ ') . abs($redeemedGrowth) . '% vs last month',
         ];
 
-        return view('dashboard.coupons.index', compact('coupons', 'stats'));
+        $offerProducts = Product::query()->select('id', 'name')->orderBy('name')->get();
+
+        return view('dashboard.coupons.index', compact('coupons', 'stats', 'offerProducts'));
     }
 
     public function store(Request $request)
@@ -110,18 +113,29 @@ class CouponController extends Controller
     {
         $entryType = $request->input('entry_type', 'coupon');
         $couponId = $coupon?->id;
+        $expiryRules = [
+            Rule::requiredIf($entryType === 'offer' || ($entryType === 'coupon' && ! $coupon)),
+            'nullable',
+            'date',
+        ];
+
+        if ($entryType === 'offer') {
+            $expiryRules[] = 'after_or_equal:starts_at';
+        }
 
         return $request->validate([
             'entry_type'       => ['required', Rule::in(['coupon', 'offer'])],
             'title'            => [Rule::requiredIf($entryType === 'offer'), 'nullable', 'string', 'max:120'],
             'description'      => [Rule::requiredIf($entryType === 'offer'), 'nullable', 'string', 'max:500'],
+            'product_id'       => [$entryType === 'offer' ? 'nullable' : 'prohibited', 'nullable', 'integer', Rule::exists('products', 'id')],
             'code'             => [Rule::requiredIf($entryType === 'coupon'), 'nullable', 'string', 'max:50', Rule::unique('coupons', 'code')->ignore($couponId)],
             'type'             => ['required', Rule::in(['flat', 'percent'])],
             'value'            => ['required', 'numeric', 'min:0.01', 'max:99999999.99'],
             'min_order_amount' => ['nullable', 'numeric', 'min:0'],
             'max_uses'         => ['nullable', 'integer', 'min:1'],
             'per_user_limit'   => ['nullable', 'integer', 'min:1'],
-            'expires_at'       => [$entryType === 'coupon' && !$coupon ? 'required' : 'nullable', 'date'],
+            'starts_at'        => [$entryType === 'offer' ? 'required' : 'nullable', 'nullable', 'date'],
+            'expires_at'       => $expiryRules,
             'is_active'        => ['boolean'],
         ]);
     }
@@ -163,6 +177,8 @@ class CouponController extends Controller
         if (($data['entry_type'] ?? 'coupon') !== 'offer') {
             $data['title'] = null;
             $data['description'] = null;
+            $data['product_id'] = null;
+            $data['starts_at'] = null;
         }
 
         return $data;

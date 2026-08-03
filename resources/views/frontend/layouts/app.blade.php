@@ -33,7 +33,12 @@
     #sidebar-overlay { display: none !important; }
 }
 /* Prevent horizontal overflow */
-html, body { overflow-x: hidden; max-width: 100vw; }
+html, body { overflow-x: clip; max-width: 100vw; }
+@media (min-width: 1024px) {
+    main h1 { font-size: 2.25rem !important; line-height: 1.18 !important; }
+    main h2 { font-size: 1.75rem !important; line-height: 1.25 !important; }
+    main h3 { font-size: 1.1rem !important; line-height: 1.35 !important; }
+}
 /* Scrollbar hide utility */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
@@ -70,8 +75,60 @@ html, body { overflow-x: hidden; max-width: 100vw; }
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
 }
+.logo-fish-flight {
+    position: absolute;
+    left: -12px;
+    top: 2px;
+    z-index: 2;
+    color: #49a942;
+    font-size: 18px;
+    line-height: 1;
+    opacity: 0;
+    filter: drop-shadow(0 2px 2px rgba(20, 83, 45, .2));
+    pointer-events: none;
+    animation: logo-fish-swim 4.2s ease-in-out infinite;
+}
+.logo-fish-flight::before,
+.logo-fish-flight::after {
+    content: "";
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border: 1.5px solid #60a5fa;
+    border-radius: 999px;
+    opacity: 0;
+}
+.logo-fish-flight::before { left: -8px; top: 2px; }
+.logo-fish-flight::after { left: -14px; top: -5px; width: 3px; height: 3px; }
+@keyframes logo-fish-swim {
+    0%, 10% { opacity: 0; transform: translate3d(-8px, 16px, 0) rotate(-12deg) scale(.72); }
+    16% { opacity: 1; }
+    36% { transform: translate3d(58px, -9px, 0) rotate(-4deg) scale(1); }
+    58% { opacity: 1; transform: translate3d(126px, -13px, 0) rotate(5deg) scale(.96); }
+    72% { opacity: .9; transform: translate3d(172px, 1px, 0) rotate(18deg) scale(.82); }
+    82%, 100% { opacity: 0; transform: translate3d(194px, 24px, 0) rotate(35deg) scale(.45); }
+}
+@keyframes logo-fish-bubble {
+    0%, 12%, 76%, 100% { opacity: 0; transform: translateY(5px) scale(.5); }
+    22% { opacity: .85; }
+    58% { opacity: 0; transform: translateY(-13px) scale(1.15); }
+}
+.logo-fish-flight::before { animation: logo-fish-bubble 4.2s ease-out infinite; }
+.logo-fish-flight::after { animation: logo-fish-bubble 4.2s .18s ease-out infinite; }
+.logo-fish-flight--second {
+    top: 7px;
+    color: #168a55;
+    font-size: 15px;
+    animation-delay: 2.1s;
+}
+.logo-fish-flight--second::before { animation-delay: 2.1s; }
+.logo-fish-flight--second::after { animation-delay: 2.28s; }
+@media (max-width: 767px) {
+    .logo-fish-flight { display: none; }
+}
 @media (prefers-reduced-motion: reduce) {
     .announcement-track { animation: none; }
+    .logo-fish-flight { display: none; }
 }
 </style>
 @yield('styles')
@@ -228,7 +285,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
 
 <!-- Header -->
 <header class="fixed inset-x-0 top-0 z-[9997] bg-white shadow-sm">
-    <div class="flex h-8 items-center overflow-hidden bg-blue-900 text-white">
+    <div class="relative flex h-8 items-center overflow-hidden bg-blue-900 pr-[108px] text-white sm:pr-[162px]">
         <div class="announcement-track items-center whitespace-nowrap text-[10px] font-bold sm:text-[11px]">
             @for($copy = 0; $copy < 2; $copy++)
                 <div class="flex items-center gap-10 pr-10">
@@ -248,16 +305,23 @@ html, body { overflow-x: hidden; max-width: 100vw; }
                 </div>
             @endfor
         </div>
+        <a href="{{ route('frontend.deals') }}" class="absolute inset-y-0 right-0 z-10 flex items-center gap-1.5 border-l border-white/20 bg-gradient-to-r from-blue-800 to-indigo-950 px-3 text-[9px] font-black uppercase tracking-wider text-yellow-300 shadow-[-10px_0_18px_rgba(30,58,138,0.9)] transition hover:text-white sm:px-4 sm:text-[10px]">
+            <i class="fa-solid fa-ticket"></i>
+            <span class="sm:hidden">Deals</span>
+            <span class="hidden sm:inline">Coupons &amp; Offers</span>
+        </a>
     </div>
     <div class="w-full px-3 py-2.5 sm:px-3 md:px-4 lg:py-3 flex items-center justify-between gap-2 lg:gap-4">
         <button onclick="toggleSidebar()" aria-label="Open menu" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-gray-700 text-lg lg:hidden">
             <i class="fa-solid fa-bars"></i>
         </button>
-        <a href="{{ route('frontend.home') }}" class="flex flex-shrink-0 items-center">
+        <a href="{{ route('frontend.home') }}" class="relative flex flex-shrink-0 items-center">
             <img src="{{ $brandLogoUrl }}"
                  alt="FarmSea"
                  class="h-10 w-auto object-contain sm:h-12 md:h-14 lg:h-20"
                  onerror="this.style.display='none'; document.getElementById('header-logo-fallback').style.display='inline-flex'">
+            <span class="logo-fish-flight" aria-hidden="true"><i class="fa-solid fa-fish-fins"></i></span>
+            <span class="logo-fish-flight logo-fish-flight--second" aria-hidden="true"><i class="fa-solid fa-fish-fins"></i></span>
             <span id="header-logo-fallback" class="hidden text-xl font-extrabold text-green-700">FarmSea</span>
         </a>
         <form action="{{ route('frontend.products') }}" method="GET" class="relative mx-2 hidden max-w-lg flex-grow md:flex lg:mx-4">

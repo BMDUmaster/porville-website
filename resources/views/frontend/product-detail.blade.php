@@ -496,6 +496,20 @@
                 </div>
             </div>
 
+            @if(count($offerCards))
+                @php($featuredOffer = $offerCards[0])
+                <button type="button" onclick="activateDetailTab('offers'); document.getElementById('detail-tabs-section').scrollIntoView({ behavior: 'smooth', block: 'start' });" class="group flex w-full items-center justify-between gap-4 rounded-[20px] border border-emerald-200 bg-gradient-to-r from-emerald-50 to-green-100/60 px-4 py-3 text-left shadow-sm transition hover:border-emerald-300 hover:shadow-md">
+                    <span class="flex min-w-0 items-center gap-3">
+                        <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm"><i class="fa-solid fa-percent"></i></span>
+                        <span class="min-w-0">
+                            <span class="block text-[16px] font-black text-slate-900">{{ $featuredOffer['discount'] ?? $featuredOffer['title'] }}</span>
+                            <span class="mt-0.5 block truncate text-[11px] font-semibold text-emerald-700">{{ $featuredOffer['title'] }} · {{ $featuredOffer['scope'] ?? 'For this product' }}</span>
+                        </span>
+                    </span>
+                    <span class="flex-shrink-0 rounded-xl bg-emerald-700 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-white">View Offer <i class="fa-solid fa-arrow-right ml-1"></i></span>
+                </button>
+            @endif
+
             <div class="flex flex-wrap gap-2">
                 <span class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-[11px] font-black {{ $isProductAvailable ? 'border border-green-200 bg-green-50 text-green-700' : 'border border-red-200 bg-red-50 text-red-600' }}">
                     <i class="fa-solid {{ $isProductAvailable ? 'fa-circle-check' : 'fa-ban' }} text-[10px]"></i>

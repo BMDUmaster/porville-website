@@ -166,6 +166,7 @@ Route::middleware('admin')->group(function () {
 // FRONTEND — Home
 
 Route::get('/home', [HomeController::class, 'index'])->name('frontend.home');
+Route::get('/deals', [PageController::class, 'deals'])->name('frontend.deals');
 
 // Signed links sent after delivery; customer login is not required.
 Route::get('/review/order/{order}', [FrontReviewController::class, 'create'])->name('frontend.review.create');
