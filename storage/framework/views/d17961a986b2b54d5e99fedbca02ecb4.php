@@ -399,7 +399,10 @@
                 <h2 class="text-2xl font-extrabold text-gray-800">New <span class="text-blue-600">Arrivals</span></h2>
                 <p class="mt-1 text-xs text-gray-500">The freshest additions to our selection.</p>
             </div>
-            <a href="<?php echo e(route('frontend.products')); ?>" class="text-xs font-bold uppercase tracking-wider text-blue-600 hover:underline">See All</a>
+            <a href="<?php echo e(route('frontend.products')); ?>" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-blue-700 transition hover:border-blue-600 hover:bg-blue-600 hover:text-white sm:px-5">
+                See All
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
         </div>
         <div id="home-new-arrivals-scroller" class="scrollbar-hide flex gap-3 overflow-x-auto scroll-smooth pb-3 md:gap-5">
             <?php $__empty_1 = true; $__currentLoopData = $newArrivals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
