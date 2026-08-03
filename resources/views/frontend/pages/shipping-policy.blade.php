@@ -34,10 +34,9 @@
     }
 
     .policy-mobile-nav {
-        position: fixed;
-        top: calc(var(--policy-nav-offset) + 104px);
-        left: 28px;
-        right: 12px;
+        position: -webkit-sticky;
+        position: sticky;
+        top: var(--policy-nav-offset);
     }
 
     .policy-mobile-nav::-webkit-scrollbar,
@@ -251,8 +250,7 @@
                 </div>
             </div>
 
-            <div class="mt-6 h-[70px] lg:hidden"></div>
-            <div class="policy-mobile-nav z-30 flex gap-2 overflow-x-auto rounded-[22px] border border-slate-100 bg-white/95 p-2 shadow-[0_16px_32px_rgba(15,23,42,0.08)] backdrop-blur lg:hidden">
+            <div class="policy-mobile-nav z-30 mt-6 flex gap-2 overflow-x-auto rounded-[22px] border border-slate-100 bg-white/95 p-2 shadow-[0_16px_32px_rgba(15,23,42,0.08)] backdrop-blur lg:hidden">
                 @foreach($sections as $section)
                     <a
                         href="#{{ $section['id'] }}"
