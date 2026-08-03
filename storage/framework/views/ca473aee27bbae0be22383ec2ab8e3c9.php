@@ -1,4 +1,3 @@
-
 <?php $__env->startSection('title', 'All Products'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -605,65 +604,9 @@
     </div>
 </div>
 
-<?php
-    $shopTrustCards = [
-        [
-            'icon' => 'fa-truck-fast',
-            'icon_bg' => 'bg-[#eef8ea]',
-            'icon_color' => 'text-[#2f8c43]',
-            'title' => 'Same Day Delivery',
-            'copy' => 'Order before 10 AM for delivery by evening. Cold-chain guaranteed from farm to door.',
-            'card' => 'border-[#e5efe0] bg-white text-slate-900',
-            'copy_color' => 'text-slate-600',
-        ],
-        [
-            'icon' => 'fa-shield-halved',
-            'icon_bg' => 'bg-[#e9f3ff]',
-            'icon_color' => 'text-[#256dcc]',
-            'title' => 'FSSAI Certified',
-            'copy' => 'All products are 100% hygienic and certified by Indian food safety boards.',
-            'card' => 'border-[#e3ebf4] bg-white text-slate-900',
-            'copy_color' => 'text-slate-600',
-        ],
-        [
-            'icon' => 'fa-snowflake',
-            'icon_bg' => 'bg-[#fff4d8]',
-            'icon_color' => 'text-[#f3a51d]',
-            'title' => 'Cold Chain Packed',
-            'copy' => 'Individually packed in food-grade covers with ice-gel packs to preserve freshness.',
-            'card' => 'border-[#f3ecda] bg-white text-slate-900',
-            'copy_color' => 'text-slate-600',
-        ],
-        [
-            'icon' => 'fa-rotate-left',
-            'icon_bg' => 'bg-white/8',
-            'icon_color' => 'text-white',
-            'title' => 'Freshness Guarantee',
-            'copy' => 'Not fresh? We will replace or refund your order within 24 hours. No questions asked.',
-            'card' => 'border-[#222c44] bg-[#141c31] text-white',
-            'copy_color' => 'text-[#8ea0c7]',
-        ],
-    ];
-?>
-
 <section class="px-4 pb-12 md:px-6 md:pb-16">
     <div class="mx-auto max-w-7xl">
-        <div class="grid gap-5 xl:grid-cols-4">
-            <?php $__currentLoopData = $shopTrustCards; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $card): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <div class="group rounded-[28px] border <?php echo e($card['card']); ?> p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_28px_60px_rgba(15,23,42,0.14)]">
-                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl <?php echo e($card['icon_bg']); ?> <?php echo e($card['icon_color']); ?> text-[24px] shadow-sm transition duration-300 group-hover:scale-110">
-                        <i class="fa-solid <?php echo e($card['icon']); ?>"></i>
-                    </div>
-                    <h3 class="mt-7 text-[18px] font-extrabold leading-tight"><?php echo e($card['title']); ?></h3>
-                    <p class="mt-4 max-w-[320px] text-[16px] leading-8 <?php echo e($card['copy_color']); ?>">
-                        <?php echo e($card['copy']); ?>
-
-                    </p>
-                </div>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-        </div>
-
-        <div class="mt-8 overflow-hidden rounded-[34px] border border-[#e6eddc] bg-[radial-gradient(circle_at_top_left,_rgba(211,241,198,0.35),_rgba(255,255,255,0.98)_42%)] px-6 py-8 shadow-[0_24px_60px_rgba(15,23,42,0.08)] md:px-9 md:py-10 lg:px-10 lg:py-12">
+        <div class="overflow-hidden rounded-[34px] border border-[#e6eddc] bg-[radial-gradient(circle_at_top_left,_rgba(211,241,198,0.35),_rgba(255,255,255,0.98)_42%)] px-6 py-8 shadow-[0_24px_60px_rgba(15,23,42,0.08)] md:px-9 md:py-10 lg:px-10 lg:py-12">
             <div class="flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between">
                 <div class="max-w-[700px]">
                     <span class="inline-flex rounded-full bg-[#d8efc9] px-4 py-2 text-[12px] font-black uppercase tracking-[0.22em] text-[#2f8c43]">

@@ -258,7 +258,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
         <button onclick="toggleSidebar()" aria-label="Open menu" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-gray-700 text-lg lg:hidden">
             <i class="fa-solid fa-bars"></i>
         </button>
-        <a href="<?php echo e(route('frontend.home')); ?>" class="flex flex-shrink-0 items-center lg:ml-[100px]">
+        <a href="<?php echo e(route('frontend.home')); ?>" class="flex flex-shrink-0 items-center">
             <img src="<?php echo e($brandLogoUrl); ?>"
                  alt="FarmSea"
                  class="h-10 w-auto object-contain sm:h-12 md:h-14 lg:h-20"
@@ -375,7 +375,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
     </div>
     <!-- Nav strip -->
     <div class="border-t border-gray-100 hidden md:block overflow-visible bg-white">
-        <div class="w-full px-4 lg:px-[116px] flex items-center gap-1 h-10 text-sm scrollbar-hide overflow-visible">
+        <div class="flex h-10 w-full items-center gap-1 overflow-visible px-3 text-sm scrollbar-hide sm:px-3 md:px-4">
             <a href="<?php echo e(route('frontend.products')); ?>" class="px-3 py-1.5 bg-gray-100 text-gray-600 font-semibold whitespace-nowrap rounded-md flex-shrink-0">All Products</a>
             <?php $__currentLoopData = $frontendNavCategories ?? collect(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <?php if($category->children->isNotEmpty()): ?>

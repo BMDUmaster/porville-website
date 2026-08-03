@@ -23,8 +23,39 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
-<main class="flex-1 py-10" style="background:#f0f2f5;">
-<div class="mx-auto max-w-[680px] px-4">
+<section class="relative overflow-hidden bg-[linear-gradient(135deg,#eef6ff_0%,#f7fbf5_52%,#ffffff_100%)] px-4 py-10 md:px-6 md:py-14">
+<div class="pointer-events-none absolute -left-24 top-16 h-72 w-72 rounded-full bg-blue-200/25 blur-3xl"></div>
+<div class="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-green-200/30 blur-3xl"></div>
+
+<div class="relative mx-auto grid w-full max-w-5xl overflow-hidden rounded-[30px] border border-white/80 bg-white shadow-[0_28px_90px_rgba(15,23,42,0.13)] lg:min-h-[650px] lg:grid-cols-[1.05fr_0.95fr]">
+    <div class="relative hidden min-h-[650px] overflow-hidden lg:block">
+        <img
+            src="<?php echo e(asset('storage/products/HiVF3oTdVV5ivcPECY0aMpXFljIdua0hBYBlCAUW.webp')); ?>"
+            alt="Fresh FarmSea food prepared for serving"
+            class="absolute inset-0 h-full w-full object-cover"
+        >
+        <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.08),rgba(15,23,42,0.88))]"></div>
+
+        <div class="absolute inset-x-0 bottom-0 p-8 text-white md:p-10">
+            <span class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.18em] backdrop-blur">
+                <i class="fa-solid fa-leaf text-green-300"></i> Join the FarmSea family
+            </span>
+            <h2 class="mt-5 max-w-md text-3xl font-extrabold leading-tight md:text-[40px]">
+                Fresh choices start
+                <span class="block text-green-300">with your account.</span>
+            </h2>
+            <p class="mt-4 max-w-md text-[13px] leading-6 text-white/75">
+                Create your account to enjoy quicker checkout, easy order tracking, and fresh favourites delivered to your door.
+            </p>
+            <div class="mt-6 flex flex-wrap gap-3 text-[10px] font-bold uppercase tracking-[0.12em] text-white/90">
+                <span class="rounded-full border border-white/15 bg-black/15 px-3 py-2"><i class="fa-solid fa-shield-halved mr-2 text-green-300"></i>Secure signup</span>
+                <span class="rounded-full border border-white/15 bg-black/15 px-3 py-2"><i class="fa-solid fa-truck-fast mr-2 text-green-300"></i>Fast delivery</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex items-center px-6 py-9 sm:px-10 md:py-12 lg:px-12">
+    <div class="mx-auto w-full max-w-[420px]">
 
     <?php if($errors->any()): ?>
     <div data-auto-dismiss="3000" class="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600 transition-all duration-500">
@@ -34,12 +65,11 @@
     </div>
     <?php endif; ?>
 
-    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div class="px-8 py-8">
-            <div class="mb-7">
-                <h1 class="text-2xl font-extrabold uppercase tracking-tight text-gray-900">Create Account</h1>
-                <p class="mt-1 text-sm text-gray-400">Phone and address details will be collected at checkout.</p>
-            </div>
+        <div class="mb-7">
+            <span class="inline-flex rounded-full bg-blue-50 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.18em] text-blue-700">Fresh start</span>
+            <h1 class="mt-4 text-3xl font-extrabold tracking-tight text-slate-950">Create your account</h1>
+            <p class="mt-2 text-[13px] leading-6 text-slate-500">Phone and address details will be collected at checkout.</p>
+        </div>
 
             <form method="POST" action="<?php echo e(route('frontend.register.post')); ?>" id="signupForm" novalidate>
                 <?php echo csrf_field(); ?>
@@ -113,10 +143,10 @@
                     <a href="<?php echo e(route('frontend.login')); ?>" class="font-bold text-green-600 hover:underline">Sign in here</a>
                 </p>
             </form>
-        </div>
+    </div>
     </div>
 </div>
-</main>
+</section>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('scripts'); ?>

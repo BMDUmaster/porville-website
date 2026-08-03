@@ -254,25 +254,25 @@ html, body { overflow-x: hidden; max-width: 100vw; }
             <?php endfor; ?>
         </div>
     </div>
-    <div class="w-full px-3 py-2.5 sm:px-3 md:px-4 md:py-3 flex items-center justify-between gap-2 md:gap-4">
+    <div class="w-full px-3 py-2.5 sm:px-3 md:px-4 lg:py-3 flex items-center justify-between gap-2 lg:gap-4">
         <button onclick="toggleSidebar()" aria-label="Open menu" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-gray-700 text-lg lg:hidden">
             <i class="fa-solid fa-bars"></i>
         </button>
-        <a href="<?php echo e(route('frontend.home')); ?>" class="flex-shrink-0 md:ml-[100px] flex items-center">
+        <a href="<?php echo e(route('frontend.home')); ?>" class="flex flex-shrink-0 items-center">
             <img src="<?php echo e($brandLogoUrl); ?>"
                  alt="FarmSea"
-                 class="h-10 w-auto object-contain sm:h-12 md:h-20"
+                 class="h-10 w-auto object-contain sm:h-12 md:h-14 lg:h-20"
                  onerror="this.style.display='none'; document.getElementById('header-logo-fallback').style.display='inline-flex'">
             <span id="header-logo-fallback" class="hidden text-xl font-extrabold text-green-700">FarmSea</span>
         </a>
-        <form action="<?php echo e(route('frontend.products')); ?>" method="GET" class="hidden md:flex flex-grow max-w-lg mx-4 relative">
+        <form action="<?php echo e(route('frontend.products')); ?>" method="GET" class="relative mx-2 hidden max-w-lg flex-grow md:flex lg:mx-4">
             <input type="text" name="search" placeholder="Search Ready to Cook Items"
                    class="w-full border border-gray-200 rounded-xl px-5 py-2.5 text-sm focus:outline-none focus:border-green-500 transition">
             <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-600">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
         </form>
-        <div class="flex items-center gap-3 md:gap-4 md:pr-7">
+        <div class="flex items-center gap-3 md:gap-3 lg:gap-4 lg:pr-7">
             <!-- Account -->
             <div class="relative">
                 <?php if(auth()->guard('web_frontend')->check()): ?>
@@ -375,7 +375,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
     </div>
     <!-- Nav strip -->
     <div class="border-t border-gray-100 hidden md:block overflow-visible bg-white">
-        <div class="max-w-screen-xl mx-auto px-4 flex items-center gap-1 h-10 text-sm scrollbar-hide overflow-visible">
+        <div class="flex h-10 w-full items-center gap-1 overflow-visible px-3 text-sm scrollbar-hide sm:px-3 md:px-4">
             <a href="<?php echo e(route('frontend.products')); ?>" class="px-3 py-1.5 bg-gray-100 text-gray-600 font-semibold whitespace-nowrap rounded-md flex-shrink-0">All Products</a>
             <?php $__currentLoopData = $frontendNavCategories ?? collect(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <?php if($category->children->isNotEmpty()): ?>
@@ -406,7 +406,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
     </div>
 </header>
 
-<div class="pt-[135px] md:pt-[178px]">
+<div class="pt-[135px] md:pt-[154px] lg:pt-[178px]">
     <!-- Flash Messages -->
     <?php if(session('success')): ?>
         <div data-auto-dismiss="3000" class="mx-4 mt-3 flex items-center gap-2 rounded-lg bg-green-100 p-3 text-sm text-green-700 transition-all duration-500">
@@ -430,17 +430,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
 <!-- Footer -->
 <footer class="relative overflow-hidden bg-[#0f172b] pt-10 md:pt-12 lg:pt-14 pb-5 md:pb-6 lg:pb-7 text-white" style="font-family:'Poppins',sans-serif;">
     <div class="relative z-10 mx-auto max-w-[1220px] px-5 sm:px-6 lg:px-8">
-        <div class="border-b border-white/6 pb-5 lg:pb-7">
-            <div class="max-w-[430px]">
-                <h4 class="mb-3 text-[14px] font-semibold text-white">About FarmSea</h4>
-                <p class="text-[13px] leading-[1.5] text-[#94a7c6]">
-                    FarmSea brings farm-fresh chicken, premium mutton, and fresh seafood directly to your doorstep.
-                    We ensure hygienic processing, quality cuts, and same-day delivery for the freshest experience.
-                </p>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-x-6 gap-y-7 py-6 lg:grid-cols-[1fr_1fr_1fr_1fr_180px] lg:gap-x-8 lg:gap-y-6 lg:py-7">
+        <div class="grid grid-cols-2 gap-x-6 gap-y-7 pb-6 lg:grid-cols-[1fr_1fr_1fr_1fr_180px] lg:gap-x-8 lg:gap-y-6 lg:pb-7">
             <div>
                 <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Info</h4>
                 <ul class="space-y-3.5">
@@ -456,6 +446,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
                     <li><a href="<?php echo e(route('frontend.contact')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Help Center</a></li>
                     <li><a href="<?php echo e(route('frontend.shipping')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Shipping Info</a></li>
                     <li><a href="<?php echo e(route('frontend.returns')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Return Policy</a></li>
+                    <li><a href="<?php echo e(route('frontend.privacy')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Privacy Policy</a></li>
                 </ul>
             </div>
 
@@ -493,13 +484,20 @@ html, body { overflow-x: hidden; max-width: 100vw; }
             <p class="text-[10px] uppercase tracking-[0.2em] text-[#84a0c3]">
                 &copy; <?php echo e(date('Y')); ?> FarmSea - Fresh Meat &amp; Seafood Delivered
             </p>
-            <div class="flex min-h-7 flex-wrap items-center justify-center gap-4 md:justify-end">
-                <span class="inline-flex h-7 w-[58px] items-center justify-center rounded bg-white px-2 shadow-sm ring-1 ring-white/20" aria-label="Visa">
-                    <span class="font-sans text-[18px] font-black italic leading-none tracking-[-0.02em] text-[#1434cb]">VISA</span>
-                </span>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" class="block h-6 w-[78px] object-contain opacity-80" alt="Mastercard">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" class="block h-6 w-[72px] object-contain opacity-90" alt="Google Pay">
-            </div>
+            <a
+                href="https://digitalutilization.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="group inline-flex items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 transition hover:border-[#38bdf8]/40 hover:bg-white/[0.08] md:justify-end"
+                aria-label="Developed by BMDU - visit Digital Utilization"
+            >
+                <span class="text-[10px] font-bold uppercase tracking-[0.16em] text-[#9bb0cf] transition group-hover:text-white">Developed By</span>
+                <img
+                    src="<?php echo e(asset('images/bmdu-logo.webp')); ?>"
+                    class="block h-8 w-auto max-w-[120px] object-contain transition duration-200 group-hover:scale-[1.03]"
+                    alt="BMDU"
+                >
+            </a>
         </div>
     </div>
 </footer>

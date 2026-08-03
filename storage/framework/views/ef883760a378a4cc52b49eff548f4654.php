@@ -9,8 +9,6 @@
 
     :root {
         --policy-nav-offset: 150px;
-        --policy-desktop-left: 0px;
-        --policy-desktop-width: 250px;
     }
 
     .policy-anchor {
@@ -48,12 +46,18 @@
     }
 
     .policy-desktop-nav {
-        position: fixed;
-        top: calc(var(--policy-nav-offset) + 140px);
-        left: calc(var(--policy-desktop-left) + 12px);
-        width: var(--policy-desktop-width);
-        max-height: calc(100vh - var(--policy-nav-offset) - 158px);
+        max-height: calc(100vh - var(--policy-nav-offset) - 36px);
         overflow-y: auto;
+    }
+
+    @media (min-width: 1024px) {
+        .policy-desktop-wrapper {
+            position: -webkit-sticky;
+            position: sticky;
+            top: calc(var(--policy-nav-offset) + 18px);
+            align-self: start;
+            z-index: 20;
+        }
     }
 
     .policy-mobile-nav,
@@ -210,11 +214,11 @@
     ];
 ?>
 
-<section id="top" class="relative overflow-x-hidden bg-[linear-gradient(180deg,#eef4ff_0%,#f9fbff_42%,#ffffff_100%)]">
+<section id="top" class="relative bg-[linear-gradient(180deg,#eef4ff_0%,#f9fbff_42%,#ffffff_100%)]">
     <div class="absolute inset-x-0 top-0 h-56 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_52%),radial-gradient(circle_at_top_right,rgba(34,197,94,0.12),transparent_44%)]"></div>
 
     <div class="relative mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-14">
-        <div class="rounded-[28px] border border-blue-100 bg-white/90 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur md:p-8 lg:p-10">
+        <div class="rounded-[28px] border border-blue-100 bg-white/90 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] md:p-8 lg:p-10">
             <div class="flex flex-col gap-6 border-b border-slate-100 pb-8 lg:flex-row lg:items-end lg:justify-between">
                 <div class="max-w-2xl">
                     <span class="inline-flex rounded-full bg-blue-600 px-4 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.2em] text-white shadow-sm">
@@ -262,7 +266,7 @@
             </div>
 
             <div class="mt-8 grid gap-8 lg:grid-cols-[250px_minmax(0,1fr)]">
-                <aside class="hidden lg:block" data-policy-desktop-wrapper>
+                <aside class="policy-desktop-wrapper hidden lg:block" data-policy-desktop-wrapper>
                     <div class="policy-desktop-nav rounded-[24px] border border-slate-100 bg-[#f8fbff] p-4 shadow-[0_14px_40px_rgba(15,23,42,0.06)]">
                         <p class="px-2 text-[11px] font-extrabold uppercase tracking-[0.26em] text-slate-400">On This Page</p>
                         <div class="mt-4 space-y-2">
@@ -393,7 +397,9 @@
                 event.preventDefault();
                 setActive(id);
                 scrollToSection(id);
-                link.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                if (link.dataset.policyMobileLink) {
+                    link.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
             });
         });
 

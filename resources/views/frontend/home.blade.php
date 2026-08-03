@@ -318,9 +318,9 @@
         <div class="mb-6 flex items-end justify-between gap-4">
             <div>
                 <h2 class="home-category-heading text-3xl font-extrabold text-slate-900 md:text-4xl">
-                    Shop by <span class="text-blue-600">Category</span>
+                    Shop by <span class="text-blue-600"> Category  </span>
                 </h2>
-                <p class="mt-2 text-sm text-slate-500">Farm-to-table freshness across every cut and kind.</p>
+                <p class="mt-2 text-sm text-slate-500"> Farm-to-table freshness across every cut and kind. </p>
             </div>
             <a
                 href="{{ route('frontend.categories') }}"
@@ -401,8 +401,8 @@
                     <a href="{{ route('frontend.product.show', $product->slug) }}" class="relative block aspect-square overflow-hidden bg-gray-50">
                         @if(in_array($product->id, $newArrivalProductIds ?? [], true))
                             <span class="absolute left-3 top-3 z-10 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-white shadow-sm">
-                                New Arrival
-                            </span>
+                                     New Arrival  
+                            </span>  
                         @endif
                         @if($product->images && count($product->images))
                             <img src="{{ asset('storage/'.$product->images[0]) }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition-transform duration-500 hover:scale-105">

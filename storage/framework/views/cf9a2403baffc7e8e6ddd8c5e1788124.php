@@ -136,7 +136,8 @@
     }
 
     @media (max-width: 640px) {
-        main section h2 { font-size: 24px !important; line-height: 1.15; }
+        main section h2 { font-size: 20px !important; line-height: 1.15; }
+        .home-category-heading { white-space: nowrap; }
         .home-hero-content { align-items: flex-start; padding: 22px 16px 34px; }
         .home-hero-content > div { padding: 0; }
         .home-hero-content h1 { font-size: 23px; line-height: 1.08; }
@@ -320,11 +321,18 @@
 
         <div class="mb-6 flex items-end justify-between gap-4">
             <div>
-                <h2 class="text-3xl font-extrabold text-slate-900 md:text-4xl">
-                    Shop by <span class="text-blue-600">Category</span>
+                <h2 class="home-category-heading text-3xl font-extrabold text-slate-900 md:text-4xl">
+                    Shop by <span class="text-blue-600"> Category  </span>
                 </h2>
-                <p class="mt-2 text-sm text-slate-500">Farm-to-table freshness across every cut and kind.</p>
+                <p class="mt-2 text-sm text-slate-500"> Farm-to-table freshness across every cut and kind. </p>
             </div>
+            <a
+                href="<?php echo e(route('frontend.categories')); ?>"
+                class="inline-flex shrink-0 items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-blue-700 transition hover:border-blue-600 hover:bg-blue-600 hover:text-white sm:px-5"
+            >
+                See All
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
         </div>
 
         <div
@@ -399,8 +407,8 @@
                     <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="relative block aspect-square overflow-hidden bg-gray-50">
                         <?php if(in_array($product->id, $newArrivalProductIds ?? [], true)): ?>
                             <span class="absolute left-3 top-3 z-10 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-white shadow-sm">
-                                New Arrival
-                            </span>
+                                     New Arrival  
+                            </span>  
                         <?php endif; ?>
                         <?php if($product->images && count($product->images)): ?>
                             <img src="<?php echo e(asset('storage/'.$product->images[0])); ?>" alt="<?php echo e($product->name); ?>" class="h-full w-full object-cover transition-transform duration-500 hover:scale-105">
@@ -685,6 +693,19 @@
                             </div>
                         </article>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                    <?php for($slot = $typeShowcaseGrid->count(); $slot < 6; $slot++): ?>
+                        <article class="type-showcase-card flex min-h-[245px] flex-col items-center justify-center rounded-[19px] border border-dashed border-green-200 bg-[linear-gradient(145deg,#f7fbf5,#eff8ec)] p-5 text-center shadow-[0_10px_30px_rgba(15,23,43,0.035)]">
+                            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-lg text-green-600 shadow-sm">
+                                <i class="fa-solid fa-basket-shopping"></i>
+                            </span>
+                            <p class="mt-4 text-[12px] font-extrabold uppercase tracking-[0.12em] text-slate-800">More Fresh Picks</p>
+                            <p class="mt-1 text-[10px] leading-5 text-slate-500">New products coming soon</p>
+                            <a href="<?php echo e(route('frontend.products')); ?>" class="mt-4 inline-flex rounded-lg border border-green-200 bg-white px-3 py-2 text-[9px] font-extrabold uppercase tracking-[0.12em] text-green-700 transition hover:border-green-300 hover:bg-green-50">
+                                View All
+                            </a>
+                        </article>
+                    <?php endfor; ?>
                 </div>
             </div>
         <?php elseif($typeShowcaseLeadCategory): ?>
