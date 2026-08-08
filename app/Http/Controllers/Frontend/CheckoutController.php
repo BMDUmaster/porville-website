@@ -10,6 +10,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Support\DeliverySlotManager;
 use App\Support\OrderPricing;
+use App\Support\OrderingManager;
 use App\Support\ProductDayPricing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -118,12 +119,22 @@ class CheckoutController extends Controller
                 ->all();
         }
 
-        return view('frontend.checkout', compact('items', 'subtotal', 'checkoutDefaults', 'selectedDeliverySlot', 'pricing', 'availableCoupons', 'pastAddresses', 'pinSectors', 'checkoutNewArrivals', 'checkoutSimilarProducts'));
+        return view('frontend.checkout', compact('items', 'subtotal', 'checkoutDefaults', 'selectedDeliverySlot', 'pricing', 'availableCoupons', 'pastAddresses', 'pinSectors', 'checkoutNewArrivals', 'checkoutSimilarProducts'))
+            ->with([
+                'orderingActive'          => OrderingManager::isActive(),
+                'orderingInactiveTitle'   => OrderingManager::inactiveTitle(),
+                'orderingInactiveMessage' => OrderingManager::inactiveMessage(),
+            ]);
     }
 
     /** POST /checkout */
     public function store(Request $request)
     {
+        // Block order if ordering is disabled by admin
+        if (! OrderingManager::isActive()) {
+            return back()->with('ordering_inactive', true);
+        }
+
         $fullCart = session('cart', []);
         $checkoutDay = ProductDayPricing::normalizeDay(session('checkout_delivery_day', 'today'));
         $cart = $this->cartForDay($fullCart, $checkoutDay);
@@ -135,7 +146,7 @@ class CheckoutController extends Controller
             'first_name'       => 'required|string|max:60',
             'last_name'        => 'nullable|string|max:60',
             'email'            => 'required|email',
-            'phone'            => ['required', 'regex:/^(?:\d{10}|\d{12})$/'],
+            'phone'            => ['required', 'regex:/^\d{10}$/'],
             'address'          => 'required|string',
             'city'             => 'required|string',
             'state'            => 'required|string',
@@ -158,7 +169,7 @@ class CheckoutController extends Controller
             'payment_method'   => 'required|in:COD,online,upi',
             'coupon_code'      => 'nullable|string',
         ], [
-            'phone.regex' => 'Phone number must be 10 or 12 digits.',
+            'phone.regex' => 'Phone number must be exactly 10 digits.',
         ]);
 
         session(['selected_delivery_slot_' . $checkoutDay => $data['delivery_slot']]);
@@ -401,7 +412,7 @@ class CheckoutController extends Controller
     {
         $digits = preg_replace('/\D/', '', (string) $phone) ?? '';
 
-        return in_array(strlen($digits), [10, 12], true) ? $digits : '';
+        return strlen($digits) === 10 ? $digits : '';
     }
 
     private function resolveCoupon(?string $couponCode, float $subtotal, bool $lock = false): ?Coupon

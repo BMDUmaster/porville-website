@@ -492,6 +492,15 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                     <li><a href="{{ route('frontend.about') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">About Us</a></li>
                     <li><a href="{{ route('frontend.contact') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Contact Us</a></li>
                     <li><a href="{{ route('frontend.about') }}#faq" class="text-[14px] text-[#9bb0cf] transition hover:text-white">FAQ</a></li>
+                    <li>
+                        <a href="{{ asset('docs/fssai-certificate.pdf') }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="inline-flex items-center gap-1.5 text-[14px] text-[#9bb0cf] transition hover:text-white">
+                            <i class="fa-solid fa-certificate text-green-400 text-xs"></i>
+                            FSSAI Certificate
+                        </a>
+                    </li>
                 </ul>
             </div>
 
@@ -518,11 +527,16 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
             <div>
                 <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Reach Us</h4>
                 <p class="mb-3 text-[14px] text-[#9bb0cf]">Delhi NCR, India</p>
-                <a href="tel:+919876543210" class="mb-2 block text-[15px] font-semibold text-white transition hover:text-[#26c95a]">+91 98765 43210</a>
-                <a href="mailto:support@farmsea.com" class="mb-4 block text-[14px] text-[#9bb0cf] transition hover:text-white">support@farmsea.com</a>
+                <a href="tel:+918796937990" class="mb-2 flex items-center gap-2 text-[15px] font-semibold text-white transition hover:text-[#26c95a]">
+                    <i class="fa-solid fa-phone text-[#26c95a] text-xs"></i> +91 87969 37990
+                </a>
+                <a href="mailto:info@farmsea.in" class="mb-4 flex items-center gap-2 text-[14px] text-[#9bb0cf] transition hover:text-white">
+                    <i class="fa-regular fa-envelope text-xs"></i> info@farmsea.in
+                </a>
                 <div class="flex items-center gap-3.5 text-[15px] text-[#9bb0cf]">
-                    <a href="#" class="transition hover:text-white" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-                    <a href="#" class="transition hover:text-white" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://wa.me/918796937990" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                    <a href="https://www.instagram.com/farmsea.in?igsh=MXA1NXRzYjlsNXJ5OQ==" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://www.facebook.com/profile.php?id=61575413880421" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
                 </div>
             </div>
 
@@ -668,8 +682,11 @@ function addToCart(productId, variantIndex, pricingDay = 'today') {
             return;
         }
 
-        document.getElementById('header-cart-badge').textContent = data.cart_count;
-        showCartAddedAlert('Add to Cart');
+        // Update badge with unique product count (not total quantity)
+        document.getElementById('header-cart-badge').textContent = data.unique_count ?? data.cart_count;
+
+        // Open cart drawer immediately on add
+        openCart();
     });
 }
 function formatCartCurrency(amount) {
@@ -880,8 +897,10 @@ function refreshCartDrawer() {
         .then(r => r.json())
         .then(data => {
             selectedCartDrawerDay = data.delivery_day || selectedCartDrawerDay;
-            document.getElementById('header-cart-badge').textContent = data.count;
-            document.getElementById('cart-badge-drawer').textContent = data.count + ' item' + (data.count !== 1 ? 's' : '');
+            const uniqueCount = data.unique_count ?? data.count;
+            const totalQty = data.count;
+            document.getElementById('header-cart-badge').textContent = uniqueCount;
+            document.getElementById('cart-badge-drawer').textContent = uniqueCount + ' item' + (uniqueCount !== 1 ? 's' : '');
             document.getElementById('cart-subtotal-drawer').textContent = formatCartCurrency(data.subtotal);
             const chargePercent = Number(data.service_charge_percent || 0);
             const chargePercentText = Number.isInteger(chargePercent)

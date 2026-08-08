@@ -123,9 +123,10 @@ class CartController extends Controller
 
         if ($request->expectsJson()) {
             return response()->json([
-                'success'    => true,
-                'message'    => 'Added to cart!',
-                'cart_count' => array_sum(array_column($cart, 'quantity')),
+                'success'      => true,
+                'message'      => 'Added to cart!',
+                'cart_count'   => array_sum(array_column($cart, 'quantity')),
+                'unique_count' => count($cart),
             ]);
         }
 
@@ -256,8 +257,9 @@ class CartController extends Controller
         }
 
         return response()->json([
-            'count' => array_sum(array_column($cart, 'quantity')),
-            'items' => $items,
+            'count'        => array_sum(array_column($cart, 'quantity')),
+            'unique_count' => count($cart),
+            'items'        => $items,
             'subtotal' => $subtotal,
             'service_charge' => $pricing['service_charge'],
             'service_charge_percent' => $pricing['service_charge_percent'],

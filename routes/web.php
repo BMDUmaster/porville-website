@@ -61,7 +61,7 @@ use App\Http\Controllers\Frontend\ReviewController as FrontReviewController;
 
 // ROOT
 
-Route::get('/', [HomeController::class, 'index']);
+Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 
 
 // ADMIN DASHBOARD AUTH
@@ -160,12 +160,14 @@ Route::middleware('admin')->group(function () {
     Route::put('/settings/service-charge', [ServiceChargeController::class, 'update'])->name('dashboard.settings.service-charge.update');
     Route::get('/settings/delivery-slots', [DeliverySlotController::class, 'index'])->name('dashboard.settings.delivery-slots');
     Route::put('/settings/delivery-slots', [DeliverySlotController::class, 'update'])->name('dashboard.settings.delivery-slots.update');
+    Route::get('/settings/ordering',  [\App\Http\Controllers\Dashboard\OrderingSettingController::class, 'index'])->name('dashboard.settings.ordering');
+    Route::put('/settings/ordering',  [\App\Http\Controllers\Dashboard\OrderingSettingController::class, 'update'])->name('dashboard.settings.ordering.update');
 });
 
 
 // FRONTEND — Home
 
-Route::get('/home', [HomeController::class, 'index'])->name('frontend.home');
+Route::get('/home', fn() => redirect('/', 301));
 Route::get('/deals', [PageController::class, 'deals'])->name('frontend.deals');
 
 // Signed links sent after delivery; customer login is not required.
