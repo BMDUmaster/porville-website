@@ -403,7 +403,7 @@
             <div class="flex min-w-[260px] max-w-[260px] flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition hover:border-green-300 hover:shadow-lg">
                     <a href="{{ route('frontend.product.show', $product->slug) }}" class="relative block aspect-square overflow-hidden bg-gray-50">
                         @if(in_array($product->id, $newArrivalProductIds ?? [], true))
-                            <span class="absolute left-3 top-3 z-10 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-white shadow-sm">
+                            <span class="absolute left-2 top-2 z-10 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-white shadow-sm">
                                      New Arrival  
                             </span>  
                         @endif
@@ -622,7 +622,7 @@
 
                         <a href="{{ route('frontend.product.show', $typeShowcaseLead->slug) }}" class="relative block overflow-hidden">
                             @if(in_array($typeShowcaseLead->id, $newArrivalProductIds ?? [], true))
-                                <span class="absolute left-5 top-5 z-10 inline-flex rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
+                                <span class="absolute left-2 top-2 z-10 inline-flex rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
                                     New Arrival
                                 </span>
                             @endif
@@ -646,7 +646,7 @@
                         <article class="type-showcase-card group overflow-hidden rounded-[19px] border border-slate-200 bg-white p-3 shadow-[0_10px_30px_rgba(15,23,43,0.05)]">
                             <a href="{{ route('frontend.product.show', $product->slug) }}" class="relative block overflow-hidden rounded-[13px]">
                                 @if(in_array($product->id, $newArrivalProductIds ?? [], true))
-                                    <span class="absolute left-3 top-3 z-10 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
+                                    <span class="absolute left-2 top-2 z-10 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
                                         New Arrival
                                     </span>
                                 @endif
@@ -888,7 +888,7 @@
                                     </div>
                                 @endif
 
-                                <span class="absolute left-3 top-3 rounded-lg bg-white px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.16em] text-blue-700 shadow-sm">
+                                <span class="absolute left-2 top-2 rounded-lg bg-white px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.16em] text-blue-700 shadow-sm">
                                     {{ $favoriteLabel }}
                                 </span>
                             </div>

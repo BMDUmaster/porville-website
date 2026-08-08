@@ -34,6 +34,8 @@
 }
 /* Prevent horizontal overflow */
 html, body { overflow-x: clip; max-width: 100vw; }
+html, body { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display: none; }
 @media (min-width: 1024px) {
     main h1 { font-size: 2.25rem !important; line-height: 1.18 !important; }
     main h2 { font-size: 1.75rem !important; line-height: 1.25 !important; }

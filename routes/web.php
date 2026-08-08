@@ -61,7 +61,7 @@ use App\Http\Controllers\Frontend\ReviewController as FrontReviewController;
 
 // ROOT
 
-Route::get('/', fn() => redirect()->route('frontend.home'));
+Route::get('/', [HomeController::class, 'index']);
 
 
 // ADMIN DASHBOARD AUTH

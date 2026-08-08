@@ -37,7 +37,7 @@
 
                     <a href="<?php echo e(route('frontend.product.show', $item->slug)); ?>" class="relative block aspect-[1/0.9] overflow-hidden bg-[#f4f5ef]">
                         <?php if(in_array($item->id, $newArrivalProductIds ?? [], true)): ?>
-                            <span class="absolute left-3 top-3 z-10 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
+                            <span class="absolute left-2 top-2 z-10 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
                                 New Arrival
                             </span>
                         <?php endif; ?>
