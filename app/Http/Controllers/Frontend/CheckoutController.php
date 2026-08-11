@@ -8,6 +8,7 @@ use App\Models\CouponUserUsage;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\RazorpayPayment;
 use App\Support\DeliverySlotManager;
 use App\Support\OrderPricing;
 use App\Support\OrderingManager;
@@ -264,6 +265,29 @@ class CheckoutController extends Controller
             return $order;
         });
 
+        // For online/upi — call Razorpay before clearing cart
+        if (in_array($data['payment_method'], ['online', 'upi'], true)) {
+            try {
+                $razorpayService = app(\App\Services\RazorpayService::class);
+                $amountPaise     = (int) round($order->total * 100);
+                $rzpOrder        = $razorpayService->createOrder($amountPaise, $order->order_number);
+
+                RazorpayPayment::create([
+                    'order_id'          => $order->id,
+                    'razorpay_order_id' => $rzpOrder['id'],
+                    'amount'            => $rzpOrder['amount'],
+                    'status'            => 'initiated',
+                ]);
+
+                return redirect()->route('frontend.razorpay.payment', $order->id);
+
+            } catch (\Throwable $e) {
+                $order->delete();
+                return back()->withInput()->with('error', 'Payment gateway is unavailable. Please try again.');
+            }
+        }
+
+        // COD path — existing logic:
         \App\Services\OrderStatusNotificationService::notifyStatusChange($order);
 
         $remainingCart = array_diff_key($fullCart, $cart);

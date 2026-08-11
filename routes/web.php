@@ -222,7 +222,17 @@ Route::middleware('auth:web_frontend')->group(function () {
     Route::get('/checkout',             [CheckoutController::class, 'index'])->name('frontend.checkout');
     Route::post('/checkout',            [CheckoutController::class, 'store'])->name('frontend.checkout.store');
     Route::get('/order-success/{id}',   [CheckoutController::class, 'success'])->name('frontend.order.success');
+
+    // Razorpay — authenticated routes
+    Route::get('/checkout/pay/{order}',             [\App\Http\Controllers\Frontend\RazorpayController::class, 'show'])->name('frontend.razorpay.payment');
+    Route::get('/checkout/razorpay/cancel/{order}', [\App\Http\Controllers\Frontend\RazorpayController::class, 'cancel'])->name('frontend.razorpay.cancel');
 });
+
+// Razorpay callback — CSRF-exempt, rate-limited
+Route::post('/checkout/razorpay/callback', [\App\Http\Controllers\Frontend\RazorpayController::class, 'callback'])
+    ->name('frontend.razorpay.callback')
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])
+    ->middleware('throttle:20,1');
 
 // ── Track Order (public) 
 Route::get('/track-order', [FrontOrderController::class, 'track'])->name('frontend.track');

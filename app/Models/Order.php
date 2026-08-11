@@ -50,6 +50,11 @@ class Order extends Model
         return $this->hasOne(Review::class);
     }
 
+    public function razorpayPayments()
+    {
+        return $this->hasMany(RazorpayPayment::class);
+    }
+
     public function getStatusLabelAttribute(): string
     {
         return ucwords(str_replace('_', ' ', $this->status));

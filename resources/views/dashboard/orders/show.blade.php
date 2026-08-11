@@ -89,6 +89,20 @@
                     <span class="rounded px-2.5 py-1 text-xs font-bold {{ $order->status_badge_class }}">
                         {{ $order->status_label }}
                     </span>
+                    <span class="text-xs text-gray-500">
+                        <i class="fa-solid fa-credit-card mr-1"></i>{{ ucfirst(str_replace('_', ' ', $order->payment_method ?? 'cod')) }}
+                    </span>
+                    {{-- Payment Status Badge --}}
+                    @php
+                        $paymentBadgeClass = match($order->payment_status) {
+                            'paid'    => 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                            'failed'  => 'bg-red-100 text-red-700 border-red-200',
+                            default   => 'bg-amber-100 text-amber-700 border-amber-200',
+                        };
+                    @endphp
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border {{ $paymentBadgeClass }}">
+                        {{ ucfirst($order->payment_status ?? 'pending') }}
+                    </span>
                 </div>
                 <a href="#" onclick="window.print()" class="flex items-center gap-1.5 rounded border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 print:hidden">
                     <i class="fa-solid fa-download text-xs"></i> Download PDF

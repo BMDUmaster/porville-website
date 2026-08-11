@@ -652,7 +652,8 @@ sanitizeCheckoutPhone();
 // Address Selection Logic
 const pastAddresses = @json($pastAddresses ?? []);
 const hasErrors = @json($errors->has('address') || $errors->has('city') || $errors->has('state') || $errors->has('pincode') || $errors->has('sector'));
-let selectedAddressIndex = (pastAddresses.length > 0 && !hasErrors) ? 0 : null;
+// -1 means "form mode" (add new / edit), >= 0 means a saved card is selected
+let selectedAddressIndex = (pastAddresses.length > 0 && !hasErrors) ? 0 : -1;
 
 const addressCards = document.querySelectorAll('.address-card');
 const formContainer = document.getElementById('addressFormContainer');
@@ -667,31 +668,40 @@ const sectorInput = document.getElementById('shippingSectorInput');
 
 const pinToSectors = @json($pinSectors);
 
-function populateSectors(pincode) {
+function populateSectors(pincode, selectedSector) {
     if (!sectorInput) return;
-    sectorInput.innerHTML = '<option value="">Select Sector</option>';
 
     if (!pincode || !pinToSectors[pincode]) {
         sectorInput.innerHTML = '<option value="">Select PIN Code First</option>';
         return;
     }
 
+    sectorInput.innerHTML = '<option value="">Select Sector</option>';
     const sectors = pinToSectors[pincode];
     sectors.forEach(sector => {
         const opt = document.createElement('option');
         opt.value = sector;
         opt.textContent = sector;
+        if (selectedSector && sector === selectedSector) {
+            opt.selected = true;
+        }
         sectorInput.appendChild(opt);
     });
 }
 
 function updateAddressSelectionUI() {
+    const isCardSelected = selectedAddressIndex >= 0;
+
     addressCards.forEach((card, idx) => {
-        const isSelected = idx === selectedAddressIndex;
+        const isSelected = isCardSelected && idx === selectedAddressIndex;
         card.classList.toggle('border-blue-600', isSelected);
         card.classList.toggle('bg-blue-50/20', isSelected);
-        card.classList.toggle('border-gray-200', !isSelected);
-        
+        card.classList.toggle('shadow-sm', isSelected);
+        // Only reset border if not selected — avoid overriding blue border
+        if (!isSelected) {
+            card.classList.remove('border-blue-600', 'bg-blue-50/20', 'shadow-sm');
+        }
+
         const badge = card.querySelector('.select-badge');
         if (badge) {
             badge.classList.toggle('hidden', !isSelected);
@@ -699,20 +709,19 @@ function updateAddressSelectionUI() {
         }
     });
 
-    if (selectedAddressIndex !== null) {
-        // A saved address is selected, hide the input form and populate values
+    if (isCardSelected) {
+        // Saved address selected — populate hidden inputs and hide form
         const addr = pastAddresses[selectedAddressIndex];
         streetInput.value = addr.address || '';
-        cityInput.value = addr.city || '';
-        stateInput.value = addr.state || '';
+        cityInput.value = addr.city || 'Noida';
+        stateInput.value = addr.state || 'UP';
         pincodeInput.value = addr.pincode || '';
-        populateSectors(addr.pincode || '');
-        sectorInput.value = addr.sector || '';
-        
+        populateSectors(addr.pincode || '', addr.sector || '');
+
         formContainer.classList.add('hidden');
         addNewBtn?.classList.remove('hidden');
     } else {
-        // Adding new / custom address, show form
+        // Form mode (add new or edit)
         formContainer.classList.remove('hidden');
         addNewBtn?.classList.add('hidden');
     }
@@ -724,41 +733,34 @@ function selectAddressCard(index) {
 }
 
 function showNewAddressForm() {
-    selectedAddressIndex = null;
-    
-    // Clear inputs (except name/phone which are prefilled in contact info)
+    selectedAddressIndex = -1;
+
     streetInput.value = '';
     cityInput.value = 'Noida';
     stateInput.value = 'UP';
     pincodeInput.value = '';
     populateSectors('');
-    sectorInput.value = '';
-    
-    if (formActionTitle) {
-        formActionTitle.textContent = 'Add New Address';
-    }
-    
+    if (sectorInput) sectorInput.innerHTML = '<option value="">Select PIN Code First</option>';
+
+    if (formActionTitle) formActionTitle.textContent = 'Add New Address';
+
     updateAddressSelectionUI();
     streetInput.focus();
 }
 
 function editAddressCard(event, index) {
-    event.stopPropagation(); // Prevent card selection click event from firing
-    selectedAddressIndex = null;
-    
-    // Fill inputs with address details
+    event.stopPropagation();
+    selectedAddressIndex = -1; // form mode
+
     const addr = pastAddresses[index];
     streetInput.value = addr.address || '';
     cityInput.value = addr.city || 'Noida';
     stateInput.value = addr.state || 'UP';
     pincodeInput.value = addr.pincode || '';
-    populateSectors(addr.pincode || '');
-    sectorInput.value = addr.sector || '';
-    
-    if (formActionTitle) {
-        formActionTitle.textContent = 'Edit Address';
-    }
-    
+    populateSectors(addr.pincode || '', addr.sector || '');
+
+    if (formActionTitle) formActionTitle.textContent = 'Edit Address';
+
     updateAddressSelectionUI();
     streetInput.focus();
 }
@@ -770,26 +772,27 @@ function cancelAddressForm() {
     }
 }
 
-// Pincode change event listener for dynamic sectors and City/State population
+// Pincode change → repopulate sectors, keep Noida/UP fixed
 pincodeInput?.addEventListener('change', (e) => {
-    const pin = e.target.value;
-    populateSectors(pin);
+    populateSectors(e.target.value, '');
     cityInput.value = 'Noida';
     stateInput.value = 'UP';
 });
 
-// Initial Call
-if (pastAddresses.length > 0) {
+// Initial setup
+if (pastAddresses.length > 0 && !hasErrors) {
     updateAddressSelectionUI();
 } else {
-    // If no past addresses, load defaults
+    // No past addresses or validation errors — show form with old/default values
+    formContainer?.classList.remove('hidden');
+    addNewBtn?.classList.add('hidden');
     streetInput.value = @json(old('address', $checkoutDefaults['address'] ?? ''));
     cityInput.value = 'Noida';
     stateInput.value = 'UP';
     const defaultPin = @json(old('pincode', $checkoutDefaults['pincode'] ?? ''));
     pincodeInput.value = defaultPin;
-    populateSectors(defaultPin);
-    sectorInput.value = @json(old('sector', $checkoutDefaults['sector'] ?? ''));
+    const defaultSector = @json(old('sector', $checkoutDefaults['sector'] ?? ''));
+    populateSectors(defaultPin, defaultSector);
 // Ordering active check — show popup if ordering is off
 const orderingActive = {{ ($orderingActive ?? true) ? 'true' : 'false' }};
 

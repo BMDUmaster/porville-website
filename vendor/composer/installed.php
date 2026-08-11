@@ -3,7 +3,7 @@
         'name' => 'farmsea/dashboard',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'ed62e42ebd278b87ad9229bb883a4e57b36e8902',
+        'reference' => 'b079c01ec6ce3fecc6b3097c252e847d53cc2cb4',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -97,7 +97,7 @@
         'farmsea/dashboard' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'ed62e42ebd278b87ad9229bb883a4e57b36e8902',
+            'reference' => 'b079c01ec6ce3fecc6b3097c252e847d53cc2cb4',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -836,11 +836,29 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'razorpay/razorpay' => array(
+            'pretty_version' => '2.9.0',
+            'version' => '2.9.0.0',
+            'reference' => 'a3d7c2bcb416091edd6a76eb5a7600eaf00ac837',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../razorpay/razorpay',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'rhumsaa/uuid' => array(
             'dev_requirement' => false,
             'replaced' => array(
                 0 => '4.9.2',
             ),
+        ),
+        'rmccue/requests' => array(
+            'pretty_version' => 'v2.0.19',
+            'version' => '2.0.19.0',
+            'reference' => '6593fc37a5cb5b84e69d7d809f9b65fe8413f398',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../rmccue/requests',
+            'aliases' => array(),
+            'dev_requirement' => false,
         ),
         'sebastian/cli-parser' => array(
             'pretty_version' => '3.0.2',
