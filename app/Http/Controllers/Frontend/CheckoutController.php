@@ -167,7 +167,7 @@ class CheckoutController extends Controller
                 }
             ],
             'delivery_slot'    => ['required', 'string', Rule::in(array_column($this->deliverySlotOptionsForCart($cart), 'value'))],
-            'payment_method'   => 'required|in:COD,online,upi',
+            'payment_method'   => 'required|in:COD,online',
             'coupon_code'      => 'nullable|string',
         ], [
             'phone.regex' => 'Phone number must be exactly 10 digits.',
@@ -266,7 +266,7 @@ class CheckoutController extends Controller
         });
 
         // For online/upi — call Razorpay before clearing cart
-        if (in_array($data['payment_method'], ['online', 'upi'], true)) {
+        if (in_array($data['payment_method'], ['online'], true)) {
             try {
                 $razorpayService = app(\App\Services\RazorpayService::class);
                 $amountPaise     = (int) round($order->total * 100);

@@ -2,6 +2,7 @@
 @section('title', 'Checkout')
 
 @section('styles')
+<style>
 @media (max-width: 639px) {
     .checkout-page h1 { font-size: 1.2rem !important; line-height: 1.45 !important; }
     .checkout-page h2 { font-size: .88rem !important; line-height: 1.4 !important; }
@@ -15,14 +16,15 @@
         z-index: 20;
     }
 }
+</style>
 @endsection
 
 @section('content')
 @php
     $isCodAvailable = ($pricing['subtotal'] ?? 0) <= 2000;
     $paymentOptions = $isCodAvailable
-        ? ['COD' => 'Cash on Delivery', 'online' => 'Online Payment', 'upi' => 'UPI']
-        : ['online' => 'Online Payment', 'upi' => 'UPI'];
+        ? ['COD' => 'Cash on Delivery', 'online' => 'Online / UPI Payment']
+        : ['online' => 'Online / UPI Payment'];
     $selectedPaymentMethod = old('payment_method', $isCodAvailable ? 'COD' : 'online');
 
     if (! array_key_exists($selectedPaymentMethod, $paymentOptions)) {

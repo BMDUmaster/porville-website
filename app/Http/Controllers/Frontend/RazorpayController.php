@@ -25,8 +25,9 @@ class RazorpayController extends Controller
 
         $razorpayPayment = $order->razorpayPayments()->latest()->firstOrFail();
         $keyId           = config('razorpay.key_id');
+        $paymentMethod   = $order->payment_method; // 'online' or 'upi'
 
-        return view('frontend.razorpay-payment', compact('order', 'razorpayPayment', 'keyId'));
+        return view('frontend.razorpay-payment', compact('order', 'razorpayPayment', 'keyId', 'paymentMethod'));
     }
 
     /** POST /checkout/razorpay/callback (CSRF-exempt, rate-limited) */

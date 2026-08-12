@@ -55,6 +55,9 @@
             email:   '{{ addslashes($order->user->email ?? "") }}',
             contact: '{{ addslashes($order->shipping_address["phone"] ?? "") }}',
         },
+        @if($paymentMethod === 'upi')
+        {{-- UPI: remove method restrictions, let Razorpay show all UPI options --}}
+        @endif
         theme: { color: '#22c55e' },
         handler: function (response) {
             document.getElementById('rzp_order_id').value   = response.razorpay_order_id;
