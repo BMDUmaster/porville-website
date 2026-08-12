@@ -241,7 +241,7 @@
                         </span>
                         <h1 class="max-w-[390px] text-[24px] font-extrabold leading-[1.08] text-white md:text-[36px]">
                             {{ $slide['title_1'] }}
-                            <span class="block text-green-400">{{ $slide['title_2'] }}</span>
+                            <span class="block text-[18px] text-green-400 md:text-[22px]">{{ $slide['title_2'] }}</span>
                         </h1>
                         <p class="mt-4 max-w-[330px] text-[13px] leading-6 text-white/85 md:text-[15px]">
                             {{ $slide['description'] }}
