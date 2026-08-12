@@ -678,15 +678,26 @@ function populateSectors(pincode, selectedSector) {
 
     sectorInput.innerHTML = '<option value="">Select Sector</option>';
     const sectors = pinToSectors[pincode];
+    let matched = false;
     sectors.forEach(sector => {
         const opt = document.createElement('option');
         opt.value = sector;
         opt.textContent = sector;
         if (selectedSector && sector === selectedSector) {
             opt.selected = true;
+            matched = true;
         }
         sectorInput.appendChild(opt);
     });
+
+    // If no exact match, try case-insensitive match
+    if (!matched && selectedSector) {
+        Array.from(sectorInput.options).forEach(opt => {
+            if (opt.value.toLowerCase() === selectedSector.toLowerCase()) {
+                opt.selected = true;
+            }
+        });
+    }
 }
 
 function updateAddressSelectionUI() {
@@ -715,14 +726,34 @@ function updateAddressSelectionUI() {
         streetInput.value = addr.address || '';
         cityInput.value = addr.city || 'Noida';
         stateInput.value = addr.state || 'UP';
-        pincodeInput.value = addr.pincode || '';
-        populateSectors(addr.pincode || '', addr.sector || '');
+
+        // Set pincode select value
+        const pin = addr.pincode || '';
+        if (pincodeInput) {
+            pincodeInput.value = pin;
+            // Verify the option actually got selected (it exists in the dropdown)
+            if (pincodeInput.value !== pin) {
+                // Try to find and select the matching option
+                Array.from(pincodeInput.options).forEach(opt => {
+                    if (opt.value === pin) opt.selected = true;
+                });
+            }
+        }
+        populateSectors(pin, addr.sector || '');
 
         formContainer.classList.add('hidden');
+        // Disable required on hidden form inputs to prevent form submission block
+        [streetInput, pincodeInput, sectorInput].forEach(el => {
+            if (el) el.removeAttribute('required');
+        });
         addNewBtn?.classList.remove('hidden');
     } else {
         // Form mode (add new or edit)
         formContainer.classList.remove('hidden');
+        // Restore required attributes
+        if (streetInput) streetInput.setAttribute('required', '');
+        if (pincodeInput) pincodeInput.setAttribute('required', '');
+        if (sectorInput) sectorInput.setAttribute('required', '');
         addNewBtn?.classList.add('hidden');
     }
 }
@@ -772,12 +803,17 @@ function cancelAddressForm() {
     }
 }
 
-// Pincode change → repopulate sectors, keep Noida/UP fixed
-pincodeInput?.addEventListener('change', (e) => {
-    populateSectors(e.target.value, '');
+// Pincode change → repopulate sectors (user manually changed pincode in form mode)
+function handlePincodeChange() {
+    const pin = pincodeInput ? pincodeInput.value : '';
+    populateSectors(pin, '');
     cityInput.value = 'Noida';
     stateInput.value = 'UP';
-});
+    setTimeout(() => { if (sectorInput && pin) sectorInput.focus(); }, 50);
+}
+
+pincodeInput?.addEventListener('change', handlePincodeChange);
+pincodeInput?.addEventListener('input', handlePincodeChange);
 
 // Initial setup
 if (pastAddresses.length > 0 && !hasErrors) {
@@ -793,6 +829,7 @@ if (pastAddresses.length > 0 && !hasErrors) {
     pincodeInput.value = defaultPin;
     const defaultSector = @json(old('sector', $checkoutDefaults['sector'] ?? ''));
     populateSectors(defaultPin, defaultSector);
+}
 // Ordering active check — show popup if ordering is off
 const orderingActive = {{ ($orderingActive ?? true) ? 'true' : 'false' }};
 
