@@ -228,6 +228,65 @@ function setOtpStatus(message, isSuccess) {
     status.classList.add(isSuccess ? 'text-green-600' : 'text-red-600');
 }
 
+// Auto-verify OTP when 4 digits entered
+document.addEventListener('DOMContentLoaded', function () {
+    const otpInput = document.getElementById('emailOtp');
+    if (otpInput) {
+        otpInput.addEventListener('input', function () {
+            const val = this.value.replace(/\D/g, '').slice(0, 4);
+            this.value = val;
+            if (val.length === 4) {
+                verifyOtpLive(val);
+            } else {
+                // Clear verify status if user edits
+                const status = document.getElementById('otpStatus');
+                if (status && !status.textContent.includes('sent')) {
+                    status.textContent = '';
+                    status.classList.add('hidden');
+                }
+            }
+        });
+    }
+});
+
+function verifyOtpLive(otp) {
+    const email = document.getElementById('email').value.trim();
+    if (!email) return;
+
+    const status = document.getElementById('otpStatus');
+    status.textContent = 'Verifying...';
+    status.classList.remove('hidden', 'text-green-600', 'text-red-600');
+    status.classList.add('text-slate-500');
+
+    fetch('{{ route('frontend.register.verify-otp') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({ email, otp }),
+    })
+    .then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+        if (response.ok && data.valid) {
+            status.textContent = '✓ OTP verified successfully!';
+            status.classList.remove('hidden', 'text-slate-500', 'text-red-600');
+            status.classList.add('text-green-600');
+            document.getElementById('emailOtp').classList.remove('error');
+            document.getElementById('emailOtp').style.borderColor = '#16a34a';
+        } else {
+            status.textContent = data.message || 'Invalid OTP. Please try again.';
+            status.classList.remove('hidden', 'text-slate-500', 'text-green-600');
+            status.classList.add('text-red-600');
+            document.getElementById('emailOtp').classList.add('error');
+        }
+    })
+    .catch(() => {
+        // Silent fail — user can still submit form
+    });
+}
+
 function sendRegisterOtp() {
     const emailInput = document.getElementById('email');
     const email = emailInput.value.trim();

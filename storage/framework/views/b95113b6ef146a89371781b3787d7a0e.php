@@ -1,7 +1,6 @@
-@extends('frontend.layouts.app')
-@section('title', 'Checkout')
+<?php $__env->startSection('title', 'Checkout'); ?>
 
-@section('styles')
+<?php $__env->startSection('styles'); ?>
 <style>
 @media (max-width: 639px) {
     .checkout-page h1 { font-size: 1.2rem !important; line-height: 1.45 !important; }
@@ -17,10 +16,10 @@
     }
 }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
-@php
+<?php $__env->startSection('content'); ?>
+<?php
     $isCodAvailable = ($pricing['subtotal'] ?? 0) <= 2000;
     $paymentOptions = $isCodAvailable
         ? ['COD' => 'Cash on Delivery', 'online' => 'Online / UPI Payment']
@@ -32,11 +31,11 @@
     }
 
     $initialCouponCode = old('coupon_code', session('applied_coupon_' . session('checkout_delivery_day', 'today')));
-@endphp
+?>
 <div class="checkout-page max-w-5xl mx-auto px-4 py-8">
     <h1 class="nunito font-extrabold text-2xl text-gray-800 mb-6">Checkout</h1>
 
-    {{-- Noida Delivery Notice Banner --}}
+    
     <div class="mb-6 overflow-hidden rounded-2xl border border-amber-300/60 bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 p-5 text-white shadow-xl relative">
         <div class="absolute -right-6 -top-6 h-28 w-28 rounded-full bg-amber-400/10 blur-xl"></div>
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
@@ -67,15 +66,15 @@
 
     <div id="checkoutGrid" class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div class="flex-1 space-y-5">
-            <form method="POST" action="{{ route('frontend.checkout.store') }}" id="checkoutForm">
-                @csrf
-                <input type="hidden" name="delivery_slot" value="{{ $selectedDeliverySlot }}">
+            <form method="POST" action="<?php echo e(route('frontend.checkout.store')); ?>" id="checkoutForm">
+                <?php echo csrf_field(); ?>
+                <input type="hidden" name="delivery_slot" value="<?php echo e($selectedDeliverySlot); ?>">
 
-                @if($errors->any())
+                <?php if($errors->any()): ?>
                 <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-                    @foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach
+                    <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><p><?php echo e($error); ?></p><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
-                @endif
+                <?php endif; ?>
 
                 <div class="overflow-hidden rounded-2xl border bg-white">
                     <button type="button" id="contactInfoToggle" class="w-full flex items-center justify-between border-b px-6 py-4 hover:bg-gray-50 transition">
@@ -86,33 +85,33 @@
                         <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform" id="contactInfoChevron"></i>
                     </button>
 
-                    {{-- Hidden inputs so form still submits name/email --}}
-                    <input type="hidden" name="first_name" value="{{ $checkoutDefaults['first_name'] ?? '' }}">
-                    <input type="hidden" name="last_name"  value="{{ $checkoutDefaults['last_name']  ?? '' }}">
-                    <input type="hidden" name="email"      value="{{ $checkoutDefaults['email']      ?? '' }}">
+                    
+                    <input type="hidden" name="first_name" value="<?php echo e($checkoutDefaults['first_name'] ?? ''); ?>">
+                    <input type="hidden" name="last_name"  value="<?php echo e($checkoutDefaults['last_name']  ?? ''); ?>">
+                    <input type="hidden" name="email"      value="<?php echo e($checkoutDefaults['email']      ?? ''); ?>">
 
                     <div id="contactInfoContent" class="px-6 py-5 space-y-4 hidden">
-                        {{-- Name & Email as styled read-only labels --}}
+                        
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <div>
                                 <p class="text-xs font-semibold text-gray-400 mb-0.5">First Name</p>
-                                <p class="text-sm font-bold text-gray-800">{{ $checkoutDefaults['first_name'] ?? '—' }}</p>
+                                <p class="text-sm font-bold text-gray-800"><?php echo e($checkoutDefaults['first_name'] ?? '—'); ?></p>
                             </div>
                             <div>
                                 <p class="text-xs font-semibold text-gray-400 mb-0.5">Last Name</p>
-                                <p class="text-sm font-bold text-gray-800">{{ $checkoutDefaults['last_name'] ?: '—' }}</p>
+                                <p class="text-sm font-bold text-gray-800"><?php echo e($checkoutDefaults['last_name'] ?: '—'); ?></p>
                             </div>
                         </div>
 
                         <div>
                             <p class="text-xs font-semibold text-gray-400 mb-0.5">Email</p>
-                            <p class="text-sm font-bold text-gray-800">{{ $checkoutDefaults['email'] ?? '—' }}</p>
+                            <p class="text-sm font-bold text-gray-800"><?php echo e($checkoutDefaults['email'] ?? '—'); ?></p>
                         </div>
 
                         <hr class="border-gray-100">
                     </div>
 
-                    {{-- Phone: always visible, exactly 10 digits --}}
+                    
                     <div class="px-6 py-4">
                         <label for="checkoutPhoneInput" class="mb-1 block text-xs font-semibold text-gray-600">
                             Phone <span class="text-red-500">*</span>
@@ -121,7 +120,7 @@
                         <input type="tel"
                                name="phone"
                                id="checkoutPhoneInput"
-                               value="{{ $checkoutDefaults['phone'] ?? '' }}"
+                               value="<?php echo e($checkoutDefaults['phone'] ?? ''); ?>"
                                required
                                inputmode="numeric"
                                pattern="\d{10}"
@@ -133,7 +132,7 @@
                                oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)"
                                class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-100">
                         <p class="mt-1 text-xs text-gray-400" id="phoneHint">
-                            <span id="phoneCounter">{{ strlen($checkoutDefaults['phone'] ?? '') }}</span>/10 digits entered
+                            <span id="phoneCounter"><?php echo e(strlen($checkoutDefaults['phone'] ?? '')); ?></span>/10 digits entered
                         </p>
                     </div>
                 </div>
@@ -144,48 +143,48 @@
                             <div class="flex h-7 w-7 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">2</div>
                             <h2 class="nunito text-base font-extrabold text-gray-800">Shipping Address</h2>
                         </div>
-                        @if(!empty($pastAddresses))
+                        <?php if(!empty($pastAddresses)): ?>
                             <button type="button" onclick="showNewAddressForm()" id="addNewAddressBtn"
                                     class="text-xs font-bold text-blue-700 hover:text-blue-800 flex items-center gap-1">
                                 <i class="fa-solid fa-plus text-[10px]"></i> Add New
                             </button>
-                        @endif
+                        <?php endif; ?>
                     </div>
                     <div class="px-6 py-5 space-y-3">
-                        @if(!empty($pastAddresses))
+                        <?php if(!empty($pastAddresses)): ?>
                             <div id="savedAddressesContainer" class="space-y-2 mb-4">
-                                @foreach($pastAddresses as $index => $addr)
+                                <?php $__currentLoopData = $pastAddresses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $addr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <div class="address-card border rounded-xl p-3 cursor-pointer relative hover:border-blue-500 transition-all duration-200 flex items-center justify-between gap-3"
-                                         data-index="{{ $index }}"
-                                         onclick="selectAddressCard({{ $index }})">
+                                         data-index="<?php echo e($index); ?>"
+                                         onclick="selectAddressCard(<?php echo e($index); ?>)">
                                          <div class="min-w-0 flex-1">
                                              <div class="flex items-center justify-between gap-2">
-                                                 <p class="text-sm font-bold text-gray-800 truncate">{{ $addr['name'] ?? '' }}</p>
+                                                 <p class="text-sm font-bold text-gray-800 truncate"><?php echo e($addr['name'] ?? ''); ?></p>
                                                  <span class="text-[10px] font-bold text-green-700 select-badge items-center gap-1 hidden flex-shrink-0">
                                                      <i class="fa-solid fa-circle-check text-[10px]"></i> Selected
                                                  </span>
                                              </div>
-                                             <p class="text-xs text-gray-500 mt-1 line-clamp-1">{{ $addr['address'] }} @if(!empty($addr['sector']))• Sector: {{ $addr['sector'] }}@endif</p>
-                                             <p class="text-xs text-gray-500 line-clamp-1">{{ $addr['city'] }}, {{ $addr['state'] }} - {{ $addr['pincode'] }}@if(!empty($addr['phone'])) • {{ $addr['phone'] }}@endif</p>
+                                             <p class="text-xs text-gray-500 mt-1 line-clamp-1"><?php echo e($addr['address']); ?> <?php if(!empty($addr['sector'])): ?>• Sector: <?php echo e($addr['sector']); ?><?php endif; ?></p>
+                                             <p class="text-xs text-gray-500 line-clamp-1"><?php echo e($addr['city']); ?>, <?php echo e($addr['state']); ?> - <?php echo e($addr['pincode']); ?><?php if(!empty($addr['phone'])): ?> • <?php echo e($addr['phone']); ?><?php endif; ?></p>
                                          </div>
-                                         <button type="button" onclick="editAddressCard(event, {{ $index }})" 
+                                         <button type="button" onclick="editAddressCard(event, <?php echo e($index); ?>)" 
                                                  class="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1 flex-shrink-0">
                                                  <i class="fa-regular fa-pen-to-square text-[10px]"></i>
                                          </button>
                                     </div>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
-                        @endif
+                        <?php endif; ?>
 
                         <div id="addressFormContainer" class="space-y-4 pt-2">
-                            @if(!empty($pastAddresses))
+                            <?php if(!empty($pastAddresses)): ?>
                                 <div class="flex items-center justify-between mb-2">
                                     <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider" id="formActionTitle">Add New Address</h3>
                                     <button type="button" onclick="cancelAddressForm()" class="text-xs text-gray-400 hover:text-gray-600 font-medium">
                                         Cancel
                                     </button>
                                 </div>
-                            @endif
+                            <?php endif; ?>
 
                             <div>
                                 <label class="mb-1 block text-xs font-semibold text-gray-600">Street Address *</label>
@@ -206,16 +205,19 @@
                             </div>
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div>
-                                  <label class="mb-1 block text-xs font-semibold text-gray-600">Sector *</label>
-                                 <div class="relative">
-                                    <input type="text" id="shippingSectorSearchInput" placeholder="Search sector or PIN code..."
-                                           autocomplete="off"
-                                                 class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-100">
-                                                 <input type="hidden" name="sector" id="shippingSectorInput">
-                                   <div id="sectorDropdown" class="hidden absolute bottom-full left-0 right-0 mb-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-72 overflow-y-auto">
-        <!-- Sectors will be populated by JS -->
-    </div>
-</div>
+                                    <label class="mb-1 block text-xs font-semibold text-gray-600">Sector *</label>
+                                    <div class="relative z-50">
+                                        <input type="text" id="shippingSectorSearchInput" placeholder="Search or select sector..."
+                                               class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-100">
+                                        <select name="sector" id="shippingSectorInput" required
+                                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                style="appearance: none; -webkit-appearance: none; -moz-appearance: none;">
+                                            <option value="">Select Sector</option>
+                                        </select>
+                                        <div id="sectorDropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-72 overflow-y-auto">
+                                            <!-- Sectors will be populated by JS -->
+                                        </div>
+                                    </div>
                                 </div>
                                 <div>
                                     <label class="mb-1 block text-xs font-semibold text-gray-600">PIN Code *</label>
@@ -234,84 +236,86 @@
                         <h2 class="nunito text-base font-extrabold text-gray-800">Payment Method</h2>
                     </div>
                     <div class="space-y-3 px-6 py-5">
-                        @unless($isCodAvailable)
+                        <?php if (! ($isCodAvailable)): ?>
                             <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-700">
                                 Cash on Delivery is available only for orders up to &#8377;2,000.
                             </div>
-                        @endunless
-                        @foreach($paymentOptions as $val => $label)
+                        <?php endif; ?>
+                        <?php $__currentLoopData = $paymentOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 p-4 transition hover:border-blue-500">
-                            <input type="radio" name="payment_method" value="{{ $val }}" {{ $selectedPaymentMethod === $val ? 'checked' : '' }} class="accent-blue-600">
-                            <span class="text-sm font-semibold text-gray-700">{{ $label }}</span>
+                            <input type="radio" name="payment_method" value="<?php echo e($val); ?>" <?php echo e($selectedPaymentMethod === $val ? 'checked' : ''); ?> class="accent-blue-600">
+                            <span class="text-sm font-semibold text-gray-700"><?php echo e($label); ?></span>
                         </label>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
 
                 <div id="checkoutCouponSection" class="rounded-2xl border bg-white p-5">
                     <label class="mb-2 block text-xs font-semibold text-gray-600">Coupon Code (optional)</label>
                     <div class="flex flex-col gap-2 sm:flex-row">
-                        <input type="text" name="coupon_code" id="couponCodeInput" value="{{ $initialCouponCode }}" placeholder="Enter coupon code"
+                        <input type="text" name="coupon_code" id="couponCodeInput" value="<?php echo e($initialCouponCode); ?>" placeholder="Enter coupon code"
                                class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm uppercase outline-none focus:border-blue-500">
                         <button type="button" id="applyCouponButton"
-                                class="{{ $initialCouponCode ? '' : 'hidden' }} rounded-xl bg-green-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-green-700">
+                                class="<?php echo e($initialCouponCode ? '' : 'hidden'); ?> rounded-xl bg-green-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-green-700">
                             Apply
                         </button>
                     </div>
                     <p id="couponMessage" class="mt-2 hidden text-xs font-semibold"></p>
-                    @if(($availableCoupons ?? collect())->isNotEmpty())
+                    <?php if(($availableCoupons ?? collect())->isNotEmpty()): ?>
                         <div class="mt-4 flex flex-wrap gap-2">
-                            @foreach($availableCoupons as $coupon)
+                            <?php $__currentLoopData = $availableCoupons; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $coupon): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <button type="button"
-                                        data-coupon-code="{{ $coupon->code }}"
+                                        data-coupon-code="<?php echo e($coupon->code); ?>"
                                         class="coupon-chip rounded-full border border-green-200 bg-green-50 px-3 py-1.5 text-[11px] font-bold text-green-700 transition hover:border-green-500 hover:bg-white">
-                                    {{ $coupon->code }}
+                                    <?php echo e($coupon->code); ?>
+
                                 </button>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
 
-                {{-- Order Summary --}}
+                
                 <div id="checkoutOrderSummary" class="overflow-hidden rounded-2xl border bg-white shadow-sm">
                     <div class="h-1 bg-gradient-to-r from-blue-700 to-orange-400"></div>
                     <div class="border-b px-5 py-4">
                         <h2 class="nunito text-base font-extrabold text-gray-800">Order Summary</h2>
                     </div>
                     <div class="max-h-64 space-y-3 overflow-y-auto border-b px-5 py-4">
-                        @foreach($items as $item)
+                        <?php $__currentLoopData = $items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="flex items-center gap-3">
                             <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-100">
-                                @if($item['image'])
-                                    <img src="{{ asset('storage/' . $item['image']) }}" class="h-full w-full object-cover" alt="{{ $item['name'] }}">
-                                @else
+                                <?php if($item['image']): ?>
+                                    <img src="<?php echo e(asset('storage/' . $item['image'])); ?>" class="h-full w-full object-cover" alt="<?php echo e($item['name']); ?>">
+                                <?php else: ?>
                                     <i class="fa-solid fa-basket-shopping text-sm text-gray-400"></i>
-                                @endif
+                                <?php endif; ?>
                             </div>
                             <div class="min-w-0 flex-1">
-                                <p class="truncate text-xs font-semibold text-gray-800">{{ $item['name'] }}</p>
+                                <p class="truncate text-xs font-semibold text-gray-800"><?php echo e($item['name']); ?></p>
                                 <div class="mt-1 flex items-center gap-2">
-                                    <span class="text-[10px] text-gray-400">Qty: {{ $item['quantity'] }}</span>
-                                    <span class="inline-flex items-center rounded border px-1.5 py-0.5 text-[8px] font-extrabold uppercase tracking-wider {{ ($item['pricing_day'] ?? 'today') === 'tomorrow' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100' }}">
-                                        {{ ($item['pricing_day'] ?? 'today') === 'tomorrow' ? 'Tomorrow' : 'Today' }}
+                                    <span class="text-[10px] text-gray-400">Qty: <?php echo e($item['quantity']); ?></span>
+                                    <span class="inline-flex items-center rounded border px-1.5 py-0.5 text-[8px] font-extrabold uppercase tracking-wider <?php echo e(($item['pricing_day'] ?? 'today') === 'tomorrow' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100'); ?>">
+                                        <?php echo e(($item['pricing_day'] ?? 'today') === 'tomorrow' ? 'Tomorrow' : 'Today'); ?>
+
                                     </span>
                                 </div>
                             </div>
-                            <span class="flex-shrink-0 text-xs font-bold text-gray-800">&#8377;{{ number_format($item['subtotal'], 2) }}</span>
+                            <span class="flex-shrink-0 text-xs font-bold text-gray-800">&#8377;<?php echo e(number_format($item['subtotal'], 2)); ?></span>
                         </div>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                     <div class="space-y-2 px-5 py-4 text-sm">
-                        <div class="flex justify-between"><span class="text-gray-500">Subtotal</span><span>&#8377;{{ number_format($pricing['subtotal'], 2) }}</span></div>
-                        @if((float) ($pricing['delivery_charge'] ?? 0) > 0)
-                            <div class="flex justify-between"><span class="text-gray-500">Delivery</span><span>&#8377;{{ number_format($pricing['delivery_charge'], 2) }}</span></div>
-                        @endif
-                        @if((float) ($pricing['service_charge'] ?? 0) > 0)
+                        <div class="flex justify-between"><span class="text-gray-500">Subtotal</span><span>&#8377;<?php echo e(number_format($pricing['subtotal'], 2)); ?></span></div>
+                        <?php if((float) ($pricing['delivery_charge'] ?? 0) > 0): ?>
+                            <div class="flex justify-between"><span class="text-gray-500">Delivery</span><span>&#8377;<?php echo e(number_format($pricing['delivery_charge'], 2)); ?></span></div>
+                        <?php endif; ?>
+                        <?php if((float) ($pricing['service_charge'] ?? 0) > 0): ?>
                         <div class="flex justify-between">
                             <span class="text-gray-500">&#8505;&#65039; Service Charge</span>
-                            <span>&#8377;{{ number_format($pricing['service_charge'], 2) }}</span>
+                            <span>&#8377;<?php echo e(number_format($pricing['service_charge'], 2)); ?></span>
                         </div>
-                        @endif
+                        <?php endif; ?>
                         <div id="checkoutDiscountRow" class="hidden justify-between text-green-600">
                             <span>Discount</span>
                             <span id="checkoutDiscountAmount">-&#8377;0.00</span>
@@ -319,7 +323,7 @@
                         <hr class="border-gray-100">
                         <div class="flex justify-between text-base font-bold text-gray-800">
                             <span>Total</span>
-                            <span id="checkoutFinalTotal" class="text-blue-700">&#8377;{{ number_format($pricing['total'], 2) }}</span>
+                            <span id="checkoutFinalTotal" class="text-blue-700">&#8377;<?php echo e(number_format($pricing['total'], 2)); ?></span>
                         </div>
                     </div>
                 </div>
@@ -328,25 +332,25 @@
                         onclick="return checkOrderingActive(event)"
                         class="flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-700 py-4 text-sm font-bold text-white transition hover:bg-blue-800">
                     <i class="fa-solid fa-lock text-xs"></i>
-                    Place Order - <span id="placeOrderTotal">&#8377;{{ number_format($pricing['total'], 2) }}</span>
+                    Place Order - <span id="placeOrderTotal">&#8377;<?php echo e(number_format($pricing['total'], 2)); ?></span>
                 </button>
             </form>
 
-{{-- Ordering Inactive Popup --}}
+
 <div id="orderingInactiveModal"
-     class="fixed inset-0 z-[10100] {{ (session('ordering_inactive') || !($orderingActive ?? true)) ? 'flex' : 'hidden' }} items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+     class="fixed inset-0 z-[10100] <?php echo e((session('ordering_inactive') || !($orderingActive ?? true)) ? 'flex' : 'hidden'); ?> items-center justify-center bg-black/60 backdrop-blur-sm px-4">
     <div class="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl">
-        {{-- Dark header --}}
+        
         <div class="bg-gradient-to-br from-slate-900 to-slate-800 px-7 py-7 text-center">
             <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-500/20 ring-2 ring-orange-400/30">
                 <i class="fa-solid fa-store-slash text-2xl text-orange-400"></i>
             </div>
-            <h2 class="text-xl font-black text-white">{{ $orderingInactiveTitle ?? 'Orders Temporarily Paused' }}</h2>
-            <p class="mt-3 text-sm leading-relaxed text-slate-300">{{ $orderingInactiveMessage ?? 'We are currently not accepting new orders. Please check back soon.' }}</p>
+            <h2 class="text-xl font-black text-white"><?php echo e($orderingInactiveTitle ?? 'Orders Temporarily Paused'); ?></h2>
+            <p class="mt-3 text-sm leading-relaxed text-slate-300"><?php echo e($orderingInactiveMessage ?? 'We are currently not accepting new orders. Please check back soon.'); ?></p>
         </div>
-        {{-- Footer --}}
+        
         <div class="flex gap-3 bg-slate-50 px-7 py-5">
-            <a href="{{ route('frontend.home') }}"
+            <a href="<?php echo e(route('frontend.home')); ?>"
                class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-slate-900 py-3 text-sm font-bold text-white transition hover:bg-slate-700">
                 <i class="fa-solid fa-house text-xs"></i> Go Home
             </a>
@@ -362,7 +366,7 @@
 
         <aside id="checkoutSideColumn" class="w-full lg:self-stretch">
             <div id="checkoutPromoCard" class="group relative overflow-hidden rounded-[24px] border border-emerald-100 bg-white shadow-md">
-                <img src="{{ asset('images/checkout/fresh-delivery-banner.png') }}" alt="Fresh meat and seafood packed for delivery" class="h-48 w-full object-cover transition duration-700 group-hover:scale-105">
+                <img src="<?php echo e(asset('images/checkout/fresh-delivery-banner.png')); ?>" alt="Fresh meat and seafood packed for delivery" class="h-48 w-full object-cover transition duration-700 group-hover:scale-105">
                 <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 via-slate-900/55 to-transparent px-5 pb-4 pt-12 text-white">
                     <p class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-300">FarmSea Fresh Promise</p>
                     <h3 class="mt-1 text-lg font-black">Freshness packed with care</h3>
@@ -370,49 +374,49 @@
                 </div>
             </div>
 
-            @if(($checkoutNewArrivals ?? collect())->isNotEmpty())
+            <?php if(($checkoutNewArrivals ?? collect())->isNotEmpty()): ?>
                 <div id="checkoutNewArrivals" class="mt-6 rounded-[22px] border border-slate-200 bg-white p-3 shadow-sm">
                     <div class="mb-3 flex items-center justify-between px-1">
                         <div>
                             <p class="text-[9px] font-black uppercase tracking-[0.18em] text-blue-600">Just In</p>
                             <h3 class="text-sm font-black text-slate-900">New Arrivals</h3>
                         </div>
-                        <a href="{{ route('frontend.products', ['sort' => 'latest']) }}" class="text-[9px] font-black uppercase tracking-wider text-blue-600 hover:underline">View All</a>
+                        <a href="<?php echo e(route('frontend.products', ['sort' => 'latest'])); ?>" class="text-[9px] font-black uppercase tracking-wider text-blue-600 hover:underline">View All</a>
                     </div>
 
                     <div class="space-y-2.5">
-                        @foreach($checkoutNewArrivals as $arrival)
-                            @php
+                        <?php $__currentLoopData = $checkoutNewArrivals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $arrival): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php
                                 $arrivalVariantIndex = collect($arrival->variants ?? [])->search(
                                     fn ($variant) => filled($variant['selling_price'] ?? null) || filled($variant['today_price'] ?? null)
                                 );
                                 $arrivalVariantIndex = $arrivalVariantIndex === false ? null : $arrivalVariantIndex;
                                 $arrivalImage = $arrival->images && count($arrival->images) ? asset('storage/' . $arrival->images[0]) : null;
-                            @endphp
+                            ?>
                             <article class="group/item flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50/70 p-2 transition hover:border-green-200 hover:bg-green-50/50">
-                                <a href="{{ route('frontend.product.show', $arrival->slug) }}" class="h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-white">
-                                    @if($arrivalImage)
-                                        <img src="{{ $arrivalImage }}" alt="{{ $arrival->name }}" class="h-full w-full object-cover transition duration-300 group-hover/item:scale-105">
-                                    @else
+                                <a href="<?php echo e(route('frontend.product.show', $arrival->slug)); ?>" class="h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-white">
+                                    <?php if($arrivalImage): ?>
+                                        <img src="<?php echo e($arrivalImage); ?>" alt="<?php echo e($arrival->name); ?>" class="h-full w-full object-cover transition duration-300 group-hover/item:scale-105">
+                                    <?php else: ?>
                                         <span class="flex h-full w-full items-center justify-center text-slate-300"><i class="fa-solid fa-basket-shopping"></i></span>
-                                    @endif
+                                    <?php endif; ?>
                                 </a>
                                 <div class="min-w-0 flex-1">
-                                    <p class="truncate text-[9px] font-black uppercase tracking-wider text-emerald-600">{{ $arrival->category->name ?? 'Fresh' }}</p>
-                                    <a href="{{ route('frontend.product.show', $arrival->slug) }}" class="mt-0.5 block truncate text-[11px] font-black text-slate-900 hover:text-green-700">{{ $arrival->name }}</a>
-                                    <p class="mt-1 text-xs font-black text-slate-900">Rs{{ number_format($arrival->display_price, 0) }} <span class="text-[9px] font-semibold text-slate-400">{{ $arrival->display_pack_label }}</span></p>
+                                    <p class="truncate text-[9px] font-black uppercase tracking-wider text-emerald-600"><?php echo e($arrival->category->name ?? 'Fresh'); ?></p>
+                                    <a href="<?php echo e(route('frontend.product.show', $arrival->slug)); ?>" class="mt-0.5 block truncate text-[11px] font-black text-slate-900 hover:text-green-700"><?php echo e($arrival->name); ?></a>
+                                    <p class="mt-1 text-xs font-black text-slate-900">Rs<?php echo e(number_format($arrival->display_price, 0)); ?> <span class="text-[9px] font-semibold text-slate-400"><?php echo e($arrival->display_pack_label); ?></span></p>
                                 </div>
-                                <button type="button" onclick="addToCart({{ $arrival->id }}, {{ $arrivalVariantIndex === null ? 'null' : $arrivalVariantIndex }}, 'today')" aria-label="Add {{ $arrival->name }} to cart" title="Add to cart" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-green-700 text-white shadow-sm transition hover:bg-green-800">
+                                <button type="button" onclick="addToCart(<?php echo e($arrival->id); ?>, <?php echo e($arrivalVariantIndex === null ? 'null' : $arrivalVariantIndex); ?>, 'today')" aria-label="Add <?php echo e($arrival->name); ?> to cart" title="Add to cart" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-green-700 text-white shadow-sm transition hover:bg-green-800">
                                     <i class="fa-solid fa-cart-plus text-xs"></i>
                                 </button>
                             </article>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
-            @endif
+            <?php endif; ?>
 
-            <a id="checkoutMealBanner" href="{{ route('frontend.products') }}" class="group relative mt-6 block overflow-hidden rounded-[22px] border border-amber-100 bg-white shadow-md">
-                <img src="{{ asset('images/checkout/ready-to-cook-meal-banner.png') }}" alt="Fresh ready-to-cook fish and chicken meal" class="h-40 w-full object-cover transition duration-700 group-hover:scale-105">
+            <a id="checkoutMealBanner" href="<?php echo e(route('frontend.products')); ?>" class="group relative mt-6 block overflow-hidden rounded-[22px] border border-amber-100 bg-white shadow-md">
+                <img src="<?php echo e(asset('images/checkout/ready-to-cook-meal-banner.png')); ?>" alt="Fresh ready-to-cook fish and chicken meal" class="h-40 w-full object-cover transition duration-700 group-hover:scale-105">
                 <div class="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-900/30 to-transparent"></div>
                 <div class="absolute inset-y-0 left-0 flex max-w-[72%] flex-col justify-center px-4 text-white">
                     <p class="text-[9px] font-black uppercase tracking-[0.18em] text-amber-300">Cook Something Fresh</p>
@@ -434,51 +438,51 @@
                     <div class="flex items-center gap-3 py-3">
                         <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600"><i class="fa-solid fa-headset text-xs"></i></span>
                         <div class="min-w-0 flex-1"><p class="text-[11px] font-black text-slate-900">Need checkout help?</p><p class="mt-0.5 text-[9px] font-semibold text-slate-400">Our support team is ready</p></div>
-                        <a href="{{ route('frontend.contact') }}" class="rounded-lg bg-slate-900 px-2.5 py-1.5 text-[8px] font-black uppercase tracking-wider text-white transition hover:bg-emerald-700">Get Help</a>
+                        <a href="<?php echo e(route('frontend.contact')); ?>" class="rounded-lg bg-slate-900 px-2.5 py-1.5 text-[8px] font-black uppercase tracking-wider text-white transition hover:bg-emerald-700">Get Help</a>
                     </div>
                 </div>
             </div>
 
-            @if(($checkoutSimilarProducts ?? collect())->isNotEmpty())
+            <?php if(($checkoutSimilarProducts ?? collect())->isNotEmpty()): ?>
                 <div id="checkoutSimilarProducts" class="mt-6 rounded-[22px] border border-violet-100 bg-white p-3 shadow-sm">
                     <div class="mb-3 flex items-center justify-between px-1">
                         <div>
                             <p class="text-[9px] font-black uppercase tracking-[0.18em] text-violet-600">You May Also Like</p>
                             <h3 class="text-sm font-black text-slate-900">Similar Products</h3>
                         </div>
-                        <a href="{{ route('frontend.products') }}" class="text-[9px] font-black uppercase tracking-wider text-violet-600 hover:underline">View All</a>
+                        <a href="<?php echo e(route('frontend.products')); ?>" class="text-[9px] font-black uppercase tracking-wider text-violet-600 hover:underline">View All</a>
                     </div>
 
                     <div class="space-y-2.5">
-                        @foreach($checkoutSimilarProducts as $similarProduct)
-                            @php
+                        <?php $__currentLoopData = $checkoutSimilarProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $similarProduct): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php
                                 $similarVariantIndex = collect($similarProduct->variants ?? [])->search(
                                     fn ($variant) => filled($variant['selling_price'] ?? null) || filled($variant['today_price'] ?? null)
                                 );
                                 $similarVariantIndex = $similarVariantIndex === false ? null : $similarVariantIndex;
                                 $similarImage = $similarProduct->images && count($similarProduct->images) ? asset('storage/' . $similarProduct->images[0]) : null;
-                            @endphp
+                            ?>
                             <article class="group/similar flex items-center gap-3 rounded-2xl border border-violet-50 bg-violet-50/45 p-2 transition hover:border-violet-200 hover:bg-violet-50">
-                                <a href="{{ route('frontend.product.show', $similarProduct->slug) }}" class="h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-white">
-                                    @if($similarImage)
-                                        <img src="{{ $similarImage }}" alt="{{ $similarProduct->name }}" class="h-full w-full object-cover transition duration-300 group-hover/similar:scale-105">
-                                    @else
+                                <a href="<?php echo e(route('frontend.product.show', $similarProduct->slug)); ?>" class="h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-white">
+                                    <?php if($similarImage): ?>
+                                        <img src="<?php echo e($similarImage); ?>" alt="<?php echo e($similarProduct->name); ?>" class="h-full w-full object-cover transition duration-300 group-hover/similar:scale-105">
+                                    <?php else: ?>
                                         <span class="flex h-full w-full items-center justify-center text-violet-200"><i class="fa-solid fa-basket-shopping"></i></span>
-                                    @endif
+                                    <?php endif; ?>
                                 </a>
                                 <div class="min-w-0 flex-1">
-                                    <p class="truncate text-[9px] font-black uppercase tracking-wider text-violet-600">{{ $similarProduct->category->name ?? 'Recommended' }}</p>
-                                    <a href="{{ route('frontend.product.show', $similarProduct->slug) }}" class="mt-0.5 block truncate text-[11px] font-black text-slate-900 hover:text-violet-700">{{ $similarProduct->name }}</a>
-                                    <p class="mt-1 text-xs font-black text-slate-900">Rs{{ number_format($similarProduct->display_price, 0) }} <span class="text-[9px] font-semibold text-slate-400">{{ $similarProduct->display_pack_label }}</span></p>
+                                    <p class="truncate text-[9px] font-black uppercase tracking-wider text-violet-600"><?php echo e($similarProduct->category->name ?? 'Recommended'); ?></p>
+                                    <a href="<?php echo e(route('frontend.product.show', $similarProduct->slug)); ?>" class="mt-0.5 block truncate text-[11px] font-black text-slate-900 hover:text-violet-700"><?php echo e($similarProduct->name); ?></a>
+                                    <p class="mt-1 text-xs font-black text-slate-900">Rs<?php echo e(number_format($similarProduct->display_price, 0)); ?> <span class="text-[9px] font-semibold text-slate-400"><?php echo e($similarProduct->display_pack_label); ?></span></p>
                                 </div>
-                                <button type="button" onclick="addToCart({{ $similarProduct->id }}, {{ $similarVariantIndex === null ? 'null' : $similarVariantIndex }}, 'today')" aria-label="Add {{ $similarProduct->name }} to cart" title="Add to cart" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-violet-600 text-white shadow-sm transition hover:bg-violet-700">
+                                <button type="button" onclick="addToCart(<?php echo e($similarProduct->id); ?>, <?php echo e($similarVariantIndex === null ? 'null' : $similarVariantIndex); ?>, 'today')" aria-label="Add <?php echo e($similarProduct->name); ?> to cart" title="Add to cart" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-violet-600 text-white shadow-sm transition hover:bg-violet-700">
                                     <i class="fa-solid fa-cart-plus text-xs"></i>
                                 </button>
                             </article>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
-            @endif
+            <?php endif; ?>
 
 
         </aside>
@@ -489,8 +493,8 @@
 // Order Summary is now part of the main form (not sticky sidebar)
 
 const checkoutPricing = {
-    subtotal: Number(@json((float) ($pricing['subtotal'] ?? 0))),
-    total: Number(@json((float) ($pricing['total'] ?? 0))),
+    subtotal: Number(<?php echo json_encode((float) ($pricing['subtotal'] ?? 0), 15, 512) ?>),
+    total: Number(<?php echo json_encode((float) ($pricing['total'] ?? 0), 15, 512) ?>),
 };
 
 const couponInput = document.getElementById('couponCodeInput');
@@ -622,8 +626,8 @@ phoneInput?.addEventListener('input', sanitizeCheckoutPhone);
 sanitizeCheckoutPhone();
 
 // Address Selection Logic
-const pastAddresses = @json($pastAddresses ?? []);
-const hasErrors = @json($errors->has('address') || $errors->has('city') || $errors->has('state') || $errors->has('pincode') || $errors->has('sector'));
+const pastAddresses = <?php echo json_encode($pastAddresses ?? [], 15, 512) ?>;
+const hasErrors = <?php echo json_encode($errors->has('address') || $errors->has('city') || $errors->has('state') || $errors->has('pincode') || $errors->has('sector'), 15, 512) ?>;
 // -1 means "form mode" (add new / edit), >= 0 means a saved card is selected
 let selectedAddressIndex = (pastAddresses.length > 0 && !hasErrors) ? 0 : -1;
 
@@ -640,7 +644,7 @@ const sectorInput = document.getElementById('shippingSectorInput');
 const sectorSearchInput = document.getElementById('shippingSectorSearchInput');
 const sectorDropdown = document.getElementById('sectorDropdown');
 
-const pinToSectors = @json($pinSectors);
+const pinToSectors = <?php echo json_encode($pinSectors, 15, 512) ?>;
 
 // Build mapping: sector+pincode -> pincode, and all sector options
 const sectorToPinMap = {};
@@ -703,22 +707,18 @@ function populateAllSectors() {
 }
 
 function selectSectorFromDropdown(sector, pincode) {
-    // Focus: hamesha current text ke hisab se fresh list dikhao (stale list bug fix)
-sectorSearchInput?.addEventListener('focus', () => {
-    sectorDropdown.classList.remove('hidden');
-    filterSectors();
-});
-
-sectorSearchInput?.addEventListener('input', () => {
-    sectorDropdown.classList.remove('hidden');
-    filterSectors();
-});
-
-sectorSearchInput?.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        sectorDropdown.classList.add('hidden');
+    if (!sectorSearchInput) {
+        console.error('sectorSearchInput not found');
+        return;
     }
-});
+    if (!sectorInput) {
+        console.error('sectorInput not found');
+        return;
+    }
+    if (!pincodeInput) {
+        console.error('pincodeInput not found');
+        return;
+    }
     
     sectorSearchInput.value = sector;
     sectorInput.value = sector;
@@ -800,14 +800,9 @@ sectorSearchInput?.addEventListener('keydown', (e) => {
 });
 
 // Close dropdown when clicking outside
-document.getElementById('checkoutForm')?.addEventListener('submit', function (e) {
-    const isFormMode = selectedAddressIndex === -1; // naya address add/edit ho raha hai
-    if (isFormMode && !sectorInput.value) {
-        e.preventDefault();
-        sectorSearchInput.classList.add('border-red-400');
-        sectorSearchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        sectorSearchInput.focus();
-        alert('Kripya apna sector select karein.');
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('[id="shippingSectorSearchInput"]') && !e.target.closest('#sectorDropdown')) {
+        sectorDropdown.classList.add('hidden');
     }
 });
 
@@ -948,11 +943,11 @@ if (pastAddresses.length > 0 && !hasErrors) {
     // No past addresses or validation errors — show form with old/default values
     formContainer?.classList.remove('hidden');
     addNewBtn?.classList.add('hidden');
-    streetInput.value = @json(old('address', $checkoutDefaults['address'] ?? ''));
+    streetInput.value = <?php echo json_encode(old('address', $checkoutDefaults['address'] ?? ''), 512) ?>;
     cityInput.value = 'Noida';
     stateInput.value = 'UP';
-    const defaultPin = @json(old('pincode', $checkoutDefaults['pincode'] ?? ''));
-    const defaultSector = @json(old('sector', $checkoutDefaults['sector'] ?? ''));
+    const defaultPin = <?php echo json_encode(old('pincode', $checkoutDefaults['pincode'] ?? ''), 512) ?>;
+    const defaultSector = <?php echo json_encode(old('sector', $checkoutDefaults['sector'] ?? ''), 512) ?>;
     sectorSearchInput.value = defaultSector;
     sectorInput.value = defaultSector;
     pincodeInput.value = defaultPin;
@@ -971,7 +966,7 @@ if (contactToggle) {
 }
 
 // Ordering active check — show popup if ordering is off
-const orderingActive = {{ ($orderingActive ?? true) ? 'true' : 'false' }};
+const orderingActive = <?php echo e(($orderingActive ?? true) ? 'true' : 'false'); ?>;
 
 function checkOrderingActive(e) {
     if (!orderingActive) {
@@ -984,4 +979,6 @@ function checkOrderingActive(e) {
     return true;
 }
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('frontend.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views/frontend/checkout.blade.php ENDPATH**/ ?>

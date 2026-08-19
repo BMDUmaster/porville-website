@@ -493,13 +493,10 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                     <li><a href="{{ route('frontend.contact') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Contact Us</a></li>
                     <li><a href="{{ route('frontend.about') }}#faq" class="text-[14px] text-[#9bb0cf] transition hover:text-white">FAQ</a></li>
                     <li>
-                        <a href="{{ asset('docs/fssai-certificate.pdf') }}"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           class="inline-flex items-center gap-1.5 text-[14px] text-[#9bb0cf] transition hover:text-white">
-                            <i class="fa-solid fa-certificate text-green-400 text-xs"></i>
-                            FSSAI Certificate
-                        </a>
+                        <span class="inline-flex items-center gap-1.5 text-[14px] text-[#9bb0cf]">
+                            <img src="{{ asset('images/fssai-logo.png') }}" alt="FSSAI" class="h-5 w-auto">
+                            22726924000264
+                        </span>
                     </li>
                 </ul>
             </div>

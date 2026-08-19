@@ -78,22 +78,22 @@
             'eyebrow' => '01 / Customer',
             'title' => 'Fresh Support',
             'text' => 'Help with orders, delivery tracking and product queries.',
-            'link' => 'support@farmsea.com',
-            'href' => 'mailto:support@farmsea.com',
+            'link' => 'info@farmsea.in',
+            'href' => 'mailto:admin@farmsea.in',
         ],
         [
             'eyebrow' => '02 / Logistics',
             'title' => 'Delivery Help',
             'text' => 'Support for order tracking and delivery issues.',
-            'link' => 'logistics@farmsea.com',
-            'href' => 'mailto:logistics@farmsea.com',
+            'link' => 'admin@farmsea.in',
+            'href' => 'mailto:admin@farmsea.in',
         ],
         [
             'eyebrow' => '03 / Office',
             'title' => 'Head Office',
             'text' => '350 Agriculture Street, India',
-            'link' => '+91 99999 99999',
-            'href' => 'tel:+919999999999',
+            'link' => '+91 8796937990',
+            'href' => 'tel:+919796937990',
         ],
     ];
 @endphp

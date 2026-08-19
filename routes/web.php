@@ -204,6 +204,7 @@ Route::middleware('guest:web_frontend')->group(function () {
     Route::post('/account/forgot-password/reset', [FrontAuthController::class, 'resetForgotPassword'])->middleware('throttle:5,1')->name('frontend.password.reset');
     Route::get('/account/register',  [FrontAuthController::class, 'showRegister'])->name('frontend.register');
     Route::post('/account/register/send-otp', [FrontAuthController::class, 'sendRegisterOtp'])->middleware('throttle:3,1')->name('frontend.register.otp');
+    Route::post('/account/register/verify-otp', [FrontAuthController::class, 'verifyRegisterOtp'])->middleware('throttle:10,1')->name('frontend.register.verify-otp');
     Route::post('/account/register', [FrontAuthController::class, 'register'])->middleware('throttle:3,1')->name('frontend.register.post');
 });
 Route::post('/account/logout', [FrontAuthController::class, 'logout'])->name('frontend.logout');

@@ -163,6 +163,30 @@ class AuthController extends Controller
             ->with('success', 'Password created successfully. Please log in with your new password.');
     }
 
+    /** POST /account/register/verify-otp (AJAX live check) */
+    public function verifyRegisterOtp(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email'],
+            'otp'   => ['required', 'digits:4'],
+        ]);
+
+        $email     = strtolower($request->email);
+        $otpHash   = session('register_otp_hash');
+        $otpEmail  = session('register_otp_email');
+        $expiresAt = (int) session('register_otp_expires_at', 0);
+
+        $valid = $otpEmail === $email
+            && $otpHash
+            && $expiresAt >= now()->timestamp
+            && Hash::check($request->otp, $otpHash);
+
+        return response()->json([
+            'valid'   => $valid,
+            'message' => $valid ? 'OTP verified successfully!' : 'Invalid or expired OTP.',
+        ]);
+    }
+
     /** POST /account/register/send-otp */
     public function sendRegisterOtp(Request $request)
     {
