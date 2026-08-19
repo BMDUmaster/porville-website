@@ -35,7 +35,8 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (Auth::guard('web_frontend')->attempt($credentials, $request->boolean('remember'))) {
+        // Keep customers signed in across normal session expiry; logout remains manual.
+        if (Auth::guard('web_frontend')->attempt($credentials, true)) {
             $user = Auth::guard('web_frontend')->user();
 
             if ($user && in_array($user->status, ['blocked', 'inactive'], true)) {

@@ -215,6 +215,8 @@ Route::middleware('auth:web_frontend')->group(function () {
     Route::put('/account/profile',      [FrontProfileController::class, 'update'])->name('frontend.profile.update');
     Route::put('/account/password',     [FrontProfileController::class, 'updatePassword'])->name('frontend.profile.password');
     Route::post('/account/notifications/read', [FrontProfileController::class, 'markNotificationsRead'])->name('frontend.notifications.read');
+    Route::post('/account/notifications/{notification}/read', [FrontProfileController::class, 'markNotificationRead'])->name('frontend.notifications.mark-read');
+    Route::delete('/account/notifications/{notification}', [FrontProfileController::class, 'deleteNotification'])->name('frontend.notifications.delete');
 
     Route::get('/account/orders',       [FrontOrderController::class, 'index'])->name('frontend.orders');
     Route::get('/account/orders/{id}',  [FrontOrderController::class, 'show'])->name('frontend.order.show');

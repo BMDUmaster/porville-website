@@ -314,6 +314,34 @@
                                     <p class="mt-auto pt-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
                                         {{ $notification->created_at->format('d M Y, h:i A') }}
                                     </p>
+                                    <div class="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-200/80 pt-3">
+                                        <button
+                                            type="button"
+                                            class="notification-view-btn rounded-lg bg-slate-900 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-white transition hover:bg-slate-700"
+                                            data-subject="{{ $notification->subject }}"
+                                            data-message="{{ $notification->message }}"
+                                            data-date="{{ $notification->created_at->format('d M Y, h:i A') }}"
+                                        >
+                                            View
+                                        </button>
+                                        @if($notification->recipient_id === $user->id)
+                                            @if(! $notification->read_at)
+                                                <form method="POST" action="{{ route('frontend.notifications.mark-read', $notification) }}">
+                                                    @csrf
+                                                    <button type="submit" class="rounded-lg border border-blue-200 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-blue-700 transition hover:bg-blue-50">
+                                                        Mark as Read
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            <form method="POST" action="{{ route('frontend.notifications.delete', $notification) }}" onsubmit="return confirm('Delete this notification?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="rounded-lg border border-red-200 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-red-600 transition hover:bg-red-50">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
@@ -443,6 +471,21 @@
         </div>
     </div>
 </div>
+<div id="notificationViewModal" class="fixed inset-0 z-[10060] hidden items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-lg rounded-[24px] bg-white p-6 shadow-2xl">
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-[0.18em] text-blue-600">FarmSea Notification</p>
+                <h2 id="notificationViewSubject" class="mt-2 text-xl font-extrabold leading-snug text-slate-900"></h2>
+            </div>
+            <button type="button" id="notificationViewClose" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200" aria-label="Close notification">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <p id="notificationViewDate" class="mt-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400"></p>
+        <p id="notificationViewMessage" class="mt-5 whitespace-pre-wrap text-sm leading-7 text-slate-600"></p>
+    </div>
+</div>
 <script>
 const profilePhoneInput = document.getElementById('profilePhoneInput');
 
@@ -456,5 +499,30 @@ function sanitizeProfilePhone() {
 
 profilePhoneInput?.addEventListener('input', sanitizeProfilePhone);
 sanitizeProfilePhone();
+
+const notificationViewModal = document.getElementById('notificationViewModal');
+const notificationViewSubject = document.getElementById('notificationViewSubject');
+const notificationViewMessage = document.getElementById('notificationViewMessage');
+const notificationViewDate = document.getElementById('notificationViewDate');
+
+function closeNotificationView() {
+    notificationViewModal?.classList.add('hidden');
+    notificationViewModal?.classList.remove('flex');
+}
+
+document.querySelectorAll('.notification-view-btn').forEach((button) => {
+    button.addEventListener('click', () => {
+        notificationViewSubject.textContent = button.dataset.subject || 'Notification';
+        notificationViewMessage.textContent = button.dataset.message || '';
+        notificationViewDate.textContent = button.dataset.date || '';
+        notificationViewModal.classList.remove('hidden');
+        notificationViewModal.classList.add('flex');
+    });
+});
+
+document.getElementById('notificationViewClose')?.addEventListener('click', closeNotificationView);
+notificationViewModal?.addEventListener('click', (event) => {
+    if (event.target === notificationViewModal) closeNotificationView();
+});
 </script>
 @endsection

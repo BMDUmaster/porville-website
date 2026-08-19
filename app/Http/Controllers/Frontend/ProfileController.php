@@ -113,4 +113,27 @@ class ProfileController extends Controller
 
         return back()->with('success', 'Notifications marked as read.');
     }
+
+    public function markNotificationRead(Notification $notification)
+    {
+        $this->ensureNotificationBelongsToUser($notification);
+
+        $notification->update(['read_at' => now()]);
+
+        return back()->with('success', 'Notification marked as read.');
+    }
+
+    public function deleteNotification(Notification $notification)
+    {
+        $this->ensureNotificationBelongsToUser($notification);
+
+        $notification->delete();
+
+        return back()->with('success', 'Notification deleted.');
+    }
+
+    private function ensureNotificationBelongsToUser(Notification $notification): void
+    {
+        abort_unless($notification->recipient_id === Auth::guard('web_frontend')->id(), 404);
+    }
 }
