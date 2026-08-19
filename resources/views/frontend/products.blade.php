@@ -26,7 +26,7 @@
         <img
             src="{{ $shopHeroImage }}"
             alt="All products hero banner"
-            class="absolute inset-0 h-full w-full object-cover"
+            class="absolute inset-0 h-full w-full object-fill"
         >
         <div class="hidden absolute inset-0 bg-black/55"></div>
         <div class="hidden absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.74)_0%,rgba(0,0,0,0.52)_34%,rgba(0,0,0,0.18)_58%,rgba(0,0,0,0.62)_100%)]"></div>

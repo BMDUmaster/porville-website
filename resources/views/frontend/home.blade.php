@@ -228,7 +228,7 @@
                     <img
                         src="{{ $slide['image'] }}"
                         alt="{{ $slide['title_1'] }} {{ $slide['title_2'] }}"
-                        class="absolute inset-0 h-full w-full object-cover"
+                        class="absolute inset-0 h-full w-full object-fill"
                     >
                 </picture>
                 <div class="hidden absolute inset-0 bg-black/45"></div>
