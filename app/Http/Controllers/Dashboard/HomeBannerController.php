@@ -31,10 +31,9 @@ class HomeBannerController extends Controller
     {
         $data = $request->validate($this->rules(true));
 
-        $data['is_active'] = $request->boolean('is_active');
-        $data['sort_order'] = (int) ($data['sort_order'] ?? 0);
-        $data['button_text'] = $data['button_text'] ?: 'Shop Now';
         $data['image'] = WebpImage::store($request->file('image'), 'home-banners');
+        $data['title_1'] = 'Banner';
+        $data['is_active'] = true;
         if ($request->hasFile('mobile_image')) {
             $data['mobile_image'] = WebpImage::store($request->file('mobile_image'), 'home-banners/mobile');
         }
@@ -47,10 +46,6 @@ class HomeBannerController extends Controller
     public function update(Request $request, HomeBanner $banner)
     {
         $data = $request->validate($this->rules(false));
-
-        $data['is_active'] = $request->boolean('is_active');
-        $data['sort_order'] = (int) ($data['sort_order'] ?? 0);
-        $data['button_text'] = $data['button_text'] ?: 'Shop Now';
 
         if ($request->hasFile('image')) {
             $data['image'] = WebpImage::store($request->file('image'), 'home-banners');
@@ -76,14 +71,6 @@ class HomeBannerController extends Controller
         return [
             'image' => [$imageRequired ? 'required' : 'nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp,avif', 'max:5120'],
             'mobile_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp,avif', 'max:5120'],
-            'badge' => ['nullable', 'string', 'max:80'],
-            'title_1' => ['required', 'string', 'max:120'],
-            'title_2' => ['nullable', 'string', 'max:120'],
-            'description' => ['nullable', 'string', 'max:500'],
-            'button_text' => ['nullable', 'string', 'max:40'],
-            'link_url' => ['nullable', 'string', 'max:255'],
-            'sort_order' => ['nullable', 'integer', 'min:0'],
-            'is_active' => ['nullable', 'boolean'],
         ];
     }
 }

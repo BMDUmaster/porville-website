@@ -22,9 +22,7 @@
                 <tr>
                     <th class="px-4 py-3 text-xs uppercase">Sr.No.</th>
                     <th class="px-4 py-3 text-xs uppercase">Banner</th>
-                    <th class="px-4 py-3 text-xs uppercase">Text</th>
-                    <th class="px-4 py-3 text-xs uppercase">Button / Link</th>
-                    <th class="px-4 py-3 text-xs uppercase">Order</th>
+                    
                     <th class="px-4 py-3 text-xs uppercase">Status</th>
                     <th class="px-4 py-3 text-center text-xs uppercase">Actions</th>
                 </tr>
@@ -47,16 +45,8 @@
                                 @endif
                             </div>
                         </td>
-                        <td class="px-4 py-3">
-                            <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-green-600">{{ $banner->badge ?: 'No badge' }}</p>
-                            <p class="mt-1 text-sm font-bold text-slate-900">{{ $banner->title_1 }} {{ $banner->title_2 }}</p>
-                            <p class="mt-1 max-w-[280px] truncate text-xs text-slate-500">{{ $banner->description ?: 'No description' }}</p>
-                        </td>
-                        <td class="px-4 py-3">
-                            <p class="text-sm font-semibold text-slate-700">{{ $banner->button_text }}</p>
-                            <p class="max-w-[220px] truncate text-xs text-slate-400">{{ $banner->link_url ?: 'No link' }}</p>
-                        </td>
-                        <td class="px-4 py-3 text-sm text-slate-600">{{ $banner->sort_order }}</td>
+                       
+                       
                         <td class="px-4 py-3">
                             <span class="rounded-full px-3 py-1 text-xs font-bold {{ $banner->is_active ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500' }}">
                                 {{ $banner->is_active ? 'Active' : 'Inactive' }}
@@ -158,15 +148,6 @@ function fillField(id, value) {
 
 function openEditModal(button) {
     document.getElementById('editForm').action = bannerUpdateUrlTemplate.replace('__ID__', encodeURIComponent(button.dataset.id));
-    fillField('editBadge', button.dataset.badge);
-    fillField('editTitle1', button.dataset.title1);
-    fillField('editTitle2', button.dataset.title2);
-    fillField('editDescription', button.dataset.description);
-    fillField('editButtonText', button.dataset.buttonText);
-    fillField('editLinkUrl', button.dataset.linkUrl);
-    fillField('editSortOrder', button.dataset.sortOrder);
-    document.getElementById('editIsActive').checked = button.dataset.isActive === '1';
-
     openModal('editModal');
 }
 </script>

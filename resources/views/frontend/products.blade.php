@@ -22,16 +22,16 @@
 @endphp
 
 <section class="pt-0">
-    <div class="relative overflow-hidden bg-[#151819] text-white shadow-[0_24px_70px_rgba(15,23,42,0.22)]">
+    <div class="relative min-h-[230px] overflow-hidden bg-[#151819] text-white shadow-[0_24px_70px_rgba(15,23,42,0.22)] sm:min-h-[270px] md:min-h-[340px]">
         <img
             src="{{ $shopHeroImage }}"
             alt="All products hero banner"
             class="absolute inset-0 h-full w-full object-cover"
         >
-        <div class="absolute inset-0 bg-black/55"></div>
-        <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.74)_0%,rgba(0,0,0,0.52)_34%,rgba(0,0,0,0.18)_58%,rgba(0,0,0,0.62)_100%)]"></div>
+        <div class="hidden absolute inset-0 bg-black/55"></div>
+        <div class="hidden absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.74)_0%,rgba(0,0,0,0.52)_34%,rgba(0,0,0,0.18)_58%,rgba(0,0,0,0.62)_100%)]"></div>
 
-        <div class="relative z-10 mx-auto flex min-h-[230px] max-w-7xl flex-col justify-between gap-4 px-4 py-5 sm:min-h-[270px] sm:px-5 sm:py-7 md:min-h-[340px] md:gap-8 md:px-8 md:py-10 lg:flex-row lg:items-center lg:px-10">
+        <div class="hidden relative z-10 mx-auto min-h-[230px] max-w-7xl flex-col justify-between gap-4 px-4 py-5 sm:min-h-[270px] sm:px-5 sm:py-7 md:min-h-[340px] md:gap-8 md:px-8 md:py-10 lg:flex-row lg:items-center lg:px-10">
             <div class="max-w-[620px]">
                 <div class="flex items-center gap-2 text-[9px] font-extrabold uppercase tracking-[0.22em] text-white/80 sm:text-[11px] sm:tracking-[0.28em]">
                     <span class="inline-block h-2 w-2 rounded-full bg-[#9ae16d] shadow-[0_0_16px_rgba(154,225,109,0.7)]"></span>

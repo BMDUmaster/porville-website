@@ -231,10 +231,10 @@
                         class="absolute inset-0 h-full w-full object-cover"
                     >
                 </picture>
-                <div class="absolute inset-0 bg-black/45"></div>
-                <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-black/10"></div>
+                <div class="hidden absolute inset-0 bg-black/45"></div>
+                <div class="hidden absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-black/10"></div>
 
-                <div class="home-hero-content absolute inset-0 z-10 flex h-full items-center px-7 md:px-14 lg:px-20">
+                <div class="home-hero-content hidden absolute inset-0 z-10 h-full items-center px-7 md:px-14 lg:px-20">
                     <div class="max-w-[430px] p-5 md:p-7">
                         <span class="mb-4 inline-flex w-fit rounded-md bg-blue-600 px-4 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.16em] text-white shadow-lg">
                             {{ $slide['badge'] }}
