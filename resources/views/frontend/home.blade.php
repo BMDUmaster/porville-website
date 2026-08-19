@@ -10,6 +10,8 @@
     }
 
     .home-hero-slide.active {
+        position: relative;
+        inset: auto;
         opacity: 1;
         transform: scale(1);
         pointer-events: auto;
@@ -218,7 +220,7 @@
 @endphp
 
 <section class="relative bg-[#0a0f1a] px-0 py-0">
-    <div id="home-hero-carousel" class="home-hero-card relative h-[235px] overflow-hidden md:h-[340px]">
+    <div id="home-hero-carousel" class="home-hero-card relative overflow-hidden">
         @foreach($heroSlides as $index => $slide)
             <div class="home-hero-slide {{ $index === 0 ? 'active' : '' }} absolute inset-0" data-home-hero-slide="{{ $index }}">
                 <picture>
@@ -228,7 +230,7 @@
                     <img
                         src="{{ $slide['image'] }}"
                         alt="{{ $slide['title_1'] }} {{ $slide['title_2'] }}"
-                        class="absolute inset-0 h-full w-full object-fill"
+                        class="block h-auto w-full"
                     >
                 </picture>
                 <div class="hidden absolute inset-0 bg-black/45"></div>

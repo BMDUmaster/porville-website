@@ -22,11 +22,11 @@
 @endphp
 
 <section class="pt-0">
-    <div class="relative min-h-[230px] overflow-hidden bg-[#151819] text-white shadow-[0_24px_70px_rgba(15,23,42,0.22)] sm:min-h-[270px] md:min-h-[340px]">
+    <div class="relative overflow-hidden bg-[#151819] text-white shadow-[0_24px_70px_rgba(15,23,42,0.22)]">
         <img
             src="{{ $shopHeroImage }}"
             alt="All products hero banner"
-            class="absolute inset-0 h-full w-full object-fill"
+            class="block h-auto w-full"
         >
         <div class="hidden absolute inset-0 bg-black/55"></div>
         <div class="hidden absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.74)_0%,rgba(0,0,0,0.52)_34%,rgba(0,0,0,0.18)_58%,rgba(0,0,0,0.62)_100%)]"></div>
