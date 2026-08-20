@@ -80,9 +80,9 @@
                     <div class="relative">
                         <i class="fa-regular fa-user field-icon"></i>
                         <input type="text" name="name" id="name" value="{{ old('name') }}"
-                               placeholder="John Doe" class="field-input" required>
+                               placeholder="John Doe" class="field-input" minlength="3" maxlength="50" autocomplete="name" required>
                     </div>
-                    <div class="error-msg" id="nameErr"><i class="fa-solid fa-circle-exclamation text-xs"></i><span>Full name is required</span></div>
+                    <div class="error-msg" id="nameErr"><i class="fa-solid fa-circle-exclamation text-xs"></i><span></span></div>
                 </div>
 
                 <div class="mb-5">
@@ -90,9 +90,9 @@
                     <div class="relative">
                         <i class="fa-regular fa-envelope field-icon"></i>
                         <input type="email" name="email" id="email" value="{{ old('email') }}"
-                               placeholder="john@example.com" class="field-input" required>
+                               placeholder="john@example.com" class="field-input" maxlength="254" autocomplete="email" required>
                     </div>
-                    <div class="error-msg" id="emailErr"><i class="fa-solid fa-circle-exclamation text-xs"></i><span>Enter a valid email address</span></div>
+                    <div class="error-msg" id="emailErr"><i class="fa-solid fa-circle-exclamation text-xs"></i><span></span></div>
                 </div>
 
                 <div class="mb-5">
@@ -130,7 +130,7 @@
                         <div class="str-bar" id="sb3"></div>
                         <div class="str-bar" id="sb4"></div>
                     </div>
-                    <div class="error-msg" id="pwErr"><i class="fa-solid fa-circle-exclamation text-xs"></i><span>Min. 8 characters required</span></div>
+                    <div class="error-msg" id="pwErr"><i class="fa-solid fa-circle-exclamation text-xs"></i><span></span></div>
                 </div>
 
                 <button type="submit" onclick="return validateForm()"
@@ -180,9 +180,11 @@ function checkStrength(value) {
     });
 }
 
-function showErr(id, show) {
+function showErr(id, show, message = '') {
     const el = document.getElementById(id);
     if (el) {
+        const messageEl = el.querySelector('span');
+        if (messageEl && message) messageEl.textContent = message;
         el.classList.toggle('show', show);
     }
 }
@@ -196,17 +198,20 @@ function setInputError(id, hasError) {
 
 function validateForm() {
     let valid = true;
-    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const nameRe = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
+    const emailRe = /^(?!.*\.\.)[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*\.[A-Za-z]{2,}$/;
     const name = document.getElementById('name').value.trim();
     const email = document.getElementById('email').value.trim();
     const otp = document.getElementById('emailOtp').value.trim();
     const password = document.getElementById('pw').value;
 
-    showErr('nameErr', !name);
-    setInputError('name', !name);
-    if (!name) valid = false;
+    const nameMessage = !name ? 'Full name is required' : name.length < 3 || name.length > 50 ? 'Full name must be 3 to 50 characters' : 'Use letters and spaces only';
+    const nameValid = name.length >= 3 && name.length <= 50 && nameRe.test(name);
+    showErr('nameErr', !nameValid, nameMessage);
+    setInputError('name', !nameValid);
+    if (!nameValid) valid = false;
 
-    showErr('emailErr', !emailRe.test(email));
+    showErr('emailErr', !emailRe.test(email), 'Enter a valid email address');
     setInputError('email', !emailRe.test(email));
     if (!emailRe.test(email)) valid = false;
 
@@ -214,9 +219,10 @@ function validateForm() {
     setInputError('emailOtp', !/^\d{4}$/.test(otp));
     if (!/^\d{4}$/.test(otp)) valid = false;
 
-    showErr('pwErr', password.length < 8);
-    setInputError('pw', password.length < 8);
-    if (password.length < 8) valid = false;
+    const passwordValid = password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9\s]/.test(password) && !/\s/.test(password) && !/(password|123456|qwerty)/i.test(password);
+    showErr('pwErr', !passwordValid, 'Use 8+ characters with uppercase, lowercase, number, special character; no spaces or common passwords');
+    setInputError('pw', !passwordValid);
+    if (!passwordValid) valid = false;
 
     return valid;
 }
@@ -230,6 +236,28 @@ function setOtpStatus(message, isSuccess) {
 
 // Auto-verify OTP when 4 digits entered
 document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('signupForm');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('pw');
+
+    form.addEventListener('submit', function (event) {
+        if (!validateForm()) event.preventDefault();
+    });
+
+    nameInput.addEventListener('input', function () {
+        this.value = this.value.replace(/[^A-Za-z\s]/g, '').replace(/\s{2,}/g, ' ');
+    });
+
+    emailInput.addEventListener('input', function () {
+        this.value = this.value.replace(/\s/g, '');
+    });
+
+    passwordInput.addEventListener('blur', function () {
+        this.value = this.value.trim();
+        checkStrength(this.value);
+    });
+
     const otpInput = document.getElementById('emailOtp');
     if (otpInput) {
         otpInput.addEventListener('input', function () {
@@ -290,10 +318,10 @@ function verifyOtpLive(otp) {
 function sendRegisterOtp() {
     const emailInput = document.getElementById('email');
     const email = emailInput.value.trim();
-    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRe = /^(?!.*\.\.)[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*\.[A-Za-z]{2,}$/;
     const button = document.getElementById('sendOtpBtn');
 
-    showErr('emailErr', !emailRe.test(email));
+    showErr('emailErr', !emailRe.test(email), 'Enter a valid email address');
     setInputError('email', !emailRe.test(email));
 
     if (!emailRe.test(email)) {

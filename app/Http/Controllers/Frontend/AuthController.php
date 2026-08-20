@@ -167,8 +167,10 @@ class AuthController extends Controller
     /** POST /account/register/verify-otp (AJAX live check) */
     public function verifyRegisterOtp(Request $request)
     {
+        $request->merge(['email' => strtolower(trim((string) $request->input('email')))]);
+
         $request->validate([
-            'email' => ['required', 'email'],
+            'email' => $this->registrationEmailRules(),
             'otp'   => ['required', 'digits:4'],
         ]);
 
@@ -191,8 +193,10 @@ class AuthController extends Controller
     /** POST /account/register/send-otp */
     public function sendRegisterOtp(Request $request)
     {
+        $request->merge(['email' => strtolower(trim((string) $request->input('email')))]);
+
         $data = $request->validate([
-            'email' => ['required', 'email', 'unique:users,email'],
+            'email' => [...$this->registrationEmailRules(), 'unique:users,email'],
         ]);
 
         $email = strtolower($data['email']);
@@ -225,11 +229,25 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        $request->merge([
+            'name' => trim((string) $request->input('name')),
+            'email' => strtolower(trim((string) $request->input('email'))),
+            'password' => trim((string) $request->input('password')),
+        ]);
+
         $request->validate([
-            'name'      => 'required|string|max:100',
-            'email'     => 'required|email|unique:users,email',
+            'name'      => ['bail', 'required', 'string', 'min:3', 'max:50', 'regex:/^[A-Za-z]+(?:\\s[A-Za-z]+)*$/'],
+            'email'     => [...$this->registrationEmailRules(), 'unique:users,email'],
             'email_otp' => ['required', 'digits:4'],
-            'password'  => 'required|string|min:8',
+            'password'  => ['bail', 'required', 'string', 'min:8', 'regex:/[A-Z]/', 'regex:/[a-z]/', 'regex:/[0-9]/', 'regex:/[^A-Za-z0-9\\s]/', 'not_regex:/\\s/', 'not_regex:/(password|123456|qwerty)/i'],
+        ], [
+            'name.min' => 'Full name must be at least 3 characters.',
+            'name.max' => 'Full name must not exceed 50 characters.',
+            'name.regex' => 'Full name may contain letters and single spaces only.',
+            'email.regex' => 'Enter a valid email address, such as rahul.sharma@gmail.com.',
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.regex' => 'Password must include uppercase, lowercase, number, and special character.',
+            'password.not_regex' => 'Password cannot contain spaces or common passwords.',
         ]);
 
         $email = strtolower($request->email);
@@ -276,6 +294,17 @@ class AuthController extends Controller
     private function generateOtp(): string
     {
         return (string) random_int(1000, 9999);
+    }
+
+    private function registrationEmailRules(): array
+    {
+        return [
+            'bail',
+            'required',
+            'string',
+            'max:254',
+            'regex:/^(?!.*\\.\\.)[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*\\.[A-Za-z]{2,}$/',
+        ];
     }
 
     private function sendOtpEmail(string $email, string $otp, string $purpose, int $ttlMinutes): void

@@ -14,11 +14,23 @@ class AuthApiController extends Controller
      */
     public function register(Request $request)
     {
+        $request->merge([
+            'name' => trim((string) $request->input('name')),
+            'email' => strtolower(trim((string) $request->input('email'))),
+            'password' => trim((string) $request->input('password')),
+            'password_confirmation' => trim((string) $request->input('password_confirmation')),
+        ]);
+
         $data = $request->validate([
-            'name'     => 'required|string|max:100',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
+            'name'     => ['bail', 'required', 'string', 'min:3', 'max:50', 'regex:/^[A-Za-z]+(?:\\s[A-Za-z]+)*$/'],
+            'email'    => ['bail', 'required', 'string', 'max:254', 'regex:/^(?!.*\\.\\.)[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*\\.[A-Za-z]{2,}$/', 'unique:users,email'],
+            'password' => ['bail', 'required', 'string', 'min:8', 'confirmed', 'regex:/[A-Z]/', 'regex:/[a-z]/', 'regex:/[0-9]/', 'regex:/[^A-Za-z0-9\\s]/', 'not_regex:/\\s/', 'not_regex:/(password|123456|qwerty)/i'],
             'phone'    => 'nullable|string|max:20',
+        ], [
+            'name.regex' => 'Full name may contain letters and single spaces only.',
+            'email.regex' => 'Enter a valid email address.',
+            'password.regex' => 'Password must include uppercase, lowercase, number, and special character.',
+            'password.not_regex' => 'Password cannot contain spaces or common passwords.',
         ]);
 
         $user = User::create([
