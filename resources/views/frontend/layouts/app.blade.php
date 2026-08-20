@@ -260,19 +260,19 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
         </div>
         <div id="cart-delivery-charge-row" class="mb-2 flex justify-between text-xs text-slate-500">
             <span>Delivery</span>
-            <span id="cart-delivery-charge-drawer">Rs0.00</span>
+            <span id="cart-delivery-charge-drawer">₹0.00</span>
         </div>
         <div id="cart-service-charge-row" class="mb-2 flex justify-between text-xs text-slate-500">
             <span id="cart-service-charge-label">&#8505;&#65039; Service Charge</span>
-            <span id="cart-service-charge-drawer">Rs0.00</span>
+            <span id="cart-service-charge-drawer">₹0.00</span>
         </div>
         <div id="cart-discount-row" class="mb-2 hidden justify-between text-xs font-bold text-emerald-600">
             <span>Discount</span>
-            <span id="cart-discount-drawer">-Rs0.00</span>
+            <span id="cart-discount-drawer">-₹0.00</span>
         </div>
         <div class="mb-3 flex justify-between text-sm font-bold text-slate-900">
             <span>Total</span>
-            <span id="cart-total-drawer">Rs0.00</span>
+            <span id="cart-total-drawer">₹0.00</span>
         </div>
         <a id="cart-checkout-link" href="{{ route('frontend.checkout') }}"
            class="flex items-center justify-center gap-2 w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl text-sm mb-2">
@@ -687,7 +687,7 @@ function addToCart(productId, variantIndex, pricingDay = 'today') {
     });
 }
 function formatCartCurrency(amount) {
-    return 'Rs' + Number(amount || 0).toFixed(2);
+    return '₹' + Number(amount || 0).toFixed(2);
 }
 let selectedCartDrawerDay = 'today';
 
@@ -728,7 +728,7 @@ function renderCartCoupons(data) {
     }
     panel.innerHTML = `<p class="mb-2 text-[10px] font-black uppercase tracking-wider text-blue-700">Available offers</p>` +
         available.map(coupon => `<div class="mb-2 flex items-center justify-between gap-2 rounded-xl bg-white p-2 last:mb-0">
-            <div class="min-w-0"><p class="truncate text-xs font-bold text-slate-800">${escapeHtml(coupon.title)}</p><p class="text-[10px] text-slate-500">${coupon.type === 'percent' ? coupon.value + '%' : 'Rs' + coupon.value} off</p></div>
+            <div class="min-w-0"><p class="truncate text-xs font-bold text-slate-800">${escapeHtml(coupon.title)}</p><p class="text-[10px] text-slate-500">${coupon.type === 'percent' ? coupon.value + '%' : '₹' + coupon.value} off</p></div>
             <button type="button" onclick="applyCartCoupon('${escapeHtml(coupon.code)}')" class="rounded-lg bg-blue-700 px-3 py-1.5 text-[10px] font-black text-white">Apply</button>
         </div>`).join('');
 }
@@ -1031,6 +1031,40 @@ function showToast(msg, type = 'success') {
 // Init badge
 refreshCartDrawer();
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
+
+// Display every visible rupee amount consistently with the Indian rupee symbol.
+function formatVisibleRupeeSymbols(root = document.body) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+            const parentTag = node.parentElement?.tagName;
+
+            return ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(parentTag)
+                ? NodeFilter.FILTER_REJECT
+                : NodeFilter.FILTER_ACCEPT;
+        },
+    });
+
+    const textNodes = [];
+    while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+    textNodes.forEach((node) => {
+        node.nodeValue = node.nodeValue.replace(/\bRs\.?\s*(?=\d)/g, '₹');
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    formatVisibleRupeeSymbols();
+
+    new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === Node.ELEMENT_NODE || node.nodeType === Node.TEXT_NODE) {
+                    formatVisibleRupeeSymbols(node.nodeType === Node.TEXT_NODE ? node.parentElement : node);
+                }
+            });
+        });
+    }).observe(document.body, { childList: true, subtree: true });
+});
 </script>
 @yield('scripts')
 </body>

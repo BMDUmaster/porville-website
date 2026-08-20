@@ -477,12 +477,12 @@
                 </div>
                 <div class="flex min-w-0 flex-wrap items-end gap-2 sm:gap-3">
                     <span class="max-w-full break-words text-[36px] font-black leading-none text-slate-900 sm:text-[40px] md:text-[46px]">
-                        Rs<span id="detailCurrentPrice">{{ number_format($defaultDisplayedPrice, 0) }}</span>
+                        ₹<span id="detailCurrentPrice">{{ number_format($defaultDisplayedPrice, 0) }}</span>
                         <span id="detailCurrentPriceUnit" class="ml-1 text-[14px] font-bold text-slate-400 md:text-[16px]">{{ $defaultVariant['price_unit_label'] ?? $formatPriceUnit($product->weight ?? null, $product->unit ?? null) }}</span>
                     </span>
                     <span id="detailMrpWrap" class="{{ ($defaultVariant['mrp'] ?? 0) > $defaultDisplayedPrice ? '' : 'hidden' }} flex items-center gap-2">
                         <span id="detailMrp" class="text-[16px] font-bold text-slate-400 line-through">
-                            Rs{{ number_format($defaultVariant['mrp'] ?? $product->mrp, 0) }}
+                            ₹{{ number_format($defaultVariant['mrp'] ?? $product->mrp, 0) }}
                         </span>
                         <span id="detailOffer" class="rounded-full bg-[#ff6d5e] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white">
                             -{{ (int) ($defaultVariant['today_offer'] ?? 0) }}% off
@@ -490,7 +490,7 @@
                     </span>
                 </div>
                 <div id="detailSaveRow" class="{{ $selectedSaveAmount > 0 ? '' : 'hidden' }} mt-3 inline-flex items-center gap-1 rounded-xl border border-[#8bd39a] bg-[#dff6e3] px-3 py-1.5 text-[11px] font-black text-[#2f8c43]">
-                    <span>You save Rs</span>
+                    <span>You save ₹</span>
                     <span id="detailSaveAmount">{{ number_format($selectedSaveAmount, 0) }}</span>
                     <span>on this order</span>
                 </div>
@@ -661,7 +661,7 @@
 
                                             @if(!empty($offer['min_order_amount']))
                                                 <div class="inline-flex items-center rounded-xl bg-slate-100 px-3 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-slate-600">
-                                                    Min order Rs{{ number_format((float) $offer['min_order_amount'], 0) }}
+                                                    Min order ₹{{ number_format((float) $offer['min_order_amount'], 0) }}
                                                 </div>
                                             @endif
                                         </div>
@@ -993,7 +993,7 @@ function selectVariant(index) {
     const canShowDiscount = Number(variant.mrp || 0) > Number(activePrice || 0);
     const saveValue = Math.max(Number(variant.mrp || 0) - Number(activePrice || 0), 0);
 
-    if (mrp) mrp.textContent = 'Rs' + Math.round(variant.mrp || 0);
+    if (mrp) mrp.textContent = '₹' + Math.round(variant.mrp || 0);
     if (offer) offer.textContent = '-' + Math.round(activeOffer || 0) + '% off';
     if (saveAmount) saveAmount.textContent = Math.round(saveValue);
 
