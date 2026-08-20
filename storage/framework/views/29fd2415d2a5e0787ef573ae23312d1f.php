@@ -291,7 +291,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 
 <!-- Header -->
 <header class="fixed inset-x-0 top-0 z-[9997] bg-white shadow-sm">
-    <div class="relative flex h-8 items-center overflow-hidden bg-blue-900 pr-[108px] text-white sm:pr-[162px]">
+    <div class="hidden relative flex h-8 items-center overflow-hidden bg-blue-900 pr-[108px] text-white sm:pr-[162px]">
         <div class="announcement-track items-center whitespace-nowrap text-[10px] font-bold sm:text-[11px]">
             <?php for($copy = 0; $copy < 2; $copy++): ?>
                 <div class="flex items-center gap-10 pr-10">
@@ -472,7 +472,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
     </div>
 </header>
 
-<div class="pt-[135px] md:pt-[154px] lg:pt-[178px]">
+<div class="pt-[103px] md:pt-[122px] lg:pt-[146px]">
     <!-- Flash Messages -->
     <?php if(session('success')): ?>
         <div data-auto-dismiss="3000" class="mx-4 mt-3 flex items-center gap-2 rounded-lg bg-green-100 p-3 text-sm text-green-700 transition-all duration-500">
@@ -503,15 +503,12 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                     <li><a href="<?php echo e(route('frontend.about')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">About Us</a></li>
                     <li><a href="<?php echo e(route('frontend.contact')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Contact Us</a></li>
                     <li><a href="<?php echo e(route('frontend.about')); ?>#faq" class="text-[14px] text-[#9bb0cf] transition hover:text-white">FAQ</a></li>
-                    <li>
-                        <a href="<?php echo e(asset('docs/fssai-certificate.pdf')); ?>"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           class="inline-flex items-center gap-1.5 text-[14px] text-[#9bb0cf] transition hover:text-white">
-                            <i class="fa-solid fa-certificate text-green-400 text-xs"></i>
-                            FSSAI Certificate
-                        </a>
-                    </li>
+                   <li>
+   <span class="inline-flex items-center gap-1.5 text-[14px] text-[#9bb0cf]">
+    <img src="<?php echo e(asset('images/fssai-logo.png')); ?>" alt="FSSAI" style="width: 60px; height: 40px;">
+    22726924000264
+</span>
+</li>
                 </ul>
             </div>
 
@@ -1043,4 +1040,4 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart();
 <?php echo $__env->yieldContent('scripts'); ?>
 </body>
 </html>
-<?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views/frontend/layouts/app.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views\frontend\layouts\app.blade.php ENDPATH**/ ?>

@@ -57,6 +57,11 @@
                         <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Orders</p>
                         <p class="mt-1 text-sm font-bold text-indigo-600">{{ $user->orders_count }}</p>
                     </div>
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">DOB / Gender</p>
+                        <p class="mt-1 text-sm text-gray-700">{{ $user->date_of_birth?->format('d M Y') ?: '-' }}</p>
+                        <p class="text-xs text-gray-500">{{ $user->gender ? ucfirst(str_replace('_', ' ', $user->gender)) : 'Not set' }}</p>
+                    </div>
                 </div>
 
                 <div class="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-3">
@@ -106,6 +111,7 @@
                     <th class="px-4 py-3">Name</th>
                     <th class="px-4 py-3">Email</th>
                     <th class="px-4 py-3">Phone</th>
+                    <th class="px-4 py-3">DOB / Gender</th>
                     <th class="px-4 py-3">Orders</th>
                     <th class="px-4 py-3">Delivery Charge</th>
                     <th class="px-4 py-3">Status</th>
@@ -119,6 +125,10 @@
                     <td class="px-4 py-3 font-medium">{{ $user->name }}</td>
                     <td class="px-4 py-3 text-gray-600">{{ $user->email }}</td>
                     <td class="px-4 py-3 text-gray-600">{{ $user->phone ?: '-' }}</td>
+                    <td class="px-4 py-3 text-gray-600">
+                        <p>{{ $user->date_of_birth?->format('d M Y') ?: '-' }}</p>
+                        <p class="mt-1 text-xs text-gray-400">{{ $user->gender ? ucfirst(str_replace('_', ' ', $user->gender)) : 'Not set' }}</p>
+                    </td>
                     <td class="px-4 py-3 text-center font-bold text-indigo-600">{{ $user->orders_count }}</td>
                     <td class="px-4 py-3">
                         <div class="max-w-[210px]">
@@ -159,7 +169,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="8" class="px-4 py-8 text-center text-gray-400">No customers found.</td></tr>
+                <tr><td colspan="9" class="px-4 py-8 text-center text-gray-400">No customers found.</td></tr>
                 @endforelse
             </tbody>
         </table>

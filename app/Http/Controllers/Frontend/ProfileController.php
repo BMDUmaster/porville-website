@@ -70,10 +70,14 @@ class ProfileController extends Controller
         $user = Auth::guard('web_frontend')->user();
 
         $data = $request->validate([
-            'name'  => 'required|string|max:100',
-            'phone' => ['nullable', 'regex:/^(?:\d{10}|\d{12})$/'],
+            'name'          => 'required|string|max:100',
+            'phone'         => ['nullable', 'regex:/^(?:\d{10}|\d{12})$/'],
+            'date_of_birth' => ['nullable', 'date', 'before:today'],
+            'gender'        => ['nullable', 'in:male,female,other,prefer_not_to_say'],
         ], [
             'phone.regex' => 'Phone number must be 10 or 12 digits.',
+            'date_of_birth.before' => 'Date of birth must be before today.',
+            'gender.in' => 'Please select a valid gender.',
         ]);
 
         $data['phone'] = $data['phone'] ? preg_replace('/\D/', '', $data['phone']) : null;

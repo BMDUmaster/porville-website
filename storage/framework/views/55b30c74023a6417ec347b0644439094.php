@@ -205,19 +205,16 @@
                             </div>
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label class="mb-1 block text-xs font-semibold text-gray-600">Sector *</label>
-                                    <div class="relative z-50">
-                                        <input type="text" id="shippingSectorSearchInput" placeholder="Search or select sector..."
-                                               class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-100">
-                                        <select name="sector" id="shippingSectorInput" required
-                                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                                style="appearance: none; -webkit-appearance: none; -moz-appearance: none;">
-                                            <option value="">Select Sector</option>
-                                        </select>
-                                        <div id="sectorDropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-72 overflow-y-auto">
-                                            <!-- Sectors will be populated by JS -->
-                                        </div>
-                                    </div>
+                                  <label class="mb-1 block text-xs font-semibold text-gray-600">Sector *</label>
+                                 <div class="relative">
+                                    <input type="text" id="shippingSectorSearchInput" placeholder="Search sector or PIN code..."
+                                           autocomplete="off"
+                                                 class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-100">
+                                                 <input type="hidden" name="sector" id="shippingSectorInput">
+                                   <div id="sectorDropdown" class="hidden absolute bottom-full left-0 right-0 mb-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-72 overflow-y-auto">
+        <!-- Sectors will be populated by JS -->
+    </div>
+</div>
                                 </div>
                                 <div>
                                     <label class="mb-1 block text-xs font-semibold text-gray-600">PIN Code *</label>
@@ -707,18 +704,22 @@ function populateAllSectors() {
 }
 
 function selectSectorFromDropdown(sector, pincode) {
-    if (!sectorSearchInput) {
-        console.error('sectorSearchInput not found');
-        return;
+    // Focus: hamesha current text ke hisab se fresh list dikhao (stale list bug fix)
+sectorSearchInput?.addEventListener('focus', () => {
+    sectorDropdown.classList.remove('hidden');
+    filterSectors();
+});
+
+sectorSearchInput?.addEventListener('input', () => {
+    sectorDropdown.classList.remove('hidden');
+    filterSectors();
+});
+
+sectorSearchInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        sectorDropdown.classList.add('hidden');
     }
-    if (!sectorInput) {
-        console.error('sectorInput not found');
-        return;
-    }
-    if (!pincodeInput) {
-        console.error('pincodeInput not found');
-        return;
-    }
+});
     
     sectorSearchInput.value = sector;
     sectorInput.value = sector;
@@ -800,9 +801,14 @@ sectorSearchInput?.addEventListener('keydown', (e) => {
 });
 
 // Close dropdown when clicking outside
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('[id="shippingSectorSearchInput"]') && !e.target.closest('#sectorDropdown')) {
-        sectorDropdown.classList.add('hidden');
+document.getElementById('checkoutForm')?.addEventListener('submit', function (e) {
+    const isFormMode = selectedAddressIndex === -1; // naya address add/edit ho raha hai
+    if (isFormMode && !sectorInput.value) {
+        e.preventDefault();
+        sectorSearchInput.classList.add('border-red-400');
+        sectorSearchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        sectorSearchInput.focus();
+        alert('Kripya apna sector select karein.');
     }
 });
 
@@ -981,4 +987,4 @@ function checkOrderingActive(e) {
 </script>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('frontend.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views/frontend/checkout.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('frontend.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views\frontend\checkout.blade.php ENDPATH**/ ?>
