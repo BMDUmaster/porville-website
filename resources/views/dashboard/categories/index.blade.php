@@ -6,18 +6,6 @@
 <div class="p-4 sm:p-6">
 
     {{-- Toolbar --}}
-   
-
-    {{-- Table --}}
-    <div class="bg-white rounded-xl border overflow-x-auto">
-@extends('layouts.dashboard')
-@section('title', 'Categories')
-@section('page_title', 'Category Management')
-
-@section('content')
-<div class="p-4 sm:p-6">
-
-    {{-- Toolbar --}}
     <div class="bg-white rounded-xl border p-4 mb-4 flex flex-col md:flex-row gap-3 items-center">
         <form method="GET" class="flex-1 relative w-full">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
