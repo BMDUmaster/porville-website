@@ -16,7 +16,7 @@
 <div class="p-4 md:p-8 space-y-6">
 
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        @foreach([["Today's Orders",$stats['today'],'purple','fa-calendar-day'],['Pending',$stats['pending'],'emerald','fa-hourglass-split'],['Delivered',$stats['delivered'],'blue','fa-bag-check'],['Cancelled',$stats['cancelled'],'red','fa-circle-xmark']] as [$label,$val,$color,$icon])
+        @foreach([["Today's Orders",$stats['today'],'purple','fa-calendar-day'],['Pending',$stats['pending'],'emerald','fa-clock'],['Delivered',$stats['delivered'],'blue','fa-check'],['Cancelled',$stats['cancelled'],'red','fa-circle-xmark']] as [$label,$val,$color,$icon])
             <div class="flex items-center gap-4 rounded-2xl border bg-white p-5 shadow-sm">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-{{ $color }}-500 text-white shadow-lg">
                     <i class="fa-solid {{ $icon }} text-xl"></i>
