@@ -82,6 +82,7 @@
     ];
     $packWeights = ['250g', '500g', '1 kg', '1.5 kg'];
     $isFlashDealActive = request()->boolean('flash_deal') || request()->filled('flash_deal') || request('offer') === 'flash_deal';
+    $hasActiveProductQuery = ! empty(request()->query());
     $flashDealToggleUrl = $isFlashDealActive
         ? route('frontend.products', request()->except(['flash_deal', 'offer', 'page']))
         : route('frontend.products', array_merge(request()->except('page'), ['flash_deal' => '1']));
@@ -676,7 +677,7 @@
     setupFilterForm('filterForm', 'sidebarPriceRange', 'sidebarPriceRangeInput', 'priceRangeValue');
     setupFilterForm('mobileFilterForm', 'mobileSidebarPriceRange', 'mobileSidebarPriceRangeInput', 'mobilePriceRangeValue');
 
-    const hasActiveProductQuery = @json(request()->hasAny(['search', 'category', 'subcategory', 'sort', 'min_price', 'max_price', 'flash_deal', 'offer', 'page']));
+    const hasActiveProductQuery = @json($hasActiveProductQuery);
     if (hasActiveProductQuery) {
         window.addEventListener('load', () => {
             document.getElementById('product-results')?.scrollIntoView({ block: 'start' });
