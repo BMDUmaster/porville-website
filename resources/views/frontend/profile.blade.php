@@ -30,7 +30,7 @@
 
 @section('content')
 @php
-    $memberSince = $stats['member_since'] ?: optional($user->created_at)->format('M Y');
+    $memberSince = $stats['member_since'] ?: optional($user->created_at)->format('d M Y');
     $profileCompletion = max(12, min(100, $stats['profile_completion']));
     $remainingPoints = max(0, 1000 - $stats['loyalty_points']);
 @endphp

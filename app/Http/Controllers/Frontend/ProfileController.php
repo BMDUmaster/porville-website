@@ -55,7 +55,7 @@ class ProfileController extends Controller
             'total_orders' => $totalOrders,
             'total_spent' => $totalSpent,
             'loyalty_points' => $loyaltyPoints,
-            'member_since' => optional($user->created_at)->format('M y'),
+            'member_since' => optional($user->created_at)->format('d M Y'),
             'delivered_orders' => $deliveredOrders,
             'active_orders' => $activeOrders,
             'profile_completion' => $profileCompletion,

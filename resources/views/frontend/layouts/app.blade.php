@@ -784,7 +784,13 @@ function renderCartDrawerItems(items) {
                                 </button>
                             </div>
                         </div>
-                        <p class="text-xs font-extrabold text-blue-700">${formatCartCurrency(item.subtotal)}</p>
+                        <div class="flex items-center gap-2">
+                            <p class="text-xs font-extrabold text-blue-700">${formatCartCurrency(item.subtotal)}</p>
+                            <button type="button" onclick="removeCartDrawerItem('${item.key}')" class="inline-flex items-center gap-1 rounded-md bg-red-500 px-2.5 py-1.5 text-[9px] font-black uppercase tracking-wide text-white transition hover:bg-red-600" title="Remove item">
+                                <i class="fa-solid fa-trash-can"></i>
+                                Remove
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
