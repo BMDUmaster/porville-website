@@ -1020,7 +1020,8 @@ function sendCartRequest(productId, redirectToCheckout = false) {
 
         const headerBadge = document.getElementById('header-cart-badge');
         if (headerBadge) {
-            headerBadge.textContent = data.cart_count;
+            // The header badge represents unique cart items, not their total quantity.
+            headerBadge.textContent = data.unique_count ?? data.cart_count;
         }
 
         if (redirectToCheckout) {

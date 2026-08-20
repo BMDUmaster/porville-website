@@ -90,7 +90,12 @@ class CartController extends Controller
         $key  = $product->id . ($variantIndex !== null ? '_v' . $variantIndex : '') . '_d_' . $pricingDay;
 
         if (isset($cart[$key])) {
-            $cart[$key]['quantity'] += $qty;
+            // Re-add the existing line so it is treated as the latest cart action.
+            // The drawer displays the newest cart items first.
+            $cartItem = $cart[$key];
+            $cartItem['quantity'] += $qty;
+            unset($cart[$key]);
+            $cart[$key] = $cartItem;
         } else {
             $price = $variant
                 ? ProductDayPricing::sellingPrice($variant, $pricingDay, (float) $product->price)
@@ -279,6 +284,10 @@ class CartController extends Controller
 
     private function buildCartItems(array $cart): array
     {
+        // PHP session arrays keep insertion order; reverse it so the most recently
+        // added (or updated) product is always shown at the top of the cart.
+        $cart = array_reverse($cart, true);
+
         return array_map(function ($item, $key) {
             $item['key']      = $key;
             $item['subtotal'] = $item['price'] * $item['quantity'];
