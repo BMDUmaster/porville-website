@@ -456,7 +456,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
             <span class="ml-auto"></span>
             <a href="{{ route('frontend.orders') }}" class="inline-flex items-center gap-2 px-3 py-1.5 font-extrabold text-green-700 whitespace-nowrap rounded-md transition hover:bg-green-50">
                 <i class="fa-solid fa-rotate-left text-[13px]"></i>
-                view order
+                View Order
             </a>
             <a href="{{ route('frontend.products', ['sort' => 'latest']) }}" class="px-3 py-1.5 text-slate-700 font-semibold whitespace-nowrap rounded-md transition hover:bg-slate-100">Latest</a>
         </div>

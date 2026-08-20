@@ -98,6 +98,9 @@
         </div>
 
         <form method="GET" action="{{ route('frontend.products') }}" id="mobileFilterForm" class="flex-1 overflow-y-auto">
+            @if(request()->filled('subcategory'))
+                <input type="hidden" name="subcategory" value="{{ request('subcategory') }}" data-subcategory-filter>
+            @endif
             <div class="space-y-6 px-5 py-5">
                 <div>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search cuts, packs, combos..."
@@ -113,7 +116,7 @@
                                 <span class="flex items-center gap-3">
                                     <input type="radio" name="category" value="{{ $cat->slug }}"
                                            {{ request('category') == $cat->slug ? 'checked' : '' }}
-                                           data-auto-submit
+                                           data-auto-submit data-category-filter
                                            class="h-4 w-4 border-slate-300 text-green-600 focus:ring-green-500">
                                     <span class="text-[13px] font-semibold text-slate-700">{{ $cat->name }}</span>
                                 </span>
@@ -188,6 +191,9 @@
     <aside class="hidden w-full flex-shrink-0 lg:block lg:w-[290px] xl:w-[310px]">
         <div class="space-y-5 lg:sticky lg:top-[150px]">
             <form method="GET" action="{{ route('frontend.products') }}" id="filterForm">
+                @if(request()->filled('subcategory'))
+                    <input type="hidden" name="subcategory" value="{{ request('subcategory') }}" data-subcategory-filter>
+                @endif
                 <div class="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_22px_55px_rgba(15,23,42,0.08)]">
                     <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
                         <h3 class="text-[13px] font-black uppercase tracking-[0.22em] text-slate-900">Filter Products</h3>
@@ -209,7 +215,7 @@
                                         <span class="flex items-center gap-3">
                                             <input type="radio" name="category" value="{{ $cat->slug }}"
                                                    {{ request('category') == $cat->slug ? 'checked' : '' }}
-                                                   data-auto-submit
+                                                   data-auto-submit data-category-filter
                                                    class="h-4 w-4 border-slate-300 text-green-600 focus:ring-green-500">
                                             <span class="text-[13px] font-semibold text-slate-700">{{ $cat->name }}</span>
                                         </span>
@@ -643,7 +649,15 @@
         }
 
         autoSubmitInputs.forEach((input) => {
-            input.addEventListener('change', () => filterForm.submit());
+            input.addEventListener('change', () => {
+                // A category change starts a new category listing; sorting and price
+                // filters retain the currently selected subcategory.
+                if (input.matches('[data-category-filter]')) {
+                    filterForm.querySelector('[data-subcategory-filter]')?.remove();
+                }
+
+                filterForm.submit();
+            });
         });
 
         if (searchInput) {

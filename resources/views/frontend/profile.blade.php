@@ -440,7 +440,7 @@
                         <div>
                             <label class="mb-1 block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Gender</label>
                             <select name="gender" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-400 focus:bg-white">
-                                <option value="">Select gender</option>
+                                <option value="">Select Gender</option>
                                 @foreach(['male' => 'Male', 'female' => 'Female', 'other' => 'Other', 'prefer_not_to_say' => 'Prefer not to say'] as $value => $label)
                                     <option value="{{ $value }}" @selected(old('gender', $user->gender) === $value)>{{ $label }}</option>
                                 @endforeach

@@ -529,7 +529,7 @@
                             type="button"
                             id="variant-btn-{{ $index }}"
                             onclick="selectVariant({{ $index }})"
-                            class="variant-card {{ $index === 0 ? 'is-active' : '' }} min-w-[84px] rounded-[16px] border border-slate-200 bg-white px-3 py-3 text-left shadow-sm transition hover:border-green-200"
+                            class="variant-card {{ $index === 0 ? 'is-active' : '' }} min-w-[84px] rounded-[16px] border border-slate-200 bg-white px-3 py-3 text-left shadow-sm transition duration-200 hover:-translate-y-1 hover:border-green-400 hover:bg-green-50 hover:shadow-[0_14px_28px_rgba(47,140,67,0.16)] active:translate-y-0 active:scale-[0.98]"
                         >
                             <div class="text-[11px] font-black text-slate-800">{{ $variant['label'] ?: 'Standard Pack' }}</div>
                             <div class="mt-1 text-[10px] font-semibold text-slate-400" data-variant-day-price="{{ $index }}">₹{{ number_format($variant['today_price'], 0) }}</div>
