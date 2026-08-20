@@ -181,7 +181,7 @@
     </div>
 </div>
 
-<div class="max-w-7xl mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8">
+<div id="product-results" class="max-w-7xl mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8" style="scroll-margin-top: 150px;">
 
     {{-- Sidebar Filters --}}
     <aside class="hidden w-full flex-shrink-0 lg:block lg:w-[290px] xl:w-[310px]">
@@ -646,13 +646,11 @@
         });
 
         if (searchInput) {
-            let searchTimer;
-
-            searchInput.addEventListener('input', () => {
-                clearTimeout(searchTimer);
-                searchTimer = setTimeout(() => {
+            searchInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
                     filterForm.submit();
-                }, 450);
+                }
             });
         }
 
@@ -677,6 +675,13 @@
 
     setupFilterForm('filterForm', 'sidebarPriceRange', 'sidebarPriceRangeInput', 'priceRangeValue');
     setupFilterForm('mobileFilterForm', 'mobileSidebarPriceRange', 'mobileSidebarPriceRangeInput', 'mobilePriceRangeValue');
+
+    const hasActiveProductQuery = @json(request()->hasAny(['search', 'category', 'subcategory', 'sort', 'min_price', 'max_price', 'flash_deal', 'offer', 'page']));
+    if (hasActiveProductQuery) {
+        window.addEventListener('load', () => {
+            document.getElementById('product-results')?.scrollIntoView({ block: 'start' });
+        }, { once: true });
+    }
 })();
 
 function openMobileFilter() {
