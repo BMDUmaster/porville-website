@@ -794,9 +794,6 @@ function renderCartDrawerItems(items) {
                         <a href="${item.product_url}" class="line-clamp-2 text-[13px] font-bold leading-4 text-slate-900 hover:text-blue-700">
                             ${item.name}
                         </a>
-                        <button onclick="removeCartDrawerItem('${item.key}')" class="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition hover:bg-red-50 hover:text-red-500">
-                            <i class="fa-solid fa-xmark text-[11px]"></i>
-                        </button>
                     </div>
                     <div class="mt-0.5 flex flex-wrap items-center gap-1">
                         <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
