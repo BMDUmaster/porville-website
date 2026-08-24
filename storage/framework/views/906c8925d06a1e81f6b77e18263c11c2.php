@@ -106,34 +106,48 @@
 
     
     <div class="hidden w-full overflow-x-auto rounded-2xl bg-white shadow md:block">
-        <table class="w-full min-w-[980px] text-sm">
+        <table class="w-full min-w-[1120px] table-fixed text-sm">
+            <colgroup>
+                <col class="w-[6%]">
+                <col class="w-[8%]">
+                <col class="w-[16%]">
+                <col class="w-[22%]">
+                <col class="w-[12%]">
+                <col class="w-[12%]">
+                <col class="w-[7%]">
+                <col class="w-[13%]">
+                <col class="w-[8%]">
+                <col class="w-[10%]">
+            </colgroup>
             <thead class="bg-blue-600 text-white">
                 <tr>
-                    <th class="px-4 py-3">customer_id</th>
-                    <th class="px-4 py-3">Name</th>
-                    <th class="px-4 py-3">Email</th>
-                    <th class="px-4 py-3">Phone</th>
-                    <th class="px-4 py-3">DOB / Gender</th>
-                    <th class="px-4 py-3">Orders</th>
-                    <th class="px-4 py-3">Delivery Charge</th>
-                    <th class="px-4 py-3">Status</th>
-                    <th class="px-4 py-3">Action</th>
+                    <th class="px-3 py-3 text-left">Sr. No.</th>
+                    <th class="px-3 py-3 text-left">Customer ID</th>
+                    <th class="px-3 py-3 text-left">Name</th>
+                    <th class="px-3 py-3 text-left">Email</th>
+                    <th class="px-3 py-3 text-left">Phone</th>
+                    <th class="px-3 py-3 text-left">DOB / Gender</th>
+                    <th class="px-3 py-3 text-center">Orders</th>
+                    <th class="px-3 py-3 text-left">Delivery Charge</th>
+                    <th class="px-3 py-3 text-center">Status</th>
+                    <th class="px-3 py-3 text-left">Action</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
                 <?php $__empty_1 = true; $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-3 font-semibold text-slate-700">#<?php echo e($user->id); ?></td>
-                    <td class="px-4 py-3 font-medium"><?php echo e($user->name); ?></td>
-                    <td class="px-4 py-3 text-gray-600"><?php echo e($user->email); ?></td>
-                    <td class="px-4 py-3 text-gray-600"><?php echo e($user->phone ?: '-'); ?></td>
-                    <td class="px-4 py-3 text-gray-600">
+                <tr class="align-middle hover:bg-gray-50">
+                    <td class="px-3 py-3 font-semibold text-slate-500"><?php echo e($users->firstItem() + $loop->index); ?></td>
+                    <td class="px-3 py-3 font-semibold text-slate-700">#<?php echo e($user->id); ?></td>
+                    <td class="truncate px-3 py-3 font-medium" title="<?php echo e($user->name); ?>"><?php echo e($user->name); ?></td>
+                    <td class="truncate px-3 py-3 text-gray-600" title="<?php echo e($user->email); ?>"><?php echo e($user->email); ?></td>
+                    <td class="px-3 py-3 text-gray-600"><?php echo e($user->phone ?: '-'); ?></td>
+                    <td class="px-3 py-3 text-gray-600">
                         <p><?php echo e($user->date_of_birth?->format('d M Y') ?: '-'); ?></p>
                         <p class="mt-1 text-xs text-gray-400"><?php echo e($user->gender ? ucfirst(str_replace('_', ' ', $user->gender)) : 'Not set'); ?></p>
                     </td>
-                    <td class="px-4 py-3 text-center font-bold text-indigo-600"><?php echo e($user->orders_count); ?></td>
-                    <td class="px-4 py-3">
-                        <div class="max-w-[210px]">
+                    <td class="px-3 py-3 text-center font-bold text-indigo-600"><?php echo e($user->orders_count); ?></td>
+                    <td class="px-3 py-3">
+                        <div>
                             <?php if($user->delivery_charge !== null): ?>
                                 <p class="text-xs font-bold text-blue-600">Custom Rs<?php echo e(number_format($user->delivery_charge, 2)); ?></p>
                             <?php endif; ?>
@@ -150,13 +164,13 @@
                             </form>
                         </div>
                     </td>
-                    <td class="px-4 py-3">
+                    <td class="px-3 py-3 text-center">
                         <span class="rounded-full px-3 py-1 text-xs font-bold <?php echo e($user->status === 'active' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'); ?>">
                             <?php echo e(ucfirst($user->status ?? 'active')); ?>
 
                         </span>
                     </td>
-                    <td class="px-4 py-3">
+                    <td class="px-3 py-3">
                         <div class="flex items-center gap-2">
                             <a href="<?php echo e(route('dashboard.users.show', $user)); ?>"
                                class="text-xs font-bold text-blue-600 hover:underline">View</a>
@@ -173,13 +187,31 @@
                     </td>
                 </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                <tr><td colspan="9" class="px-4 py-8 text-center text-gray-400">No customers found.</td></tr>
+                <tr><td colspan="10" class="px-4 py-8 text-center text-gray-400">No customers found.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>
     </div>
 
-    <div class="mt-4"><?php echo e($users->withQueryString()->links()); ?></div>
+    <?php if($users->hasPages()): ?>
+        <nav class="mt-6 flex items-center justify-center gap-2" aria-label="Customer pagination">
+            <?php if($users->onFirstPage()): ?>
+                <span class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-400">Previous</span>
+            <?php else: ?>
+                <a href="<?php echo e($users->previousPageUrl()); ?>" class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Previous</a>
+            <?php endif; ?>
+
+            <?php $__currentLoopData = $users->getUrlRange(max(1, $users->currentPage() - 2), min($users->lastPage(), $users->currentPage() + 2)); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $page => $url): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <a href="<?php echo e($url); ?>" class="flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-bold transition <?php echo e($page === $users->currentPage() ? 'bg-blue-600 text-white shadow-sm' : 'border border-slate-300 text-slate-700 hover:bg-slate-50'); ?>"><?php echo e($page); ?></a>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+            <?php if($users->hasMorePages()): ?>
+                <a href="<?php echo e($users->nextPageUrl()); ?>" class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Next</a>
+            <?php else: ?>
+                <span class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-400">Next</span>
+            <?php endif; ?>
+        </nav>
+    <?php endif; ?>
 </div>
 <?php $__env->stopSection(); ?>
 

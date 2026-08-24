@@ -38,37 +38,46 @@
     </form>
 
     <div class="bg-white rounded-2xl shadow w-full overflow-x-auto">
-        <table class="w-full text-sm min-w-[820px]">
+        <table class="w-full min-w-[1050px] table-fixed text-sm">
+            <colgroup>
+                <col style="width: 8%">
+                <col style="width: 18%">
+                <col style="width: 15%">
+                <col style="width: 13%">
+                <col style="width: 12%">
+                <col style="width: 20%">
+                <col style="width: 14%">
+            </colgroup>
             <thead class="bg-blue-600 text-white">
                 <tr>
-                    <th class="px-4 py-3">Sr no</th>
-                    <th class="px-4 py-3">Partner Name</th>
-                    <th class="px-4 py-3">Phone Number</th>
-                    <th class="px-4 py-3">Area</th>
-                    <th class="px-4 py-3">Status</th>
-                    <th class="px-4 py-3">Last Assigned</th>
-                    <th class="px-4 py-3">Action</th>
+                    <th scope="col" class="px-4 py-3 text-left font-bold">Sr no</th>
+                    <th scope="col" class="px-4 py-3 text-left font-bold">Partner Name</th>
+                    <th scope="col" class="px-4 py-3 text-left font-bold">Phone Number</th>
+                    <th scope="col" class="px-4 py-3 text-left font-bold">Area</th>
+                    <th scope="col" class="px-4 py-3 text-left font-bold">Status</th>
+                    <th scope="col" class="px-4 py-3 text-left font-bold">Last Assigned</th>
+                    <th scope="col" class="px-4 py-3 text-left font-bold">Action</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
                 <?php $__empty_1 = true; $__currentLoopData = $deliveryBoys; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $deliveryBoy): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-3 font-semibold text-slate-700"><?php echo e($deliveryBoys->firstItem() + $index); ?></td>
-                        <td class="px-4 py-3 font-medium"><?php echo e($deliveryBoy->partner_name); ?></td>
-                        <td class="px-4 py-3 text-gray-600"><?php echo e($deliveryBoy->phone_number); ?></td>
-                        <td class="px-4 py-3 text-gray-600"><?php echo e($deliveryBoy->area); ?></td>
-                        <td class="px-4 py-3">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold <?php echo e($deliveryBoy->status === 'active' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'); ?>">
+                        <td class="truncate px-4 py-3 font-medium" title="<?php echo e($deliveryBoy->partner_name); ?>"><?php echo e($deliveryBoy->partner_name); ?></td>
+                        <td class="whitespace-nowrap px-4 py-3 text-gray-600"><?php echo e($deliveryBoy->phone_number); ?></td>
+                        <td class="truncate px-4 py-3 text-gray-600" title="<?php echo e($deliveryBoy->area); ?>"><?php echo e($deliveryBoy->area); ?></td>
+                        <td class="whitespace-nowrap px-4 py-3">
+                            <span class="inline-block px-3 py-1 rounded-full text-xs font-bold <?php echo e($deliveryBoy->status === 'active' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'); ?>">
                                 <?php echo e(ucfirst($deliveryBoy->status)); ?>
 
                             </span>
                         </td>
-                        <td class="px-4 py-3 text-gray-600">
+                        <td class="whitespace-nowrap px-4 py-3 text-gray-600">
                             <?php echo e($deliveryBoy->last_assigned ? $deliveryBoy->last_assigned->format('d M Y, h:i A') : 'Not assigned yet'); ?>
 
                         </td>
                         <td class="px-4 py-3">
-                            <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-3 whitespace-nowrap">
                                 <form method="POST" action="<?php echo e(route('dashboard.delivery-boys.toggle', $deliveryBoy)); ?>">
                                     <?php echo csrf_field(); ?>
                                     <?php echo method_field('PATCH'); ?>

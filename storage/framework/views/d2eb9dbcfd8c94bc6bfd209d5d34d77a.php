@@ -56,12 +56,6 @@
             <i class="fa-solid fa-arrow-left text-xs"></i> Back
         </a>
         <div class="flex items-center gap-2">
-            <a href="#" title="Export Excel" class="flex h-9 w-9 items-center justify-center rounded bg-green-600 text-sm text-white hover:bg-green-700">
-                <i class="fa-solid fa-file-excel"></i>
-            </a>
-            <a href="#" title="Export PDF" class="flex h-9 w-9 items-center justify-center rounded bg-red-600 text-sm text-white hover:bg-red-700">
-                <i class="fa-solid fa-file-pdf"></i>
-            </a>
             <button onclick="window.print()" title="Print" class="flex h-9 w-9 items-center justify-center rounded bg-teal-600 text-sm text-white hover:bg-teal-700">
                 <i class="fa-solid fa-print"></i>
             </button>
@@ -72,13 +66,6 @@
         <h2 class="mb-4 flex items-center gap-2 text-lg font-bold text-blue-600">
             <i class="fa-solid fa-circle-check text-blue-500"></i> Order Details
         </h2>
-
-        <div class="mb-4 flex justify-end print:hidden">
-            <div class="flex items-center gap-2 text-sm">
-                <span class="font-medium text-gray-600">Search:</span>
-                <input type="text" id="orderSearch" class="w-48 rounded border border-gray-300 px-3 py-1.5 text-sm outline-none focus:border-blue-400">
-            </div>
-        </div>
 
         <div class="overflow-hidden rounded-lg border border-gray-200">
             <div class="flex items-center justify-between border-b bg-gray-50 px-4 py-3">
@@ -106,9 +93,6 @@
 
                     </span>
                 </div>
-                <a href="#" onclick="window.print()" class="flex items-center gap-1.5 rounded border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 print:hidden">
-                    <i class="fa-solid fa-download text-xs"></i> Download PDF
-                </a>
             </div>
 
             <div class="border-b bg-white px-4 py-2">

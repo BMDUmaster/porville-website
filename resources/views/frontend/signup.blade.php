@@ -93,6 +93,12 @@
                                placeholder="john@example.com" class="field-input" maxlength="254" autocomplete="email" required>
                     </div>
                     <div class="error-msg" id="emailErr"><i class="fa-solid fa-circle-exclamation text-xs"></i><span></span></div>
+                    <p id="existingEmailHelp" class="mt-2 hidden text-xs font-semibold text-red-600">
+                        This email is already registered.
+                        <a href="{{ route('frontend.login') }}" class="underline hover:text-red-800">Log in</a>
+                        or
+                        <a href="{{ route('frontend.password.forgot') }}" class="underline hover:text-red-800">reset your password</a>.
+                    </p>
                     <button type="button" id="sendOtpBtn" onclick="sendRegisterOtp()"
                             class="mt-3 w-full rounded-xl bg-green-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-green-700">
                         Send OTP
@@ -196,6 +202,10 @@ function setInputError(id, hasError) {
     }
 }
 
+function setExistingEmailHelp(show) {
+    document.getElementById('existingEmailHelp')?.classList.toggle('hidden', !show);
+}
+
 function setOtpVerifiedState(verified) {
     otpVerified = verified;
     const password = document.getElementById('pw');
@@ -269,6 +279,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     emailInput.addEventListener('input', function () {
         this.value = this.value.replace(/\s/g, '');
+        setExistingEmailHelp(false);
         if (this.value.trim().toLowerCase() !== otpSentForEmail) {
             setOtpVerifiedState(false);
             document.getElementById('otpSection').classList.add('hidden');
@@ -379,6 +390,7 @@ function sendRegisterOtp() {
 
     showErr('emailErr', !emailRe.test(email), 'Enter a valid email address');
     setInputError('email', !emailRe.test(email));
+    setExistingEmailHelp(false);
 
     if (!emailRe.test(email)) {
         return;
@@ -403,7 +415,9 @@ function sendRegisterOtp() {
 
         if (!response.ok) {
             const message = data.message || Object.values(data.errors || {})?.[0]?.[0] || 'Could not send OTP.';
-            throw new Error(message);
+            const error = new Error(message);
+            error.emailExists = data.email_exists === true;
+            throw error;
         }
 
         setOtpStatus(data.message || 'OTP sent successfully. Please check your email.', true);
@@ -416,6 +430,10 @@ function sendRegisterOtp() {
         document.querySelector('.otp-digit').focus();
     })
     .catch((error) => {
+        const emailAlreadyRegistered = error.emailExists === true;
+        showErr('emailErr', false);
+        setInputError('email', emailAlreadyRegistered);
+        setExistingEmailHelp(emailAlreadyRegistered);
         setOtpStatus(error.message || 'Could not send OTP.', false);
     })
     .finally(() => {

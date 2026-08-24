@@ -205,10 +205,19 @@ class AuthController extends Controller
         $request->merge(['email' => strtolower(trim((string) $request->input('email')))]);
 
         $data = $request->validate([
-            'email' => [...$this->registrationEmailRules(), 'unique:users,email'],
+            'email' => $this->registrationEmailRules(),
         ]);
 
         $email = strtolower($data['email']);
+
+        if (User::query()->where('email', $email)->exists()) {
+            return response()->json([
+                'success' => false,
+                'email_exists' => true,
+                'message' => 'This email is already registered. Please log in or reset your password.',
+            ], 422);
+        }
+
         $otp = $this->generateOtp();
 
         try {
@@ -254,6 +263,7 @@ class AuthController extends Controller
             'name.max' => 'Full name must not exceed 50 characters.',
             'name.regex' => 'Full name may contain letters and single spaces only.',
             'email.regex' => 'Enter a valid email address, such as rahul.sharma@gmail.com.',
+            'email.unique' => 'This email is already registered. Please log in or reset your password.',
             'password.min' => 'Password must be at least 8 characters.',
             'password.regex' => 'Password must include uppercase, lowercase, number, and special character.',
             'password.not_regex' => 'Password cannot contain spaces or common passwords.',

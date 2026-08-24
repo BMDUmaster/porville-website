@@ -192,6 +192,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 
 @php
     $drawerCart = session('cart', []);
+    $initialCartItemCount = count($drawerCart);
     $drawerCartDays = collect($drawerCart)->pluck('pricing_day')->filter();
     $drawerUsesTomorrowDelivery = $drawerCartDays->contains('tomorrow') && ! $drawerCartDays->contains('today');
     $drawerDeliveryDayLabel = $drawerUsesTomorrowDelivery ? 'Tomorrow' : 'Today';
@@ -416,7 +417,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                 <div class="relative">
                     <i class="fa-solid fa-cart-shopping text-xl group-hover:text-blue-800"></i>
                     <span id="header-cart-badge"
-                          class="absolute -top-2 -right-2 bg-yellow-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-black border border-white">0</span>
+                          class="absolute -top-2 -right-2 bg-yellow-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-black border border-white {{ $initialCartItemCount > 0 ? '' : 'hidden' }}">{{ $initialCartItemCount }}</span>
                 </div>
                 <span class="text-[10px] font-bold mt-0.5 hidden md:block">Cart</span>
             </button>
@@ -681,6 +682,16 @@ function showCartAddedAlert(message = 'Add to Cart') {
     }, 1800);
 }
 // Add to cart (AJAX)
+function updateHeaderCartBadge(count) {
+    const badge = document.getElementById('header-cart-badge');
+
+    if (!badge) return;
+
+    const itemCount = Math.max(0, Number(count) || 0);
+    badge.textContent = itemCount;
+    badge.classList.toggle('hidden', itemCount === 0);
+}
+
 function addToCart(productId, variantIndex, pricingDay = 'today') {
     fetch('{{ route("frontend.cart.add") }}', {
         method: 'POST',
@@ -699,7 +710,7 @@ function addToCart(productId, variantIndex, pricingDay = 'today') {
         }
 
         // Update badge with unique product count (not total quantity)
-        document.getElementById('header-cart-badge').textContent = data.unique_count ?? data.cart_count;
+        updateHeaderCartBadge(data.unique_count ?? data.cart_count);
 
         // Open cart drawer immediately on add
         openCart();
@@ -921,7 +932,7 @@ function refreshCartDrawer() {
             selectedCartDrawerDay = data.delivery_day || selectedCartDrawerDay;
             const uniqueCount = data.unique_count ?? data.count;
             const totalQty = data.count;
-            document.getElementById('header-cart-badge').textContent = uniqueCount;
+            updateHeaderCartBadge(uniqueCount);
             document.getElementById('cart-badge-drawer').textContent = uniqueCount + ' item' + (uniqueCount !== 1 ? 's' : '');
             document.getElementById('cart-subtotal-drawer').textContent = formatCartCurrency(data.subtotal);
             const chargePercent = Number(data.service_charge_percent || 0);

@@ -1021,7 +1021,14 @@ function sendCartRequest(productId, redirectToCheckout = false) {
         const headerBadge = document.getElementById('header-cart-badge');
         if (headerBadge) {
             // The header badge represents unique cart items, not their total quantity.
-            headerBadge.textContent = data.unique_count ?? data.cart_count;
+            const cartItemCount = data.unique_count ?? data.cart_count;
+
+            if (typeof updateHeaderCartBadge === 'function') {
+                updateHeaderCartBadge(cartItemCount);
+            } else {
+                headerBadge.textContent = cartItemCount;
+                headerBadge.classList.toggle('hidden', Number(cartItemCount) === 0);
+            }
         }
 
         if (redirectToCheckout) {
