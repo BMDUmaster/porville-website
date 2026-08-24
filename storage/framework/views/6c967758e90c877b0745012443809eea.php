@@ -94,9 +94,6 @@
                     <div class="error-msg" id="emailErr"><i class="fa-solid fa-circle-exclamation text-xs"></i><span></span></div>
                     <p id="existingEmailHelp" class="mt-2 hidden text-xs font-semibold text-red-600">
                         This email is already registered.
-                        <a href="<?php echo e(route('frontend.login')); ?>" class="underline hover:text-red-800">Log in</a>
-                        or
-                        <a href="<?php echo e(route('frontend.password.forgot')); ?>" class="underline hover:text-red-800">reset your password</a>.
                     </p>
                     <button type="button" id="sendOtpBtn" onclick="sendRegisterOtp()"
                             class="mt-3 w-full rounded-xl bg-green-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-green-700">

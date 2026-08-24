@@ -104,31 +104,31 @@
 
     {{-- Desktop Table --}}
     <div class="hidden w-full overflow-x-auto rounded-2xl bg-white shadow md:block">
-        <table class="w-full min-w-[1120px] table-fixed text-sm">
+        <table class="w-full min-w-[1460px] table-fixed text-sm">
             <colgroup>
-                <col class="w-[6%]">
-                <col class="w-[8%]">
-                <col class="w-[16%]">
-                <col class="w-[22%]">
-                <col class="w-[12%]">
-                <col class="w-[12%]">
-                <col class="w-[7%]">
-                <col class="w-[13%]">
-                <col class="w-[8%]">
-                <col class="w-[10%]">
+                <col style="width: 70px">
+                <col style="width: 100px">
+                <col style="width: 160px">
+                <col style="width: 260px">
+                <col style="width: 145px">
+                <col style="width: 155px">
+                <col style="width: 75px">
+                <col style="width: 220px">
+                <col style="width: 110px">
+                <col style="width: 165px">
             </colgroup>
             <thead class="bg-blue-600 text-white">
                 <tr>
-                    <th class="px-3 py-3 text-left">Sr. No.</th>
-                    <th class="px-3 py-3 text-left">Customer ID</th>
+                    <th class="whitespace-nowrap px-3 py-3 text-left">Sr. No.</th>
+                    <th class="whitespace-nowrap px-3 py-3 text-left">Customer ID</th>
                     <th class="px-3 py-3 text-left">Name</th>
                     <th class="px-3 py-3 text-left">Email</th>
-                    <th class="px-3 py-3 text-left">Phone</th>
+                    <th class="whitespace-nowrap px-3 py-3 text-left">Phone</th>
                     <th class="px-3 py-3 text-left">DOB / Gender</th>
                     <th class="px-3 py-3 text-center">Orders</th>
-                    <th class="px-3 py-3 text-left">Delivery Charge</th>
-                    <th class="px-3 py-3 text-center">Status</th>
-                    <th class="px-3 py-3 text-left">Action</th>
+                    <th class="whitespace-nowrap px-3 py-3 text-left">Delivery Charge</th>
+                    <th class="whitespace-nowrap px-3 py-3 text-center">Status</th>
+                    <th class="whitespace-nowrap px-3 py-3 text-left">Action</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -138,7 +138,7 @@
                     <td class="px-3 py-3 font-semibold text-slate-700">#{{ $user->id }}</td>
                     <td class="truncate px-3 py-3 font-medium" title="{{ $user->name }}">{{ $user->name }}</td>
                     <td class="truncate px-3 py-3 text-gray-600" title="{{ $user->email }}">{{ $user->email }}</td>
-                    <td class="px-3 py-3 text-gray-600">{{ $user->phone ?: '-' }}</td>
+                    <td class="whitespace-nowrap px-3 py-3 text-gray-600">{{ $user->phone ?: '-' }}</td>
                     <td class="px-3 py-3 text-gray-600">
                         <p>{{ $user->date_of_birth?->format('d M Y') ?: '-' }}</p>
                         <p class="mt-1 text-xs text-gray-400">{{ $user->gender ? ucfirst(str_replace('_', ' ', $user->gender)) : 'Not set' }}</p>
@@ -149,7 +149,7 @@
                             @if($user->delivery_charge !== null)
                                 <p class="text-xs font-bold text-blue-600">Custom Rs{{ number_format($user->delivery_charge, 2) }}</p>
                             @endif
-                            <form method="POST" action="{{ route('dashboard.users.delivery-charge', $user) }}" class="mt-2 flex items-center gap-3">
+                            <form method="POST" action="{{ route('dashboard.users.delivery-charge', $user) }}" class="mt-2 flex items-center gap-2 whitespace-nowrap">
                                 @csrf
                                 @method('PATCH')
                                 <input type="number" name="delivery_charge" min="0" step="0.01"
@@ -168,7 +168,7 @@
                         </span>
                     </td>
                     <td class="px-3 py-3">
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 whitespace-nowrap">
                             <a href="{{ route('dashboard.users.show', $user) }}"
                                class="text-xs font-bold text-blue-600 hover:underline">View</a>
                             <form method="POST" action="{{ route('dashboard.users.toggle', $user) }}">
