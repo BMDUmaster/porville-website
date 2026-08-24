@@ -51,15 +51,11 @@
     $quickActions = [
         ['title' => 'New Coupon', 'subtitle' => 'Create product coupon', 'icon' => 'fa-tags', 'color' => 'indigo', 'payload' => null],
         ['title' => 'Flash Sale', 'subtitle' => 'Limited time offer', 'icon' => 'fa-bolt', 'color' => 'amber', 'payload' => ['entry_type' => 'offer']],
-        ['title' => 'Bulk Discount', 'subtitle' => 'Volume based pricing', 'icon' => 'fa-cubes-stacked', 'color' => 'emerald', 'payload' => ['entry_type' => 'coupon', 'type' => 'flat']],
-        ['title' => 'Referral Offer', 'subtitle' => 'Refer & earn', 'icon' => 'fa-user-plus', 'color' => 'violet', 'payload' => ['entry_type' => 'coupon', 'type' => 'percent']],
     ];
 
     $tabs = [
         'my_coupons' => ['label' => 'My Coupons', 'icon' => 'fa-tags'],
         'flash_sales' => ['label' => 'Flash Sales', 'icon' => 'fa-bolt'],
-        'bulk_discounts' => ['label' => 'Bulk Discounts', 'icon' => 'fa-cubes-stacked'],
-        'referral_offers' => ['label' => 'Referral Offers', 'icon' => 'fa-user-plus'],
     ];
 
     $titleBySegment = [

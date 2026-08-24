@@ -82,7 +82,7 @@
                     <div class="flex items-center justify-between gap-4">
                         <label class="flex cursor-pointer items-center gap-2.5 text-[12px] font-medium text-slate-600">
                             <input type="checkbox" name="remember" class="h-4 w-4 rounded border-slate-300 accent-blue-600">
-                            Remember me
+                            Remember Me
                         </label>
                         <a href="{{ route('frontend.password.forgot') }}" class="text-[12px] font-extrabold text-blue-700 transition hover:text-blue-900 hover:underline">Forgot password?</a>
                     </div>

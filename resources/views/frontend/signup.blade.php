@@ -117,7 +117,13 @@
                 </div>
 
                 <div class="mb-6">
-                    <label class="field-label">Password <span class="req">*</span></label>
+                    <div class="mb-1.5 flex items-center justify-between">
+                        <label class="field-label mb-0">Password <span class="req">*</span></label>
+                        <button type="button" id="resendOtpLink" onclick="sendRegisterOtp()"
+                                class="hidden text-xs font-semibold text-green-600 transition hover:text-green-700 hover:underline">
+                            Resend OTP
+                        </button>
+                    </div>
                     <div class="relative">
                         <i class="fa-solid fa-lock field-icon"></i>
                         <input type="password" name="password" id="pw"
@@ -384,6 +390,7 @@ function sendRegisterOtp() {
     const email = emailInput.value.trim();
     const emailRe = /^(?!.*\.\.)[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*\.[A-Za-z]{2,}$/;
     const button = document.getElementById('sendOtpBtn');
+    const resendLink = document.getElementById('resendOtpLink');
 
     showErr('emailErr', !emailRe.test(email), 'Enter a valid email address');
     setInputError('email', !emailRe.test(email));
@@ -396,6 +403,8 @@ function sendRegisterOtp() {
     button.disabled = true;
     button.textContent = 'Sending...';
     button.classList.add('opacity-70');
+    resendLink.disabled = true;
+    resendLink.classList.add('opacity-60', 'pointer-events-none');
     setOtpStatus('Preparing OTP...', true);
 
     fetch('{{ route('frontend.register.otp') }}', {
@@ -422,6 +431,7 @@ function sendRegisterOtp() {
         setOtpVerifiedState(false);
         otpHasBeenSent = true;
         document.getElementById('otpSection').classList.remove('hidden');
+        document.getElementById('resendOtpLink').classList.remove('hidden');
         document.getElementById('emailOtp').value = '';
         document.querySelectorAll('.otp-digit').forEach((box) => { box.value = ''; });
         document.querySelector('.otp-digit').focus();
@@ -435,11 +445,11 @@ function sendRegisterOtp() {
     })
     .finally(() => {
         button.disabled = false;
-        button.textContent = otpHasBeenSent ? 'Resend OTP' : 'Send OTP';
-        button.classList.toggle('bg-red-600', otpHasBeenSent);
-        button.classList.toggle('hover:bg-red-700', otpHasBeenSent);
-        button.classList.toggle('bg-green-600', !otpHasBeenSent);
-        button.classList.toggle('hover:bg-green-700', !otpHasBeenSent);
+        button.textContent = 'Send OTP';
+        button.classList.toggle('hidden', otpHasBeenSent);
+        resendLink.disabled = false;
+        resendLink.classList.toggle('hidden', !otpHasBeenSent);
+        resendLink.classList.remove('opacity-60', 'pointer-events-none');
         button.classList.remove('opacity-70');
     });
 }
