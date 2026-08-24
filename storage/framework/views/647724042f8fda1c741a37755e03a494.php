@@ -478,12 +478,12 @@
                 </div>
                 <div class="flex min-w-0 flex-wrap items-end gap-2 sm:gap-3">
                     <span class="max-w-full break-words text-[36px] font-black leading-none text-slate-900 sm:text-[40px] md:text-[46px]">
-                        Rs<span id="detailCurrentPrice"><?php echo e(number_format($defaultDisplayedPrice, 0)); ?></span>
+                        ₹<span id="detailCurrentPrice"><?php echo e(number_format($defaultDisplayedPrice, 0)); ?></span>
                         <span id="detailCurrentPriceUnit" class="ml-1 text-[14px] font-bold text-slate-400 md:text-[16px]"><?php echo e($defaultVariant['price_unit_label'] ?? $formatPriceUnit($product->weight ?? null, $product->unit ?? null)); ?></span>
                     </span>
                     <span id="detailMrpWrap" class="<?php echo e(($defaultVariant['mrp'] ?? 0) > $defaultDisplayedPrice ? '' : 'hidden'); ?> flex items-center gap-2">
                         <span id="detailMrp" class="text-[16px] font-bold text-slate-400 line-through">
-                            Rs<?php echo e(number_format($defaultVariant['mrp'] ?? $product->mrp, 0)); ?>
+                            ₹<?php echo e(number_format($defaultVariant['mrp'] ?? $product->mrp, 0)); ?>
 
                         </span>
                         <span id="detailOffer" class="rounded-full bg-[#ff6d5e] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white">
@@ -492,7 +492,7 @@
                     </span>
                 </div>
                 <div id="detailSaveRow" class="<?php echo e($selectedSaveAmount > 0 ? '' : 'hidden'); ?> mt-3 inline-flex items-center gap-1 rounded-xl border border-[#8bd39a] bg-[#dff6e3] px-3 py-1.5 text-[11px] font-black text-[#2f8c43]">
-                    <span>You save Rs</span>
+                    <span>You save ₹</span>
                     <span id="detailSaveAmount"><?php echo e(number_format($selectedSaveAmount, 0)); ?></span>
                     <span>on this order</span>
                 </div>
@@ -532,7 +532,7 @@
                             type="button"
                             id="variant-btn-<?php echo e($index); ?>"
                             onclick="selectVariant(<?php echo e($index); ?>)"
-                            class="variant-card <?php echo e($index === 0 ? 'is-active' : ''); ?> min-w-[84px] rounded-[16px] border border-slate-200 bg-white px-3 py-3 text-left shadow-sm transition hover:border-green-200"
+                            class="variant-card <?php echo e($index === 0 ? 'is-active' : ''); ?> min-w-[84px] rounded-[16px] border border-slate-200 bg-white px-3 py-3 text-left shadow-sm transition duration-200 hover:-translate-y-1 hover:border-green-400 hover:bg-green-50 hover:shadow-[0_14px_28px_rgba(47,140,67,0.16)] active:translate-y-0 active:scale-[0.98]"
                         >
                             <div class="text-[11px] font-black text-slate-800"><?php echo e($variant['label'] ?: 'Standard Pack'); ?></div>
                             <div class="mt-1 text-[10px] font-semibold text-slate-400" data-variant-day-price="<?php echo e($index); ?>">₹<?php echo e(number_format($variant['today_price'], 0)); ?></div>
@@ -668,7 +668,7 @@
 
                                             <?php if(!empty($offer['min_order_amount'])): ?>
                                                 <div class="inline-flex items-center rounded-xl bg-slate-100 px-3 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-slate-600">
-                                                    Min order Rs<?php echo e(number_format((float) $offer['min_order_amount'], 0)); ?>
+                                                    Min order ₹<?php echo e(number_format((float) $offer['min_order_amount'], 0)); ?>
 
                                                 </div>
                                             <?php endif; ?>
@@ -1004,7 +1004,7 @@ function selectVariant(index) {
     const canShowDiscount = Number(variant.mrp || 0) > Number(activePrice || 0);
     const saveValue = Math.max(Number(variant.mrp || 0) - Number(activePrice || 0), 0);
 
-    if (mrp) mrp.textContent = 'Rs' + Math.round(variant.mrp || 0);
+    if (mrp) mrp.textContent = '₹' + Math.round(variant.mrp || 0);
     if (offer) offer.textContent = '-' + Math.round(activeOffer || 0) + '% off';
     if (saveAmount) saveAmount.textContent = Math.round(saveValue);
 
@@ -1031,7 +1031,8 @@ function sendCartRequest(productId, redirectToCheckout = false) {
 
         const headerBadge = document.getElementById('header-cart-badge');
         if (headerBadge) {
-            headerBadge.textContent = data.cart_count;
+            // The header badge represents unique cart items, not their total quantity.
+            headerBadge.textContent = data.unique_count ?? data.cart_count;
         }
 
         if (redirectToCheckout) {

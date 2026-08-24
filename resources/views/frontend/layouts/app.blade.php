@@ -476,6 +476,25 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
         </div>
     @endif
 
+    @if(session('account_blocked'))
+        <div id="accountBlockedModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-950/60 px-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="accountBlockedTitle">
+            <div class="w-full max-w-md overflow-hidden rounded-3xl bg-white text-center shadow-2xl">
+                <div class="bg-gradient-to-br from-red-500 to-rose-600 px-6 pb-12 pt-8 text-white">
+                    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white/20 ring-8 ring-white/10"><i class="fa-solid fa-lock text-2xl"></i></div>
+                    <p class="mt-5 text-xs font-bold uppercase tracking-[0.2em] text-red-100">Order unavailable</p>
+                </div>
+                <div class="-mt-5 rounded-t-3xl bg-white px-7 pb-7 pt-6">
+                    <h2 id="accountBlockedTitle" class="text-xl font-extrabold text-slate-900">Your account is blocked</h2>
+                    <p class="mt-3 text-sm leading-6 text-slate-600">You cannot place an order while your account is blocked. Please contact our support team for help.</p>
+                    <div class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <a href="{{ route('frontend.contact') }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-green-700"><i class="fa-solid fa-headset"></i> Contact Us</a>
+                        <button type="button" data-close-account-blocked class="rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50">Go Back</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Main Content -->
     <main class="flex-1">
         @yield('content')
@@ -1053,7 +1072,56 @@ function formatVisibleRupeeSymbols(root = document.body) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    const accountBlockedModal = document.getElementById('accountBlockedModal');
+    if (accountBlockedModal) {
+        accountBlockedModal.classList.remove('hidden');
+        accountBlockedModal.classList.add('flex');
+        accountBlockedModal.querySelector('[data-close-account-blocked]')?.addEventListener('click', () => {
+            accountBlockedModal.classList.add('hidden');
+            accountBlockedModal.classList.remove('flex');
+        });
+    }
+
     formatVisibleRupeeSymbols();
+
+    document.querySelectorAll('input[type="password"]').forEach((input) => {
+        const parent = input.parentElement;
+
+        // Password fields that already provide their own toggle (for example,
+        // the signup form) are left unchanged.
+        if (parent.querySelector('button')) {
+            return;
+        }
+
+        const parentStyle = window.getComputedStyle(parent);
+        const wrapper = parentStyle.position === 'relative' ? parent : document.createElement('div');
+
+        if (wrapper !== parent) {
+            wrapper.style.position = 'relative';
+            input.before(wrapper);
+            wrapper.appendChild(input);
+        }
+
+        input.style.paddingRight = '3rem';
+
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.setAttribute('data-password-visibility-toggle', '');
+        toggle.setAttribute('aria-label', 'Show password');
+        toggle.setAttribute('aria-pressed', 'false');
+        toggle.style.cssText = 'position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);padding:0.35rem;color:#94a3b8;line-height:1;cursor:pointer;background:transparent;border:0;';
+        toggle.innerHTML = '<i class="fa-regular fa-eye" aria-hidden="true"></i>';
+
+        toggle.addEventListener('click', () => {
+            const isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            toggle.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+            toggle.setAttribute('aria-pressed', String(isHidden));
+            toggle.innerHTML = `<i class="fa-regular ${isHidden ? 'fa-eye-slash' : 'fa-eye'}" aria-hidden="true"></i>`;
+        });
+
+        wrapper.appendChild(toggle);
+    });
 
     new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {

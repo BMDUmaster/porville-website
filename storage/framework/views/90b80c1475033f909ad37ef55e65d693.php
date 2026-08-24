@@ -22,7 +22,7 @@
     </div>
 
     
-    <form method="GET" class="bg-white rounded-xl border p-4 mb-4 grid grid-cols-1 md:grid-cols-6 gap-3 items-center">
+    <form method="GET" class="bg-white rounded-xl border p-4 mb-4 grid grid-cols-1 md:grid-cols-7 gap-3 items-center">
         <input type="text" name="search" value="<?php echo e(request('search')); ?>" placeholder="Search..."
                class="md:col-span-2 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-green-500">
         <select name="category" class="border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none">
@@ -36,6 +36,10 @@
             <option value="active" <?php echo e(request('status') === 'active' ? 'selected' : ''); ?>>Active</option>
             <option value="inactive" <?php echo e(request('status') === 'inactive' ? 'selected' : ''); ?>>Inactive</option>
         </select>
+        <button type="submit"
+                class="bg-blue-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 transition hover:bg-blue-700">
+            <i class="fa-solid fa-filter text-xs"></i> Filter
+        </button>
         <a href="<?php echo e(route('dashboard.subcategories')); ?>" class="bg-red-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl text-center">Reset</a>
         <button onclick="openModal('addModal')" type="button"
                 class="bg-orange-400 text-white text-sm font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1 justify-center">

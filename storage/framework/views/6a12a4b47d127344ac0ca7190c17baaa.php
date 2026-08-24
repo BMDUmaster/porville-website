@@ -59,7 +59,7 @@
                     <p class="mt-1 text-xs text-slate-500"><?php echo e($product->category->name ?? '-'); ?> | <?php echo e($product->subcategory->name ?? '-'); ?></p>
                 </div>
                 <span class="rounded px-2 py-1 text-[10px] font-bold <?php echo e($product->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'); ?>">
-                    <?php echo e($product->is_active ? 'ACTIVE' : 'DEACTIVE'); ?>
+                    <?php echo e($product->is_active ? 'ACTIVE' : 'INACTIVE'); ?>
 
                 </span>
             </div>
@@ -71,7 +71,7 @@
                 </div>
                 <div>
                     <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Stock</p>
-                    <p class="mt-1 text-sm font-bold <?php echo e($product->is_active ? 'text-green-700' : 'text-red-600'); ?>"><?php echo e($product->is_active ? 'Active' : 'Deactive'); ?></p>
+                    <p class="mt-1 text-sm font-bold <?php echo e($product->is_active ? 'text-green-700' : 'text-red-600'); ?>"><?php echo e($product->is_active ? 'Active' : 'Inactive'); ?></p>
                 </div>
             </div>
 
@@ -149,7 +149,7 @@
                     <td class="px-6 py-4 text-xs font-semibold text-slate-700">₹<?php echo e(number_format($product->price, 2)); ?></td>
                     <td class="px-6 py-4">
                         <span class="text-xs font-bold px-2 py-1 rounded <?php echo e($product->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'); ?>">
-                            <?php echo e($product->is_active ? 'ACTIVE' : 'DEACTIVE'); ?>
+                            <?php echo e($product->is_active ? 'ACTIVE' : 'INACTIVE'); ?>
 
                         </span>
                     </td>
@@ -277,7 +277,7 @@
                 <select name="is_active"
                         class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-blue-400">
                     <option value="1">Active</option>
-                    <option value="0">Deactive</option>
+                    <option value="0">Inactive</option>
                 </select>
             </div>
 
@@ -444,7 +444,7 @@
                     <label class="text-xs font-bold text-slate-600 block mb-1">Stock Status</label>
                     <select name="is_active" id="editIsActive" class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
                         <option value="1">Active</option>
-                        <option value="0">Deactive</option>
+                        <option value="0">Inactive</option>
                     </select>
                 </div>
             </div>

@@ -14,8 +14,20 @@ class NotificationController extends Controller
         $query = Notification::with('recipient')->latest();
 
         if ($request->filled('search')) {
-            $query->where('subject', 'like', '%' . $request->search . '%')
-                  ->orWhere('message', 'like', '%' . $request->search . '%');
+            $search = trim((string) $request->input('search'));
+
+            if ($search !== '') {
+                $query->where(function ($notificationQuery) use ($search) {
+                    $notificationQuery
+                        ->where('subject', 'like', '%' . $search . '%')
+                        ->orWhere('message', 'like', '%' . $search . '%')
+                        ->orWhereHas('recipient', function ($userQuery) use ($search) {
+                            $userQuery->where('name', 'like', '%' . $search . '%')
+                                ->orWhere('email', 'like', '%' . $search . '%')
+                                ->orWhere('id', $search);
+                        });
+                });
+            }
         }
 
         $notifications = $query->paginate(20);

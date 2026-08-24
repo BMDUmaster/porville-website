@@ -6,12 +6,16 @@
 <div class="space-y-6 p-4 md:p-8">
 
     
-    <form method="GET" class="flex justify-end">
+    <form method="GET" action="<?php echo e(route('dashboard.notifications')); ?>" class="flex justify-end">
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
             <label class="text-sm font-bold text-gray-600">Search:</label>
             <input type="text" name="search" value="<?php echo e(request('search')); ?>"
+                   placeholder="Customer, email, subject or message"
                    class="border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             <button type="submit" class="bg-blue-600 text-white px-4 py-1.5 rounded text-sm">Go</button>
+            <?php if(request()->filled('search')): ?>
+                <a href="<?php echo e(route('dashboard.notifications')); ?>" class="px-3 py-1.5 text-sm font-semibold text-slate-500 hover:text-slate-800">Clear</a>
+            <?php endif; ?>
         </div>
     </form>
 

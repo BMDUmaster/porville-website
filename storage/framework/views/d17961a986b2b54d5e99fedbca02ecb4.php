@@ -844,7 +844,7 @@
         <div class="mb-7 flex items-end justify-between gap-4">
             <div>
                 <h2 class="text-3xl font-extrabold text-slate-900 md:text-4xl">
-                    Best <span class="text-slate-300">Sellers</span>
+                    Best <span class="text-slate-900">Sellers</span>
                 </h2>
                 <p class="mt-2 text-sm text-slate-500">Yeh wo products hain jo customers sabse zyada order karte hain.</p>
             </div>

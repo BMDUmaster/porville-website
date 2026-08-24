@@ -26,6 +26,10 @@ class CheckoutController extends Controller
     /** GET /checkout */
     public function index(Request $request)
     {
+        if (! $this->canPlaceOrders()) {
+            return redirect()->route('frontend.cart')->with('account_blocked', true);
+        }
+
         $cart = session('cart', []);
         if (empty($cart)) {
             return redirect()->route('frontend.cart')->with('error', 'Your cart is empty.');
@@ -131,6 +135,10 @@ class CheckoutController extends Controller
     /** POST /checkout */
     public function store(Request $request)
     {
+        if (! $this->canPlaceOrders()) {
+            return redirect()->route('frontend.cart')->with('account_blocked', true);
+        }
+
         // Block order if ordering is disabled by admin
         if (! OrderingManager::isActive()) {
             return back()->with('ordering_inactive', true);
@@ -296,6 +304,11 @@ class CheckoutController extends Controller
         session()->forget('checkout_delivery_day');
 
         return redirect()->route('frontend.order.success', $order->id);
+    }
+
+    private function canPlaceOrders(): bool
+    {
+        return auth('web_frontend')->user()?->canPlaceOrders() ?? false;
     }
 
     public function success($orderId)

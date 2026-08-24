@@ -317,13 +317,6 @@
                         <p class="mt-1 text-sm font-bold text-slate-900"><?php echo e($user->phone ?: 'Not provided'); ?></p>
                     </div>
                     <div>
-                        <p class="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Email Verified</p>
-                        <p class="mt-1 text-sm font-bold text-slate-900">
-                            <?php echo e($user->email_verified_at ? $user->email_verified_at->format('d M Y, h:i A') : 'Not verified'); ?>
-
-                        </p>
-                    </div>
-                    <div>
                         <p class="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Joined</p>
                         <p class="mt-1 text-sm font-bold text-slate-900"><?php echo e($user->created_at->format('d M Y, h:i A')); ?></p>
                     </div>

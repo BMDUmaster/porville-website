@@ -31,7 +31,7 @@ class UserController extends Controller
             $query->where('status', $request->status);
         }
 
-        $users = $query->latest()->paginate(20);
+        $users = $query->latest()->paginate(25);
 
         $stats = [
             'total'   => User::where('role', 'customer')->count(),

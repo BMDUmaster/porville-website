@@ -5,18 +5,6 @@
 <div class="p-4 sm:p-6">
 
     
-   
-
-    
-    <div class="bg-white rounded-xl border overflow-x-auto">
-
-<?php $__env->startSection('title', 'Categories'); ?>
-<?php $__env->startSection('page_title', 'Category Management'); ?>
-
-<?php $__env->startSection('content'); ?>
-<div class="p-4 sm:p-6">
-
-    
     <div class="bg-white rounded-xl border p-4 mb-4 flex flex-col md:flex-row gap-3 items-center">
         <form method="GET" class="flex-1 relative w-full">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
@@ -24,7 +12,7 @@
                    class="w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm outline-none focus:border-blue-400">
         </form>
         <button onclick="openModal('addModal')"
-                class="bg-purple-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 w-full md:w-auto justify-center">
+                class="bg-purple-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 w-full md:w-auto md:self-start justify-center">
             <i class="fa-solid fa-plus"></i> Add New Category
         </button>
     </div>
@@ -46,8 +34,8 @@
             <tbody class="divide-y divide-gray-100">
                 <?php $__empty_1 = true; $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <tr class="hover:bg-gray-50 transition">
-                    <td class="px-4 py-3 text-sm text-gray-500"><?php echo e($categories->firstItem() + $i); ?></td>
-                    <td class="px-4 py-3">
+                    <td class="px-4 py-3 align-middle text-sm text-gray-500"><?php echo e($categories->firstItem() + $i); ?></td>
+                    <td class="px-4 py-3 align-middle">
                         <?php if($cat->image): ?>
                             <img src="<?php echo e(asset('storage/'.$cat->image)); ?>" class="w-12 h-12 rounded-lg object-cover">
                         <?php else: ?>
@@ -56,29 +44,29 @@
                             </div>
                         <?php endif; ?>
                     </td>
-                    <td class="px-4 py-3">
+                    <td class="px-4 py-3 align-middle">
                         <p class="font-semibold text-sm text-gray-800"><?php echo e($cat->name); ?></p>
                         <p class="text-xs text-gray-400 truncate max-w-[200px]"><?php echo e($cat->description ?? 'No description'); ?></p>
                     </td>
-                    <td class="px-4 py-3 text-sm text-gray-600"><?php echo e($cat->children->count()); ?></td>
-                    <td class="px-4 py-3 text-sm text-gray-500"><?php echo e($cat->created_at->format('d M Y')); ?></td>
-                    <td class="px-4 py-3 text-sm">
+                    <td class="px-4 py-3 align-middle text-sm text-gray-600"><?php echo e($cat->children->count()); ?></td>
+                    <td class="px-4 py-3 align-middle text-sm text-gray-500"><?php echo e($cat->created_at->format('d M Y')); ?></td>
+                    <td class="px-4 py-3 align-middle text-sm">
                         <?php if($cat->is_active): ?>
                             <span class="bg-green-100 text-green-800 text-[11px] font-semibold px-2.5 py-1 rounded-full">Active</span>
                         <?php else: ?>
                             <span class="bg-red-100 text-red-800 text-[11px] font-semibold px-2.5 py-1 rounded-full">Inactive</span>
                         <?php endif; ?>
                     </td>
-                    <td class="px-4 py-3 text-center">
-                        <div class="flex justify-center gap-2">
+                    <td class="px-4 py-3 align-middle text-center">
+                        <div class="flex items-center justify-center gap-2">
                             <button onclick="openEditModal(<?php echo e($cat->id); ?>, '<?php echo e(addslashes($cat->name)); ?>', '<?php echo e(addslashes($cat->description ?? '')); ?>', <?php echo e($cat->is_active ? 1 : 0); ?>)"
-                                    class="p-2 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs">
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg text-xs text-indigo-600 transition hover:bg-indigo-100">
                                 <i class="fa-regular fa-pen-to-square"></i>
                             </button>
                             <form method="POST" action="<?php echo e(route('dashboard.categories.destroy', $cat)); ?>"
                                   onsubmit="return confirm('Delete this category?')">
                                 <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
-                                <button type="submit" class="p-2 hover:bg-red-100 text-red-500 rounded-lg text-xs">
+                                <button type="submit" class="flex h-8 w-8 items-center justify-center rounded-lg text-xs text-red-500 transition hover:bg-red-100">
                                     <i class="fa-regular fa-trash-can"></i>
                                 </button>
                             </form>
@@ -196,5 +184,4 @@ function openEditModal(id, name, desc, isActive) {
 </script>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.dashboard', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 <?php echo $__env->make('layouts.dashboard', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views\dashboard\categories\index.blade.php ENDPATH**/ ?>

@@ -194,9 +194,10 @@
     </div>
 
     <div class="hidden overflow-x-auto rounded-lg border bg-white shadow-sm md:block">
-        <table class="w-full min-w-[1320px] text-left">
+        <table class="w-full min-w-[1380px] text-left">
             <thead class="border-b bg-gray-50">
                 <tr>
+                    <th class="px-4 py-4 text-xs font-bold uppercase text-gray-700">Sr No.</th>
                     <th class="px-4 py-4 text-xs font-bold uppercase text-gray-700">Order ID</th>
                     <th class="px-4 py-4 text-xs font-bold uppercase text-gray-700">Date & Time</th>
                     <th class="px-4 py-4 text-xs font-bold uppercase text-gray-700">Customer</th>
@@ -212,6 +213,7 @@
             <tbody class="divide-y divide-slate-100">
                 <?php $__empty_1 = true; $__currentLoopData = $orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <tr class="transition hover:bg-slate-50">
+                        <td class="px-4 py-4 text-sm font-semibold text-gray-600"><?php echo e($orders->firstItem() + $loop->index); ?></td>
                         <td class="px-4 py-4 text-sm font-bold text-blue-600">#ORD-<?php echo e(str_pad($order->id, 4, '0', STR_PAD_LEFT)); ?></td>
                         <td class="px-4 py-4 text-sm text-gray-600">
                             <p><?php echo e($order->created_at->format('d M Y')); ?></p>
@@ -296,7 +298,7 @@
                     </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                     <tr>
-                        <td colspan="10" class="px-4 py-8 text-center text-gray-400">No orders found.</td>
+                        <td colspan="11" class="px-4 py-8 text-center text-gray-400">No orders found.</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

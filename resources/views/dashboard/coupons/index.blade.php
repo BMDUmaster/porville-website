@@ -270,9 +270,6 @@
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </form>
-                                    <button type="button" class="text-slate-400 transition hover:text-slate-600">
-                                        <i class="fa-solid fa-ellipsis-vertical"></i>
-                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -379,12 +376,13 @@
                            class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
                 </div>
                 <div id="couponMaxUsesWrap">
-                    <label class="mb-1 block text-sm font-bold text-slate-700">Max Uses</label>
+                    <label class="mb-1 block text-sm font-bold text-slate-700">Total Uses Limit</label>
                     <input type="number" name="max_uses" id="couponMaxUses" min="1"
                            class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
+                    <p class="mt-1 text-xs text-slate-400">Blank means unlimited total redemptions.</p>
                 </div>
                 <div id="couponPerUserWrap">
-                    <label class="mb-1 block text-sm font-bold text-slate-700">Uses Per User</label>
+                    <label class="mb-1 block text-sm font-bold text-slate-700">Uses Per User Limit</label>
                     <input type="number" name="per_user_limit" id="couponPerUserLimit" min="1"
                            class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
                     <p class="mt-1 text-xs text-slate-400">Blank means unlimited per customer.</p>
@@ -453,12 +451,14 @@ function toggleCouponFields() {
     const isCoupon = entryType === 'coupon';
 
     const offerFields = document.getElementById('offerFields');
-    const couponOnlyIds = ['couponCodeWrap', 'couponMinOrderWrap', 'couponMaxUsesWrap', 'couponPerUserWrap', 'couponExpiresWrap'];
+    const couponOnlyIds = ['couponCodeWrap', 'couponExpiresWrap'];
+    const sharedLimitIds = ['couponMinOrderWrap', 'couponMaxUsesWrap', 'couponPerUserWrap'];
     const couponExpiresAt = document.getElementById('couponExpiresAt');
     const offerExpiresAt = document.getElementById('offerExpiresAt');
 
     offerFields.classList.toggle('hidden', isCoupon);
     couponOnlyIds.forEach(id => document.getElementById(id).classList.toggle('hidden', !isCoupon));
+    sharedLimitIds.forEach(id => document.getElementById(id).classList.remove('hidden'));
     document.getElementById('couponTitle').required = !isCoupon;
     document.getElementById('couponDescription').required = !isCoupon;
     document.getElementById('couponStartsAt').required = !isCoupon;

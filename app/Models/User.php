@@ -30,6 +30,11 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
+    public function canPlaceOrders(): bool
+    {
+        return $this->status === 'active';
+    }
+
     public function orders()
     {
         return $this->hasMany(Order::class);

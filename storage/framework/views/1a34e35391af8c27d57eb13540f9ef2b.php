@@ -29,7 +29,7 @@
 
 <?php $__env->startSection('content'); ?>
 <?php
-    $memberSince = $stats['member_since'] ?: optional($user->created_at)->format('M Y');
+    $memberSince = $stats['member_since'] ?: optional($user->created_at)->format('d M Y');
     $profileCompletion = max(12, min(100, $stats['profile_completion']));
     $remainingPoints = max(0, 1000 - $stats['loyalty_points']);
 ?>
@@ -450,7 +450,7 @@
                         <div>
                             <label class="mb-1 block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Gender</label>
                             <select name="gender" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-400 focus:bg-white">
-                                <option value="">Select gender</option>
+                                <option value="">Select Gender</option>
                                 <?php $__currentLoopData = ['male' => 'Male', 'female' => 'Female', 'other' => 'Other', 'prefer_not_to_say' => 'Prefer not to say']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $value => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <option value="<?php echo e($value); ?>" <?php if(old('gender', $user->gender) === $value): echo 'selected'; endif; ?>><?php echo e($label); ?></option>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

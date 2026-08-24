@@ -77,6 +77,10 @@ class Coupon extends Model
                     ->orWhere('starts_at', '<=', now());
             })
             ->where(function ($innerQuery) {
+                $innerQuery->whereNull('starts_at')
+                    ->orWhere('starts_at', '<=', now());
+            })
+            ->where(function ($innerQuery) {
                 $innerQuery->whereNull('expires_at')
                     ->orWhere('expires_at', '>', now());
             });

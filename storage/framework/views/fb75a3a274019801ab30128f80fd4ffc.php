@@ -15,7 +15,7 @@
 <div class="p-4 md:p-8 space-y-6">
 
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        <?php $__currentLoopData = [["Today's Orders",$stats['today'],'purple','fa-calendar-day'],['Pending',$stats['pending'],'emerald','fa-hourglass-split'],['Delivered',$stats['delivered'],'blue','fa-bag-check'],['Cancelled',$stats['cancelled'],'red','fa-circle-xmark']]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as [$label,$val,$color,$icon]): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <?php $__currentLoopData = [["Today's Orders",$stats['today'],'purple','fa-calendar-day'],['Pending',$stats['pending'],'emerald','fa-clock'],['Delivered',$stats['delivered'],'blue','fa-check'],['Cancelled',$stats['cancelled'],'red','fa-circle-xmark']]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as [$label,$val,$color,$icon]): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="flex items-center gap-4 rounded-2xl border bg-white p-5 shadow-sm">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-<?php echo e($color); ?>-500 text-white shadow-lg">
                     <i class="fa-solid <?php echo e($icon); ?> text-xl"></i>

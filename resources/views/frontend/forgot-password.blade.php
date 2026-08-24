@@ -1,12 +1,21 @@
 @extends('frontend.layouts.app')
 @section('title', 'Forgot Password')
 
+@section('styles')
+<style>
+@media (max-width: 639px) {
+    .password-recovery-card { width:calc(100vw - 2rem); max-width:calc(100vw - 2rem); }
+    .password-recovery-content { min-width:0; padding-left:1.5rem; padding-right:1.5rem; }
+}
+</style>
+@endsection
+
 @section('content')
 <section class="relative overflow-hidden bg-[linear-gradient(135deg,#eef6ff_0%,#f7fbf5_52%,#ffffff_100%)] px-4 py-10 md:px-6 md:py-14">
     <div class="pointer-events-none absolute -left-24 top-16 h-72 w-72 rounded-full bg-blue-200/25 blur-3xl"></div>
     <div class="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-green-200/30 blur-3xl"></div>
 
-    <div class="relative mx-auto grid w-full max-w-5xl overflow-hidden rounded-[30px] border border-white/80 bg-white shadow-[0_28px_90px_rgba(15,23,42,0.13)] lg:min-h-[560px] lg:grid-cols-[1.05fr_0.95fr]">
+    <div class="password-recovery-card relative mx-auto grid w-full max-w-5xl overflow-hidden rounded-[30px] border border-white/80 bg-white shadow-[0_28px_90px_rgba(15,23,42,0.13)] lg:min-h-[560px] lg:grid-cols-[1.05fr_0.95fr]">
         <div class="relative hidden min-h-[560px] overflow-hidden lg:block">
             <img
                 src="{{ asset('storage/products/HiVF3oTdVV5ivcPECY0aMpXFljIdua0hBYBlCAUW.webp') }}"
@@ -37,8 +46,8 @@
             </div>
         </div>
 
-        <div class="flex items-center px-6 py-9 sm:px-10 md:py-12 lg:px-12">
-        <div class="mx-auto w-full max-w-[390px]">
+        <div class="password-recovery-content flex min-w-0 items-center px-6 py-9 sm:px-10 md:py-12 lg:px-12">
+        <div class="mx-auto w-full min-w-0 max-w-[390px]">
             <a href="{{ route('frontend.login') }}" class="mb-6 inline-flex items-center gap-2 text-sm font-bold text-slate-500 transition hover:text-blue-700">
                 <i class="fa-solid fa-arrow-left text-xs"></i>
                 Back to login
@@ -88,8 +97,14 @@
             @elseif($step === 'otp')
                 <form method="POST" action="{{ route('frontend.password.verify') }}" class="space-y-4">
                     @csrf
-                    <div class="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-800">
-                        {{ session('password_reset_otp_email') }}
+                    <div class="flex w-full max-w-full items-center justify-between gap-2 overflow-hidden rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-800">
+                        <span class="min-w-0 truncate">{{ session('password_reset_otp_email') }}</span>
+                        <a href="{{ route('frontend.password.forgot', ['edit-email' => 1]) }}"
+                           class="inline-flex shrink-0 items-center rounded-lg p-2 text-sm font-bold text-blue-700 transition hover:bg-blue-100 hover:text-blue-900"
+                           title="Edit email address" aria-label="Edit email address">
+                            <i class="fa-solid fa-pen"></i>
+                            <span class="sr-only">Edit email</span>
+                        </a>
                     </div>
 
                     <div>

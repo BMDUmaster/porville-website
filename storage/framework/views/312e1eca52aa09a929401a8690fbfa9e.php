@@ -430,6 +430,43 @@
             if (e.key === 'Escape') { closeSidebar(); closeProfile(); }
         });
 
+        document.querySelectorAll('input[type="password"]').forEach((input) => {
+            const parent = input.parentElement;
+
+            if (parent.querySelector('button')) {
+                return;
+            }
+
+            const parentStyle = window.getComputedStyle(parent);
+            const wrapper = parentStyle.position === 'relative' ? parent : document.createElement('div');
+
+            if (wrapper !== parent) {
+                wrapper.style.position = 'relative';
+                input.before(wrapper);
+                wrapper.appendChild(input);
+            }
+
+            input.style.paddingRight = '3rem';
+
+            const toggle = document.createElement('button');
+            toggle.type = 'button';
+            toggle.setAttribute('data-password-visibility-toggle', '');
+            toggle.setAttribute('aria-label', 'Show password');
+            toggle.setAttribute('aria-pressed', 'false');
+            toggle.style.cssText = 'position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);padding:0.35rem;color:#94a3b8;line-height:1;cursor:pointer;background:transparent;border:0;';
+            toggle.innerHTML = '<i class="fa-regular fa-eye" aria-hidden="true"></i>';
+
+            toggle.addEventListener('click', () => {
+                const isHidden = input.type === 'password';
+                input.type = isHidden ? 'text' : 'password';
+                toggle.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+                toggle.setAttribute('aria-pressed', String(isHidden));
+                toggle.innerHTML = `<i class="fa-regular ${isHidden ? 'fa-eye-slash' : 'fa-eye'}" aria-hidden="true"></i>`;
+            });
+
+            wrapper.appendChild(toggle);
+        });
+
         (() => {
             const badge = document.getElementById('contactSidebarUnreadBadge');
             if (!badge) return;

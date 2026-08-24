@@ -264,19 +264,19 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
         </div>
         <div id="cart-delivery-charge-row" class="mb-2 flex justify-between text-xs text-slate-500">
             <span>Delivery</span>
-            <span id="cart-delivery-charge-drawer">Rs0.00</span>
+            <span id="cart-delivery-charge-drawer">₹0.00</span>
         </div>
         <div id="cart-service-charge-row" class="mb-2 flex justify-between text-xs text-slate-500">
             <span id="cart-service-charge-label">&#8505;&#65039; Service Charge</span>
-            <span id="cart-service-charge-drawer">Rs0.00</span>
+            <span id="cart-service-charge-drawer">₹0.00</span>
         </div>
         <div id="cart-discount-row" class="mb-2 hidden justify-between text-xs font-bold text-emerald-600">
             <span>Discount</span>
-            <span id="cart-discount-drawer">-Rs0.00</span>
+            <span id="cart-discount-drawer">-₹0.00</span>
         </div>
         <div class="mb-3 flex justify-between text-sm font-bold text-slate-900">
             <span>Total</span>
-            <span id="cart-total-drawer">Rs0.00</span>
+            <span id="cart-total-drawer">₹0.00</span>
         </div>
         <a id="cart-checkout-link" href="<?php echo e(route('frontend.checkout')); ?>"
            class="flex items-center justify-center gap-2 w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl text-sm mb-2">
@@ -465,7 +465,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
             <span class="ml-auto"></span>
             <a href="<?php echo e(route('frontend.orders')); ?>" class="inline-flex items-center gap-2 px-3 py-1.5 font-extrabold text-green-700 whitespace-nowrap rounded-md transition hover:bg-green-50">
                 <i class="fa-solid fa-rotate-left text-[13px]"></i>
-                view order
+                View Order
             </a>
             <a href="<?php echo e(route('frontend.products', ['sort' => 'latest'])); ?>" class="px-3 py-1.5 text-slate-700 font-semibold whitespace-nowrap rounded-md transition hover:bg-slate-100">Latest</a>
         </div>
@@ -484,6 +484,25 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
         <div data-auto-dismiss="3000" class="mx-4 mt-3 flex items-center gap-2 rounded-lg bg-red-100 p-3 text-sm text-red-700 transition-all duration-500">
             <i class="fa-solid fa-circle-xmark"></i> <?php echo e(session('error')); ?>
 
+        </div>
+    <?php endif; ?>
+
+    <?php if(session('account_blocked')): ?>
+        <div id="accountBlockedModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-950/60 px-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="accountBlockedTitle">
+            <div class="w-full max-w-md overflow-hidden rounded-3xl bg-white text-center shadow-2xl">
+                <div class="bg-gradient-to-br from-red-500 to-rose-600 px-6 pb-12 pt-8 text-white">
+                    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white/20 ring-8 ring-white/10"><i class="fa-solid fa-lock text-2xl"></i></div>
+                    <p class="mt-5 text-xs font-bold uppercase tracking-[0.2em] text-red-100">Order unavailable</p>
+                </div>
+                <div class="-mt-5 rounded-t-3xl bg-white px-7 pb-7 pt-6">
+                    <h2 id="accountBlockedTitle" class="text-xl font-extrabold text-slate-900">Your account is blocked</h2>
+                    <p class="mt-3 text-sm leading-6 text-slate-600">You cannot place an order while your account is blocked. Please contact our support team for help.</p>
+                    <div class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <a href="<?php echo e(route('frontend.contact')); ?>" class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-green-700"><i class="fa-solid fa-headset"></i> Contact Us</a>
+                        <button type="button" data-close-account-blocked class="rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50">Go Back</button>
+                    </div>
+                </div>
+            </div>
         </div>
     <?php endif; ?>
 
@@ -698,7 +717,7 @@ function addToCart(productId, variantIndex, pricingDay = 'today') {
     });
 }
 function formatCartCurrency(amount) {
-    return 'Rs' + Number(amount || 0).toFixed(2);
+    return '₹' + Number(amount || 0).toFixed(2);
 }
 let selectedCartDrawerDay = 'today';
 
@@ -739,7 +758,7 @@ function renderCartCoupons(data) {
     }
     panel.innerHTML = `<p class="mb-2 text-[10px] font-black uppercase tracking-wider text-blue-700">Available offers</p>` +
         available.map(coupon => `<div class="mb-2 flex items-center justify-between gap-2 rounded-xl bg-white p-2 last:mb-0">
-            <div class="min-w-0"><p class="truncate text-xs font-bold text-slate-800">${escapeHtml(coupon.title)}</p><p class="text-[10px] text-slate-500">${coupon.type === 'percent' ? coupon.value + '%' : 'Rs' + coupon.value} off</p></div>
+            <div class="min-w-0"><p class="truncate text-xs font-bold text-slate-800">${escapeHtml(coupon.title)}</p><p class="text-[10px] text-slate-500">${coupon.type === 'percent' ? coupon.value + '%' : '₹' + coupon.value} off</p></div>
             <button type="button" onclick="applyCartCoupon('${escapeHtml(coupon.code)}')" class="rounded-lg bg-blue-700 px-3 py-1.5 text-[10px] font-black text-white">Apply</button>
         </div>`).join('');
 }
@@ -795,7 +814,13 @@ function renderCartDrawerItems(items) {
                                 </button>
                             </div>
                         </div>
-                        <p class="text-xs font-extrabold text-blue-700">${formatCartCurrency(item.subtotal)}</p>
+                        <div class="flex items-center gap-2">
+                            <p class="text-xs font-extrabold text-blue-700">${formatCartCurrency(item.subtotal)}</p>
+                            <button type="button" onclick="removeCartDrawerItem('${item.key}')" class="inline-flex items-center gap-1 rounded-md bg-red-500 px-2.5 py-1.5 text-[9px] font-black uppercase tracking-wide text-white transition hover:bg-red-600" title="Remove item">
+                                <i class="fa-solid fa-trash-can"></i>
+                                Remove
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1036,6 +1061,89 @@ function showToast(msg, type = 'success') {
 // Init badge
 refreshCartDrawer();
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
+
+// Display every visible rupee amount consistently with the Indian rupee symbol.
+function formatVisibleRupeeSymbols(root = document.body) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+            const parentTag = node.parentElement?.tagName;
+
+            return ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(parentTag)
+                ? NodeFilter.FILTER_REJECT
+                : NodeFilter.FILTER_ACCEPT;
+        },
+    });
+
+    const textNodes = [];
+    while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+    textNodes.forEach((node) => {
+        node.nodeValue = node.nodeValue.replace(/\bRs\.?\s*(?=\d)/g, '₹');
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const accountBlockedModal = document.getElementById('accountBlockedModal');
+    if (accountBlockedModal) {
+        accountBlockedModal.classList.remove('hidden');
+        accountBlockedModal.classList.add('flex');
+        accountBlockedModal.querySelector('[data-close-account-blocked]')?.addEventListener('click', () => {
+            accountBlockedModal.classList.add('hidden');
+            accountBlockedModal.classList.remove('flex');
+        });
+    }
+
+    formatVisibleRupeeSymbols();
+
+    document.querySelectorAll('input[type="password"]').forEach((input) => {
+        const parent = input.parentElement;
+
+        // Password fields that already provide their own toggle (for example,
+        // the signup form) are left unchanged.
+        if (parent.querySelector('button')) {
+            return;
+        }
+
+        const parentStyle = window.getComputedStyle(parent);
+        const wrapper = parentStyle.position === 'relative' ? parent : document.createElement('div');
+
+        if (wrapper !== parent) {
+            wrapper.style.position = 'relative';
+            input.before(wrapper);
+            wrapper.appendChild(input);
+        }
+
+        input.style.paddingRight = '3rem';
+
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.setAttribute('data-password-visibility-toggle', '');
+        toggle.setAttribute('aria-label', 'Show password');
+        toggle.setAttribute('aria-pressed', 'false');
+        toggle.style.cssText = 'position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);padding:0.35rem;color:#94a3b8;line-height:1;cursor:pointer;background:transparent;border:0;';
+        toggle.innerHTML = '<i class="fa-regular fa-eye" aria-hidden="true"></i>';
+
+        toggle.addEventListener('click', () => {
+            const isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            toggle.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+            toggle.setAttribute('aria-pressed', String(isHidden));
+            toggle.innerHTML = `<i class="fa-regular ${isHidden ? 'fa-eye-slash' : 'fa-eye'}" aria-hidden="true"></i>`;
+        });
+
+        wrapper.appendChild(toggle);
+    });
+
+    new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === Node.ELEMENT_NODE || node.nodeType === Node.TEXT_NODE) {
+                    formatVisibleRupeeSymbols(node.nodeType === Node.TEXT_NODE ? node.parentElement : node);
+                }
+            });
+        });
+    }).observe(document.body, { childList: true, subtree: true });
+});
 </script>
 <?php echo $__env->yieldContent('scripts'); ?>
 </body>

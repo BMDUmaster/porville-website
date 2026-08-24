@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Coupon;
+use App\Models\CouponUserUsage;
 use App\Models\Order;
 use App\Models\Product;
 use App\Support\DeliverySlotManager;
@@ -74,6 +75,13 @@ class OrderApiController extends Controller
      */
     public function store(Request $request)
     {
+        if (! $request->user()->canPlaceOrders()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Your account is blocked. Please contact support to place an order.',
+            ], 403);
+        }
+
         $data = $request->validate([
             'items'                    => 'required|array|min:1',
             'items.*.product_id'       => 'required|exists:products,id',
@@ -135,6 +143,10 @@ class OrderApiController extends Controller
 
             if ($coupon) {
                 $coupon->increment('used_count');
+                CouponUserUsage::query()->updateOrCreate(
+                    ['coupon_id' => $coupon->id, 'user_id' => $request->user()->id],
+                    ['usage_count' => $coupon->usageCountFor($request->user()->id) + 1]
+                );
             }
 
             return $order;
@@ -254,6 +266,12 @@ class OrderApiController extends Controller
         if (! $coupon) {
             throw ValidationException::withMessages([
                 'coupon_code' => ['The selected coupon is invalid, expired, or already fully used.'],
+            ]);
+        }
+
+        if (! $coupon->canBeUsedBy($request->user()->id)) {
+            throw ValidationException::withMessages([
+                'coupon_code' => ['You have reached the usage limit for this coupon or offer.'],
             ]);
         }
 

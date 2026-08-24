@@ -79,7 +79,7 @@ class CouponController extends Controller
     {
         $data = $this->validatedData($request);
 
-        $data['is_active'] = $request->boolean('is_active', true);
+        $data['is_active'] = $request->boolean('is_active');
         $data['code'] = $this->normalizedCode($request);
         $data = $this->normalizeEntryPayload($data);
         Coupon::create($data);
@@ -93,7 +93,7 @@ class CouponController extends Controller
     {
         $data = $this->validatedData($request, $coupon);
 
-        $data['is_active'] = $request->boolean('is_active', true);
+        $data['is_active'] = $request->boolean('is_active');
         $data['code'] = $this->normalizedCode($request, $coupon);
         $data = $this->normalizeEntryPayload($data);
         $coupon->update($data);

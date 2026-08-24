@@ -64,10 +64,19 @@ class AuthController extends Controller
     }
 
     /** GET /account/forgot-password */
-    public function showForgotPassword()
+    public function showForgotPassword(Request $request)
     {
         if (Auth::guard('web_frontend')->check()) {
             return redirect()->route('frontend.profile');
+        }
+
+        if ($request->boolean('edit-email')) {
+            session()->forget([
+                'password_reset_otp_email',
+                'password_reset_otp_hash',
+                'password_reset_otp_expires_at',
+                'password_reset_verified',
+            ]);
         }
 
         $step = session('password_reset_verified')
