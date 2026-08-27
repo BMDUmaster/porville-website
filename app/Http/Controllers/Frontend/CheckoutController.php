@@ -126,7 +126,7 @@ class CheckoutController extends Controller
 
         return view('frontend.checkout', compact('items', 'subtotal', 'checkoutDefaults', 'selectedDeliverySlot', 'pricing', 'availableCoupons', 'pastAddresses', 'pinSectors', 'checkoutNewArrivals', 'checkoutSimilarProducts'))
             ->with([
-                'orderingActive'          => OrderingManager::isActive(),
+                'orderingActive'          => OrderingManager::isActiveForDay($checkoutDay),
                 'orderingInactiveTitle'   => OrderingManager::inactiveTitle(),
                 'orderingInactiveMessage' => OrderingManager::inactiveMessage(),
             ]);
@@ -139,14 +139,14 @@ class CheckoutController extends Controller
             return redirect()->route('frontend.cart')->with('account_blocked', true);
         }
 
-        // Block order if ordering is disabled by admin
-        if (! OrderingManager::isActive()) {
-            return back()->with('ordering_inactive', true);
-        }
-
         $fullCart = session('cart', []);
         $checkoutDay = ProductDayPricing::normalizeDay(session('checkout_delivery_day', 'today'));
         $cart = $this->cartForDay($fullCart, $checkoutDay);
+
+        // Block order only for the selected delivery day.
+        if (! OrderingManager::isActiveForDay($checkoutDay)) {
+            return back()->with('ordering_inactive', true);
+        }
 
         $pinSectors = self::pinSectors();
         $allowedPins = array_keys($pinSectors);

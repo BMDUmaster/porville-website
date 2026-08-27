@@ -7,6 +7,10 @@
         ->filter()
         ->values()
         ->all();
+    $productVideos = collect($product->videos ?? [])
+        ->filter()
+        ->values()
+        ->all();
 
     $variantCollection = collect($product->variants ?? [])
         ->filter(fn($variant) => filled($variant['quantity'] ?? null) || filled($variant['selling_price'] ?? null))
@@ -88,7 +92,9 @@
 
     $defaultVariant = $variantPayload->first();
     $defaultPricingDay = 'today';
-    $selectedPackLabel = $defaultVariant['label'] ?: (($product->weight ?: '1') . ' ' . ($product->unit ?: 'unit'));
+    $selectedPackLabel = filled($product->weight)
+        ? trim((string) $product->weight)
+        : ($defaultVariant['label'] ?: (($product->weight ?: '1') . ' ' . ($product->unit ?: 'unit')));
     $defaultDisplayedPrice = (float) ($defaultVariant['today_price'] ?? $defaultVariant['selling_price'] ?? $product->price);
     $selectedSaveAmount = max(($defaultVariant['mrp'] ?? 0) - $defaultDisplayedPrice, 0);
     $hasProductDescription = filled(trim(strip_tags((string) ($product->description ?? ''))));
@@ -393,6 +399,23 @@
                                 <img src="{{ asset('storage/' . $image) }}" alt="{{ $product->name }} thumbnail {{ $index + 1 }}" class="h-full w-full rounded-[20px] object-cover">
                             </button>
                         @endforeach
+                    </div>
+                </div>
+            @endif
+
+            @if(count($productVideos))
+                <div class="mt-5 overflow-hidden rounded-[24px] border border-[#dce5d9] bg-white shadow-[0_18px_45px_rgba(15,23,42,0.07)]">
+                    <div class="flex items-center gap-2 border-b border-slate-100 px-4 py-3">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#edf8ef] text-[#2f8c43]">
+                            <i class="fa-solid fa-circle-play text-sm"></i>
+                        </span>
+                        <p class="text-sm font-black text-slate-800">Product Video</p>
+                    </div>
+                    <div class="bg-slate-950">
+                        <video controls preload="metadata" class="aspect-video w-full bg-black object-contain">
+                            <source src="{{ asset('storage/' . $productVideos[0]) }}">
+                            Your browser does not support the video tag.
+                        </video>
                     </div>
                 </div>
             @endif

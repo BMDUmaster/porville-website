@@ -225,9 +225,17 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
         <p class="text-center text-gray-400 py-8">Your cart is empty</p>
     </div>
     <div class="px-5 py-4 border-t bg-white">
-        <div id="cart-coupon-panel" class="mb-3 hidden rounded-2xl border border-blue-100 bg-blue-50/60 p-3"></div>
-        <div class="mb-4 rounded-2xl border border-green-100 bg-green-50/60 p-3">
-            <div class="mb-2 flex items-center justify-between gap-3">
+        <div id="cart-coupon-wrap" class="mb-3 hidden rounded-2xl border border-blue-100 bg-blue-50/60">
+            <button type="button" onclick="toggleCartDropdown('cart-coupon-panel', 'cart-coupon-chevron')" class="flex w-full items-center justify-between gap-3 px-3 py-3 text-left">
+                <span class="text-xs font-black uppercase tracking-[0.16em] text-blue-700">
+                    <i class="fa-solid fa-tag mr-1"></i> Offers &amp; Coupons
+                </span>
+                <i id="cart-coupon-chevron" class="fa-solid fa-chevron-down text-[10px] text-blue-700 transition"></i>
+            </button>
+            <div id="cart-coupon-panel" class="hidden border-t border-blue-100 px-3 py-3"></div>
+        </div>
+        <div class="mb-3 rounded-2xl border border-green-100 bg-green-50/60">
+            <button type="button" onclick="toggleCartDropdown('drawer-delivery-slot-options', 'cart-slot-chevron')" class="flex w-full items-center justify-between gap-3 px-3 py-3 text-left">
                 <span class="text-xs font-black uppercase tracking-[0.16em] text-slate-600">
                     Delivery Slot
                     <span id="drawer-delivery-day-label" class="ml-1 rounded-full bg-white px-2 py-1 text-[9px] tracking-[0.12em] text-green-700">
@@ -237,8 +245,9 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                 <span id="drawer-delivery-slot-label" class="text-[10px] font-bold text-green-700">
                     {{ \App\Support\DeliverySlotManager::label($drawerSelectedDeliverySlot) }}
                 </span>
-            </div>
-            <div id="drawer-delivery-slot-options" class="flex flex-wrap gap-2">
+                <i id="cart-slot-chevron" class="fa-solid fa-chevron-down text-[10px] text-green-700 transition"></i>
+            </button>
+            <div id="drawer-delivery-slot-options" class="hidden flex-wrap gap-2 border-t border-green-100 px-3 py-3">
                 @forelse($drawerDeliverySlotOptions as $slot)
                     <button
                         type="button"
@@ -255,6 +264,12 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                 @endforelse
             </div>
         </div>
+        <div class="mb-3 rounded-2xl border border-slate-200 bg-slate-50/70">
+            <button type="button" onclick="toggleCartDropdown('cart-amount-details', 'cart-amount-chevron')" class="flex w-full items-center justify-between gap-3 px-3 py-3 text-left">
+                <span class="text-xs font-black uppercase tracking-[0.16em] text-slate-600">Amount Details</span>
+                <i id="cart-amount-chevron" class="fa-solid fa-chevron-down text-[10px] text-slate-500 transition"></i>
+            </button>
+            <div id="cart-amount-details" class="hidden border-t border-slate-200 px-3 py-3">
         <div class="flex justify-between text-sm font-semibold mb-2">
             <span>Subtotal</span>
             <span id="cart-subtotal-drawer">₹0.00</span>
@@ -274,6 +289,8 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
         <div class="mb-3 flex justify-between text-sm font-bold text-slate-900">
             <span>Total</span>
             <span id="cart-total-drawer">₹0.00</span>
+        </div>
+            </div>
         </div>
         <a id="cart-checkout-link" href="{{ route('frontend.checkout') }}"
            class="flex items-center justify-center gap-2 w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl text-sm mb-2">
@@ -328,7 +345,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
             <span id="header-logo-fallback" class="hidden text-xl font-extrabold text-green-700">FarmSea</span>
         </a>
         <form action="{{ route('frontend.products') }}" method="GET" class="relative mx-2 hidden max-w-lg flex-grow md:flex lg:mx-4">
-            <input type="text" name="search" placeholder="Search Ready to Cook Items"
+            <input type="text" name="search" placeholder="Search Chicken Mutton Fish Items"
                    class="w-full border border-gray-200 rounded-xl px-5 py-2.5 text-sm focus:outline-none focus:border-green-500 transition">
             <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-600">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -514,7 +531,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                     <li><a href="{{ route('frontend.about') }}#faq" class="text-[14px] text-[#9bb0cf] transition hover:text-white">FAQ</a></li>
                    <li>
    <span class="inline-flex items-center gap-1.5 text-[14px] text-[#9bb0cf]">
-    <img src="{{ asset('images/fssai-logo.png') }}" alt="FSSAI" style="width: 60px; height: 40px;">
+    <img src="{{ asset('images/fssai-logo.png') }}" alt="FSSAI" class="h-6 w-10 object-contain sm:h-10 sm:w-[60px]">
     22726924000264
 </span>
 </li>
@@ -537,14 +554,14 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                     <li><a href="{{ route('frontend.products', ['category' => 'Chicken']) }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Chicken</a></li>
                     <li><a href="{{ route('frontend.products', ['category' => 'Mutton']) }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Mutton</a></li>
                     <li><a href="{{ route('frontend.products', ['category' => 'Fish']) }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Fish &amp; Seafood</a></li>
-                    <li><a href="{{ route('frontend.products') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Ready to Cook</a></li>
+                    <li><a href="{{ route('frontend.products', ['category' => 'Fruits']) }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">fruits</a></li>
                 </ul>
             </div>
 
             <div>
                 <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Reach Us</h4>
                 <p class="mb-3 text-[14px] text-[#9bb0cf]">Delhi NCR, India</p>
-                <a href="tel:+918796937990" class="mb-2 flex items-center gap-2 text-[15px] font-semibold text-white transition hover:text-[#26c95a]">
+                <a href="tel:8796937990" class="mb-2 inline-flex min-h-9 items-center gap-2 rounded-lg pr-3 text-[15px] font-semibold text-white transition hover:text-[#26c95a]">
                     <i class="fa-solid fa-phone text-[#26c95a] text-xs"></i> +91 87969 37990
                 </a>
                 <a href="mailto:info@farmsea.in" class="mb-4 flex items-center gap-2 text-[14px] text-[#9bb0cf] transition hover:text-white">
@@ -568,7 +585,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 
         <div class="flex flex-col gap-4 border-t border-white/6 pt-4 text-center sm:pt-5 md:flex-row md:items-center md:justify-between md:text-left">
             <p class="text-[10px] uppercase tracking-[0.2em] text-[#84a0c3]">
-                &copy; {{ date('Y') }} FarmSea - Fresh Meat &amp; Seafood Delivered
+                &copy; {{ date('Y') }} FarmSea Fresh Limited Liability Partnership .
             </p>
             <a
                 href="https://digitalutilization.com/"
@@ -721,6 +738,21 @@ function formatCartCurrency(amount) {
 }
 let selectedCartDrawerDay = 'today';
 
+function toggleCartDropdown(panelId, chevronId) {
+    const panel = document.getElementById(panelId);
+    const chevron = document.getElementById(chevronId);
+    if (!panel) return;
+
+    const willOpen = panel.classList.contains('hidden');
+    panel.classList.toggle('hidden', !willOpen);
+
+    if (panelId === 'drawer-delivery-slot-options') {
+        panel.classList.toggle('flex', willOpen);
+    }
+
+    chevron?.classList.toggle('rotate-180', willOpen);
+}
+
 function selectCartDrawerDay(day) {
     selectedCartDrawerDay = day === 'tomorrow' ? 'tomorrow' : 'today';
     refreshCartDrawer();
@@ -745,10 +777,13 @@ function removeCartCoupon() {
 }
 function renderCartCoupons(data) {
     const panel = document.getElementById('cart-coupon-panel');
+    const wrap = document.getElementById('cart-coupon-wrap');
     if (!panel) return;
     const applied = data.applied_coupon;
     const available = data.available_coupons || [];
-    panel.classList.toggle('hidden', !applied && !available.length);
+    wrap?.classList.toggle('hidden', !applied && !available.length);
+    panel.classList.add('hidden');
+    document.getElementById('cart-coupon-chevron')?.classList.remove('rotate-180');
     if (applied) {
         panel.innerHTML = `<div class="flex items-center justify-between gap-3">
             <div><p class="text-[10px] font-black uppercase tracking-wider text-emerald-600">Applied</p><p class="text-xs font-bold text-slate-800">${escapeHtml(applied.title)}</p></div>

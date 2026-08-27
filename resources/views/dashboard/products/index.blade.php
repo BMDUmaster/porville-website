@@ -86,10 +86,12 @@
                         'category_id' => $product->category_id,
                         'subcategory_id' => $product->subcategory_id,
                         'description' => $product->description,
+                        'weight' => $product->weight,
                         'price' => $product->price,
                         'is_active' => $product->is_active ? 1 : 0,
                         'images_count' => is_array($product->images) ? count($product->images) : 0,
                         'images' => is_array($product->images) ? array_values($product->images) : [],
+                        'videos' => is_array($product->videos) ? array_values($product->videos) : [],
                         'variants' => is_array($product->variants) ? array_values($product->variants) : [],
                     ];
                 @endphp
@@ -164,10 +166,12 @@
                                     'category_id' => $product->category_id,
                                     'subcategory_id' => $product->subcategory_id,
                                     'description' => $product->description,
+                                    'weight' => $product->weight,
                                     'price' => $product->price,
                                     'is_active' => $product->is_active ? 1 : 0,
                                     'images_count' => is_array($product->images) ? count($product->images) : 0,
                                     'images' => is_array($product->images) ? array_values($product->images) : [],
+                                    'videos' => is_array($product->videos) ? array_values($product->videos) : [],
                                     'variants' => is_array($product->variants) ? array_values($product->variants) : [],
                                 ];
                             @endphp
@@ -256,11 +260,25 @@
                 <div id="addProductImagePreviews" class="mt-3 flex flex-wrap gap-3"></div>
             </div>
 
+            <div>
+                <label class="block text-sm text-gray-700 mb-1">Product Video</label>
+                <input type="file" name="videos[]" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska"
+                       class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-blue-400">
+                <p class="mt-1 text-[11px] text-gray-400">Ek product video upload karo. MP4/WebM/MOV supported, max 50MB.</p>
+            </div>
+
             {{-- Product Name --}}
             <div>
                 <label class="block text-sm text-gray-700 mb-1">Product Name</label>
                 <input type="text" name="name" required placeholder="Enter product name"
                        class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-blue-400">
+            </div>
+
+            <div>
+                <label class="block text-sm text-gray-700 mb-1">Pack Weight</label>
+                <input type="text" name="weight" placeholder="e.g. 1 Kg, 500 Gram, 6-8 pieces"
+                       class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-blue-400">
+                <p class="mt-1 text-[11px] text-gray-400">Ye product details page ke Pack Weight row mein show hoga.</p>
             </div>
 
             {{-- Product Description --}}
@@ -406,6 +424,12 @@
                        class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
             </div>
             <div>
+                <label class="text-xs font-bold text-slate-600 block mb-1">Pack Weight</label>
+                <input type="text" name="weight" id="editProductWeight" placeholder="e.g. 1 Kg, 500 Gram, 6-8 pieces"
+                       class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
+                <p class="mt-1 text-[11px] text-slate-400">Product details page par Pack Weight mein ye value show hogi.</p>
+            </div>
+            <div>
                 <label class="text-xs font-bold text-slate-600 block mb-1">Description</label>
                 <textarea name="description" id="editDescription" rows="4"
                           class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none resize-none"></textarea>
@@ -431,6 +455,12 @@
                     <p class="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">New Images</p>
                     <div id="editNewImagePreviews" class="flex flex-wrap gap-3"></div>
                 </div>
+            </div>
+            <div>
+                <label class="text-xs font-bold text-slate-600 block mb-1">Product Video</label>
+                <input type="file" name="videos[]" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska"
+                       class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
+                <p id="editVideoHint" class="mt-1 text-[11px] text-slate-400">New video choose karoge to old video update ho jayega.</p>
             </div>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
@@ -644,10 +674,14 @@ function openEditModal(source) {
     };
 
     document.getElementById('editProductName').value  = product.name ?? '';
+    document.getElementById('editProductWeight').value = product.weight ?? '';
     document.getElementById('editCatId').value        = product.category_id ?? '';
     document.getElementById('editDescription').value  = product.description ?? '';
     document.getElementById('editPrice').value        = product.price ?? '';
     document.getElementById('editIsActive').value     = product.is_active ?? 1;
+    document.getElementById('editVideoHint').textContent = (product.videos ?? []).length
+        ? 'Current video saved hai. New video choose karoge to old video update ho jayega.'
+        : 'Abhi video saved nahi hai. Ek video choose karke update kar sakte ho.';
     document.getElementById('editImageHint').textContent = 'Current images neeche dikhengi. Delete icon se hata sakte ho, aur new images add karne ke liye image choose karke Add dabao.';
     resetEditProductImages(false);
     renderEditCurrentImages(product.images ?? []);

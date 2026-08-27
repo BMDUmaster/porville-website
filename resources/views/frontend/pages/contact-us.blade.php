@@ -93,7 +93,7 @@
             'title' => 'Head Office',
             'text' => '350 Agriculture Street, India',
             'link' => '+91 8796937990',
-            'href' => 'tel:+919796937990',
+            'href' => 'tel:8796937990',
         ],
     ];
 @endphp
