@@ -10,9 +10,13 @@ class OrderingSettingController extends Controller
 {
     public function index()
     {
+        $isTodayActive = OrderingManager::isActiveForDay('today');
+        $isTomorrowActive = OrderingManager::isActiveForDay('tomorrow');
+
         return view('dashboard.settings.ordering', [
-            'isTodayActive' => OrderingManager::isActiveForDay('today'),
-            'isTomorrowActive' => OrderingManager::isActiveForDay('tomorrow'),
+            'isActive' => $isTodayActive && $isTomorrowActive,
+            'isTodayActive' => $isTodayActive,
+            'isTomorrowActive' => $isTomorrowActive,
             'title'    => OrderingManager::inactiveTitle(),
             'message'  => OrderingManager::inactiveMessage(),
         ]);

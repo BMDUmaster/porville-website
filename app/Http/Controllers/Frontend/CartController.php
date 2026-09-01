@@ -54,7 +54,10 @@ class CartController extends Controller
 
         $product      = Product::findOrFail($request->product_id);
         $qty          = $request->get('quantity', 1);
-        $variantIndex = $request->get('variant_index');
+        $variantIndex = $request->filled('variant_index') ? (int) $request->input('variant_index') : null;
+        if ($variantIndex === null && ! empty($product->variants ?? [])) {
+            $variantIndex = 0;
+        }
         $pricingDay   = ProductDayPricing::normalizeDay($request->get('pricing_day'));
         $variant = ($variantIndex !== null && isset($product->variants[$variantIndex]))
             ? $product->variants[$variantIndex]

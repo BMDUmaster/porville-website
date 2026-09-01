@@ -50,13 +50,16 @@ class OrderingManager
                 'ordering_inactive_message',
             ])->pluck('value', 'key')->toArray();
 
-            return array_merge([
-                'ordering_active'           => '1',
-                'ordering_active_today'     => $rows['ordering_active'] ?? '1',
-                'ordering_active_tomorrow'  => $rows['ordering_active'] ?? '1',
-                'ordering_inactive_title'   => 'Orders Temporarily Paused',
-                'ordering_inactive_message' => 'We are currently not accepting new orders. Please check back soon.',
-            ], $rows);
+            // Use the global ordering_active as fallback only when per-day keys are absent from DB.
+            $globalActive = $rows['ordering_active'] ?? '1';
+
+            return [
+                'ordering_active'           => $rows['ordering_active'] ?? '1',
+                'ordering_active_today'     => $rows['ordering_active_today'] ?? $globalActive,
+                'ordering_active_tomorrow'  => $rows['ordering_active_tomorrow'] ?? $globalActive,
+                'ordering_inactive_title'   => $rows['ordering_inactive_title'] ?? 'Orders Temporarily Paused',
+                'ordering_inactive_message' => $rows['ordering_inactive_message'] ?? 'We are currently not accepting new orders. Please check back soon.',
+            ];
         });
     }
 

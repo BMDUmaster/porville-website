@@ -248,23 +248,24 @@
                     </div>
                 </div>
 
-                <div id="checkoutCouponSection" class="rounded-2xl border bg-white p-5">
+                <div id="checkoutCouponSection" class="rounded-2xl border bg-white p-4 sm:p-5">
                     <label class="mb-2 block text-xs font-semibold text-gray-600">Coupon Code (optional)</label>
-                    <div class="flex flex-col gap-2 sm:flex-row">
+                    <div class="flex gap-2">
                         <input type="text" name="coupon_code" id="couponCodeInput" value="{{ $initialCouponCode }}" placeholder="Enter coupon code"
-                               class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm uppercase outline-none focus:border-blue-500">
+                               class="min-w-0 flex-1 rounded-xl border border-gray-200 px-3 py-2.5 text-sm uppercase outline-none focus:border-blue-500 sm:px-4">
                         <button type="button" id="applyCouponButton"
-                                class="{{ $initialCouponCode ? '' : 'hidden' }} rounded-xl bg-green-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-green-700">
+                                class="{{ $initialCouponCode ? '' : 'hidden' }} flex-shrink-0 rounded-xl bg-green-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-700 sm:px-5">
                             Apply
                         </button>
                     </div>
                     <p id="couponMessage" class="mt-2 hidden text-xs font-semibold"></p>
                     @if(($availableCoupons ?? collect())->isNotEmpty())
-                        <div class="mt-4 flex flex-wrap gap-2">
+                        <p class="mt-3 text-[10px] font-bold uppercase tracking-wider text-gray-400">Available Coupons</p>
+                        <div class="mt-2 flex flex-wrap gap-1.5 sm:gap-2">
                             @foreach($availableCoupons as $coupon)
                                 <button type="button"
                                         data-coupon-code="{{ $coupon->code }}"
-                                        class="coupon-chip rounded-full border border-green-200 bg-green-50 px-3 py-1.5 text-[11px] font-bold text-green-700 transition hover:border-green-500 hover:bg-white">
+                                        class="coupon-chip rounded-full border border-green-200 bg-green-50 px-2.5 py-1 text-[10px] font-bold text-green-700 transition hover:border-green-500 hover:bg-white sm:px-3 sm:py-1.5 sm:text-[11px]">
                                     {{ $coupon->code }}
                                 </button>
                             @endforeach

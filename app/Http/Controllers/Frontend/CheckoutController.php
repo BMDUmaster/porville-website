@@ -37,6 +37,11 @@ class CheckoutController extends Controller
 
         $checkoutDay = $this->checkoutDay($request, $cart);
         $cart = $this->cartForDay($cart, $checkoutDay);
+
+        if (empty($cart)) {
+            return redirect()->route('frontend.cart')->with('error', 'No items found for the selected delivery day.');
+        }
+
         session(['checkout_delivery_day' => $checkoutDay]);
 
         try {
@@ -534,9 +539,11 @@ class CheckoutController extends Controller
 
     private function deliverySlotOptionsForCart(array $cart): array
     {
-        return $this->usesTomorrowDelivery($cart)
-            ? DeliverySlotManager::options()
-            : DeliverySlotManager::availableOptions();
+        $day = $this->usesTomorrowDelivery($cart) ? 'tomorrow' : 'today';
+
+        return $day === 'tomorrow'
+            ? DeliverySlotManager::options('tomorrow')
+            : DeliverySlotManager::availableOptions('today');
     }
 
     private function usesTomorrowDelivery(array $cart): bool

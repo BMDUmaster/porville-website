@@ -11,6 +11,10 @@
         ->filter()
         ->values()
         ->all();
+    $detailMedia = collect($galleryImages)
+        ->map(fn($image) => ['type' => 'image', 'path' => $image, 'url' => asset('storage/' . $image)])
+        ->concat(collect($productVideos)->map(fn($video) => ['type' => 'video', 'path' => $video, 'url' => asset('storage/' . $video)]))
+        ->values();
 
     $variantCollection = collect($product->variants ?? [])
         ->filter(fn($variant) => filled($variant['quantity'] ?? null) || filled($variant['selling_price'] ?? null))
@@ -332,22 +336,31 @@
                             New Arrival
                         </span>
                     @endif
-                    @if(count($galleryImages))
+                    @if($detailMedia->isNotEmpty())
                         <img
-                            src="{{ asset('storage/' . $galleryImages[0]) }}"
+                            src="{{ $detailMedia->first()['url'] }}"
                             alt="{{ $product->name }}"
                             id="detailMainImage"
-                            class="h-full w-full object-cover transition duration-500"
+                            class="{{ $detailMedia->first()['type'] === 'image' ? '' : 'hidden' }} h-full w-full object-cover transition duration-500"
                         >
+                        <video
+                            id="detailMainVideo"
+                            controls
+                            preload="metadata"
+                            class="{{ $detailMedia->first()['type'] === 'video' ? '' : 'hidden' }} h-full w-full bg-black object-contain"
+                        >
+                            <source src="{{ $detailMedia->first()['type'] === 'video' ? $detailMedia->first()['url'] : '' }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
                     @else
                         <div class="flex h-full w-full items-center justify-center text-7xl text-slate-300">
                             <i class="fa-solid fa-drumstick-bite"></i>
                         </div>
                     @endif
 
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-black/5"></div>
+                    <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-black/5"></div>
 
-                    @if(count($galleryImages) > 1)
+                    @if($detailMedia->count() > 1)
                         <button type="button" onclick="moveGallery(-1)"
                                 class="absolute left-4 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-md transition hover:bg-white"
                                 aria-label="Previous image">
@@ -375,10 +388,10 @@
                 </div>
             </div>
 
-            @if(count($galleryImages) > 1)
+            @if($detailMedia->count() > 1)
                 <div class="mt-5 px-2 md:px-4">
                     <div class="mb-4 flex justify-center gap-2">
-                        @foreach($galleryImages as $index => $image)
+                        @foreach($detailMedia as $index => $media)
                             <button
                                 type="button"
                                 onclick="showGalleryImage({{ $index }})"
@@ -388,34 +401,28 @@
                             ></button>
                         @endforeach
                     </div>
-                    <div class="flex flex-wrap justify-start gap-4 md:gap-5">
-                        @foreach($galleryImages as $index => $image)
+                    <div class="flex flex-wrap justify-start gap-2 md:gap-5">
+                        @foreach($detailMedia as $index => $media)
                             <button
                                 type="button"
                                 onclick="showGalleryImage({{ $index }})"
                                 id="detailThumb{{ $index }}"
-                                class="detail-thumb {{ $index === 0 ? 'is-active' : '' }} h-24 w-24 overflow-hidden rounded-[24px] border-2 border-transparent bg-white p-1 shadow-[0_10px_30px_rgba(15,23,42,0.08)] transition hover:-translate-y-0.5 md:h-28 md:w-28"
+                                class="detail-thumb {{ $index === 0 ? 'is-active' : '' }} h-14 w-14 overflow-hidden rounded-[16px] border-2 border-transparent bg-white p-1 shadow-[0_10px_30px_rgba(15,23,42,0.08)] transition hover:-translate-y-0.5 sm:h-20 sm:w-20 sm:rounded-[20px] md:h-28 md:w-28 md:rounded-[24px]"
                             >
-                                <img src="{{ asset('storage/' . $image) }}" alt="{{ $product->name }} thumbnail {{ $index + 1 }}" class="h-full w-full rounded-[20px] object-cover">
+                                @if($media['type'] === 'video')
+                                    <span class="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[12px] bg-slate-900 text-white sm:rounded-[16px] md:rounded-[20px]">
+                                        <video preload="metadata" muted class="h-full w-full object-cover opacity-70">
+                                            <source src="{{ $media['url'] }}">
+                                        </video>
+                                        <span class="absolute inset-0 flex items-center justify-center">
+                                            <i class="fa-solid fa-circle-play text-lg drop-shadow sm:text-2xl"></i>
+                                        </span>
+                                    </span>
+                                @else
+                                    <img src="{{ $media['url'] }}" alt="{{ $product->name }} thumbnail {{ $index + 1 }}" class="h-full w-full rounded-[12px] object-cover sm:rounded-[16px] md:rounded-[20px]">
+                                @endif
                             </button>
                         @endforeach
-                    </div>
-                </div>
-            @endif
-
-            @if(count($productVideos))
-                <div class="mt-5 overflow-hidden rounded-[24px] border border-[#dce5d9] bg-white shadow-[0_18px_45px_rgba(15,23,42,0.07)]">
-                    <div class="flex items-center gap-2 border-b border-slate-100 px-4 py-3">
-                        <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#edf8ef] text-[#2f8c43]">
-                            <i class="fa-solid fa-circle-play text-sm"></i>
-                        </span>
-                        <p class="text-sm font-black text-slate-800">Product Video</p>
-                    </div>
-                    <div class="bg-slate-950">
-                        <video controls preload="metadata" class="aspect-video w-full bg-black object-contain">
-                            <source src="{{ asset('storage/' . $productVideos[0]) }}">
-                            Your browser does not support the video tag.
-                        </video>
                     </div>
                 </div>
             @endif
@@ -635,55 +642,55 @@
             </div>
         @endif
 
-        <section data-detail-panel="offers" class="detail-tab-panel {{ $initialDetailTab !== 'offers' ? 'hidden' : '' }} px-5 py-6 md:px-7">
-            <div class="overflow-hidden rounded-[26px] border border-[#d7e6d7] bg-[radial-gradient(circle_at_top_left,_rgba(229,245,232,0.9),_rgba(255,255,255,1)_55%)]">
-                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#e3ece3] px-5 py-5 md:px-6">
-                    <div>
-                        <p class="text-[11px] font-black uppercase tracking-[0.2em] text-[#2f8c43]">Admin Offers</p>
-                        <h3 class="mt-1 text-[20px] font-black text-slate-900">Fresh deals on this product page</h3>
+        <section data-detail-panel="offers" class="detail-tab-panel {{ $initialDetailTab !== 'offers' ? 'hidden' : '' }} px-3 py-5 sm:px-5 sm:py-6 md:px-7">
+            <div class="overflow-hidden rounded-[22px] border border-[#d7e6d7] bg-[radial-gradient(circle_at_top_left,_rgba(229,245,232,0.9),_rgba(255,255,255,1)_55%)] sm:rounded-[26px]">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#e3ece3] px-4 py-4 sm:gap-3 sm:px-5 sm:py-5 md:px-6">
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-[#2f8c43] sm:text-[11px]">Admin Offers</p>
+                        <h3 class="mt-0.5 text-[16px] font-black text-slate-900 sm:mt-1 sm:text-[20px]">Fresh deals on this product page</h3>
                     </div>
-                    <div class="inline-flex items-center rounded-full bg-white/90 px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-slate-500 shadow-sm">
+                    <div class="inline-flex flex-shrink-0 items-center rounded-full bg-white/90 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-slate-500 shadow-sm sm:px-4 sm:py-2 sm:text-[11px]">
                         {{ count($offerCards) }} active offers
                     </div>
                 </div>
 
                 @if(count($offerCards))
-                    <div class="grid gap-4 p-5 md:grid-cols-2 md:p-6">
+                    <div class="grid gap-3 p-3 sm:gap-4 sm:p-5 md:grid-cols-2 md:p-6">
                         @foreach($offerCards as $offer)
-                            <article class="group relative overflow-hidden rounded-[24px] border border-white/70 bg-white p-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_50px_rgba(15,23,42,0.12)]">
-                                <div class="absolute right-0 top-0 h-24 w-24 rounded-bl-[36px] bg-gradient-to-br from-slate-100/80 via-transparent to-transparent"></div>
+                            <article class="group relative overflow-hidden rounded-[18px] border border-white/70 bg-white p-4 shadow-[0_8px_24px_rgba(15,23,42,0.07)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(15,23,42,0.11)] sm:rounded-[24px] sm:p-5">
+                                <div class="absolute right-0 top-0 h-20 w-20 rounded-bl-[28px] bg-gradient-to-br from-slate-100/80 via-transparent to-transparent sm:h-24 sm:w-24 sm:rounded-bl-[36px]"></div>
 
-                                <div class="relative flex items-start gap-4">
-                                    <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl {{ $offer['icon_bg'] }} {{ $offer['icon_color'] }} shadow-sm">
-                                        <i class="fa-solid {{ $offer['icon'] }} text-[16px]"></i>
+                                <div class="relative flex items-start gap-3 sm:gap-4">
+                                    <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl {{ $offer['icon_bg'] }} {{ $offer['icon_color'] }} shadow-sm sm:h-12 sm:w-12 sm:rounded-2xl">
+                                        <i class="fa-solid {{ $offer['icon'] }} text-[13px] sm:text-[16px]"></i>
                                     </div>
 
                                     <div class="min-w-0 flex-1">
-                                        <div class="flex flex-wrap items-center gap-2">
-                                            <span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">
+                                        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                                            <span class="inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.15em] text-slate-500 sm:px-2.5 sm:py-1 sm:text-[10px]">
                                                 {{ $offer['badge'] ?? 'Live Offer' }}
                                             </span>
                                             @if(!empty($offer['expires_at']))
-                                                <span class="inline-flex items-center gap-1 rounded-full bg-[#fff7e8] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-[#b66a00]">
-                                                    <i class="fa-regular fa-clock text-[9px]"></i>
+                                                <span class="inline-flex items-center gap-1 rounded-full bg-[#fff7e8] px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.12em] text-[#b66a00] sm:px-2.5 sm:py-1 sm:text-[10px]">
+                                                    <i class="fa-regular fa-clock text-[8px] sm:text-[9px]"></i>
                                                     Ends {{ $offer['expires_at'] }}
                                                 </span>
                                             @endif
                                         </div>
 
-                                        <h4 class="mt-3 text-[17px] font-black leading-6 text-slate-900">{{ $offer['title'] }}</h4>
-                                        <p class="mt-2 text-[13px] font-semibold leading-6 text-slate-500">{{ $offer['text'] }}</p>
+                                        <h4 class="mt-2 text-[15px] font-black leading-5 text-slate-900 sm:mt-3 sm:text-[17px] sm:leading-6">{{ $offer['title'] }}</h4>
+                                        <p class="mt-1 text-[12px] font-semibold leading-5 text-slate-500 sm:mt-2 sm:text-[13px] sm:leading-6">{{ $offer['text'] }}</p>
 
-                                        <div class="mt-4 flex flex-wrap items-center gap-2">
+                                        <div class="mt-3 flex flex-wrap items-center gap-1.5 sm:mt-4 sm:gap-2">
                                             @if($offer['code'])
-                                                <div class="inline-flex items-center rounded-xl border border-dashed border-[#2f8c43] {{ $offer['code_bg'] }} px-3 py-2 text-[11px] font-black uppercase tracking-[0.18em] {{ $offer['code_text'] }}">
-                                                    <i class="fa-solid fa-ticket mr-2 text-[10px]"></i>
+                                                <div class="inline-flex items-center rounded-lg border border-dashed border-[#2f8c43] {{ $offer['code_bg'] }} px-2.5 py-1.5 text-[10px] font-black uppercase tracking-[0.15em] {{ $offer['code_text'] }} sm:rounded-xl sm:px-3 sm:py-2 sm:text-[11px]">
+                                                    <i class="fa-solid fa-ticket mr-1.5 text-[9px] sm:mr-2 sm:text-[10px]"></i>
                                                     {{ $offer['code'] }}
                                                 </div>
                                             @endif
 
                                             @if(!empty($offer['min_order_amount']))
-                                                <div class="inline-flex items-center rounded-xl bg-slate-100 px-3 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-slate-600">
+                                                <div class="inline-flex items-center rounded-lg bg-slate-100 px-2.5 py-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-slate-600 sm:rounded-xl sm:px-3 sm:py-2 sm:text-[11px]">
                                                     Min order ₹{{ number_format((float) $offer['min_order_amount'], 0) }}
                                                 </div>
                                             @endif
@@ -694,13 +701,13 @@
                         @endforeach
                     </div>
                 @else
-                    <div class="px-5 py-10 md:px-6">
-                        <div class="rounded-[24px] border border-dashed border-[#cfe1d0] bg-white/80 px-6 py-10 text-center">
-                            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#edf8ef] text-[#2f8c43]">
-                                <i class="fa-solid fa-tags text-lg"></i>
+                    <div class="px-4 py-8 sm:px-5 sm:py-10 md:px-6">
+                        <div class="rounded-[20px] border border-dashed border-[#cfe1d0] bg-white/80 px-5 py-8 text-center sm:rounded-[24px] sm:px-6 sm:py-10">
+                            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#edf8ef] text-[#2f8c43] sm:h-14 sm:w-14 sm:rounded-2xl">
+                                <i class="fa-solid fa-tags text-base sm:text-lg"></i>
                             </div>
-                            <h4 class="mt-4 text-[18px] font-black text-slate-900">No live offers right now</h4>
-                            <p class="mx-auto mt-2 max-w-[420px] text-[13px] font-semibold leading-6 text-slate-500">
+                            <h4 class="mt-3 text-[16px] font-black text-slate-900 sm:mt-4 sm:text-[18px]">No live offers right now</h4>
+                            <p class="mx-auto mt-2 max-w-[420px] text-[12px] font-semibold leading-6 text-slate-500 sm:text-[13px]">
                                 Admin se naya offer add hote hi yahin par automatically show hoga.
                             </p>
                         </div>
@@ -818,7 +825,7 @@
 
 @section('scripts')
 <script>
-const detailGalleryImages = @json(collect($galleryImages)->map(fn($image) => asset('storage/' . $image))->values());
+const detailGalleryMedia = @json($detailMedia);
 const detailVariants = @json($variantPayload);
 
 let currentQty = 1;
@@ -840,13 +847,33 @@ function changeQty(delta) {
 }
 
 function showGalleryImage(index) {
-    if (!detailGalleryImages.length) return;
+    if (!detailGalleryMedia.length) return;
 
-    galleryIndex = (index + detailGalleryImages.length) % detailGalleryImages.length;
+    galleryIndex = (index + detailGalleryMedia.length) % detailGalleryMedia.length;
+    const media = detailGalleryMedia[galleryIndex];
 
     const mainImage = document.getElementById('detailMainImage');
-    if (mainImage) {
-        mainImage.src = detailGalleryImages[galleryIndex];
+    const mainVideo = document.getElementById('detailMainVideo');
+    const mainVideoSource = mainVideo?.querySelector('source');
+
+    if (media.type === 'video') {
+        if (mainImage) mainImage.classList.add('hidden');
+        if (mainVideo && mainVideoSource) {
+            mainVideoSource.src = media.url;
+            mainVideoSource.type = videoMimeType(media.url);
+            mainVideo.load();
+            mainVideo.classList.remove('hidden');
+        }
+    } else {
+        if (mainVideo) {
+            mainVideo.pause();
+            mainVideo.classList.add('hidden');
+        }
+        if (mainVideoSource) mainVideoSource.src = '';
+        if (mainImage) {
+            mainImage.src = media.url;
+            mainImage.classList.remove('hidden');
+        }
     }
     resetProductImageZoom();
 
@@ -864,6 +891,17 @@ function showGalleryImage(index) {
         dot.classList.toggle('w-2.5', !isActive);
         dot.classList.toggle('bg-[#cfd7d1]', !isActive);
     });
+}
+
+function videoMimeType(url) {
+    const cleanUrl = String(url || '').split('?')[0].toLowerCase();
+
+    if (cleanUrl.endsWith('.webm')) return 'video/webm';
+    if (cleanUrl.endsWith('.mov')) return 'video/quicktime';
+    if (cleanUrl.endsWith('.avi')) return 'video/x-msvideo';
+    if (cleanUrl.endsWith('.mkv')) return 'video/x-matroska';
+
+    return 'video/mp4';
 }
 
 function moveGallery(direction) {
