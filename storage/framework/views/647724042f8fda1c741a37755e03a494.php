@@ -1,8 +1,7 @@
-@extends('frontend.layouts.app')
-@section('title', $product->name)
+<?php $__env->startSection('title', $product->name); ?>
 
-@section('content')
-@php
+<?php $__env->startSection('content'); ?>
+<?php
     $galleryImages = collect($product->images ?? [])
         ->filter()
         ->values()
@@ -295,23 +294,23 @@
         'Opened packets eligible for return if quality is poor',
         'Refunds processed within 24–48 hours',
     ];
-@endphp
+?>
 
 <div class="mx-auto w-full max-w-7xl px-3 py-5 sm:px-4 md:px-6 md:py-8">
     <div class="mb-5 hidden flex-wrap items-center justify-between gap-3 text-[11px] font-semibold text-slate-400 md:flex">
         <nav class="flex items-center gap-2">
-            <a href="{{ route('frontend.home') }}" class="transition hover:text-green-700">Home</a>
+            <a href="<?php echo e(route('frontend.home')); ?>" class="transition hover:text-green-700">Home</a>
             <i class="fa-solid fa-angle-right text-[9px]"></i>
-            <a href="{{ route('frontend.products') }}" class="transition hover:text-green-700">Products</a>
+            <a href="<?php echo e(route('frontend.products')); ?>" class="transition hover:text-green-700">Products</a>
             <i class="fa-solid fa-angle-right text-[9px]"></i>
-            @if($product->category)
-                <a href="{{ route('frontend.products', ['category' => $product->category->slug]) }}" class="transition hover:text-green-700">{{ $product->category->name }}</a>
+            <?php if($product->category): ?>
+                <a href="<?php echo e(route('frontend.products', ['category' => $product->category->slug])); ?>" class="transition hover:text-green-700"><?php echo e($product->category->name); ?></a>
                 <i class="fa-solid fa-angle-right text-[9px]"></i>
-            @endif
-            <span class="text-slate-600">{{ $product->name }}</span>
+            <?php endif; ?>
+            <span class="text-slate-600"><?php echo e($product->name); ?></span>
         </nav>
 
-        <a href="{{ route('frontend.products') }}" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-[11px] font-bold text-slate-600 shadow-sm transition hover:border-green-200 hover:text-green-700">
+        <a href="<?php echo e(route('frontend.products')); ?>" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-[11px] font-bold text-slate-600 shadow-sm transition hover:border-green-200 hover:text-green-700">
             <i class="fa-solid fa-arrow-left text-[10px]"></i>
             Back
         </a>
@@ -321,46 +320,46 @@
         <div class="min-w-0">
             <div class="overflow-hidden rounded-[28px] border border-[#dce5d9] bg-white shadow-[0_22px_60px_rgba(15,23,42,0.08)]">
                 <div class="relative aspect-[1/0.94] overflow-hidden bg-[#f4f5ef]">
-                    @php
+                    <?php
                         $isInWishlist = in_array($product->id, session('wishlist', []), true);
-                    @endphp
-                    <button onclick="toggleWishlist({{ $product->id }}, this)" 
-                            class="wishlist-btn absolute left-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-lg backdrop-blur-sm transition hover:scale-110 {{ $isInWishlist ? 'active' : '' }}"
-                            data-product-id="{{ $product->id }}"
-                            title="{{ $isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}">
-                        <i class="{{ $isInWishlist ? 'fa-solid fa-heart text-xl text-red-500' : 'fa-regular fa-heart text-xl text-slate-600 hover:text-red-500' }}"></i>
+                    ?>
+                    <button onclick="toggleWishlist(<?php echo e($product->id); ?>, this)" 
+                            class="wishlist-btn absolute left-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-lg backdrop-blur-sm transition hover:scale-110 <?php echo e($isInWishlist ? 'active' : ''); ?>"
+                            data-product-id="<?php echo e($product->id); ?>"
+                            title="<?php echo e($isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'); ?>">
+                        <i class="<?php echo e($isInWishlist ? 'fa-solid fa-heart text-xl text-red-500' : 'fa-regular fa-heart text-xl text-slate-600 hover:text-red-500'); ?>"></i>
                     </button>
 
-                    @if(in_array($product->id, $newArrivalProductIds ?? [], true))
+                    <?php if(in_array($product->id, $newArrivalProductIds ?? [], true)): ?>
                         <span class="absolute right-4 top-4 z-20 inline-flex items-center rounded-full bg-blue-600 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white shadow-lg">
                             New Arrival
                         </span>
-                    @endif
-                    @if($detailMedia->isNotEmpty())
+                    <?php endif; ?>
+                    <?php if($detailMedia->isNotEmpty()): ?>
                         <img
-                            src="{{ $detailMedia->first()['url'] }}"
-                            alt="{{ $product->name }}"
+                            src="<?php echo e($detailMedia->first()['url']); ?>"
+                            alt="<?php echo e($product->name); ?>"
                             id="detailMainImage"
-                            class="{{ $detailMedia->first()['type'] === 'image' ? '' : 'hidden' }} h-full w-full object-cover transition duration-500"
+                            class="<?php echo e($detailMedia->first()['type'] === 'image' ? '' : 'hidden'); ?> h-full w-full object-cover transition duration-500"
                         >
                         <video
                             id="detailMainVideo"
                             controls
                             preload="metadata"
-                            class="{{ $detailMedia->first()['type'] === 'video' ? '' : 'hidden' }} h-full w-full bg-black object-contain"
+                            class="<?php echo e($detailMedia->first()['type'] === 'video' ? '' : 'hidden'); ?> h-full w-full bg-black object-contain"
                         >
-                            <source src="{{ $detailMedia->first()['type'] === 'video' ? $detailMedia->first()['url'] : '' }}" type="video/mp4">
+                            <source src="<?php echo e($detailMedia->first()['type'] === 'video' ? $detailMedia->first()['url'] : ''); ?>" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
-                    @else
+                    <?php else: ?>
                         <div class="flex h-full w-full items-center justify-center text-7xl text-slate-300">
                             <i class="fa-solid fa-drumstick-bite"></i>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
                     <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-black/5"></div>
 
-                    @if($detailMedia->count() > 1)
+                    <?php if($detailMedia->count() > 1): ?>
                         <button type="button" onclick="moveGallery(-1)"
                                 class="absolute left-4 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-md transition hover:bg-white"
                                 aria-label="Previous image">
@@ -371,7 +370,7 @@
                                 aria-label="Next image">
                             <i class="fa-solid fa-chevron-right text-xs"></i>
                         </button>
-                    @endif
+                    <?php endif; ?>
 
                     <div class="absolute bottom-4 right-4 flex flex-col gap-2">
                         <button type="button" id="detailZoomOutButton" onclick="zoomProductImage(-0.25)"
@@ -388,44 +387,44 @@
                 </div>
             </div>
 
-            @if($detailMedia->count() > 1)
+            <?php if($detailMedia->count() > 1): ?>
                 <div class="mt-5 px-2 md:px-4">
                     <div class="mb-4 flex justify-center gap-2">
-                        @foreach($detailMedia as $index => $media)
+                        <?php $__currentLoopData = $detailMedia; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $media): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <button
                                 type="button"
-                                onclick="showGalleryImage({{ $index }})"
-                                id="detailDot{{ $index }}"
-                                class="detail-dot {{ $index === 0 ? 'is-active w-7 bg-[#2f8c43]' : 'w-2.5 bg-[#cfd7d1]' }} h-2.5 rounded-full transition-all duration-200"
-                                aria-label="Go to image {{ $index + 1 }}"
+                                onclick="showGalleryImage(<?php echo e($index); ?>)"
+                                id="detailDot<?php echo e($index); ?>"
+                                class="detail-dot <?php echo e($index === 0 ? 'is-active w-7 bg-[#2f8c43]' : 'w-2.5 bg-[#cfd7d1]'); ?> h-2.5 rounded-full transition-all duration-200"
+                                aria-label="Go to image <?php echo e($index + 1); ?>"
                             ></button>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                     <div class="flex flex-wrap justify-start gap-2 md:gap-5">
-                        @foreach($detailMedia as $index => $media)
+                        <?php $__currentLoopData = $detailMedia; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $media): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <button
                                 type="button"
-                                onclick="showGalleryImage({{ $index }})"
-                                id="detailThumb{{ $index }}"
-                                class="detail-thumb {{ $index === 0 ? 'is-active' : '' }} h-14 w-14 overflow-hidden rounded-[16px] border-2 border-transparent bg-white p-1 shadow-[0_10px_30px_rgba(15,23,42,0.08)] transition hover:-translate-y-0.5 sm:h-20 sm:w-20 sm:rounded-[20px] md:h-28 md:w-28 md:rounded-[24px]"
+                                onclick="showGalleryImage(<?php echo e($index); ?>)"
+                                id="detailThumb<?php echo e($index); ?>"
+                                class="detail-thumb <?php echo e($index === 0 ? 'is-active' : ''); ?> h-14 w-14 overflow-hidden rounded-[16px] border-2 border-transparent bg-white p-1 shadow-[0_10px_30px_rgba(15,23,42,0.08)] transition hover:-translate-y-0.5 sm:h-20 sm:w-20 sm:rounded-[20px] md:h-28 md:w-28 md:rounded-[24px]"
                             >
-                                @if($media['type'] === 'video')
+                                <?php if($media['type'] === 'video'): ?>
                                     <span class="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[12px] bg-slate-900 text-white sm:rounded-[16px] md:rounded-[20px]">
                                         <video preload="metadata" muted class="h-full w-full object-cover opacity-70">
-                                            <source src="{{ $media['url'] }}">
+                                            <source src="<?php echo e($media['url']); ?>">
                                         </video>
                                         <span class="absolute inset-0 flex items-center justify-center">
                                             <i class="fa-solid fa-circle-play text-lg drop-shadow sm:text-2xl"></i>
                                         </span>
                                     </span>
-                                @else
-                                    <img src="{{ $media['url'] }}" alt="{{ $product->name }} thumbnail {{ $index + 1 }}" class="h-full w-full rounded-[12px] object-cover sm:rounded-[16px] md:rounded-[20px]">
-                                @endif
+                                <?php else: ?>
+                                    <img src="<?php echo e($media['url']); ?>" alt="<?php echo e($product->name); ?> thumbnail <?php echo e($index + 1); ?>" class="h-full w-full rounded-[12px] object-cover sm:rounded-[16px] md:rounded-[20px]">
+                                <?php endif; ?>
                             </button>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
-            @endif
+            <?php endif; ?>
         </div>
 
         <div class="min-w-0 space-y-4">
@@ -437,10 +436,12 @@
                         </span>
                     </div>
                     <h1 class="break-words text-[25px] font-black leading-[1.12] tracking-[-0.02em] text-slate-900 md:text-[32px] md:leading-[1.06]">
-                        {{ $product->name }}
+                        <?php echo e($product->name); ?>
+
                     </h1>
                     <p class="mt-2 text-[12px] font-semibold tracking-[0.01em] text-slate-400">
-                        {{ $productTagline }}
+                        <?php echo e($productTagline); ?>
+
                     </p>
                     <button type="button" onclick="activateDetailTab('reviews'); document.getElementById('detail-tabs-section').scrollIntoView({ behavior: 'smooth' });" class="mt-2.5 flex items-center gap-1.5 hover:opacity-85 text-left">
                         <div class="flex gap-0.5 text-xs text-[#f59e0b]">
@@ -450,22 +451,22 @@
                             <i class="fa-solid fa-star"></i>
                             <i class="fa-solid fa-star"></i>
                         </div>
-                        <span class="text-xs font-black text-slate-700">{{ $reviewSummary['rating'] }}</span>
+                        <span class="text-xs font-black text-slate-700"><?php echo e($reviewSummary['rating']); ?></span>
                         <span class="text-slate-300">|</span>
-                        <span class="text-xs font-semibold text-[#2f8c43] hover:underline">{{ $reviewSummary['total'] }} Reviews</span>
+                        <span class="text-xs font-semibold text-[#2f8c43] hover:underline"><?php echo e($reviewSummary['total']); ?> Reviews</span>
                     </button>
-                    @if($hasProductDescription)
+                    <?php if($hasProductDescription): ?>
                         <div class="relative mt-3 max-w-[650px] overflow-hidden text-[14px] leading-7 text-slate-500 md:text-[15px]">
-                            <p class="line-clamp-2 {{ $hasLongProductDescription ? 'pr-[92px]' : '' }}">{{ $productDescriptionText }}</p>
-                            @if($hasLongProductDescription)
+                            <p class="line-clamp-2 <?php echo e($hasLongProductDescription ? 'pr-[92px]' : ''); ?>"><?php echo e($productDescriptionText); ?></p>
+                            <?php if($hasLongProductDescription): ?>
                                 <button type="button"
                                         onclick="activateDetailTab('description'); document.getElementById('detail-tabs-section').scrollIntoView({ behavior: 'smooth', block: 'start' });"
                                         class="absolute bottom-0 right-0 bg-[#f5f6fa] pl-2 text-[13px] font-black text-green-700 hover:underline md:text-[14px]">
                                     ... See more
                                 </button>
-                            @endif
+                            <?php endif; ?>
                         </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
 
                 <div class="flex flex-shrink-0 items-center gap-1.5 sm:gap-2">
@@ -475,10 +476,10 @@
                         </button>
                         <div id="productShareMenu" class="hidden absolute right-0 top-11 z-50 w-52 overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl">
                             <p class="px-3 pb-2 pt-1 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Share product</p>
-                            <a href="https://wa.me/?text={{ urlencode($product->name . ' - ' . url()->current()) }}" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 hover:bg-green-50 hover:text-green-700">
+                            <a href="https://wa.me/?text=<?php echo e(urlencode($product->name . ' - ' . url()->current())); ?>" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 hover:bg-green-50 hover:text-green-700">
                                 <i class="fa-brands fa-whatsapp w-5 text-lg text-green-500"></i> WhatsApp
                             </a>
-                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-700">
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo e(urlencode(url()->current())); ?>" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-700">
                                 <i class="fa-brands fa-facebook w-5 text-lg text-blue-600"></i> Facebook
                             </a>
                             <button type="button" onclick="shareProductToInstagram(this)" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-slate-700 hover:bg-pink-50 hover:text-pink-700">
@@ -507,43 +508,45 @@
                 </div>
                 <div class="flex min-w-0 flex-wrap items-end gap-2 sm:gap-3">
                     <span class="max-w-full break-words text-[36px] font-black leading-none text-slate-900 sm:text-[40px] md:text-[46px]">
-                        ₹<span id="detailCurrentPrice">{{ number_format($defaultDisplayedPrice, 0) }}</span>
-                        <span id="detailCurrentPriceUnit" class="ml-1 text-[14px] font-bold text-slate-400 md:text-[16px]">{{ $defaultVariant['price_unit_label'] ?? $formatPriceUnit($product->weight ?? null, $product->unit ?? null) }}</span>
+                        ₹<span id="detailCurrentPrice"><?php echo e(number_format($defaultDisplayedPrice, 0)); ?></span>
+                        <span id="detailCurrentPriceUnit" class="ml-1 text-[14px] font-bold text-slate-400 md:text-[16px]"><?php echo e($defaultVariant['price_unit_label'] ?? $formatPriceUnit($product->weight ?? null, $product->unit ?? null)); ?></span>
                     </span>
-                    <span id="detailMrpWrap" class="{{ ($defaultVariant['mrp'] ?? 0) > $defaultDisplayedPrice ? '' : 'hidden' }} flex items-center gap-2">
+                    <span id="detailMrpWrap" class="<?php echo e(($defaultVariant['mrp'] ?? 0) > $defaultDisplayedPrice ? '' : 'hidden'); ?> flex items-center gap-2">
                         <span id="detailMrp" class="text-[16px] font-bold text-slate-400 line-through">
-                            ₹{{ number_format($defaultVariant['mrp'] ?? $product->mrp, 0) }}
+                            ₹<?php echo e(number_format($defaultVariant['mrp'] ?? $product->mrp, 0)); ?>
+
                         </span>
                         <span id="detailOffer" class="rounded-full bg-[#ff6d5e] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white">
-                            -{{ (int) ($defaultVariant['today_offer'] ?? 0) }}% off
+                            -<?php echo e((int) ($defaultVariant['today_offer'] ?? 0)); ?>% off
                         </span>
                     </span>
                 </div>
-                <div id="detailSaveRow" class="{{ $selectedSaveAmount > 0 ? '' : 'hidden' }} mt-3 inline-flex items-center gap-1 rounded-xl border border-[#8bd39a] bg-[#dff6e3] px-3 py-1.5 text-[11px] font-black text-[#2f8c43]">
+                <div id="detailSaveRow" class="<?php echo e($selectedSaveAmount > 0 ? '' : 'hidden'); ?> mt-3 inline-flex items-center gap-1 rounded-xl border border-[#8bd39a] bg-[#dff6e3] px-3 py-1.5 text-[11px] font-black text-[#2f8c43]">
                     <span>You save ₹</span>
-                    <span id="detailSaveAmount">{{ number_format($selectedSaveAmount, 0) }}</span>
+                    <span id="detailSaveAmount"><?php echo e(number_format($selectedSaveAmount, 0)); ?></span>
                     <span>on this order</span>
                 </div>
             </div>
 
-            @if(count($offerCards))
-                @php($featuredOffer = $offerCards[0])
+            <?php if(count($offerCards)): ?>
+                <?php ($featuredOffer = $offerCards[0]); ?>
                 <button type="button" onclick="activateDetailTab('offers'); document.getElementById('detail-tabs-section').scrollIntoView({ behavior: 'smooth', block: 'start' });" class="group flex w-full items-center justify-between gap-4 rounded-[20px] border border-emerald-200 bg-gradient-to-r from-emerald-50 to-green-100/60 px-4 py-3 text-left shadow-sm transition hover:border-emerald-300 hover:shadow-md">
                     <span class="flex min-w-0 items-center gap-3">
                         <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm"><i class="fa-solid fa-percent"></i></span>
                         <span class="min-w-0">
-                            <span class="block text-[16px] font-black text-slate-900">{{ $featuredOffer['discount'] ?? $featuredOffer['title'] }}</span>
-                            <span class="mt-0.5 block truncate text-[11px] font-semibold text-emerald-700">{{ $featuredOffer['title'] }} · {{ $featuredOffer['scope'] ?? 'For this product' }}</span>
+                            <span class="block text-[16px] font-black text-slate-900"><?php echo e($featuredOffer['discount'] ?? $featuredOffer['title']); ?></span>
+                            <span class="mt-0.5 block truncate text-[11px] font-semibold text-emerald-700"><?php echo e($featuredOffer['title']); ?> · <?php echo e($featuredOffer['scope'] ?? 'For this product'); ?></span>
                         </span>
                     </span>
                     <span class="flex-shrink-0 rounded-xl bg-emerald-700 px-3 py-2 text-[10px] font-black uppercase tracking-wider text-white">View Offer <i class="fa-solid fa-arrow-right ml-1"></i></span>
                 </button>
-            @endif
+            <?php endif; ?>
 
             <div class="flex flex-wrap gap-2">
-                <span class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-[11px] font-black {{ $isProductAvailable ? 'border border-green-200 bg-green-50 text-green-700' : 'border border-red-200 bg-red-50 text-red-600' }}">
-                    <i class="fa-solid {{ $isProductAvailable ? 'fa-circle-check' : 'fa-ban' }} text-[10px]"></i>
-                    {{ $isProductAvailable ? 'In Stock' : 'Out of Stock' }}
+                <span class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-[11px] font-black <?php echo e($isProductAvailable ? 'border border-green-200 bg-green-50 text-green-700' : 'border border-red-200 bg-red-50 text-red-600'); ?>">
+                    <i class="fa-solid <?php echo e($isProductAvailable ? 'fa-circle-check' : 'fa-ban'); ?> text-[10px]"></i>
+                    <?php echo e($isProductAvailable ? 'In Stock' : 'Out of Stock'); ?>
+
                 </span>
                 <span class="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] font-black text-amber-700">
                     <i class="fa-solid fa-snowflake text-[10px]"></i>
@@ -554,95 +557,96 @@
             <div>
                 <div class="mb-3 text-[12px] font-black uppercase tracking-[0.18em] text-slate-500">Pack Size</div>
                 <div class="flex flex-wrap gap-3">
-                    @foreach($variantPayload as $index => $variant)
+                    <?php $__currentLoopData = $variantPayload; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $variant): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <button
                             type="button"
-                            id="variant-btn-{{ $index }}"
-                            onclick="selectVariant({{ $index }})"
-                            class="variant-card {{ $index === 0 ? 'is-active' : '' }} min-w-[84px] rounded-[16px] border border-slate-200 bg-white px-3 py-3 text-left shadow-sm transition duration-200 hover:-translate-y-1 hover:border-green-400 hover:bg-green-50 hover:shadow-[0_14px_28px_rgba(47,140,67,0.16)] active:translate-y-0 active:scale-[0.98]"
+                            id="variant-btn-<?php echo e($index); ?>"
+                            onclick="selectVariant(<?php echo e($index); ?>)"
+                            class="variant-card <?php echo e($index === 0 ? 'is-active' : ''); ?> min-w-[84px] rounded-[16px] border border-slate-200 bg-white px-3 py-3 text-left shadow-sm transition duration-200 hover:-translate-y-1 hover:border-green-400 hover:bg-green-50 hover:shadow-[0_14px_28px_rgba(47,140,67,0.16)] active:translate-y-0 active:scale-[0.98]"
                         >
-                            <div class="text-[11px] font-black text-slate-800">{{ $variant['label'] ?: 'Standard Pack' }}</div>
-                            <div class="mt-1 text-[10px] font-semibold text-slate-400" data-variant-day-price="{{ $index }}">₹{{ number_format($variant['today_price'], 0) }}</div>
+                            <div class="text-[11px] font-black text-slate-800"><?php echo e($variant['label'] ?: 'Standard Pack'); ?></div>
+                            <div class="mt-1 text-[10px] font-semibold text-slate-400" data-variant-day-price="<?php echo e($index); ?>">₹<?php echo e(number_format($variant['today_price'], 0)); ?></div>
                         </button>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </div>
 
             <div class="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1.55fr)] gap-3 sm:flex sm:flex-wrap sm:items-stretch">
-                @if($isProductAvailable)
+                <?php if($isProductAvailable): ?>
                     <div class="grid min-w-0 grid-cols-3 items-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm sm:flex">
                         <button type="button" onclick="changeQty(-1)" class="flex h-12 min-w-0 items-center justify-center text-slate-500 transition hover:bg-slate-50 hover:text-slate-800 sm:w-11">-</button>
                         <span id="qty-display" class="flex h-12 min-w-0 items-center justify-center border-x border-slate-200 px-2 text-[15px] font-black text-slate-800 sm:min-w-[48px] sm:px-3">1</span>
                         <button type="button" onclick="changeQty(1)" class="flex h-12 min-w-0 items-center justify-center text-slate-500 transition hover:bg-slate-50 hover:text-slate-800 sm:w-11">+</button>
                     </div>
-                @endif
+                <?php endif; ?>
 
-                @if($isProductAvailable)
-                    <button type="button" onclick="addToCartWithQty({{ $product->id }})"
+                <?php if($isProductAvailable): ?>
+                    <button type="button" onclick="addToCartWithQty(<?php echo e($product->id); ?>)"
                             class="inline-flex min-w-0 items-center justify-center gap-2 rounded-2xl bg-[#1f9d47] px-3 py-3 text-[12px] font-black uppercase tracking-[0.1em] text-white shadow-[0_14px_30px_rgba(31,157,71,0.22)] transition hover:-translate-y-0.5 hover:bg-[#18823a] sm:flex-1 sm:px-5 sm:text-[13px] sm:tracking-[0.14em]">
                         <i class="fa-solid fa-cart-shopping text-[12px]"></i>
                         Add To Cart
                     </button>
 
-                    <button type="button" onclick="buyNowWithQty({{ $product->id }})"
+                    <button type="button" onclick="buyNowWithQty(<?php echo e($product->id); ?>)"
                             class="col-span-2 inline-flex min-w-0 items-center justify-center gap-2 rounded-2xl bg-[#1f5ea8] px-5 py-3 text-[13px] font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_rgba(31,94,168,0.24)] transition hover:-translate-y-0.5 hover:bg-[#174c89] sm:flex-1">
                         <i class="fa-solid fa-bolt text-[12px]"></i>
                         Buy Now
                     </button>
-                @else
+                <?php else: ?>
                     <div class="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-5 py-3 text-[13px] font-black uppercase tracking-[0.14em] text-red-600">
                         <i class="fa-solid fa-ban text-[12px]"></i>
                         Out Of Stock
                     </div>
-                @endif
+                <?php endif; ?>
 
             </div>
 
-            @include('frontend.partials.similar-products', ['wrapperClass' => 'mt-3 md:hidden'])
+            <?php echo $__env->make('frontend.partials.similar-products', ['wrapperClass' => 'mt-3 md:hidden'], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
             <div class="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
-                @foreach($productSpecs as $label => $value)
+                <?php $__currentLoopData = $productSpecs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $label => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-3 border-b border-slate-100 px-4 py-3 last:border-b-0 sm:grid-cols-[140px_minmax(0,1fr)] sm:gap-4">
-                        <div class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">{{ $label }}</div>
-                        <div class="text-[13px] font-semibold text-slate-700">{{ $value }}</div>
+                        <div class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400"><?php echo e($label); ?></div>
+                        <div class="text-[13px] font-semibold text-slate-700"><?php echo e($value); ?></div>
                     </div>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         </div>
     </div>
 
     <div id="detail-tabs-section" class="mt-10 overflow-x-auto">
         <div class="inline-flex min-w-full gap-1.5 rounded-[18px] border border-slate-200/90 bg-[#f7f9f7] p-2 shadow-[0_10px_25px_rgba(15,23,42,0.05)]">
-            @if($hasProductDescription)
-                <button type="button" data-detail-tab="description" class="detail-tab-button {{ $initialDetailTab === 'description' ? 'is-active bg-white border-slate-200 shadow-sm text-[#2f8c43]' : 'border-transparent text-slate-500' }} inline-flex items-center gap-2 rounded-[12px] border px-4 py-2.5 text-[12px] font-black transition hover:bg-white hover:text-slate-800">
+            <?php if($hasProductDescription): ?>
+                <button type="button" data-detail-tab="description" class="detail-tab-button <?php echo e($initialDetailTab === 'description' ? 'is-active bg-white border-slate-200 shadow-sm text-[#2f8c43]' : 'border-transparent text-slate-500'); ?> inline-flex items-center gap-2 rounded-[12px] border px-4 py-2.5 text-[12px] font-black transition hover:bg-white hover:text-slate-800">
                     <i class="fa-solid fa-bars-staggered text-[11px]"></i>
                     Description
                 </button>
-            @endif
-            <button type="button" data-detail-tab="offers" class="detail-tab-button {{ $initialDetailTab === 'offers' ? 'is-active bg-white border-slate-200 shadow-sm text-[#2f8c43]' : 'border-transparent text-slate-500' }} inline-flex items-center gap-2 rounded-[12px] border px-4 py-2.5 text-[12px] font-black transition hover:bg-white hover:text-slate-800">
+            <?php endif; ?>
+            <button type="button" data-detail-tab="offers" class="detail-tab-button <?php echo e($initialDetailTab === 'offers' ? 'is-active bg-white border-slate-200 shadow-sm text-[#2f8c43]' : 'border-transparent text-slate-500'); ?> inline-flex items-center gap-2 rounded-[12px] border px-4 py-2.5 text-[12px] font-black transition hover:bg-white hover:text-slate-800">
                 <i class="fa-solid fa-tag text-[11px]"></i>
                 Offers
             </button>
             <button type="button" data-detail-tab="reviews" class="detail-tab-button border-transparent text-slate-500 inline-flex items-center gap-2 rounded-[12px] border px-4 py-2.5 text-[12px] font-black transition hover:bg-white hover:text-slate-800">
                 <i class="fa-regular fa-star text-[11px]"></i>
-                Reviews ({{ $reviewSummary['total'] }})
+                Reviews (<?php echo e($reviewSummary['total']); ?>)
             </button>
         </div>
     </div>
 
     <div class="mt-6 overflow-hidden rounded-[28px] border border-slate-200 bg-[#fbfcfa] shadow-[0_22px_55px_rgba(15,23,42,0.06)]">
-        @if($hasProductDescription)
-            <div id="detail-tab-description" data-detail-panel="description" class="detail-tab-panel {{ $initialDetailTab !== 'description' ? 'hidden' : '' }}">
+        <?php if($hasProductDescription): ?>
+            <div id="detail-tab-description" data-detail-panel="description" class="detail-tab-panel <?php echo e($initialDetailTab !== 'description' ? 'hidden' : ''); ?>">
                 <section id="about-product" class="px-5 py-6 md:px-7">
                     <h2 class="text-[18px] font-black text-slate-900">About This Product</h2>
                     <div class="mt-3 max-w-[980px] text-[14px] leading-8 text-slate-600">
-                        {!! nl2br(e($product->description)) !!}
+                        <?php echo nl2br(e($product->description)); ?>
+
                     </div>
                 </section>
             </div>
-        @endif
+        <?php endif; ?>
 
-        <section data-detail-panel="offers" class="detail-tab-panel {{ $initialDetailTab !== 'offers' ? 'hidden' : '' }} px-3 py-5 sm:px-5 sm:py-6 md:px-7">
+        <section data-detail-panel="offers" class="detail-tab-panel <?php echo e($initialDetailTab !== 'offers' ? 'hidden' : ''); ?> px-3 py-5 sm:px-5 sm:py-6 md:px-7">
             <div class="overflow-hidden rounded-[22px] border border-[#d7e6d7] bg-[radial-gradient(circle_at_top_left,_rgba(229,245,232,0.9),_rgba(255,255,255,1)_55%)] sm:rounded-[26px]">
                 <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#e3ece3] px-4 py-4 sm:gap-3 sm:px-5 sm:py-5 md:px-6">
                     <div class="min-w-0 flex-1">
@@ -650,57 +654,61 @@
                         <h3 class="mt-0.5 text-[16px] font-black text-slate-900 sm:mt-1 sm:text-[20px]">Fresh deals on this product page</h3>
                     </div>
                     <div class="inline-flex flex-shrink-0 items-center rounded-full bg-white/90 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-slate-500 shadow-sm sm:px-4 sm:py-2 sm:text-[11px]">
-                        {{ count($offerCards) }} active offers
+                        <?php echo e(count($offerCards)); ?> active offers
                     </div>
                 </div>
 
-                @if(count($offerCards))
+                <?php if(count($offerCards)): ?>
                     <div class="grid gap-3 p-3 sm:gap-4 sm:p-5 md:grid-cols-2 md:p-6">
-                        @foreach($offerCards as $offer)
+                        <?php $__currentLoopData = $offerCards; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $offer): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <article class="group relative overflow-hidden rounded-[18px] border border-white/70 bg-white p-4 shadow-[0_8px_24px_rgba(15,23,42,0.07)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(15,23,42,0.11)] sm:rounded-[24px] sm:p-5">
                                 <div class="absolute right-0 top-0 h-20 w-20 rounded-bl-[28px] bg-gradient-to-br from-slate-100/80 via-transparent to-transparent sm:h-24 sm:w-24 sm:rounded-bl-[36px]"></div>
 
                                 <div class="relative flex items-start gap-3 sm:gap-4">
-                                    <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl {{ $offer['icon_bg'] }} {{ $offer['icon_color'] }} shadow-sm sm:h-12 sm:w-12 sm:rounded-2xl">
-                                        <i class="fa-solid {{ $offer['icon'] }} text-[13px] sm:text-[16px]"></i>
+                                    <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl <?php echo e($offer['icon_bg']); ?> <?php echo e($offer['icon_color']); ?> shadow-sm sm:h-12 sm:w-12 sm:rounded-2xl">
+                                        <i class="fa-solid <?php echo e($offer['icon']); ?> text-[13px] sm:text-[16px]"></i>
                                     </div>
 
                                     <div class="min-w-0 flex-1">
                                         <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
                                             <span class="inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.15em] text-slate-500 sm:px-2.5 sm:py-1 sm:text-[10px]">
-                                                {{ $offer['badge'] ?? 'Live Offer' }}
+                                                <?php echo e($offer['badge'] ?? 'Live Offer'); ?>
+
                                             </span>
-                                            @if(!empty($offer['expires_at']))
+                                            <?php if(!empty($offer['expires_at'])): ?>
                                                 <span class="inline-flex items-center gap-1 rounded-full bg-[#fff7e8] px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.12em] text-[#b66a00] sm:px-2.5 sm:py-1 sm:text-[10px]">
                                                     <i class="fa-regular fa-clock text-[8px] sm:text-[9px]"></i>
-                                                    Ends {{ $offer['expires_at'] }}
+                                                    Ends <?php echo e($offer['expires_at']); ?>
+
                                                 </span>
-                                            @endif
+                                            <?php endif; ?>
                                         </div>
 
-                                        <h4 class="mt-2 text-[15px] font-black leading-5 text-slate-900 sm:mt-3 sm:text-[17px] sm:leading-6">{{ $offer['title'] }}</h4>
-                                        <p class="mt-1 text-[12px] font-semibold leading-5 text-slate-500 sm:mt-2 sm:text-[13px] sm:leading-6">{{ $offer['text'] }}</p>
+                                        <h4 class="mt-2 text-[15px] font-black leading-5 text-slate-900 sm:mt-3 sm:text-[17px] sm:leading-6"><?php echo e($offer['title']); ?></h4>
+                                        <p class="mt-1 text-[12px] font-semibold leading-5 text-slate-500 sm:mt-2 sm:text-[13px] sm:leading-6"><?php echo e($offer['text']); ?></p>
 
                                         <div class="mt-3 flex flex-wrap items-center gap-1.5 sm:mt-4 sm:gap-2">
-                                            @if($offer['code'])
-                                                <div class="inline-flex items-center rounded-lg border border-dashed border-[#2f8c43] {{ $offer['code_bg'] }} px-2.5 py-1.5 text-[10px] font-black uppercase tracking-[0.15em] {{ $offer['code_text'] }} sm:rounded-xl sm:px-3 sm:py-2 sm:text-[11px]">
+                                            <?php if($offer['code']): ?>
+                                                <div class="inline-flex items-center rounded-lg border border-dashed border-[#2f8c43] <?php echo e($offer['code_bg']); ?> px-2.5 py-1.5 text-[10px] font-black uppercase tracking-[0.15em] <?php echo e($offer['code_text']); ?> sm:rounded-xl sm:px-3 sm:py-2 sm:text-[11px]">
                                                     <i class="fa-solid fa-ticket mr-1.5 text-[9px] sm:mr-2 sm:text-[10px]"></i>
-                                                    {{ $offer['code'] }}
-                                                </div>
-                                            @endif
+                                                    <?php echo e($offer['code']); ?>
 
-                                            @if(!empty($offer['min_order_amount']))
-                                                <div class="inline-flex items-center rounded-lg bg-slate-100 px-2.5 py-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-slate-600 sm:rounded-xl sm:px-3 sm:py-2 sm:text-[11px]">
-                                                    Min order ₹{{ number_format((float) $offer['min_order_amount'], 0) }}
                                                 </div>
-                                            @endif
+                                            <?php endif; ?>
+
+                                            <?php if(!empty($offer['min_order_amount'])): ?>
+                                                <div class="inline-flex items-center rounded-lg bg-slate-100 px-2.5 py-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-slate-600 sm:rounded-xl sm:px-3 sm:py-2 sm:text-[11px]">
+                                                    Min order ₹<?php echo e(number_format((float) $offer['min_order_amount'], 0)); ?>
+
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>
                             </article>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
-                @else
+                <?php else: ?>
                     <div class="px-4 py-8 sm:px-5 sm:py-10 md:px-6">
                         <div class="rounded-[20px] border border-dashed border-[#cfe1d0] bg-white/80 px-5 py-8 text-center sm:rounded-[24px] sm:px-6 sm:py-10">
                             <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#edf8ef] text-[#2f8c43] sm:h-14 sm:w-14 sm:rounded-2xl">
@@ -712,7 +720,7 @@
                             </p>
                         </div>
                     </div>
-                @endif
+                <?php endif; ?>
             </div>
         </section>
 
@@ -722,64 +730,65 @@
                 <div class="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
                     <h3 class="text-[16px] font-black text-slate-900">Customer Rating</h3>
                     <div class="mt-4 flex items-baseline gap-2">
-                        <span class="text-4xl font-black text-slate-900">{{ $reviewSummary['rating'] }}</span>
+                        <span class="text-4xl font-black text-slate-900"><?php echo e($reviewSummary['rating']); ?></span>
                         <span class="text-sm font-semibold text-slate-400">/ 5</span>
                     </div>
                     <div class="mt-2 flex gap-1 text-sm text-[#f59e0b]">
-                        @for($i = 0; $i < 5; $i++)
+                        <?php for($i = 0; $i < 5; $i++): ?>
                             <i class="fa-solid fa-star"></i>
-                        @endfor
+                        <?php endfor; ?>
                     </div>
-                    <p class="mt-2 text-xs font-semibold text-slate-400">Based on {{ $reviewSummary['total'] }} verified reviews</p>
+                    <p class="mt-2 text-xs font-semibold text-slate-400">Based on <?php echo e($reviewSummary['total']); ?> verified reviews</p>
                     
                     <div class="mt-6 space-y-2">
-                        @foreach($reviewSummary['distribution'] as $dist)
+                        <?php $__currentLoopData = $reviewSummary['distribution']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dist): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="flex items-center gap-2 text-xs font-semibold text-slate-500">
-                                <span class="w-3">{{ $dist['stars'] }}</span>
+                                <span class="w-3"><?php echo e($dist['stars']); ?></span>
                                 <i class="fa-solid fa-star text-[9px] text-[#f59e0b]"></i>
                                 <div class="h-2 flex-1 rounded-full bg-slate-100 overflow-hidden">
-                                    <div class="h-full bg-green-500" style="width: {{ $dist['percent'] }}%"></div>
+                                    <div class="h-full bg-green-500" style="width: <?php echo e($dist['percent']); ?>%"></div>
                                 </div>
-                                <span class="w-8 text-right">{{ $dist['percent'] }}%</span>
+                                <span class="w-8 text-right"><?php echo e($dist['percent']); ?>%</span>
                             </div>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
 
                 <!-- Review Cards -->
                 <div class="space-y-4">
-                    @foreach($reviewCards as $card)
+                    <?php $__currentLoopData = $reviewCards; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $card): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="rounded-[24px] border border-slate-100 bg-white p-5 shadow-sm transition hover:shadow-md">
                             <div class="flex items-center justify-between gap-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="flex h-9 w-9 items-center justify-center rounded-full text-xs font-black text-white {{ $card['color'] ?? 'bg-slate-400' }}">
-                                        {{ $card['initials'] }}
+                                    <div class="flex h-9 w-9 items-center justify-center rounded-full text-xs font-black text-white <?php echo e($card['color'] ?? 'bg-slate-400'); ?>">
+                                        <?php echo e($card['initials']); ?>
+
                                     </div>
                                     <div>
-                                        <p class="text-[13px] font-black text-slate-900">{{ $card['name'] }}</p>
-                                        <p class="text-[10px] font-semibold text-slate-400">{{ $card['date'] }}</p>
+                                        <p class="text-[13px] font-black text-slate-900"><?php echo e($card['name']); ?></p>
+                                        <p class="text-[10px] font-semibold text-slate-400"><?php echo e($card['date']); ?></p>
                                     </div>
                                 </div>
                                 <div class="flex gap-0.5 text-xs text-[#f59e0b]">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <i class="fa-solid fa-star {{ $i > ($card['rating'] ?? 5) ? 'text-slate-200' : '' }}"></i>
-                                    @endfor
+                                    <?php for($i = 1; $i <= 5; $i++): ?>
+                                        <i class="fa-solid fa-star <?php echo e($i > ($card['rating'] ?? 5) ? 'text-slate-200' : ''); ?>"></i>
+                                    <?php endfor; ?>
                                 </div>
                             </div>
-                            <h4 class="mt-3 text-[14px] font-bold text-slate-900">{{ $card['title'] }}</h4>
-                            <p class="mt-2 text-[12px] leading-6 text-slate-500">{{ $card['text'] }}</p>
+                            <h4 class="mt-3 text-[14px] font-bold text-slate-900"><?php echo e($card['title']); ?></h4>
+                            <p class="mt-2 text-[12px] leading-6 text-slate-500"><?php echo e($card['text']); ?></p>
                         </div>
-                    @endforeach
-                    @if(empty($reviewCards))
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php if(empty($reviewCards)): ?>
                         <div class="rounded-[24px] border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-400">
                             No approved reviews for this product yet.
                         </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
 
-        @if(false)
+        <?php if(false): ?>
         <section data-detail-panel="delivery" class="detail-tab-panel hidden px-5 py-6 md:px-7">
             <div class="grid gap-4 lg:grid-cols-2">
                 <div class="overflow-hidden rounded-[20px] border border-slate-200 bg-white shadow-[0_14px_30px_rgba(15,23,42,0.05)]">
@@ -790,11 +799,12 @@
                         <h4 class="text-[14px] font-black text-slate-900">Delivery</h4>
                     </div>
                     <div class="bg-[#fdfefd]">
-                        @foreach($deliveryInfoRows as $row)
+                        <?php $__currentLoopData = $deliveryInfoRows; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="border-b border-slate-100 px-4 py-3 text-[13px] font-semibold leading-6 text-slate-600 last:border-b-0">
-                                {!! preg_replace('/(10 AM|same-day delivery|3–6 hours|7 days a week|above ₹499|0–4°C delivery)/', '<strong class="font-black text-slate-900">$1</strong>', e($row)) !!}
+                                <?php echo preg_replace('/(10 AM|same-day delivery|3–6 hours|7 days a week|above ₹499|0–4°C delivery)/', '<strong class="font-black text-slate-900">$1</strong>', e($row)); ?>
+
                             </div>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
 
@@ -806,31 +816,32 @@
                         <h4 class="text-[14px] font-black text-slate-900">Returns &amp; Guarantee</h4>
                     </div>
                     <div class="bg-[#fdfefd]">
-                        @foreach($returnsInfoRows as $row)
+                        <?php $__currentLoopData = $returnsInfoRows; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="border-b border-slate-100 px-4 py-3 text-[13px] font-semibold leading-6 text-slate-600 last:border-b-0">
-                                {!! preg_replace('/(within 2 hours|free replacement or full refund|24–48 hours)/', '<strong class="font-black text-slate-900">$1</strong>', e($row)) !!}
+                                <?php echo preg_replace('/(within 2 hours|free replacement or full refund|24–48 hours)/', '<strong class="font-black text-slate-900">$1</strong>', e($row)); ?>
+
                             </div>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
             </div>
         </section>
-        @endif
+        <?php endif; ?>
     </div>
 
-    @include('frontend.partials.similar-products', ['wrapperClass' => 'mt-10 hidden md:block'])
+    <?php echo $__env->make('frontend.partials.similar-products', ['wrapperClass' => 'mt-10 hidden md:block'], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
 <script>
-const detailGalleryMedia = @json($detailMedia);
-const detailVariants = @json($variantPayload);
+const detailGalleryMedia = <?php echo json_encode($detailMedia, 15, 512) ?>;
+const detailVariants = <?php echo json_encode($variantPayload, 15, 512) ?>;
 
 let currentQty = 1;
 let selectedVariant = 0;
-let selectedPricingDay = '{{ $defaultPricingDay }}';
+let selectedPricingDay = '<?php echo e($defaultPricingDay); ?>';
 let galleryIndex = 0;
 let galleryZoomLevel = 1;
 
@@ -1049,7 +1060,7 @@ function selectVariant(index) {
     const activeOffer = getVariantDayOffer(variant, selectedPricingDay);
 
     if (currentPrice) currentPrice.textContent = Math.round(activePrice || 0);
-    if (currentPriceUnit) currentPriceUnit.textContent = variant.price_unit_label || '{{ $product->display_pack_label }}';
+    if (currentPriceUnit) currentPriceUnit.textContent = variant.price_unit_label || '<?php echo e($product->display_pack_label); ?>';
 
     const canShowDiscount = Number(variant.mrp || 0) > Number(activePrice || 0);
     const saveValue = Math.max(Number(variant.mrp || 0) - Number(activePrice || 0), 0);
@@ -1063,11 +1074,11 @@ function selectVariant(index) {
 }
 
 function sendCartRequest(productId, redirectToCheckout = false) {
-    fetch('{{ route("frontend.cart.add") }}', {
+    fetch('<?php echo e(route("frontend.cart.add")); ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
             'Accept': 'application/json',
         },
         body: JSON.stringify({ product_id: productId, quantity: currentQty, variant_index: selectedVariant, pricing_day: selectedPricingDay })
@@ -1093,7 +1104,7 @@ function sendCartRequest(productId, redirectToCheckout = false) {
         }
 
         if (redirectToCheckout) {
-            window.location.href = '{{ route("frontend.checkout") }}';
+            window.location.href = '<?php echo e(route("frontend.checkout")); ?>';
             return;
         }
 
@@ -1125,7 +1136,7 @@ function toggleProductShare(event) {
 }
 
 async function shareProductNative() {
-    const shareData = { title: @json($product->name), text: @json('Check out ' . $product->name . ' on FarmSea'), url: window.location.href };
+    const shareData = { title: <?php echo json_encode($product->name, 15, 512) ?>, text: <?php echo json_encode('Check out ' . $product->name . ' on FarmSea', 15, 512) ?>, url: window.location.href };
     if (navigator.share) {
         await navigator.share(shareData).catch(() => {});
     } else {
@@ -1143,7 +1154,7 @@ async function copyProductLink(button) {
 }
 
 async function shareProductToInstagram(button) {
-    await navigator.clipboard.writeText(@json($product->name . ' - ') + window.location.href);
+    await navigator.clipboard.writeText(<?php echo json_encode($product->name . ' - ', 15, 512) ?> + window.location.href);
     const label = button.querySelector('span');
     label.textContent = 'Link copied!';
     window.open('https://www.instagram.com/', '_blank', 'noopener');
@@ -1167,8 +1178,10 @@ document.querySelectorAll('[data-pricing-day]').forEach((button) => {
 });
 
 updateQtyDisplay();
-selectPricingDay('{{ $defaultPricingDay }}');
-activateDetailTab('{{ $initialDetailTab }}');
+selectPricingDay('<?php echo e($defaultPricingDay); ?>');
+activateDetailTab('<?php echo e($initialDetailTab); ?>');
 applyProductImageZoom();
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('frontend.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views\frontend\product-detail.blade.php ENDPATH**/ ?>

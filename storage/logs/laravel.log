@@ -2017,3 +2017,97 @@ Stack trace:
 [stacktrace]
 #0 {main}
 "} 
+[2026-09-01 14:02:57] local.ERROR: Uncaught ParseError: Unclosed '[' does not match ')' in C:\BMDU Work\FarmSea-dashboard\storage\framework\views\019c582c7d1ef7acea8a3d4e429529c1.php:45
+Stack trace:
+#0 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\Filesystem\Filesystem.php(124): Illuminate\Filesystem\Filesystem::Illuminate\Filesystem\{closure}()
+#1 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\Engines\PhpEngine.php(58): Illuminate\Filesystem\Filesystem->getRequire()
+#2 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\Engines\CompilerEngine.php(75): Illuminate\View\Engines\PhpEngine->evaluatePath()
+#3 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\View.php(209): Illuminate\View\Engines\CompilerEngine->get()
+#4 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\View.php(192): Illuminate\View\View->getContents()
+#5 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\View.php(161): Illuminate\View\View->renderContents()
+#6 Command line code(1): Illuminate\View\View->render()
+#7 {main}
+
+Next Illuminate\View\ViewException: Unclosed '[' does not match ')' (View: C:\BMDU Work\FarmSea-dashboard\resources\views\dashboard\settings\delivery-areas.blade.php) in C:\BMDU Work\FarmSea-dashboard\storage\framework\views\019c582c7d1ef7acea8a3d4e429529c1.php:45
+Stack trace:
+#0 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\Engines\PhpEngine.php(60): Illuminate\View\Engines\CompilerEngine->handleViewException()
+#1 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\Engines\CompilerEngine.php(75): Illuminate\View\Engines\PhpEngine->evaluatePath()
+#2 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\View.php(209): Illuminate\View\Engines\CompilerEngine->get()
+#3 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\View.php(192): Illuminate\View\View->getContents()
+#4 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\View.php(161): Illuminate\View\View->renderContents()
+#5 Command line code(1): Illuminate\View\View->render()
+#6 {main}
+  thrown {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Uncaught ParseError: Unclosed '[' does not match ')' in C:\\BMDU Work\\FarmSea-dashboard\\storage\\framework\\views\\019c582c7d1ef7acea8a3d4e429529c1.php:45
+Stack trace:
+#0 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\Filesystem\\Filesystem.php(124): Illuminate\\Filesystem\\Filesystem::Illuminate\\Filesystem\\{closure}()
+#1 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\Engines\\PhpEngine.php(58): Illuminate\\Filesystem\\Filesystem->getRequire()
+#2 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\Engines\\CompilerEngine.php(75): Illuminate\\View\\Engines\\PhpEngine->evaluatePath()
+#3 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\View.php(209): Illuminate\\View\\Engines\\CompilerEngine->get()
+#4 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\View.php(192): Illuminate\\View\\View->getContents()
+#5 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\View.php(161): Illuminate\\View\\View->renderContents()
+#6 Command line code(1): Illuminate\\View\\View->render()
+#7 {main}
+
+Next Illuminate\\View\\ViewException: Unclosed '[' does not match ')' (View: C:\\BMDU Work\\FarmSea-dashboard\\resources\\views\\dashboard\\settings\\delivery-areas.blade.php) in C:\\BMDU Work\\FarmSea-dashboard\\storage\\framework\\views\\019c582c7d1ef7acea8a3d4e429529c1.php:45
+Stack trace:
+#0 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\Engines\\PhpEngine.php(60): Illuminate\\View\\Engines\\CompilerEngine->handleViewException()
+#1 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\Engines\\CompilerEngine.php(75): Illuminate\\View\\Engines\\PhpEngine->evaluatePath()
+#2 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\View.php(209): Illuminate\\View\\Engines\\CompilerEngine->get()
+#3 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\View.php(192): Illuminate\\View\\View->getContents()
+#4 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\View.php(161): Illuminate\\View\\View->renderContents()
+#5 Command line code(1): Illuminate\\View\\View->render()
+#6 {main}
+  thrown at C:/BMDU Work/FarmSea-dashboard/storage/framework/views/019c582c7d1ef7acea8a3d4e429529c1.php:45)
+[stacktrace]
+#0 {main}
+"} 
+[2026-09-01 14:05:52] local.ERROR: Uncaught ErrorException: Undefined variable $errors in C:\BMDU Work\FarmSea-dashboard\storage\framework\views\019c582c7d1ef7acea8a3d4e429529c1.php:33
+Stack trace:
+#0 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php(258): Illuminate\Foundation\Bootstrap\HandleExceptions->handleError()
+#1 C:\BMDU Work\FarmSea-dashboard\storage\framework\views\019c582c7d1ef7acea8a3d4e429529c1.php(33): Illuminate\Foundation\Bootstrap\HandleExceptions->Illuminate\Foundation\Bootstrap\{closure}()
+#2 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\Filesystem\Filesystem.php(123): require('...')
+#3 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\Filesystem\Filesystem.php(124): Illuminate\Filesystem\Filesystem::Illuminate\Filesystem\{closure}()
+#4 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\Engines\PhpEngine.php(58): Illuminate\Filesystem\Filesystem->getRequire()
+#5 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\Engines\CompilerEngine.php(75): Illuminate\View\Engines\PhpEngine->evaluatePath()
+#6 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\View.php(209): Illuminate\View\Engines\CompilerEngine->get()
+#7 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\View.php(192): Illuminate\View\View->getContents()
+#8 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\View.php(161): Illuminate\View\View->renderContents()
+#9 Command line code(1): Illuminate\View\View->render()
+#10 {main}
+
+Next Illuminate\View\ViewException: Undefined variable $errors (View: C:\BMDU Work\FarmSea-dashboard\resources\views\dashboard\settings\delivery-areas.blade.php) in C:\BMDU Work\FarmSea-dashboard\storage\framework\views\019c582c7d1ef7acea8a3d4e429529c1.php:33
+Stack trace:
+#0 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\Engines\PhpEngine.php(60): Illuminate\View\Engines\CompilerEngine->handleViewException()
+#1 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\Engines\CompilerEngine.php(75): Illuminate\View\Engines\PhpEngine->evaluatePath()
+#2 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\View.php(209): Illuminate\View\Engines\CompilerEngine->get()
+#3 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\View.php(192): Illuminate\View\View->getContents()
+#4 C:\BMDU Work\FarmSea-dashboard\vendor\laravel\framework\src\Illuminate\View\View.php(161): Illuminate\View\View->renderContents()
+#5 Command line code(1): Illuminate\View\View->render()
+#6 {main}
+  thrown {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Uncaught ErrorException: Undefined variable $errors in C:\\BMDU Work\\FarmSea-dashboard\\storage\\framework\\views\\019c582c7d1ef7acea8a3d4e429529c1.php:33
+Stack trace:
+#0 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\HandleExceptions.php(258): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->handleError()
+#1 C:\\BMDU Work\\FarmSea-dashboard\\storage\\framework\\views\\019c582c7d1ef7acea8a3d4e429529c1.php(33): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\Filesystem\\Filesystem.php(123): require('...')
+#3 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\Filesystem\\Filesystem.php(124): Illuminate\\Filesystem\\Filesystem::Illuminate\\Filesystem\\{closure}()
+#4 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\Engines\\PhpEngine.php(58): Illuminate\\Filesystem\\Filesystem->getRequire()
+#5 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\Engines\\CompilerEngine.php(75): Illuminate\\View\\Engines\\PhpEngine->evaluatePath()
+#6 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\View.php(209): Illuminate\\View\\Engines\\CompilerEngine->get()
+#7 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\View.php(192): Illuminate\\View\\View->getContents()
+#8 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\View.php(161): Illuminate\\View\\View->renderContents()
+#9 Command line code(1): Illuminate\\View\\View->render()
+#10 {main}
+
+Next Illuminate\\View\\ViewException: Undefined variable $errors (View: C:\\BMDU Work\\FarmSea-dashboard\\resources\\views\\dashboard\\settings\\delivery-areas.blade.php) in C:\\BMDU Work\\FarmSea-dashboard\\storage\\framework\\views\\019c582c7d1ef7acea8a3d4e429529c1.php:33
+Stack trace:
+#0 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\Engines\\PhpEngine.php(60): Illuminate\\View\\Engines\\CompilerEngine->handleViewException()
+#1 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\Engines\\CompilerEngine.php(75): Illuminate\\View\\Engines\\PhpEngine->evaluatePath()
+#2 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\View.php(209): Illuminate\\View\\Engines\\CompilerEngine->get()
+#3 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\View.php(192): Illuminate\\View\\View->getContents()
+#4 C:\\BMDU Work\\FarmSea-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\View\\View.php(161): Illuminate\\View\\View->renderContents()
+#5 Command line code(1): Illuminate\\View\\View->render()
+#6 {main}
+  thrown at C:/BMDU Work/FarmSea-dashboard/storage/framework/views/019c582c7d1ef7acea8a3d4e429529c1.php:33)
+[stacktrace]
+#0 {main}
+"} 

@@ -1,9 +1,8 @@
-@extends('layouts.dashboard')
-@section('title', 'Delivery Areas')
-@section('page_title', 'Delivery Area Settings')
+<?php $__env->startSection('title', 'Delivery Areas'); ?>
+<?php $__env->startSection('page_title', 'Delivery Area Settings'); ?>
 
-@section('content')
-@php
+<?php $__env->startSection('content'); ?>
+<?php
     $deliveryAreaRows = old('areas');
 
     if (! is_array($deliveryAreaRows)) {
@@ -15,11 +14,11 @@
             }
         }
     }
-@endphp
+?>
 <div class="p-4 md:p-6">
-    <form method="POST" action="{{ route('dashboard.settings.delivery-areas.update') }}" class="mx-auto max-w-4xl space-y-5">
-        @csrf
-        @method('PUT')
+    <form method="POST" action="<?php echo e(route('dashboard.settings.delivery-areas.update')); ?>" class="mx-auto max-w-4xl space-y-5">
+        <?php echo csrf_field(); ?>
+        <?php echo method_field('PUT'); ?>
 
         <div class="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -31,9 +30,9 @@
             </button>
         </div>
 
-        @if($errors->any())
-            <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ $errors->first() }}</div>
-        @endif
+        <?php if($errors->any()): ?>
+            <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"><?php echo e($errors->first()); ?></div>
+        <?php endif; ?>
 
         <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between gap-3">
@@ -56,7 +55,7 @@
 </div>
 
 <script>
-const savedAreas = {!! json_encode($deliveryAreaRows, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!};
+const savedAreas = <?php echo json_encode($deliveryAreaRows, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT); ?>;
 const areaRows = document.getElementById('areaRows');
 let nextAreaIndex = 0;
 
@@ -77,4 +76,6 @@ function escapeHtml(value) {
 
 (savedAreas.length ? savedAreas : [{ pincode: '', sector: '' }]).forEach(addAreaRow);
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.dashboard', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views/dashboard/settings/delivery-areas.blade.php ENDPATH**/ ?>

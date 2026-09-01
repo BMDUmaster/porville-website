@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>@yield('title', 'FarmSea') — Fresh Meat & Seafood</title>
-<meta name="csrf-token" content="{{ csrf_token() }}">
-<link rel="icon" type="image/webp" href="{{ $brandLogoUrl }}">
-<link rel="shortcut icon" href="{{ $brandLogoUrl }}">
-<link rel="apple-touch-icon" href="{{ $brandLogoUrl }}">
+<title><?php echo $__env->yieldContent('title', 'FarmSea'); ?> — Fresh Meat & Seafood</title>
+<meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+<link rel="icon" type="image/webp" href="<?php echo e($brandLogoUrl); ?>">
+<link rel="shortcut icon" href="<?php echo e($brandLogoUrl); ?>">
+<link rel="apple-touch-icon" href="<?php echo e($brandLogoUrl); ?>">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
@@ -136,7 +136,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
     .logo-fish-flight { display: none; }
 }
 </style>
-@yield('styles')
+<?php echo $__env->yieldContent('styles'); ?>
 </head>
 <body class="min-h-screen flex flex-col" style="background:#f5f6fa;">
 
@@ -151,49 +151,50 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
     <div class="p-4 overflow-y-auto h-full pb-20">
         <h3 class="text-green-700 font-bold mb-3 mt-2">Categories</h3>
         <ul class="space-y-1 text-gray-700 text-sm mb-5">
-            @forelse($frontendNavCategories ?? collect() as $category)
+            <?php $__empty_1 = true; $__currentLoopData = $frontendNavCategories ?? collect(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <li>
-                    @if($category->children->isNotEmpty())
+                    <?php if($category->children->isNotEmpty()): ?>
                         <button
                             type="button"
-                            onclick="toggleMobileCategory('{{ $category->id }}')"
+                            onclick="toggleMobileCategory('<?php echo e($category->id); ?>')"
                             class="flex w-full items-center justify-between rounded p-2 text-left font-semibold hover:bg-gray-100"
                         >
-                            <span>{{ $category->name }}</span>
-                            <i id="mobile-category-icon-{{ $category->id }}" class="fa-solid fa-chevron-down text-[10px] text-green-700 transition-transform"></i>
+                            <span><?php echo e($category->name); ?></span>
+                            <i id="mobile-category-icon-<?php echo e($category->id); ?>" class="fa-solid fa-chevron-down text-[10px] text-green-700 transition-transform"></i>
                         </button>
-                        <ul id="mobile-category-{{ $category->id }}" class="ml-3 hidden border-l border-green-100 pl-2">
+                        <ul id="mobile-category-<?php echo e($category->id); ?>" class="ml-3 hidden border-l border-green-100 pl-2">
                             <li>
-                                <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="block rounded p-2 text-xs font-semibold text-green-700 hover:bg-gray-100">
-                                    View all {{ $category->name }}
+                                <a href="<?php echo e(route('frontend.products', ['category' => $category->slug])); ?>" class="block rounded p-2 text-xs font-semibold text-green-700 hover:bg-gray-100">
+                                    View all <?php echo e($category->name); ?>
+
                                 </a>
                             </li>
-                            @foreach($category->children as $subcategory)
+                            <?php $__currentLoopData = $category->children; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subcategory): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <li>
-                                    <a href="{{ route('frontend.products', ['category' => $category->slug, 'subcategory' => $subcategory->slug]) }}" class="block p-2 text-xs text-gray-500 hover:bg-gray-100 hover:text-green-700 rounded">{{ $subcategory->name }}</a>
+                                    <a href="<?php echo e(route('frontend.products', ['category' => $category->slug, 'subcategory' => $subcategory->slug])); ?>" class="block p-2 text-xs text-gray-500 hover:bg-gray-100 hover:text-green-700 rounded"><?php echo e($subcategory->name); ?></a>
                                 </li>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </ul>
-                    @else
-                        <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="block p-2 font-semibold hover:bg-gray-100 rounded">{{ $category->name }}</a>
-                    @endif
+                    <?php else: ?>
+                        <a href="<?php echo e(route('frontend.products', ['category' => $category->slug])); ?>" class="block p-2 font-semibold hover:bg-gray-100 rounded"><?php echo e($category->name); ?></a>
+                    <?php endif; ?>
                 </li>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <li class="p-2 text-gray-400">No categories available</li>
-            @endforelse
+            <?php endif; ?>
         </ul>
         <hr class="my-4">
-        <a href="{{ route('frontend.track') }}" class="block p-2 font-bold text-blue-600">Track Order</a>
-        @auth('web_frontend')
-            <a href="{{ route('frontend.profile') }}" class="block p-2 font-bold text-green-700">My Profile</a>
-            <a href="{{ route('frontend.orders') }}" class="block p-2 font-bold text-green-700">My Orders</a>
-        @else
-            <a href="{{ route('frontend.login') }}" class="block p-2 font-bold text-blue-600">Login / Register</a>
-        @endauth
+        <a href="<?php echo e(route('frontend.track')); ?>" class="block p-2 font-bold text-blue-600">Track Order</a>
+        <?php if(auth()->guard('web_frontend')->check()): ?>
+            <a href="<?php echo e(route('frontend.profile')); ?>" class="block p-2 font-bold text-green-700">My Profile</a>
+            <a href="<?php echo e(route('frontend.orders')); ?>" class="block p-2 font-bold text-green-700">My Orders</a>
+        <?php else: ?>
+            <a href="<?php echo e(route('frontend.login')); ?>" class="block p-2 font-bold text-blue-600">Login / Register</a>
+        <?php endif; ?>
     </div>
 </div>
 
-@php
+<?php
     $drawerCart = session('cart', []);
     $initialCartItemCount = count($drawerCart);
     $drawerCartDays = collect($drawerCart)->pluck('pricing_day')->filter();
@@ -208,7 +209,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
         $drawerSelectedDeliverySlot = $drawerDeliverySlotOptions[0]['value'] ?? null;
         session(['selected_delivery_slot' => $drawerSelectedDeliverySlot]);
     }
-@endphp
+?>
 <!-- Cart Drawer -->
 <div id="cart-overlay" class="hidden fixed inset-0 bg-black/40 z-[9998]" onclick="closeCart()"></div>
 <div id="cart-drawer" class="fixed top-0 right-0 h-full w-[420px] max-w-[95vw] bg-white shadow-2xl z-[9999] flex flex-col">
@@ -242,29 +243,32 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                 <span class="text-xs font-black uppercase tracking-[0.16em] text-slate-600">
                     Delivery Slot
                     <span id="drawer-delivery-day-label" class="ml-1 rounded-full bg-white px-2 py-1 text-[9px] tracking-[0.12em] text-green-700">
-                        {{ $drawerDeliveryDayLabel }}
+                        <?php echo e($drawerDeliveryDayLabel); ?>
+
                     </span>
                 </span>
                 <span id="drawer-delivery-slot-label" class="text-[10px] font-bold text-green-700">
-                    {{ \App\Support\DeliverySlotManager::label($drawerSelectedDeliverySlot) }}
+                    <?php echo e(\App\Support\DeliverySlotManager::label($drawerSelectedDeliverySlot)); ?>
+
                 </span>
                 <i id="cart-slot-chevron" class="fa-solid fa-chevron-down text-[10px] text-green-700 transition"></i>
             </button>
             <div id="drawer-delivery-slot-options" class="hidden flex-wrap gap-2 border-t border-green-100 px-3 py-3">
-                @forelse($drawerDeliverySlotOptions as $slot)
+                <?php $__empty_1 = true; $__currentLoopData = $drawerDeliverySlotOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $slot): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <button
                         type="button"
-                        onclick="updateCartDrawerDeliverySlot('{{ $slot['value'] }}')"
-                        data-drawer-delivery-slot="{{ $slot['value'] }}"
-                        class="drawer-delivery-slot-chip {{ $drawerSelectedDeliverySlot === $slot['value'] ? 'border-green-600 bg-white text-green-700 shadow-sm' : 'border-green-100 bg-white/80 text-slate-600' }} rounded-full border px-2.5 py-2 text-[10px] font-bold leading-none transition hover:border-green-400 hover:text-green-700"
+                        onclick="updateCartDrawerDeliverySlot('<?php echo e($slot['value']); ?>')"
+                        data-drawer-delivery-slot="<?php echo e($slot['value']); ?>"
+                        class="drawer-delivery-slot-chip <?php echo e($drawerSelectedDeliverySlot === $slot['value'] ? 'border-green-600 bg-white text-green-700 shadow-sm' : 'border-green-100 bg-white/80 text-slate-600'); ?> rounded-full border px-2.5 py-2 text-[10px] font-bold leading-none transition hover:border-green-400 hover:text-green-700"
                     >
-                        {{ $slot['label'] }}
+                        <?php echo e($slot['label']); ?>
+
                     </button>
-                @empty
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                     <span class="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-2 text-[10px] font-bold leading-none text-amber-700">
                         No slots left for today
                     </span>
-                @endforelse
+                <?php endif; ?>
             </div>
         </div>
         <div class="mb-3 rounded-2xl border border-slate-200 bg-slate-50/70">
@@ -295,11 +299,11 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
         </div>
             </div>
         </div>
-        <a id="cart-checkout-link" href="{{ route('frontend.checkout') }}"
+        <a id="cart-checkout-link" href="<?php echo e(route('frontend.checkout')); ?>"
            class="flex items-center justify-center gap-2 w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl text-sm mb-2">
             <i class="fa-solid fa-lock text-xs"></i> Proceed to Checkout
         </a>
-        <a href="{{ route('frontend.cart') }}"
+        <a href="<?php echo e(route('frontend.cart')); ?>"
            class="flex items-center justify-center gap-2 w-full border border-gray-200 text-blue-700 font-semibold py-2.5 rounded-xl text-sm hover:bg-gray-50">
             View Full Cart
         </a>
@@ -320,25 +324,26 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 <header class="fixed inset-x-0 top-0 z-[9997] bg-white shadow-sm">
     <div class="hidden relative flex h-8 items-center overflow-hidden bg-blue-900 pr-[108px] text-white sm:pr-[162px]">
         <div class="announcement-track items-center whitespace-nowrap text-[10px] font-bold sm:text-[11px]">
-            @for($copy = 0; $copy < 2; $copy++)
+            <?php for($copy = 0; $copy < 2; $copy++): ?>
                 <div class="flex items-center gap-10 pr-10">
                     <span><i class="fa-solid fa-leaf mr-2 text-green-300"></i>Farm Fresh. Ocean Fresh. Delivered to Your Door.</span>
-                    @if($frontendTickerOffer ?? null)
-                        <a href="{{ route('frontend.products', ['offer' => 'flash_deal']) }}" class="text-yellow-300 hover:text-yellow-200">
-                            <i class="fa-solid fa-bolt mr-2"></i>{{ $frontendTickerOffer->title ?: $frontendTickerOffer->description ?: 'Special offer available now' }}
+                    <?php if($frontendTickerOffer ?? null): ?>
+                        <a href="<?php echo e(route('frontend.products', ['offer' => 'flash_deal'])); ?>" class="text-yellow-300 hover:text-yellow-200">
+                            <i class="fa-solid fa-bolt mr-2"></i><?php echo e($frontendTickerOffer->title ?: $frontendTickerOffer->description ?: 'Special offer available now'); ?>
+
                         </a>
-                    @else
+                    <?php else: ?>
                         <span class="text-yellow-300"><i class="fa-solid fa-bolt mr-2"></i>Fresh deals available every day</span>
-                    @endif
-                    @if($frontendTickerProduct ?? null)
-                        <a href="{{ route('frontend.product.show', $frontendTickerProduct->slug) }}" class="hover:text-green-200">
-                            <i class="fa-solid fa-star mr-2 text-yellow-300"></i>New Arrival: {{ $frontendTickerProduct->name }} — Shop Now
+                    <?php endif; ?>
+                    <?php if($frontendTickerProduct ?? null): ?>
+                        <a href="<?php echo e(route('frontend.product.show', $frontendTickerProduct->slug)); ?>" class="hover:text-green-200">
+                            <i class="fa-solid fa-star mr-2 text-yellow-300"></i>New Arrival: <?php echo e($frontendTickerProduct->name); ?> — Shop Now
                         </a>
-                    @endif
+                    <?php endif; ?>
                 </div>
-            @endfor
+            <?php endfor; ?>
         </div>
-        <a href="{{ route('frontend.deals') }}" class="absolute inset-y-0 right-0 z-10 flex items-center gap-1.5 border-l border-white/20 bg-gradient-to-r from-blue-800 to-indigo-950 px-3 text-[9px] font-black uppercase tracking-wider text-yellow-300 shadow-[-10px_0_18px_rgba(30,58,138,0.9)] transition hover:text-white sm:px-4 sm:text-[10px]">
+        <a href="<?php echo e(route('frontend.deals')); ?>" class="absolute inset-y-0 right-0 z-10 flex items-center gap-1.5 border-l border-white/20 bg-gradient-to-r from-blue-800 to-indigo-950 px-3 text-[9px] font-black uppercase tracking-wider text-yellow-300 shadow-[-10px_0_18px_rgba(30,58,138,0.9)] transition hover:text-white sm:px-4 sm:text-[10px]">
             <i class="fa-solid fa-ticket"></i>
             <span class="sm:hidden">Deals</span>
             <span class="hidden sm:inline">Coupons &amp; Offers</span>
@@ -348,8 +353,8 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
         <button onclick="toggleSidebar()" aria-label="Open menu" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-gray-700 text-lg lg:hidden">
             <i class="fa-solid fa-bars"></i>
         </button>
-        <a href="{{ route('frontend.home') }}" class="relative flex flex-shrink-0 items-center">
-            <img src="{{ $brandLogoUrl }}"
+        <a href="<?php echo e(route('frontend.home')); ?>" class="relative flex flex-shrink-0 items-center">
+            <img src="<?php echo e($brandLogoUrl); ?>"
                  alt="FarmSea"
                  class="h-10 w-auto object-contain sm:h-12 md:h-14 lg:h-20"
                  onerror="this.style.display='none'; document.getElementById('header-logo-fallback').style.display='inline-flex'">
@@ -357,7 +362,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
             <span class="logo-fish-flight logo-fish-flight--second" aria-hidden="true"><i class="fa-solid fa-fish-fins"></i></span>
             <span id="header-logo-fallback" class="hidden text-xl font-extrabold text-green-700">FarmSea</span>
         </a>
-        <form action="{{ route('frontend.products') }}" method="GET" class="relative mx-2 hidden max-w-lg flex-grow md:flex lg:mx-4">
+        <form action="<?php echo e(route('frontend.products')); ?>" method="GET" class="relative mx-2 hidden max-w-lg flex-grow md:flex lg:mx-4">
             <input type="text" name="search" placeholder="Search Chicken Mutton Fish Items"
                    class="w-full border border-gray-200 rounded-xl px-5 py-2.5 text-sm focus:outline-none focus:border-green-500 transition">
             <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-600">
@@ -367,8 +372,8 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
         <div class="flex items-center gap-3 md:gap-3 lg:gap-4 lg:pr-7">
             <!-- Account -->
             <div class="relative">
-                @auth('web_frontend')
-                    @php
+                <?php if(auth()->guard('web_frontend')->check()): ?>
+                    <?php
                         $frontendTotalNotifications = \App\Models\Notification::query()
                             ->forUser(auth('web_frontend')->id())
                             ->count();
@@ -376,68 +381,71 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                             ->where('recipient_id', auth('web_frontend')->id())
                             ->whereNull('read_at')
                             ->count();
-                    @endphp
-                @endauth
+                    ?>
+                <?php endif; ?>
                 <button onclick="toggleAccountMenu()" class="text-gray-700 flex flex-col items-center group">
                     <span class="relative">
                         <i class="fa-regular fa-user text-xl group-hover:text-blue-600"></i>
-                        @auth('web_frontend')
-                            @if($frontendUnreadNotifications > 0)
+                        <?php if(auth()->guard('web_frontend')->check()): ?>
+                            <?php if($frontendUnreadNotifications > 0): ?>
                                 <span class="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-black leading-none text-white ring-2 ring-white">
-                                    {{ $frontendUnreadNotifications > 99 ? '99+' : $frontendUnreadNotifications }}
+                                    <?php echo e($frontendUnreadNotifications > 99 ? '99+' : $frontendUnreadNotifications); ?>
+
                                 </span>
-                            @endif
-                        @endauth
+                            <?php endif; ?>
+                        <?php endif; ?>
                     </span>
                     <span class="text-[10px] font-bold mt-0.5 hidden md:block">
-                        @auth('web_frontend') Hello, {{ Str::limit(auth('web_frontend')->user()->name, 12) }} @else Sign in/Account @endauth
+                        <?php if(auth()->guard('web_frontend')->check()): ?> Hello, <?php echo e(Str::limit(auth('web_frontend')->user()->name, 12)); ?> <?php else: ?> Sign in/Account <?php endif; ?>
                     </span>
                 </button>
                 <div id="accountMenu" class="hidden absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-3 z-50">
-                    @auth('web_frontend')
-                        <a href="{{ route('frontend.profile') }}" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
+                    <?php if(auth()->guard('web_frontend')->check()): ?>
+                        <a href="<?php echo e(route('frontend.profile')); ?>" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
                             <i class="fa-regular fa-user text-gray-500"></i> My Profile
                         </a>
-                        <a href="{{ route('frontend.profile') }}#notifications-panel" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
+                        <a href="<?php echo e(route('frontend.profile')); ?>#notifications-panel" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
                             <i class="fa-regular fa-bell text-gray-500"></i>
                             Notifications
-                            @if($frontendTotalNotifications > 0)
-                                <span class="ml-auto rounded-full {{ $frontendUnreadNotifications > 0 ? 'bg-red-500 text-white' : 'bg-slate-100 text-slate-600' }} px-2 py-0.5 text-[10px] font-bold">
-                                    {{ $frontendTotalNotifications > 99 ? '99+' : $frontendTotalNotifications }}
+                            <?php if($frontendTotalNotifications > 0): ?>
+                                <span class="ml-auto rounded-full <?php echo e($frontendUnreadNotifications > 0 ? 'bg-red-500 text-white' : 'bg-slate-100 text-slate-600'); ?> px-2 py-0.5 text-[10px] font-bold">
+                                    <?php echo e($frontendTotalNotifications > 99 ? '99+' : $frontendTotalNotifications); ?>
+
                                 </span>
-                            @endif
+                            <?php endif; ?>
                         </a>
-                        <a href="{{ route('frontend.orders') }}" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
+                        <a href="<?php echo e(route('frontend.orders')); ?>" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
                             <i class="fa-solid fa-box text-gray-500"></i> My Orders
                         </a>
                         <hr class="my-2">
-                        <form method="POST" action="{{ route('frontend.logout') }}">
-                            @csrf
+                        <form method="POST" action="<?php echo e(route('frontend.logout')); ?>">
+                            <?php echo csrf_field(); ?>
                             <button type="submit" class="w-full flex items-center gap-3 px-5 py-2 text-red-500 hover:bg-red-50 text-sm">
                                 <i class="fa-solid fa-right-from-bracket"></i> Logout
                             </button>
                         </form>
-                    @else
-                        <a href="{{ route('frontend.login') }}" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
+                    <?php else: ?>
+                        <a href="<?php echo e(route('frontend.login')); ?>" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
                             <i class="fa-solid fa-right-to-bracket text-gray-500"></i> Sign In
                         </a>
-                        <a href="{{ route('frontend.register') }}" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
+                        <a href="<?php echo e(route('frontend.register')); ?>" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
                             <i class="fa-solid fa-user-plus text-gray-500"></i> Register
                         </a>
-                    @endauth
+                    <?php endif; ?>
                 </div>
             </div>
             <!-- Wishlist -->
-            @php
+            <?php
                 $initialWishlist = session('wishlist', []);
                 $initialWishlistCount = count($initialWishlist);
-            @endphp
-            <a href="{{ route('frontend.wishlist') }}" class="text-gray-700 relative flex flex-col items-center group transition hover:text-red-500">
+            ?>
+            <a href="<?php echo e(route('frontend.wishlist')); ?>" class="text-gray-700 relative flex flex-col items-center group transition hover:text-red-500">
                 <div class="relative">
                     <i class="fa-regular fa-heart text-xl group-hover:text-red-500 transition"></i>
                     <span id="header-wishlist-badge"
-                          class="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-black border border-white {{ $initialWishlistCount > 0 ? '' : 'hidden' }}">
-                        {{ $initialWishlistCount }}
+                          class="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-black border border-white <?php echo e($initialWishlistCount > 0 ? '' : 'hidden'); ?>">
+                        <?php echo e($initialWishlistCount); ?>
+
                     </span>
                 </div>
                 <span class="text-[10px] font-bold mt-0.5 hidden md:block">Wishlist</span>
@@ -447,14 +455,14 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                 <div class="relative">
                     <i class="fa-solid fa-cart-shopping text-xl group-hover:text-blue-800"></i>
                     <span id="header-cart-badge"
-                          class="absolute -top-2 -right-2 bg-yellow-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-black border border-white {{ $initialCartItemCount > 0 ? '' : 'hidden' }}">{{ $initialCartItemCount }}</span>
+                          class="absolute -top-2 -right-2 bg-yellow-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-black border border-white <?php echo e($initialCartItemCount > 0 ? '' : 'hidden'); ?>"><?php echo e($initialCartItemCount); ?></span>
                 </div>
                 <span class="text-[10px] font-bold mt-0.5 hidden md:block">Cart</span>
             </button>
         </div>
     </div>
     <div class="px-3 pb-2.5 md:hidden">
-        <form action="{{ route('frontend.products') }}" method="GET" class="relative">
+        <form action="<?php echo e(route('frontend.products')); ?>" method="GET" class="relative">
             <input type="text" name="search" placeholder="Search fresh items"
                    class="w-full rounded-xl border border-gray-200 px-3.5 py-2 pr-10 text-xs focus:border-green-500 focus:outline-none transition">
             <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-600">
@@ -465,49 +473,52 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
     <!-- Nav strip -->
     <div class="border-t border-gray-100 hidden md:block overflow-visible bg-white">
         <div class="flex h-10 w-full items-center gap-1 overflow-visible px-3 text-sm scrollbar-hide sm:px-3 md:px-4">
-            <a href="{{ route('frontend.products') }}" class="px-3 py-1.5 bg-gray-100 text-gray-600 font-semibold whitespace-nowrap rounded-md flex-shrink-0">All Products</a>
-            @foreach($frontendNavCategories ?? collect() as $category)
-                @if($category->children->isNotEmpty())
+            <a href="<?php echo e(route('frontend.products')); ?>" class="px-3 py-1.5 bg-gray-100 text-gray-600 font-semibold whitespace-nowrap rounded-md flex-shrink-0">All Products</a>
+            <?php $__currentLoopData = $frontendNavCategories ?? collect(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php if($category->children->isNotEmpty()): ?>
                     <div class="header-nav-group relative mr-2 flex-shrink-0">
-                        <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="inline-flex items-center gap-2 rounded-md bg-green-50 px-3 py-1.5 font-medium text-green-700 transition hover:bg-green-100">
-                            {{ $category->name }}
+                        <a href="<?php echo e(route('frontend.products', ['category' => $category->slug])); ?>" class="inline-flex items-center gap-2 rounded-md bg-green-50 px-3 py-1.5 font-medium text-green-700 transition hover:bg-green-100">
+                            <?php echo e($category->name); ?>
+
                             <i class="fa-solid fa-angle-down text-xs"></i>
                         </a>
                         <div class="header-nav-dropdown absolute left-0 top-full z-[10010] mt-3 min-w-[230px] space-y-1 rounded-2xl border border-green-100 bg-white p-2 shadow-[0_20px_40px_rgba(15,23,42,0.14)]">
-                            <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="block rounded-xl px-4 py-3 text-[15px] font-semibold text-green-700 transition hover:bg-green-50">All {{ $category->name }}</a>
-                            @foreach($category->children as $subcategory)
-                                <a href="{{ route('frontend.products', ['category' => $category->slug, 'subcategory' => $subcategory->slug]) }}" class="block rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 transition hover:bg-green-50 hover:text-green-700">{{ $subcategory->name }}</a>
-                            @endforeach
+                            <a href="<?php echo e(route('frontend.products', ['category' => $category->slug])); ?>" class="block rounded-xl px-4 py-3 text-[15px] font-semibold text-green-700 transition hover:bg-green-50">All <?php echo e($category->name); ?></a>
+                            <?php $__currentLoopData = $category->children; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subcategory): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <a href="<?php echo e(route('frontend.products', ['category' => $category->slug, 'subcategory' => $subcategory->slug])); ?>" class="block rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 transition hover:bg-green-50 hover:text-green-700"><?php echo e($subcategory->name); ?></a>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                     </div>
-                @else
-                    <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-green-50 rounded-md flex-shrink-0">{{ $category->name }}</a>
-                @endif
-            @endforeach
+                <?php else: ?>
+                    <a href="<?php echo e(route('frontend.products', ['category' => $category->slug])); ?>" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-green-50 rounded-md flex-shrink-0"><?php echo e($category->name); ?></a>
+                <?php endif; ?>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             <span class="ml-auto"></span>
-            <a href="{{ route('frontend.orders') }}" class="inline-flex items-center gap-2 px-3 py-1.5 font-extrabold text-green-700 whitespace-nowrap rounded-md transition hover:bg-green-50">
+            <a href="<?php echo e(route('frontend.orders')); ?>" class="inline-flex items-center gap-2 px-3 py-1.5 font-extrabold text-green-700 whitespace-nowrap rounded-md transition hover:bg-green-50">
                 <i class="fa-solid fa-rotate-left text-[13px]"></i>
                 View Order
             </a>
-            <a href="{{ route('frontend.products', ['sort' => 'latest']) }}" class="px-3 py-1.5 text-slate-700 font-semibold whitespace-nowrap rounded-md transition hover:bg-slate-100">Latest</a>
+            <a href="<?php echo e(route('frontend.products', ['sort' => 'latest'])); ?>" class="px-3 py-1.5 text-slate-700 font-semibold whitespace-nowrap rounded-md transition hover:bg-slate-100">Latest</a>
         </div>
     </div>
 </header>
 
 <div class="pt-[103px] md:pt-[122px] lg:pt-[146px]">
     <!-- Flash Messages -->
-    @if(session('success'))
+    <?php if(session('success')): ?>
         <div data-auto-dismiss="3000" class="mx-4 mt-3 flex items-center gap-2 rounded-lg bg-green-100 p-3 text-sm text-green-700 transition-all duration-500">
-            <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
-        </div>
-    @endif
-    @if(session('error'))
-        <div data-auto-dismiss="3000" class="mx-4 mt-3 flex items-center gap-2 rounded-lg bg-red-100 p-3 text-sm text-red-700 transition-all duration-500">
-            <i class="fa-solid fa-circle-xmark"></i> {{ session('error') }}
-        </div>
-    @endif
+            <i class="fa-solid fa-circle-check"></i> <?php echo e(session('success')); ?>
 
-    @if(session('account_blocked'))
+        </div>
+    <?php endif; ?>
+    <?php if(session('error')): ?>
+        <div data-auto-dismiss="3000" class="mx-4 mt-3 flex items-center gap-2 rounded-lg bg-red-100 p-3 text-sm text-red-700 transition-all duration-500">
+            <i class="fa-solid fa-circle-xmark"></i> <?php echo e(session('error')); ?>
+
+        </div>
+    <?php endif; ?>
+
+    <?php if(session('account_blocked')): ?>
         <div id="accountBlockedModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-950/60 px-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="accountBlockedTitle">
             <div class="w-full max-w-md overflow-hidden rounded-3xl bg-white text-center shadow-2xl">
                 <div class="bg-gradient-to-br from-red-500 to-rose-600 px-6 pb-12 pt-8 text-white">
@@ -518,17 +529,17 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                     <h2 id="accountBlockedTitle" class="text-xl font-extrabold text-slate-900">Your account is blocked</h2>
                     <p class="mt-3 text-sm leading-6 text-slate-600">You cannot place an order while your account is blocked. Please contact our support team for help.</p>
                     <div class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <a href="{{ route('frontend.contact') }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-green-700"><i class="fa-solid fa-headset"></i> Contact Us</a>
+                        <a href="<?php echo e(route('frontend.contact')); ?>" class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-green-700"><i class="fa-solid fa-headset"></i> Contact Us</a>
                         <button type="button" data-close-account-blocked class="rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50">Go Back</button>
                     </div>
                 </div>
             </div>
         </div>
-    @endif
+    <?php endif; ?>
 
     <!-- Main Content -->
     <main class="flex-1">
-        @yield('content')
+        <?php echo $__env->yieldContent('content'); ?>
     </main>
 </div>
 
@@ -539,12 +550,12 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
             <div>
                 <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Info</h4>
                 <ul class="space-y-3.5">
-                    <li><a href="{{ route('frontend.about') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">About Us</a></li>
-                    <li><a href="{{ route('frontend.contact') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Contact Us</a></li>
-                    <li><a href="{{ route('frontend.about') }}#faq" class="text-[14px] text-[#9bb0cf] transition hover:text-white">FAQ</a></li>
+                    <li><a href="<?php echo e(route('frontend.about')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">About Us</a></li>
+                    <li><a href="<?php echo e(route('frontend.contact')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Contact Us</a></li>
+                    <li><a href="<?php echo e(route('frontend.about')); ?>#faq" class="text-[14px] text-[#9bb0cf] transition hover:text-white">FAQ</a></li>
                    <li>
    <span class="inline-flex items-center gap-1.5 text-[14px] text-[#9bb0cf]">
-    <img src="{{ asset('images/fssai-logo.png') }}" alt="FSSAI" class="h-6 w-10 object-contain sm:h-10 sm:w-[60px]">
+    <img src="<?php echo e(asset('images/fssai-logo.png')); ?>" alt="FSSAI" class="h-6 w-10 object-contain sm:h-10 sm:w-[60px]">
     22726924000264
 </span>
 </li>
@@ -554,20 +565,20 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
             <div>
                 <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Useful Links</h4>
                 <ul class="space-y-3.5">
-                    <li><a href="{{ route('frontend.contact') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Help Center</a></li>
-                    <li><a href="{{ route('frontend.shipping') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Shipping Info</a></li>
-                    <li><a href="{{ route('frontend.returns') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Return Policy</a></li>
-                    <li><a href="{{ route('frontend.privacy') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Privacy Policy</a></li>
+                    <li><a href="<?php echo e(route('frontend.contact')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Help Center</a></li>
+                    <li><a href="<?php echo e(route('frontend.shipping')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Shipping Info</a></li>
+                    <li><a href="<?php echo e(route('frontend.returns')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Return Policy</a></li>
+                    <li><a href="<?php echo e(route('frontend.privacy')); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Privacy Policy</a></li>
                 </ul>
             </div>
 
             <div>
                 <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Categories</h4>
                 <ul class="space-y-3.5">
-                    <li><a href="{{ route('frontend.products', ['category' => 'Chicken']) }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Chicken</a></li>
-                    <li><a href="{{ route('frontend.products', ['category' => 'Mutton']) }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Mutton</a></li>
-                    <li><a href="{{ route('frontend.products', ['category' => 'Fish']) }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Fish &amp; Seafood</a></li>
-                    <li><a href="{{ route('frontend.products', ['category' => 'Fruits']) }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">fruits</a></li>
+                    <li><a href="<?php echo e(route('frontend.products', ['category' => 'Chicken'])); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Chicken</a></li>
+                    <li><a href="<?php echo e(route('frontend.products', ['category' => 'Mutton'])); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Mutton</a></li>
+                    <li><a href="<?php echo e(route('frontend.products', ['category' => 'Fish'])); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Fish &amp; Seafood</a></li>
+                    <li><a href="<?php echo e(route('frontend.products', ['category' => 'Fruits'])); ?>" class="text-[14px] text-[#9bb0cf] transition hover:text-white">fruits</a></li>
                 </ul>
             </div>
 
@@ -598,7 +609,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 
         <div class="flex flex-col gap-4 border-t border-white/6 pt-4 text-center sm:pt-5 md:flex-row md:items-center md:justify-between md:text-left">
             <p class="text-[10px] uppercase tracking-[0.2em] text-[#84a0c3]">
-                &copy; {{ date('Y') }} FarmSea Fresh Limited Liability Partnership .
+                &copy; <?php echo e(date('Y')); ?> FarmSea Fresh Limited Liability Partnership .
             </p>
             <a
                 href="https://digitalutilization.com/"
@@ -609,7 +620,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
             >
                 <span class="text-[10px] font-bold uppercase tracking-[0.16em] text-[#9bb0cf] transition group-hover:text-white">Developed By</span>
                 <img
-                    src="{{ asset('images/bmdu-logo.webp') }}"
+                    src="<?php echo e(asset('images/bmdu-logo.webp')); ?>"
                     class="block h-8 w-auto max-w-[120px] object-contain transition duration-200 group-hover:scale-[1.03]"
                     alt="BMDU"
                 >
@@ -684,7 +695,7 @@ function openCartFromPreview() {
 }
 
 function showCartAddedPopup() {
-    fetch('{{ route("frontend.cart.count") }}?delivery_day=' + encodeURIComponent(selectedCartDrawerDay))
+    fetch('<?php echo e(route("frontend.cart.count")); ?>?delivery_day=' + encodeURIComponent(selectedCartDrawerDay))
         .then(response => response.json())
         .then(data => {
             const items = data.items || [];
@@ -760,7 +771,7 @@ function updateHeaderCartBadge(count) {
 }
 
 function addToCart(productId, variantIndex, pricingDay = 'today') {
-    fetch('{{ route("frontend.cart.add") }}', {
+    fetch('<?php echo e(route("frontend.cart.add")); ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -808,7 +819,7 @@ function selectCartDrawerDay(day) {
     refreshCartDrawer();
 }
 function applyCartCoupon(code) {
-    fetch('{{ url("cart/coupon") }}', {
+    fetch('<?php echo e(url("cart/coupon")); ?>', {
         method: 'POST',
         headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json'},
         body: JSON.stringify({code, delivery_day: selectedCartDrawerDay})
@@ -819,7 +830,7 @@ function applyCartCoupon(code) {
     }).catch(error => alert(error.message));
 }
 function removeCartCoupon() {
-    fetch('{{ url("cart/coupon") }}', {
+    fetch('<?php echo e(url("cart/coupon")); ?>', {
         method: 'DELETE',
         headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json'},
         body: JSON.stringify({delivery_day: selectedCartDrawerDay})
@@ -910,7 +921,7 @@ function renderCartDrawerItems(items) {
     `).join('');
 }
 function removeCartDrawerItem(key) {
-    fetch('{{ route("frontend.cart.remove") }}', {
+    fetch('<?php echo e(route("frontend.cart.remove")); ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -927,7 +938,7 @@ function removeCartDrawerItem(key) {
     });
 }
 function updateCartDrawerQty(key, quantity) {
-    fetch('{{ route("frontend.cart.update") }}', {
+    fetch('<?php echo e(route("frontend.cart.update")); ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -944,7 +955,7 @@ function updateCartDrawerQty(key, quantity) {
     });
 }
 function updateCartDrawerDeliverySlot(value) {
-    fetch('{{ route("frontend.cart.delivery-slot") }}', {
+    fetch('<?php echo e(route("frontend.cart.delivery-slot")); ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -1008,7 +1019,7 @@ function renderDrawerDeliverySlots(options = [], selectedValue = '') {
 
 // Refresh cart drawer
 function refreshCartDrawer() {
-    fetch('{{ route("frontend.cart.count") }}?delivery_day=' + encodeURIComponent(selectedCartDrawerDay))
+    fetch('<?php echo e(route("frontend.cart.count")); ?>?delivery_day=' + encodeURIComponent(selectedCartDrawerDay))
         .then(r => r.json())
         .then(data => {
             selectedCartDrawerDay = data.delivery_day || selectedCartDrawerDay;
@@ -1052,7 +1063,7 @@ function refreshCartDrawer() {
             });
             const checkoutLink = document.getElementById('cart-checkout-link');
             if (checkoutLink) {
-                checkoutLink.href = '{{ route("frontend.checkout") }}?delivery_day=' + encodeURIComponent(selectedCartDrawerDay);
+                checkoutLink.href = '<?php echo e(route("frontend.checkout")); ?>?delivery_day=' + encodeURIComponent(selectedCartDrawerDay);
             }
             renderDrawerDeliverySlots(data.delivery_slot_options || [], data.selected_delivery_slot || '');
             document.querySelectorAll('[data-drawer-delivery-slot]').forEach((chip) => {
@@ -1070,11 +1081,11 @@ function refreshCartDrawer() {
 }
 // Wishlist helper functions
 function toggleWishlist(productId, btnElement) {
-    fetch('{{ route("frontend.wishlist.toggle") }}', {
+    fetch('<?php echo e(route("frontend.wishlist.toggle")); ?>', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
             'Accept': 'application/json'
         },
         body: JSON.stringify({ product_id: productId })
@@ -1227,6 +1238,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }).observe(document.body, { childList: true, subtree: true });
 });
 </script>
-@yield('scripts')
+<?php echo $__env->yieldContent('scripts'); ?>
 </body>
 </html>
+<?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views\frontend\layouts\app.blade.php ENDPATH**/ ?>
