@@ -160,6 +160,8 @@ Route::middleware('admin')->group(function () {
     Route::put('/settings/service-charge', [ServiceChargeController::class, 'update'])->name('dashboard.settings.service-charge.update');
     Route::get('/settings/delivery-slots', [DeliverySlotController::class, 'index'])->name('dashboard.settings.delivery-slots');
     Route::put('/settings/delivery-slots', [DeliverySlotController::class, 'update'])->name('dashboard.settings.delivery-slots.update');
+    Route::get('/settings/delivery-areas', [\App\Http\Controllers\Dashboard\DeliveryAreaController::class, 'index'])->name('dashboard.settings.delivery-areas');
+    Route::put('/settings/delivery-areas', [\App\Http\Controllers\Dashboard\DeliveryAreaController::class, 'update'])->name('dashboard.settings.delivery-areas.update');
     Route::get('/settings/ordering',  [\App\Http\Controllers\Dashboard\OrderingSettingController::class, 'index'])->name('dashboard.settings.ordering');
     Route::put('/settings/ordering',  [\App\Http\Controllers\Dashboard\OrderingSettingController::class, 'update'])->name('dashboard.settings.ordering.update');
 });

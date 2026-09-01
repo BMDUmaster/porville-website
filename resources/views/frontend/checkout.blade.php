@@ -800,7 +800,16 @@ sectorSearchInput?.addEventListener('keydown', (e) => {
     }
 });
 
-// Close dropdown when clicking outside
+// Close the sector list whenever the customer clicks outside its input/list.
+document.addEventListener('click', (event) => {
+    if (!sectorDropdown || !sectorSearchInput) return;
+
+    const sectorPicker = sectorSearchInput.closest('.relative');
+    if (sectorPicker && !sectorPicker.contains(event.target)) {
+        sectorDropdown.classList.add('hidden');
+    }
+});
+
 document.getElementById('checkoutForm')?.addEventListener('submit', function (e) {
     const isFormMode = selectedAddressIndex === -1; // naya address add/edit ho raha hai
     if (isFormMode && !sectorInput.value) {

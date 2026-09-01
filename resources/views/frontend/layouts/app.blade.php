@@ -729,8 +729,8 @@ function addToCart(productId, variantIndex, pricingDay = 'today') {
         // Update badge with unique product count (not total quantity)
         updateHeaderCartBadge(data.unique_count ?? data.cart_count);
 
-        // Open cart drawer immediately on add
-        openCart();
+        // Keep customers on the product list; the drawer opens only from the Cart button.
+        showCartAddedAlert('Added to cart');
     });
 }
 function formatCartCurrency(amount) {

@@ -264,6 +264,14 @@
                 <span>Delivery Slots</span>
             </a>
 
+            <a href="{{ route('dashboard.settings.delivery-areas') }}"
+               class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
+                      hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
+                      {{ request()->routeIs('dashboard.settings.delivery-areas') ? 'active-link' : 'text-slate-700' }}">
+                <i class="fa-solid fa-location-dot w-5 text-green-700"></i>
+                <span>Delivery Areas</span>
+            </a>
+
             <a href="{{ route('dashboard.settings.ordering') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white
