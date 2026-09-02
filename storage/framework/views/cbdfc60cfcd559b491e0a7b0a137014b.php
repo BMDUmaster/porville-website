@@ -1241,4 +1241,4 @@ document.addEventListener('DOMContentLoaded', () => {
 <?php echo $__env->yieldContent('scripts'); ?>
 </body>
 </html>
-<?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views\frontend\layouts\app.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views/frontend/layouts/app.blade.php ENDPATH**/ ?>

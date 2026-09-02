@@ -199,15 +199,16 @@ Route::get('/shop/{slug}',     [FrontProductController::class, 'show'])->name('f
 // ── Frontend Auth (guest only)
 Route::middleware('guest:web_frontend')->group(function () {
     Route::get('/account/login',     [FrontAuthController::class, 'showLogin'])->name('frontend.login');
+    Route::post('/account/check-email', [FrontAuthController::class, 'checkEmail'])->middleware('throttle:30,1')->name('frontend.email.check');
     Route::post('/account/login',    [FrontAuthController::class, 'login'])->middleware('throttle:5,1')->name('frontend.login.post');
     Route::get('/account/forgot-password', [FrontAuthController::class, 'showForgotPassword'])->name('frontend.password.forgot');
     Route::post('/account/forgot-password/send-otp', [FrontAuthController::class, 'sendForgotPasswordOtp'])->middleware('throttle:3,1')->name('frontend.password.otp');
     Route::post('/account/forgot-password/verify-otp', [FrontAuthController::class, 'verifyForgotPasswordOtp'])->middleware('throttle:5,1')->name('frontend.password.verify');
     Route::post('/account/forgot-password/reset', [FrontAuthController::class, 'resetForgotPassword'])->middleware('throttle:5,1')->name('frontend.password.reset');
     Route::get('/account/register',  [FrontAuthController::class, 'showRegister'])->name('frontend.register');
-    Route::post('/account/register/send-otp', [FrontAuthController::class, 'sendRegisterOtp'])->middleware('throttle:3,1')->name('frontend.register.otp');
+    Route::post('/account/register/send-otp', [FrontAuthController::class, 'sendRegisterOtp'])->middleware('throttle:10,1')->name('frontend.register.otp');
     Route::post('/account/register/verify-otp', [FrontAuthController::class, 'verifyRegisterOtp'])->middleware('throttle:10,1')->name('frontend.register.verify-otp');
-    Route::post('/account/register', [FrontAuthController::class, 'register'])->middleware('throttle:3,1')->name('frontend.register.post');
+    Route::post('/account/register', [FrontAuthController::class, 'register'])->middleware('throttle:10,1')->name('frontend.register.post');
 });
 Route::post('/account/logout', [FrontAuthController::class, 'logout'])->name('frontend.logout');
 

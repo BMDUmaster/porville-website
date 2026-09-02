@@ -88,7 +88,7 @@
                     <label class="field-label">Email Address <span class="req">*</span></label>
                     <div class="relative">
                         <i class="fa-regular fa-envelope field-icon"></i>
-                        <input type="email" name="email" id="email" value="<?php echo e(old('email')); ?>"
+                        <input type="email" name="email" id="email" value="<?php echo e(old('email', request('email'))); ?>"
                                placeholder="john@example.com" class="field-input" maxlength="254" autocomplete="email" required>
                     </div>
                     <div class="error-msg" id="emailErr"><i class="fa-solid fa-circle-exclamation text-xs"></i><span></span></div>
@@ -455,4 +455,4 @@ function sendRegisterOtp() {
 </script>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('frontend.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views\frontend\signup.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('frontend.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views/frontend/signup.blade.php ENDPATH**/ ?>

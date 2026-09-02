@@ -39,9 +39,12 @@
                     <img src="{{ $brandLogoUrl }}" alt="FarmSea" class="h-14 w-auto object-contain">
                 </a>
 
-                <span class="inline-flex rounded-full bg-blue-50 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.18em] text-blue-700">Welcome back</span>
-                <h1 class="mt-4 text-3xl font-extrabold tracking-tight text-slate-950">Sign in to FarmSea</h1>
-                <p class="mt-2 text-[13px] leading-6 text-slate-500">Enter your account details to continue shopping fresh.</p>
+                <div class="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.14em]">
+                    <span class="rounded-full bg-blue-50 px-3 py-1.5 text-blue-700">1. Email</span>
+                    <span id="stepTwo" class="rounded-full bg-slate-100 px-3 py-1.5 text-slate-400">2. Continue</span>
+                </div>
+                <h1 id="authTitle" class="mt-4 text-3xl font-extrabold tracking-tight text-slate-950">Enter your email</h1>
+                <p id="authDescription" class="mt-2 text-[13px] leading-6 text-slate-500">We'll check whether you need to sign in or create an account.</p>
 
                 @if($errors->any())
                     <div class="mt-5 flex gap-3 rounded-xl border border-red-100 bg-red-50 p-3.5 text-[12px] leading-5 text-red-700">
@@ -57,7 +60,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('frontend.login.post') }}" class="mt-7 space-y-5">
+                <form method="POST" action="{{ route('frontend.login.post') }}" id="authForm" class="mt-7 space-y-5">
                     @csrf
                     <div>
                         <label for="login-email" class="mb-2 block text-[12px] font-extrabold text-slate-700">Email Address</label>
@@ -69,17 +72,17 @@
                         </div>
                     </div>
 
-                    <div>
+                    <div id="passwordStep" class="hidden">
                         <label for="login-password" class="mb-2 block text-[12px] font-extrabold text-slate-700">Password</label>
                         <div class="relative">
                             <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
-                            <input id="login-password" type="password" name="password" required autocomplete="current-password"
+                            <input id="login-password" type="password" name="password" autocomplete="current-password"
                                    placeholder="Enter your password"
                                    class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-[13px] text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50">
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between gap-4">
+                    <div id="loginExtras" class="hidden flex items-center justify-between gap-4">
                         <label class="flex cursor-pointer items-center gap-2.5 text-[12px] font-medium text-slate-600">
                             <input type="checkbox" name="remember" class="h-4 w-4 rounded border-slate-300 accent-blue-600">
                             Remember Me
@@ -87,17 +90,57 @@
                         <a href="{{ route('frontend.password.forgot') }}" class="text-[12px] font-extrabold text-blue-700 transition hover:text-blue-900 hover:underline">Forgot password?</a>
                     </div>
 
-                    <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-[12px] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_25px_rgba(37,99,235,0.22)] transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-[0_16px_30px_rgba(37,99,235,0.28)]">
+                    <p id="emailError" class="hidden text-[12px] font-semibold text-red-600"></p>
+                    <button type="button" id="continueButton" class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-[12px] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_25px_rgba(37,99,235,0.22)] transition hover:-translate-y-0.5 hover:bg-blue-700">
+                        Continue <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </button>
+                    <button type="submit" id="signInButton" class="hidden w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-[12px] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_25px_rgba(37,99,235,0.22)] transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-[0_16px_30px_rgba(37,99,235,0.28)]">
                         Sign In <i class="fa-solid fa-arrow-right text-[10px]"></i>
                     </button>
 
-                    <p class="text-center text-[12px] text-slate-500">
-                        New to FarmSea?
-                        <a href="{{ route('frontend.register') }}" class="ml-1 font-extrabold text-green-700 hover:text-green-900 hover:underline">Create an account</a>
-                    </p>
+                    <button type="button" id="changeEmail" class="hidden w-full text-center text-[12px] font-extrabold text-slate-500 hover:text-blue-700">Use a different email</button>
                 </form>
             </div>
         </div>
     </div>
 </section>
+@endsection
+
+@section('scripts')
+<script>
+const authEmail = document.getElementById('login-email');
+const continueButton = document.getElementById('continueButton');
+const passwordStep = document.getElementById('passwordStep');
+const signInButton = document.getElementById('signInButton');
+const changeEmail = document.getElementById('changeEmail');
+const emailError = document.getElementById('emailError');
+
+function resetEmailStep() {
+    passwordStep.classList.add('hidden'); document.getElementById('loginExtras').classList.add('hidden'); signInButton.classList.add('hidden'); changeEmail.classList.add('hidden'); continueButton.classList.remove('hidden');
+    authEmail.readOnly = false; document.getElementById('login-password').required = false; emailError.classList.add('hidden');
+    document.getElementById('authTitle').textContent = 'Enter your email'; document.getElementById('authDescription').textContent = "We'll check whether you need to sign in or create an account.";
+    document.getElementById('stepTwo').className = 'rounded-full bg-slate-100 px-3 py-1.5 text-slate-400';
+}
+
+continueButton.addEventListener('click', async () => {
+    if (!authEmail.reportValidity()) return;
+    continueButton.disabled = true; continueButton.textContent = 'Checking...'; emailError.classList.add('hidden');
+    try {
+        const response = await fetch('{{ route('frontend.email.check') }}', {method: 'POST', headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}'}, body: JSON.stringify({email: authEmail.value.trim()})});
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Please enter a valid email address.');
+        if (!data.exists) { window.location.href = '{{ route('frontend.register') }}?email=' + encodeURIComponent(data.email); return; }
+        authEmail.value = data.email; authEmail.readOnly = true; passwordStep.classList.remove('hidden'); document.getElementById('loginExtras').classList.remove('hidden'); signInButton.classList.remove('hidden'); changeEmail.classList.remove('hidden'); continueButton.classList.add('hidden'); document.getElementById('login-password').required = true;
+        document.getElementById('authTitle').textContent = 'Welcome back'; document.getElementById('authDescription').textContent = 'Enter your password to sign in.'; document.getElementById('stepTwo').className = 'rounded-full bg-blue-50 px-3 py-1.5 text-blue-700'; document.getElementById('login-password').focus();
+    } catch (error) { emailError.textContent = error.message; emailError.classList.remove('hidden'); }
+    finally { continueButton.disabled = false; continueButton.innerHTML = 'Continue <i class="fa-solid fa-arrow-right text-[10px]"></i>'; }
+});
+authEmail.addEventListener('input', resetEmailStep); changeEmail.addEventListener('click', () => { resetEmailStep(); authEmail.focus(); });
+document.getElementById('authForm').addEventListener('submit', (event) => {
+    if (passwordStep.classList.contains('hidden')) {
+        event.preventDefault();
+        continueButton.click();
+    }
+});
+</script>
 @endsection

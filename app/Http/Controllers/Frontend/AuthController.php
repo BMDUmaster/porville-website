@@ -27,6 +27,18 @@ class AuthController extends Controller
         return view('frontend.login');
     }
 
+    /** POST /account/check-email */
+    public function checkEmail(Request $request)
+    {
+        $data = $request->validate(['email' => ['required', 'email']]);
+        $email = strtolower(trim($data['email']));
+
+        return response()->json([
+            'exists' => User::query()->where('email', $email)->exists(),
+            'email' => $email,
+        ]);
+    }
+
     /** POST /account/login */
     public function login(Request $request)
     {
