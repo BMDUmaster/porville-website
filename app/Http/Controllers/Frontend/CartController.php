@@ -76,6 +76,41 @@ class CartController extends Controller
             $pricingDay = 'today';
         }
 
+        $slotSettings = DeliverySlotManager::settings();
+        $availableTodaySlots = DeliverySlotManager::availableOptions('today');
+        $availableTomorrowSlots = DeliverySlotManager::availableOptions('tomorrow');
+
+        $isTodayUnavailable = empty($availableTodaySlots);
+        $isTomorrowUnavailable = empty($availableTomorrowSlots)
+            || ! $variant
+            || ! array_key_exists('tomorrow_price', $variant)
+            || $variant['tomorrow_price'] === null
+            || $variant['tomorrow_price'] === ''
+            || (float) $variant['tomorrow_price'] <= 0;
+
+        $slotUnavailable = false;
+        if ($pricingDay === 'today' && $isTodayUnavailable) {
+            $slotUnavailable = true;
+        } elseif ($pricingDay === 'tomorrow' && $isTomorrowUnavailable) {
+            $slotUnavailable = true;
+        }
+
+        if ($slotUnavailable) {
+            $title = $slotSettings['no_slot_popup_title'] ?: 'Delivery Slots Unavailable';
+            $message = $slotSettings['no_slot_popup_description'] ?: 'Delivery slots for Today or Tomorrow are currently unavailable for this item. Please try again later.';
+
+            if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success'          => false,
+                    'slot_unavailable' => true,
+                    'title'            => $title,
+                    'message'          => $message,
+                ]);
+            }
+
+            return back()->with('error', $message);
+        }
+
         if ($product->is_out_of_stock) {
             $message = 'This product is currently out of stock.';
 

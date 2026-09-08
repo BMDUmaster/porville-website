@@ -21,6 +21,9 @@ class DeliverySlotManager
     private const TOMORROW_LAST_END_KEY = 'tomorrow_delivery_last_slot_end';
     private const TOMORROW_DURATION_HOURS_KEY = 'tomorrow_delivery_slot_duration_hours';
 
+    private const NO_SLOT_POPUP_TITLE_KEY = 'no_slot_popup_title';
+    private const NO_SLOT_POPUP_DESC_KEY = 'no_slot_popup_description';
+
     public static function options(string $day = 'today'): array
     {
         $day = strtolower($day) === 'tomorrow' ? 'tomorrow' : 'today';
@@ -105,6 +108,8 @@ class DeliverySlotManager
                     self::TOMORROW_EVENING_START_KEY,
                     self::TOMORROW_LAST_END_KEY,
                     self::TOMORROW_DURATION_HOURS_KEY,
+                    self::NO_SLOT_POPUP_TITLE_KEY,
+                    self::NO_SLOT_POPUP_DESC_KEY,
                 ])
                 ->pluck('value', 'key');
 
@@ -134,6 +139,13 @@ class DeliverySlotManager
                 'tomorrow_slot_duration_hours' => $storedSettings->has(self::TOMORROW_DURATION_HOURS_KEY) && $tDurationHours && $tDurationHours > 0
                     ? $tDurationHours
                     : $defaults['slot_duration_hours'],
+
+                'no_slot_popup_title' => $storedSettings->has(self::NO_SLOT_POPUP_TITLE_KEY) && filled($storedSettings->get(self::NO_SLOT_POPUP_TITLE_KEY))
+                    ? $storedSettings->get(self::NO_SLOT_POPUP_TITLE_KEY)
+                    : 'Delivery Slots Unavailable',
+                'no_slot_popup_description' => $storedSettings->has(self::NO_SLOT_POPUP_DESC_KEY) && filled($storedSettings->get(self::NO_SLOT_POPUP_DESC_KEY))
+                    ? $storedSettings->get(self::NO_SLOT_POPUP_DESC_KEY)
+                    : 'Sorry! Delivery slots for Today or Tomorrow are currently unavailable for this item. Please try again later.',
             ];
         });
     }
@@ -213,6 +225,20 @@ class DeliverySlotManager
             ['key' => self::TOMORROW_DURATION_HOURS_KEY],
             ['value' => (string) max(1, (int) ($settings['tomorrow_slot_duration_hours'] ?? 2))]
         );
+
+        if (array_key_exists('no_slot_popup_title', $settings)) {
+            AppSetting::query()->updateOrCreate(
+                ['key' => self::NO_SLOT_POPUP_TITLE_KEY],
+                ['value' => $settings['no_slot_popup_title'] ?: null]
+            );
+        }
+
+        if (array_key_exists('no_slot_popup_description', $settings)) {
+            AppSetting::query()->updateOrCreate(
+                ['key' => self::NO_SLOT_POPUP_DESC_KEY],
+                ['value' => $settings['no_slot_popup_description'] ?: null]
+            );
+        }
 
         Cache::forget(self::CACHE_KEY);
 

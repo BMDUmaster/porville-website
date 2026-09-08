@@ -1075,7 +1075,11 @@ function sendCartRequest(productId, redirectToCheckout = false) {
     .then(response => response.json())
     .then(data => {
         if (!data.success) {
-            alert(data.message || 'This product is currently unavailable.');
+            if (data.slot_unavailable && typeof openNoSlotModal === 'function') {
+                openNoSlotModal(data.title, data.message);
+            } else {
+                alert(data.message || 'This product is currently unavailable.');
+            }
             return;
         }
 

@@ -37,6 +37,9 @@ class DeliverySlotController extends Controller
             'tomorrow_evening_start' => ['nullable', 'date_format:H:i'],
             'tomorrow_last_end' => ['nullable', 'date_format:H:i'],
             'tomorrow_slot_duration_hours' => ['required', 'integer', 'min:1', 'max:6'],
+
+            'no_slot_popup_title' => ['nullable', 'string', 'max:255'],
+            'no_slot_popup_description' => ['nullable', 'string', 'max:2000'],
         ]);
 
         $fixedSlots = $this->parseFixedSlots((string) ($data['fixed_slots_text'] ?? ''));
@@ -71,18 +74,6 @@ class DeliverySlotController extends Controller
             ]);
         }
 
-        if (empty($fixedSlots) && ! $eveningStart && ! $lastEnd) {
-            throw ValidationException::withMessages([
-                'fixed_slots_text' => 'Please keep at least one delivery slot available for Today.',
-            ]);
-        }
-
-        if (empty($tomorrowFixedSlots) && ! $tomorrowEveningStart && ! $tomorrowLastEnd) {
-            throw ValidationException::withMessages([
-                'tomorrow_fixed_slots_text' => 'Please keep at least one delivery slot available for Tomorrow.',
-            ]);
-        }
-
         DeliveryChargeManager::updateAmount((float) $data['delivery_charge']);
 
         DeliverySlotManager::updateSettings([
@@ -95,6 +86,9 @@ class DeliverySlotController extends Controller
             'tomorrow_evening_start' => $tomorrowEveningStart,
             'tomorrow_last_end' => $tomorrowLastEnd,
             'tomorrow_slot_duration_hours' => (int) $data['tomorrow_slot_duration_hours'],
+
+            'no_slot_popup_title' => $data['no_slot_popup_title'] ?? null,
+            'no_slot_popup_description' => $data['no_slot_popup_description'] ?? null,
         ]);
 
         return back()->with('success', 'Delivery slots and delivery charge updated successfully.');
