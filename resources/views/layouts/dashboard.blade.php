@@ -101,8 +101,8 @@
     <!-- Page Refresh / Navigation Top Progress Bar & Loader -->
     <div id="topProgressBar" class="fixed top-0 left-0 z-[9999] h-1 w-0 bg-gradient-to-r from-blue-600 via-green-500 to-amber-400 shadow-[0_0_12px_rgba(37,99,235,0.9)] transition-all duration-300 pointer-events-none"></div>
 
-    <div id="pageLoaderPill" class="fixed top-4 right-4 z-[9999] hidden items-center gap-2.5 rounded-full bg-slate-900/90 px-4 py-2 text-white shadow-2xl backdrop-blur-md transition-all duration-300 pointer-events-none border border-white/10">
-        <i class="fa-solid fa-circle-notch fa-spin text-sm text-green-400"></i>
+    <div id="pageLoaderPill" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] hidden items-center gap-3 rounded-2xl bg-slate-900/90 px-6 py-3.5 text-white shadow-2xl backdrop-blur-md transition-all duration-300 pointer-events-none border border-white/15">
+        <i class="fa-solid fa-circle-notch fa-spin text-base text-green-400"></i>
         <span class="text-xs font-bold tracking-wide">Loading...</span>
     </div>
 

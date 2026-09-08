@@ -23,6 +23,21 @@
 #cart-drawer.open { transform: translateX(0); }
 #cart-added-popup { transform: translateX(calc(100% + 24px)); transition: transform .28s cubic-bezier(.4,0,.2,1), opacity .28s ease; opacity: 0; pointer-events: none; }
 #cart-added-popup.open { transform: translateX(0); opacity: 1; pointer-events: auto; }
+@keyframes runningBorderAnim {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+.running-color-border {
+    background: linear-gradient(135deg, #ff0055, #ff7700, #ffeb00, #00e5ff, #7a00ff, #ff0055);
+    background-size: 300% 300%;
+    animation: runningBorderAnim 2s linear infinite;
+}
+.running-color-line {
+    background: linear-gradient(90deg, #ff0055, #ff7700, #ffeb00, #00e5ff, #7a00ff, #ff0055);
+    background-size: 300% 300%;
+    animation: runningBorderAnim 2s linear infinite;
+}
 /* Mobile responsive fixes */
 @media (max-width: 640px) {
     .container { padding-left: 12px !important; padding-right: 12px !important; }
@@ -143,8 +158,8 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 <!-- Page Refresh / Navigation Top Progress Bar & Loader -->
 <div id="topProgressBar" class="fixed top-0 left-0 z-[9999] h-1 w-0 bg-gradient-to-r from-blue-600 via-green-500 to-amber-400 shadow-[0_0_12px_rgba(37,99,235,0.9)] transition-all duration-300 pointer-events-none"></div>
 
-<div id="pageLoaderPill" class="fixed top-4 right-4 z-[9999] hidden items-center gap-2.5 rounded-full bg-slate-900/90 px-4 py-2 text-white shadow-2xl backdrop-blur-md transition-all duration-300 pointer-events-none border border-white/10">
-    <i class="fa-solid fa-circle-notch fa-spin text-sm text-green-400"></i>
+<div id="pageLoaderPill" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] hidden items-center gap-3 rounded-2xl bg-slate-900/90 px-6 py-3.5 text-white shadow-2xl backdrop-blur-md transition-all duration-300 pointer-events-none border border-white/15">
+    <i class="fa-solid fa-circle-notch fa-spin text-base text-green-400"></i>
     <span class="text-xs font-bold tracking-wide">Loading...</span>
 </div>
 
@@ -315,13 +330,16 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 </div>
 
 <!-- Compact add-to-cart preview: this is intentionally separate from the full cart drawer. -->
-<aside id="cart-added-popup" class="fixed right-4 top-[88px] z-[10020] flex max-h-[calc(100vh-104px)] w-[440px] max-w-[calc(100vw-32px)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.25)]" aria-live="polite">
-    <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-        <div class="flex items-center gap-2 text-emerald-700"><i class="fa-solid fa-circle-check"></i><span class="text-sm font-black">Added to Cart</span></div>
-        <button type="button" onclick="closeCartAddedPopup()" class="text-lg leading-none text-slate-400 hover:text-slate-700" aria-label="Close cart preview">&times;</button>
+<aside id="cart-added-popup" class="fixed right-4 top-[88px] z-[10020] flex max-h-[calc(100vh-104px)] w-[440px] max-w-[calc(100vw-32px)] flex-col rounded-2xl p-[3px] shadow-[0_24px_60px_rgba(15,23,42,0.25)] running-color-border" aria-live="polite">
+    <div class="flex h-full w-full flex-col overflow-hidden rounded-[13px] bg-white">
+        <div class="h-1 w-full running-color-line"></div>
+        <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+            <div class="flex items-center gap-2 text-emerald-700"><i class="fa-solid fa-circle-check"></i><span class="text-sm font-black">Added to Cart</span></div>
+            <button type="button" onclick="closeCartAddedPopup()" class="text-lg leading-none text-slate-400 hover:text-slate-700" aria-label="Close cart preview">&times;</button>
+        </div>
+        <div id="cart-added-popup-items" class="max-h-[420px] space-y-3 overflow-y-auto px-4 py-3"></div>
+        <button type="button" onclick="openCartFromPreview()" class="m-3 mt-0 rounded-xl border border-blue-200 px-4 py-3 text-sm font-black text-blue-700 transition hover:bg-blue-50">Go to Cart <i class="fa-solid fa-angle-right ml-1"></i></button>
     </div>
-    <div id="cart-added-popup-items" class="max-h-[420px] space-y-3 overflow-y-auto px-4 py-3"></div>
-    <button type="button" onclick="openCartFromPreview()" class="m-3 mt-0 rounded-xl border border-blue-200 px-4 py-3 text-sm font-black text-blue-700 transition hover:bg-blue-50">Go to Cart <i class="fa-solid fa-angle-right ml-1"></i></button>
 </aside>
 
 <!-- Header -->
@@ -711,7 +729,7 @@ function showCartAddedPopup() {
 
             popup.classList.add('open');
             clearTimeout(cartAddedPopupTimeout);
-            cartAddedPopupTimeout = setTimeout(closeCartAddedPopup, 8000);
+            cartAddedPopupTimeout = setTimeout(closeCartAddedPopup, 3000);
         })
         .catch(() => showCartAddedAlert('Added to cart'));
 }
