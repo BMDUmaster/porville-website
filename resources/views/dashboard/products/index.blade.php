@@ -1095,10 +1095,10 @@ document.addEventListener('input', (event) => {
 </script>
 
 {{-- Multi Edit Modal --}}
-<div id="multiEditModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/50 p-4 backdrop-blur-sm sm:p-6 md:p-10">
-    <div class="relative mx-auto w-full max-w-3xl rounded-2xl bg-white shadow-2xl overflow-hidden border border-slate-200">
+<div id="multiEditModal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/60 p-3 sm:p-6 backdrop-blur-sm">
+    <div class="relative w-full max-w-3xl rounded-2xl bg-white shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
         {{-- Modal Header --}}
-        <div class="flex items-center justify-between border-b bg-slate-50 px-6 py-4">
+        <div class="flex items-center justify-between border-b bg-slate-50 px-6 py-4 flex-shrink-0">
             <div class="flex items-center gap-2.5">
                 <div class="w-9 h-9 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-sm">
                     <i class="fa-solid fa-layer-group"></i>
@@ -1113,8 +1113,8 @@ document.addEventListener('input', (event) => {
             </button>
         </div>
 
-        {{-- Modal Body --}}
-        <div class="p-6 space-y-5">
+        {{-- Modal Body (Scrollable) --}}
+        <div class="p-5 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
             {{-- Live Search Input --}}
             <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Search Products</label>
@@ -1131,27 +1131,27 @@ document.addEventListener('input', (event) => {
                     <span class="text-xs font-bold text-slate-700">Search Results</span>
                     <span id="searchResultsCount" class="text-[11px] font-semibold text-slate-500">Loading products...</span>
                 </div>
-                <div id="multiEditSearchResults" class="max-h-60 overflow-y-auto rounded-xl border bg-slate-50 p-2 space-y-2">
+                <div id="multiEditSearchResults" class="max-h-48 overflow-y-auto rounded-xl border bg-slate-50 p-2 space-y-2">
                     {{-- Populated dynamically via JS --}}
                 </div>
             </div>
 
             {{-- Selected Products Tray --}}
-            <div class="border-t pt-4">
+            <div class="border-t pt-3">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-2">
                         <i class="fa-solid fa-check-double text-purple-600"></i> Selected Products (<span id="selectedCountText">0</span>)
                     </span>
                     <button type="button" onclick="clearSelectedProducts()" class="text-[11px] font-bold text-red-600 hover:underline">Clear All</button>
                 </div>
-                <div id="selectedProductsTray" class="min-h-[60px] max-h-36 overflow-y-auto rounded-xl border bg-purple-50/50 p-2 flex flex-wrap gap-2 items-center">
+                <div id="selectedProductsTray" class="min-h-[50px] max-h-32 overflow-y-auto rounded-xl border bg-purple-50/50 p-2 flex flex-wrap gap-2 items-center">
                     <span id="noProductsSelectedPlaceholder" class="text-xs text-slate-400 italic px-2">No products selected yet. Search and click "+ Add" above.</span>
                 </div>
             </div>
         </div>
 
-        {{-- Modal Footer --}}
-        <div class="flex items-center justify-between border-t bg-slate-50 px-6 py-4">
+        {{-- Modal Footer (Sticky Bottom) --}}
+        <div class="flex items-center justify-between border-t bg-slate-50 px-6 py-4 flex-shrink-0">
             <button type="button" onclick="closeModal('multiEditModal')" class="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800">
                 Close
             </button>
