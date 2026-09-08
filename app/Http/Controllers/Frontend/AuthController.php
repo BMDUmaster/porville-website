@@ -54,25 +54,49 @@ class AuthController extends Controller
             if ($user && in_array($user->status, ['blocked', 'inactive'], true)) {
                 Auth::guard('web_frontend')->logout();
 
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Your account has been blocked. Please contact support.',
+                    ], 422);
+                }
+
                 return back()->withErrors([
                     'email' => 'Your account has been blocked. Please contact support.',
                 ])->onlyInput('email');
             }
 
             $request->session()->regenerate();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'redirect_url' => session()->pull('url.intended', route('frontend.profile')),
+                    'message' => 'Login successful!',
+                ]);
+            }
+
             return redirect()->intended(route('frontend.profile'));
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid email or password.',
+            ], 422);
         }
 
         return back()->withErrors(['email' => 'Invalid email or password.'])->onlyInput('email');
     }
 
     /** GET /account/register */
-    public function showRegister()
+    public function showRegister(Request $request)
     {
         if (Auth::guard('web_frontend')->check()) {
             return redirect()->route('frontend.profile');
         }
-        return view('frontend.signup');
+        $email = $request->query('email');
+        return redirect()->route('frontend.login', array_filter(['email' => $email]));
     }
 
     /** GET /account/forgot-password */
@@ -81,21 +105,8 @@ class AuthController extends Controller
         if (Auth::guard('web_frontend')->check()) {
             return redirect()->route('frontend.profile');
         }
-
-        if ($request->boolean('edit-email')) {
-            session()->forget([
-                'password_reset_otp_email',
-                'password_reset_otp_hash',
-                'password_reset_otp_expires_at',
-                'password_reset_verified',
-            ]);
-        }
-
-        $step = session('password_reset_verified')
-            ? 'reset'
-            : (session('password_reset_otp_email') ? 'otp' : 'email');
-
-        return view('frontend.forgot-password', compact('step'));
+        $email = $request->query('email');
+        return redirect()->route('frontend.login', array_filter(['email' => $email]));
     }
 
     /** POST /account/forgot-password/send-otp */
@@ -113,6 +124,13 @@ class AuthController extends Controller
         } catch (Throwable $exception) {
             report($exception);
 
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Could not send OTP email. Please check SMTP settings and try again.',
+                ], 422);
+            }
+
             return back()
                 ->withErrors(['email' => 'Could not send OTP email. Please check SMTP settings and try again.'])
                 ->onlyInput('email');
@@ -124,6 +142,13 @@ class AuthController extends Controller
             'password_reset_otp_expires_at' => now()->addMinutes(self::PASSWORD_OTP_TTL_MINUTES)->timestamp,
         ]);
         session()->forget('password_reset_verified');
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP sent successfully. Please check your email.',
+            ]);
+        }
 
         return redirect()
             ->route('frontend.password.forgot')
@@ -141,12 +166,25 @@ class AuthController extends Controller
         $expiresAt = (int) session('password_reset_otp_expires_at', 0);
 
         if (! $otpHash || $expiresAt < now()->timestamp || ! Hash::check($request->email_otp, $otpHash)) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid or expired OTP.',
+                ], 422);
+            }
             throw ValidationException::withMessages([
                 'email_otp' => 'Invalid or expired OTP.',
             ]);
         }
 
         session(['password_reset_verified' => true]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP verified. Create your new password.',
+            ]);
+        }
 
         return redirect()
             ->route('frontend.password.forgot')
@@ -157,12 +195,18 @@ class AuthController extends Controller
     public function resetForgotPassword(Request $request)
     {
         $request->validate([
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
         ]);
 
         $email = session('password_reset_otp_email');
 
         if (! $email || ! session('password_reset_verified')) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please verify your email OTP first.',
+                ], 422);
+            }
             throw ValidationException::withMessages([
                 'email' => 'Please verify your email OTP first.',
             ]);
@@ -179,6 +223,13 @@ class AuthController extends Controller
             'password_reset_otp_expires_at',
             'password_reset_verified',
         ]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Password created successfully. Please log in with your new password.',
+            ]);
+        }
 
         return redirect()
             ->route('frontend.login')
@@ -269,16 +320,14 @@ class AuthController extends Controller
             'name'      => ['bail', 'required', 'string', 'min:3', 'max:50', 'regex:/^[A-Za-z]+(?:\\s[A-Za-z]+)*$/'],
             'email'     => [...$this->registrationEmailRules(), 'unique:users,email'],
             'email_otp' => ['required', 'digits:4'],
-            'password'  => ['bail', 'required', 'string', 'min:8', 'regex:/[A-Z]/', 'regex:/[a-z]/', 'regex:/[0-9]/', 'regex:/[^A-Za-z0-9\\s]/', 'not_regex:/\\s/', 'not_regex:/(password|123456|qwerty)/i'],
+            'password'  => ['bail', 'required', 'string', 'min:6'],
         ], [
             'name.min' => 'Full name must be at least 3 characters.',
             'name.max' => 'Full name must not exceed 50 characters.',
             'name.regex' => 'Full name may contain letters and single spaces only.',
             'email.regex' => 'Enter a valid email address, such as rahul.sharma@gmail.com.',
             'email.unique' => 'This email is already registered. Please log in or reset your password.',
-            'password.min' => 'Password must be at least 8 characters.',
-            'password.regex' => 'Password must include uppercase, lowercase, number, and special character.',
-            'password.not_regex' => 'Password cannot contain spaces or common passwords.',
+            'password.min' => 'Password must be at least 6 characters.',
         ]);
 
         $email = strtolower($request->email);
@@ -292,6 +341,12 @@ class AuthController extends Controller
             || $expiresAt < now()->timestamp
             || ! Hash::check($request->email_otp, $otpHash)
         ) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid or expired OTP.',
+                ], 422);
+            }
             throw ValidationException::withMessages([
                 'email_otp' => 'Invalid or expired OTP.',
             ]);
@@ -309,6 +364,14 @@ class AuthController extends Controller
 
         Auth::guard('web_frontend')->login($user);
         $request->session()->regenerate();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'redirect_url' => session()->pull('url.intended', route('frontend.profile')),
+                'message' => 'Account created successfully! Welcome to FarmSea.',
+            ]);
+        }
 
         return redirect()->intended(route('frontend.profile'))->with('success', 'Account created successfully! Welcome to FarmSea.');
     }

@@ -110,11 +110,14 @@ Route::middleware('admin')->group(function () {
     Route::delete('/subcategories/{subcategory}',  [SubcategoryController::class, 'destroy'])->name('dashboard.subcategories.destroy');
 
     // Products
-    Route::get('/products',              [ProductController::class, 'index'])->name('dashboard.products');
-    Route::get('/products/{product}',    [ProductController::class, 'show'])->name('dashboard.products.show');
-    Route::post('/products',             [ProductController::class, 'store'])->name('dashboard.products.store');
-    Route::put('/products/{product}',    [ProductController::class, 'update'])->name('dashboard.products.update');
-    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('dashboard.products.destroy');
+    Route::get('/products',                      [ProductController::class, 'index'])->name('dashboard.products');
+    Route::get('/products/search-json',          [ProductController::class, 'searchJson'])->name('dashboard.products.search-json');
+    Route::match(['get', 'post'], '/products/multi-edit', [ProductController::class, 'multiEdit'])->name('dashboard.products.multi-edit');
+    Route::post('/products/multi-update',        [ProductController::class, 'multiUpdate'])->name('dashboard.products.multi-update');
+    Route::get('/products/{product}',            [ProductController::class, 'show'])->name('dashboard.products.show');
+    Route::post('/products',                     [ProductController::class, 'store'])->name('dashboard.products.store');
+    Route::put('/products/{product}',            [ProductController::class, 'update'])->name('dashboard.products.update');
+    Route::delete('/products/{product}',         [ProductController::class, 'destroy'])->name('dashboard.products.destroy');
 
     // Orders — specific routes BEFORE wildcard {order}
     Route::get('/orders',                  [OrderController::class, 'index'])->name('dashboard.orders');

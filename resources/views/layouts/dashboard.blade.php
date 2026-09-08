@@ -98,6 +98,14 @@
 </head>
 <body class="bg-slate-50 text-slate-900 antialiased">
 
+    <!-- Page Refresh / Navigation Top Progress Bar & Loader -->
+    <div id="topProgressBar" class="fixed top-0 left-0 z-[9999] h-1 w-0 bg-gradient-to-r from-blue-600 via-green-500 to-amber-400 shadow-[0_0_12px_rgba(37,99,235,0.9)] transition-all duration-300 pointer-events-none"></div>
+
+    <div id="pageLoaderPill" class="fixed top-4 right-4 z-[9999] hidden items-center gap-2.5 rounded-full bg-slate-900/90 px-4 py-2 text-white shadow-2xl backdrop-blur-md transition-all duration-300 pointer-events-none border border-white/10">
+        <i class="fa-solid fa-circle-notch fa-spin text-sm text-green-400"></i>
+        <span class="text-xs font-bold tracking-wide">Loading...</span>
+    </div>
+
     <!-- Sidebar Overlay (mobile) -->
     <div id="sidebar-overlay" onclick="closeSidebar()"
          class="hidden fixed inset-0 bg-black/60 z-40 lg:hidden"></div>
@@ -494,6 +502,109 @@
 
             refreshContactBadge();
             window.setInterval(refreshContactBadge, 10000);
+        })();
+
+        // Page Navigation / Refresh Loader
+        (function() {
+            const bar = document.getElementById('topProgressBar');
+            const pill = document.getElementById('pageLoaderPill');
+            let progressTimer = null;
+            let currentProgress = 0;
+
+            function startLoader() {
+                if (!bar) return;
+                bar.style.opacity = '1';
+                if (pill) { pill.classList.remove('hidden'); pill.classList.add('flex'); }
+
+                currentProgress = 15;
+                bar.style.width = currentProgress + '%';
+
+                clearInterval(progressTimer);
+                progressTimer = setInterval(() => {
+                    if (currentProgress < 85) {
+                        currentProgress += Math.random() * 15;
+                        bar.style.width = currentProgress + '%';
+                    }
+                }, 150);
+            }
+
+            function completeLoader() {
+                if (!bar) return;
+                clearInterval(progressTimer);
+                bar.style.width = '100%';
+                setTimeout(() => {
+                    bar.style.opacity = '0';
+                    setTimeout(() => {
+                        bar.style.width = '0%';
+                        if (pill) { pill.classList.add('hidden'); pill.classList.remove('flex'); }
+                    }, 300);
+                }, 200);
+            }
+
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('a');
+                if (!link) return;
+
+                const href = link.getAttribute('href');
+                const target = link.getAttribute('target');
+
+                if (href && !href.startsWith('#') && !href.startsWith('javascript:') && !href.startsWith('tel:') && !href.startsWith('mailto:') && target !== '_blank') {
+                    if (link.hostname === window.location.hostname) {
+                        startLoader();
+                    }
+                }
+            });
+
+            document.addEventListener('submit', () => {
+                startLoader();
+            });
+
+            window.addEventListener('beforeunload', () => {
+                startLoader();
+            });
+
+            if (document.readyState === 'complete') {
+                completeLoader();
+            } else {
+                window.addEventListener('load', completeLoader);
+                document.addEventListener('DOMContentLoaded', () => setTimeout(completeLoader, 100));
+            }
+        })();
+
+        // Scroll Position Preservation for Admin Dashboard
+        (function() {
+            const pagePath = window.location.pathname;
+            const storageKey = 'admin_scroll_pos_' + pagePath + (window.location.search || '');
+            const fallbackKey = 'admin_scroll_pos_' + pagePath;
+
+            const savedPos = sessionStorage.getItem(storageKey) || sessionStorage.getItem(fallbackKey);
+            if (savedPos !== null) {
+                const targetY = parseInt(savedPos, 10);
+                if (targetY > 0) {
+                    const restoreScroll = () => {
+                        window.scrollTo({ top: targetY, behavior: 'instant' });
+                    };
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', () => setTimeout(restoreScroll, 50));
+                    } else {
+                        setTimeout(restoreScroll, 50);
+                    }
+                }
+            }
+
+            let scrollTimer;
+            window.addEventListener('scroll', () => {
+                clearTimeout(scrollTimer);
+                scrollTimer = setTimeout(() => {
+                    sessionStorage.setItem(storageKey, window.scrollY);
+                    sessionStorage.setItem(fallbackKey, window.scrollY);
+                }, 80);
+            }, { passive: true });
+
+            document.addEventListener('submit', () => {
+                sessionStorage.setItem(storageKey, window.scrollY);
+                sessionStorage.setItem(fallbackKey, window.scrollY);
+            });
         })();
     </script>
 

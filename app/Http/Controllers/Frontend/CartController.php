@@ -76,10 +76,10 @@ class CartController extends Controller
             $pricingDay = 'today';
         }
 
-        if (! $product->is_active) {
+        if ($product->is_out_of_stock) {
             $message = 'This product is currently out of stock.';
 
-            if ($request->expectsJson()) {
+            if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => $message,
@@ -291,10 +291,15 @@ class CartController extends Controller
         // added (or updated) product is always shown at the top of the cart.
         $cart = array_reverse($cart, true);
 
-        return array_map(function ($item, $key) {
-            $item['key']      = $key;
-            $item['subtotal'] = $item['price'] * $item['quantity'];
-            $item['image_url'] = $item['image'] ? asset('storage/' . $item['image']) : null;
+        $productIds = array_column($cart, 'product_id');
+        $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+
+        return array_map(function ($item, $key) use ($products) {
+            $product = $products->get($item['product_id']);
+            $item['key']         = $key;
+            $item['is_out_of_stock'] = !$product || $product->is_out_of_stock;
+            $item['subtotal']    = $item['price'] * $item['quantity'];
+            $item['image_url']   = $item['image'] ? asset('storage/' . $item['image']) : null;
             $item['product_url'] = route('frontend.product.show', $item['slug']);
             return $item;
         }, array_values($cart), array_keys($cart));

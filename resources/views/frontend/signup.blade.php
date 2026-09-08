@@ -127,7 +127,7 @@
                     <div class="relative">
                         <i class="fa-solid fa-lock field-icon"></i>
                         <input type="password" name="password" id="pw"
-                               placeholder="Min. 8 chars" class="field-input pr-10"
+                               placeholder="Min. 6 chars" class="field-input pr-10"
                                oninput="checkStrength(this.value)" required disabled>
                         <button type="button" class="eye-btn" onclick="togglePw('pw','ei1')">
                             <i id="ei1" class="fa-regular fa-eye"></i>
@@ -179,10 +179,7 @@ function checkStrength(value) {
     const colors = ['#ef4444', '#f97316', '#eab308', '#16a34a'];
     let score = 0;
 
-    if (value.length >= 8) score++;
-    if (/[A-Z]/.test(value)) score++;
-    if (/[0-9]/.test(value)) score++;
-    if (/[^A-Za-z0-9]/.test(value)) score++;
+    if (value.length >= 6) score = 4;
 
     bars.forEach((bar, index) => {
         bar.style.background = index < score ? colors[score - 1] : '#e5e7eb';
@@ -251,8 +248,8 @@ function validateForm() {
     setInputError('emailOtp', !otpValid);
     if (!otpValid) valid = false;
 
-    const passwordValid = password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9\s]/.test(password) && !/\s/.test(password) && !/(password|123456|qwerty)/i.test(password);
-    showErr('pwErr', !passwordValid, 'Use 8+ characters with uppercase, lowercase, number, special character; no spaces or common passwords');
+    const passwordValid = password.length >= 6;
+    showErr('pwErr', !passwordValid, 'Password must be at least 6 characters');
     setInputError('pw', !passwordValid);
     if (!passwordValid) valid = false;
 

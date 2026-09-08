@@ -32,7 +32,6 @@
 @php
     $memberSince = $stats['member_since'] ?: optional($user->created_at)->format('d M Y');
     $profileCompletion = max(12, min(100, $stats['profile_completion']));
-    $remainingPoints = max(0, 1000 - $stats['loyalty_points']);
 @endphp
 
 <div class="profile-shell min-h-screen">
@@ -80,7 +79,7 @@
             </div>
         </div>
 
-        <div class="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div class="rounded-[18px] border border-slate-200/80 bg-white px-4 py-4 text-center profile-soft-shadow">
                 <p class="nunito text-xl font-extrabold text-emerald-700 md:text-2xl">{{ $stats['total_orders'] }}</p>
                 <p class="mt-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Orders</p>
@@ -88,10 +87,6 @@
             <div class="rounded-[18px] border border-slate-200/80 bg-white px-4 py-4 text-center profile-soft-shadow">
                 <p class="nunito text-xl font-extrabold text-emerald-700 md:text-2xl">&#8377;{{ number_format($stats['total_spent'], 0) }}</p>
                 <p class="mt-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Total Spent</p>
-            </div>
-            <div class="rounded-[18px] border border-slate-200/80 bg-white px-4 py-4 text-center profile-soft-shadow">
-                <p class="nunito text-xl font-extrabold text-emerald-700 md:text-2xl">{{ $stats['loyalty_points'] }}</p>
-                <p class="mt-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Loyalty Pts</p>
             </div>
             <div class="rounded-[18px] border border-slate-200/80 bg-white px-4 py-4 text-center profile-soft-shadow">
                 <p class="nunito text-xl font-extrabold text-emerald-700 md:text-2xl">{{ $memberSince }}</p>
@@ -258,18 +253,6 @@
             </div>
 
             <div class="min-w-0 space-y-5">
-                <div class="overflow-hidden rounded-[24px] border border-slate-200/80 bg-white profile-soft-shadow">
-                    <div class="bg-gradient-to-r from-[#257a2f] to-[#2567b8] px-5 py-5 text-white">
-                        <p class="nunito text-4xl font-extrabold leading-none">{{ $stats['loyalty_points'] }}</p>
-                        <p class="mt-2 text-sm font-semibold text-white/85">Current loyalty points</p>
-                        <div class="mt-5 h-2 overflow-hidden rounded-full bg-white/20">
-                            <div class="h-full rounded-full bg-white" style="width: {{ $profileCompletion }}%"></div>
-                        </div>
-                        <p class="mt-2 text-[11px] text-white/75">
-                            {{ $remainingPoints > 0 ? $remainingPoints . ' more points to reach the next badge tier' : 'Top tier unlocked for your account' }}
-                        </p>
-                    </div>
-                </div>
 
                 <div id="notifications-panel" class="rounded-[24px] border border-slate-200/80 bg-white p-4 profile-soft-shadow md:p-5">
                     <div class="mb-4 flex items-start justify-between gap-3">

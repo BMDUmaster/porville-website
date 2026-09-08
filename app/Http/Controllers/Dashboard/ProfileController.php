@@ -36,7 +36,7 @@ class ProfileController extends Controller
     {
         $request->validate([
             'current_password' => 'required',
-            'password'         => 'required|min:8|confirmed',
+            'password'         => 'required|min:6|confirmed',
         ]);
 
         $user = auth()->user();

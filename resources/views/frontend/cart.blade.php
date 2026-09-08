@@ -116,10 +116,15 @@
                                     <p class="mt-1 text-xs text-gray-400">{{ $item['variant_label'] }}</p>
                                 @endif
                                 <p class="mt-1 text-xs text-gray-400">{{ $item['unit'] }}</p>
-                                <div class="mt-1.5">
+                                <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
                                     <span class="inline-flex items-center rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider {{ ($item['pricing_day'] ?? 'today') === 'tomorrow' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100' }}">
                                         {{ ($item['pricing_day'] ?? 'today') === 'tomorrow' ? 'Tomorrow\'s Delivery' : 'Today\'s Delivery' }}
                                     </span>
+                                    @if(!empty($item['is_out_of_stock']))
+                                        <span class="inline-flex items-center rounded border border-red-200 bg-red-50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-red-600">
+                                            Out of Stock
+                                        </span>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -148,39 +153,41 @@
             </a>
         </div>
 
-        <div class="w-full flex-shrink-0 lg:w-80">
-            <div class="sticky top-24 space-y-4">
-                <div class="overflow-hidden rounded-2xl border bg-white">
-                    <div class="h-1 bg-gradient-to-r from-blue-700 to-orange-400"></div>
-                    <div class="border-b px-6 py-5">
-                        <h2 class="nunito text-lg font-extrabold text-gray-800">Order Summary</h2>
+        <div class="lg:col-span-4">
+            @php($hasOutOfStock = collect($items)->contains('is_out_of_stock', true))
+            <div class="sticky top-20 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                <h2 class="text-lg font-bold text-gray-800">Order Summary</h2>
+
+                @if($hasOutOfStock)
+                    <div class="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-semibold text-red-600">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> Some items in your cart are out of stock. Please remove them to proceed to checkout.
                     </div>
-                    <div class="space-y-3 px-6 py-5">
-                        <div class="flex justify-between text-sm"><span class="text-gray-500">Subtotal</span><span class="font-semibold">&#8377;{{ number_format($pricing['subtotal'], 2) }}</span></div>
-                        @if((float) ($pricing['delivery_charge'] ?? 0) > 0)
-                            <div class="flex justify-between text-sm"><span class="text-gray-500">Delivery</span><span class="font-semibold text-gray-800">&#8377;{{ number_format($pricing['delivery_charge'], 2) }}</span></div>
-                        @endif
-                        @if((float) ($pricing['service_charge'] ?? 0) > 0)
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-500">&#8505;&#65039; Service Charge</span>
-                            <span class="font-semibold text-gray-800">&#8377;{{ number_format($pricing['service_charge'], 2) }}</span>
-                        </div>
-                        @endif
-                        @if((float) ($pricing['discount'] ?? 0) > 0)
-                            <div class="flex justify-between text-sm font-bold text-emerald-600"><span>Discount</span><span>-&#8377;{{ number_format($pricing['discount'], 2) }}</span></div>
-                        @endif
-                        <hr class="border-gray-100">
-                        <div class="flex justify-between">
-                            <span class="font-bold text-gray-800">Total</span>
-                            <span class="nunito text-xl font-extrabold text-blue-700">&#8377;{{ number_format($pricing['total'], 2) }}</span>
-                        </div>
+                @endif
+
+                <div class="mt-4 space-y-3">
+                    <div class="flex justify-between text-sm text-gray-600"><span>Subtotal</span><span>&#8377;{{ number_format($pricing['subtotal'], 2) }}</span></div>
+                    <div class="flex justify-between text-sm text-gray-600"><span>Delivery Charge</span><span>&#8377;{{ number_format($pricing['delivery_charge'], 2) }}</span></div>
+                    <div class="flex justify-between text-sm text-gray-600"><span>Service Charge ({{ $pricing['service_charge_percent'] ?? 0 }}%)</span><span>&#8377;{{ number_format($pricing['service_charge'], 2) }}</span></div>
+                    @if(!empty($pricing['discount']) && $pricing['discount'] > 0)
+                        <div class="flex justify-between text-sm font-bold text-emerald-600"><span>Discount</span><span>-&#8377;{{ number_format($pricing['discount'], 2) }}</span></div>
+                    @endif
+                    <hr class="border-gray-100">
+                    <div class="flex justify-between">
+                        <span class="font-bold text-gray-800">Total</span>
+                        <span class="nunito text-xl font-extrabold text-blue-700">&#8377;{{ number_format($pricing['total'], 2) }}</span>
                     </div>
-                    <div class="px-6 pb-6">
+                </div>
+                <div class="px-0 pt-4">
+                    @if($hasOutOfStock)
+                        <button disabled type="button" class="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-gray-400 py-3.5 text-sm font-bold text-white opacity-70">
+                            <i class="fa-solid fa-ban text-xs"></i> Remove Out of Stock Items
+                        </button>
+                    @else
                         <a href="{{ route('frontend.checkout', ['delivery_day' => $selectedDay]) }}"
                            class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-700 py-3.5 text-sm font-bold text-white transition hover:bg-blue-800">
                             <i class="fa-solid fa-lock text-xs"></i> Proceed to Checkout
                         </a>
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>

@@ -62,14 +62,14 @@
                                         <p class="text-[11px] font-bold text-slate-400 line-through">Rs{{ number_format($item->display_mrp, 0) }}</p>
                                     @endif
                                 </div>
-                                @if($item->is_active)
+                                @if(!$item->is_out_of_stock)
                                     <button type="button" onclick="addToCart({{ $item->id }}, {{ $similarVariantIndex === null ? 'null' : $similarVariantIndex }}, 'today')" aria-label="Add {{ $item->name }} for today" title="Add for today" class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-green-700 text-white transition hover:bg-green-800">
                                         <i class="fa-solid fa-cart-shopping"></i>
                                     </button>
                                 @endif
                             </div>
 
-                            @if($item->is_active && $similarTomorrowPrice !== null)
+                            @if(!$item->is_out_of_stock && $similarTomorrowPrice !== null)
                                 <div class="mt-2 flex items-end justify-between gap-2 border-t border-dashed border-slate-100 pt-2">
                                     <div>
                                         <p class="text-[9px] font-black uppercase tracking-wider text-amber-700">Tomorrow</p>
@@ -79,8 +79,8 @@
                                         <i class="fa-solid fa-cart-shopping"></i>
                                     </button>
                                 </div>
-                            @elseif(!$item->is_active)
-                                <span class="mt-3 inline-flex w-fit rounded-lg bg-red-50 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-red-600">Out of Stock</span>
+                            @elseif($item->is_out_of_stock)
+                                <span class="mt-3 inline-flex w-fit rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-red-600">Out of Stock</span>
                             @endif
                         </div>
                     </div>

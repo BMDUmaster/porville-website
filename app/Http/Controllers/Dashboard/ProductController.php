@@ -44,6 +44,129 @@ class ProductController extends Controller
         return view('dashboard.products.index', compact('products', 'stats', 'categories', 'subcategories'));
     }
 
+    public function searchJson(Request $request)
+    {
+        $query = Product::with(['category', 'subcategory']);
+
+        if ($request->filled('q')) {
+            $search = trim((string) $request->input('q'));
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhereHas('category', fn ($cat) => $cat->where('name', 'like', "%{$search}%"))
+                  ->orWhereHas('subcategory', fn ($sub) => $sub->where('name', 'like', "%{$search}%"));
+            });
+        }
+
+        $products = $query->latest()->limit(50)->get()->map(function ($p) {
+            return [
+                'id'               => $p->id,
+                'name'             => $p->name,
+                'price'            => (float) $p->price,
+                'mrp'              => (float) $p->mrp,
+                'is_active'        => (bool) $p->is_active,
+                'category_name'    => $p->category->name ?? 'Uncategorized',
+                'subcategory_name' => $p->subcategory->name ?? '-',
+                'image'            => ($p->images && count($p->images)) ? asset('storage/' . $p->images[0]) : null,
+                'variants'         => $p->variants ?? [],
+                'variants_count'   => is_array($p->variants) ? count($p->variants) : 0,
+            ];
+        });
+
+        return response()->json([
+            'success'  => true,
+            'products' => $products,
+        ]);
+    }
+
+    public function multiEdit(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (is_string($ids)) {
+            $ids = array_filter(array_map('trim', explode(',', $ids)));
+        }
+
+        if (empty($ids)) {
+            return redirect()->route('dashboard.products')->with('error', 'Please select at least one product for multi-edit.');
+        }
+
+        $products = Product::with(['category', 'subcategory'])
+            ->whereIn('id', $ids)
+            ->get();
+
+        if ($products->isEmpty()) {
+            return redirect()->route('dashboard.products')->with('error', 'No valid products found for multi-edit.');
+        }
+
+        $categories = Category::parents()->get();
+        $subcategories = Category::subcategories()->get();
+
+        return view('dashboard.products.multi-edit', compact('products', 'categories', 'subcategories'));
+    }
+
+    public function multiUpdate(Request $request)
+    {
+        $data = $request->validate([
+            'products'                             => 'required|array|min:1',
+            'products.*.id'                        => 'required|integer|exists:products,id',
+            'products.*.name'                      => 'required|string|max:200',
+            'products.*.category_id'               => ['required', Rule::exists('categories', 'id')->whereNull('parent_id')],
+            'products.*.subcategory_id'            => ['nullable', 'integer', Rule::exists('categories', 'id')],
+            'products.*.description'               => 'nullable|string',
+            'products.*.weight'                    => 'nullable|string|max:100',
+            'products.*.price'                     => 'required|numeric|min:0|max:99999999.99',
+            'products.*.mrp'                       => 'nullable|numeric|min:0|max:99999999.99',
+            'products.*.is_active'                 => 'required|boolean',
+            'products.*.variants'                  => 'nullable|array',
+            'products.*.variants.*.quantity'       => 'nullable|string|max:50',
+            'products.*.variants.*.unit'           => 'nullable|string|max:30',
+            'products.*.variants.*.piece'          => 'nullable|string|max:50',
+            'products.*.variants.*.mrp'            => 'nullable|numeric|min:0|max:99999999.99',
+            'products.*.variants.*.selling_price'  => 'nullable|numeric|min:0|max:99999999.99',
+            'products.*.variants.*.today_price'    => 'nullable|numeric|min:0|max:99999999.99',
+            'products.*.variants.*.tomorrow_price' => 'nullable|numeric|min:0|max:99999999.99',
+            'products.*.variants.*.save_offer'     => 'nullable|string|max:100',
+            'products.*.variants.*.admin_amount'    => 'nullable|numeric|min:0|max:99999999.99',
+            'products.*.variants.*.vendor_amount'   => 'nullable|numeric|min:0|max:99999999.99',
+        ]);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($data) {
+            foreach ($data['products'] as $productInput) {
+                $product = Product::findOrFail($productInput['id']);
+
+                $this->ensureSubcategoryBelongsToCategory((int) $productInput['category_id'], isset($productInput['subcategory_id']) ? (int) $productInput['subcategory_id'] : null);
+
+                $slug = $this->generateUniqueSlug($productInput['name'], $product->id);
+                $isActive = (bool) $productInput['is_active'];
+                $variants = $this->normalizeVariants($productInput['variants'] ?? []);
+
+                $unit = ! empty($variants) ? (string) ($variants[0]['unit'] ?? 'Unit') : ($product->unit ?: 'Unit');
+                $price = ! empty($variants)
+                    ? ProductDayPricing::sellingPrice($variants[0], 'today', (float) $productInput['price'])
+                    : (float) $productInput['price'];
+                $mrp = ! empty($variants) ? (float) ($variants[0]['mrp'] ?? $productInput['mrp'] ?? 0) : (float) ($productInput['mrp'] ?? 0);
+
+                $product->update([
+                    'name'           => $productInput['name'],
+                    'slug'           => $slug,
+                    'category_id'    => $productInput['category_id'],
+                    'subcategory_id' => $productInput['subcategory_id'] ?? null,
+                    'description'    => $productInput['description'] ?? null,
+                    'weight'         => $productInput['weight'] ?? null,
+                    'price'          => $price,
+                    'mrp'            => $mrp,
+                    'unit'           => $unit,
+                    'is_active'      => $isActive,
+                    'stock'          => $isActive ? 1 : 0,
+                    'variants'       => $variants,
+                ]);
+            }
+        });
+
+        $count = count($data['products']);
+
+        return redirect()->route('dashboard.products')->with('success', "Successfully updated {$count} products!");
+    }
+
     public function show(Product $product)
     {
         $product->load(['category', 'subcategory']);
@@ -273,15 +396,32 @@ class ProductController extends Controller
                 ?? 0
             );
 
+            $mrp = (float) ($variant['mrp'] ?? 0);
+            $saveOffer = trim((string) ($variant['save_offer'] ?? ''));
+
+            $effectivePrice = ! blank($variant['today_price'] ?? null)
+                ? (float) $variant['today_price']
+                : ($resolvedSellingPrice > 0 ? $resolvedSellingPrice : (! blank($variant['tomorrow_price'] ?? null) ? (float) $variant['tomorrow_price'] : 0));
+
+            if ($mrp > 0 && $effectivePrice > 0 && $effectivePrice < $mrp) {
+                if (blank($saveOffer) || is_numeric($saveOffer) || $saveOffer === '0.1') {
+                    $pct = (($mrp - $effectivePrice) / $mrp) * 100;
+                    $formattedPct = (fmod($pct, 1.0) == 0.0) ? number_format($pct, 0) : number_format($pct, 1);
+                    $saveOffer = $formattedPct . '% OFF';
+                }
+            } elseif ($mrp > 0 && $effectivePrice >= $mrp && (is_numeric($saveOffer) || $saveOffer === '0.1')) {
+                $saveOffer = '';
+            }
+
             $normalized[] = [
                 'quantity'      => (string) ($variant['quantity'] ?? ''),
                 'unit'          => (string) ($variant['unit'] ?? 'Gram'),
                 'piece'         => (string) ($variant['piece'] ?? ''),
-                'mrp'           => (float) ($variant['mrp'] ?? 0),
+                'mrp'           => $mrp,
                 'selling_price' => $resolvedSellingPrice,
                 'today_price'   => blank($variant['today_price'] ?? null) ? null : (float) $variant['today_price'],
                 'tomorrow_price'=> blank($variant['tomorrow_price'] ?? null) ? null : (float) $variant['tomorrow_price'],
-                'save_offer'    => (string) ($variant['save_offer'] ?? ''),
+                'save_offer'    => $saveOffer,
                 'admin_amount'  => (float) ($variant['admin_amount'] ?? 0),
                 'vendor_amount' => (float) ($variant['vendor_amount'] ?? 0),
             ];

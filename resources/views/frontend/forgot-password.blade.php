@@ -123,14 +123,14 @@
                     @csrf
                     <div>
                         <label class="mb-1 block text-sm font-semibold text-gray-700">Create New Password</label>
-                        <input type="password" name="password" required minlength="8"
+                        <input type="password" name="password" required minlength="6"
                                placeholder="Enter new password"
                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white">
                     </div>
 
                     <div>
                         <label class="mb-1 block text-sm font-semibold text-gray-700">Confirm Password</label>
-                        <input type="password" name="password_confirmation" required minlength="8"
+                        <input type="password" name="password_confirmation" required minlength="6"
                                placeholder="Confirm new password"
                                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white">
                     </div>

@@ -1,8 +1,7 @@
-@extends('frontend.layouts.app')
-@section('title', 'All Products')
+<?php $__env->startSection('title', 'All Products'); ?>
 
-@section('content')
-@php
+<?php $__env->startSection('content'); ?>
+<?php
     $shopHeroProduct = $products->first(function ($product) {
         $categoryName = strtolower($product->category->name ?? '');
         $hasImage = !empty($product->images[0] ?? null);
@@ -19,12 +18,12 @@
     $shopHeroImage = !empty($sharedHeroBanner?->image_url)
         ? $sharedHeroBanner->image_url
         : $shopHeroFallbackImage;
-@endphp
+?>
 
 <section class="pt-0">
     <div class="relative overflow-hidden bg-[#151819] text-white shadow-[0_24px_70px_rgba(15,23,42,0.22)]">
         <img
-            src="{{ $shopHeroImage }}"
+            src="<?php echo e($shopHeroImage); ?>"
             alt="All products hero banner"
             class="block h-auto w-full"
         >
@@ -35,29 +34,33 @@
             <div class="max-w-[620px]">
                 <div class="flex items-center gap-2 text-[9px] font-extrabold uppercase tracking-[0.22em] text-white/80 sm:text-[11px] sm:tracking-[0.28em]">
                     <span class="inline-block h-2 w-2 rounded-full bg-[#9ae16d] shadow-[0_0_16px_rgba(154,225,109,0.7)]"></span>
-                    {{ $sharedHeroBanner?->badge ?: 'FarmSea Fresh Marketplace' }}
+                    <?php echo e($sharedHeroBanner?->badge ?: 'FarmSea Fresh Marketplace'); ?>
+
                 </div>
 
                 <h1 class="mt-2.5 text-[27px] font-black leading-[0.98] tracking-[-0.04em] text-white sm:mt-4 sm:text-[42px] md:text-[64px] lg:text-[74px]">
-                    {{ $sharedHeroBanner?->title_1 ?: 'All' }}
-                    <span class="block italic text-[#9be278]">{{ $sharedHeroBanner?->title_2 ?: 'Products.' }}</span>
+                    <?php echo e($sharedHeroBanner?->title_1 ?: 'All'); ?>
+
+                    <span class="block italic text-[#9be278]"><?php echo e($sharedHeroBanner?->title_2 ?: 'Products.'); ?></span>
                 </h1>
 
                 <p class="mt-2.5 max-w-[520px] text-[11px] leading-5 text-white/82 sm:mt-5 sm:text-[16px] sm:leading-8 md:text-[17px]">
-                    {{ $sharedHeroBanner?->description ?: 'Sourced fresh from our farms and coastal waters. Browse our complete range of chicken, mutton, fish, seafood and more delivered chilled to your door.' }}
+                    <?php echo e($sharedHeroBanner?->description ?: 'Sourced fresh from our farms and coastal waters. Browse our complete range of chicken, mutton, fish, seafood and more delivered chilled to your door.'); ?>
+
                 </p>
 
-                @if($sharedHeroBanner)
-                    <a href="{{ $sharedHeroBanner->link_url ?: route('frontend.products') }}"
+                <?php if($sharedHeroBanner): ?>
+                    <a href="<?php echo e($sharedHeroBanner->link_url ?: route('frontend.products')); ?>"
                        class="mt-3 inline-flex rounded-lg bg-green-600 px-4 py-2 text-[10px] font-black uppercase tracking-[0.14em] text-white shadow-lg transition hover:bg-green-700 sm:mt-6 sm:rounded-xl sm:px-7 sm:py-3 sm:text-[13px] sm:tracking-[0.16em]">
-                        {{ $sharedHeroBanner->button_text ?: 'Shop Now' }}
+                        <?php echo e($sharedHeroBanner->button_text ?: 'Shop Now'); ?>
+
                     </a>
-                @endif
+                <?php endif; ?>
             </div>
 
             <div class="flex w-full flex-row gap-5 border-t border-white/15 pt-3 text-white sm:w-auto sm:flex-wrap sm:items-stretch sm:gap-5 sm:border-0 sm:pt-0 lg:justify-end">
                 <div class="min-w-0 flex-1 sm:w-auto sm:min-w-[120px] sm:flex-none sm:border-l sm:pl-5">
-                    <div class="text-[24px] font-black leading-none sm:text-[46px] md:text-[56px]">{{ $products->total() }}+</div>
+                    <div class="text-[24px] font-black leading-none sm:text-[46px] md:text-[56px]"><?php echo e($products->total()); ?>+</div>
                     <div class="mt-1.5 text-[8px] font-extrabold uppercase tracking-[0.2em] text-white/65 sm:mt-2 sm:text-[11px] sm:tracking-[0.28em]">Fresh Products</div>
                 </div>
                 <div class="min-w-0 flex-1 border-l border-white/15 pl-5 sm:w-auto sm:min-w-[150px] sm:flex-none">
@@ -70,7 +73,7 @@
 
 </section>
 
-@php
+<?php
     $selectedMinPrice = max((int) request('min_price', 0), 0);
     $selectedMaxPrice = (int) request('max_price', $sidebarMaxPrice);
     $selectedMaxPrice = max(min($selectedMaxPrice, $sidebarMaxPrice), $selectedMinPrice ?: 0);
@@ -86,7 +89,7 @@
     $flashDealToggleUrl = $isFlashDealActive
         ? route('frontend.products', request()->except(['flash_deal', 'offer', 'page']))
         : route('frontend.products', array_merge(request()->except('page'), ['flash_deal' => '1']));
-@endphp
+?>
 
 <div id="mobileFilterModal" class="fixed inset-0 z-[10000] hidden bg-black/50 p-4 backdrop-blur-sm lg:hidden">
     <div class="ml-auto flex h-full w-full max-w-[380px] flex-col overflow-hidden rounded-[28px] bg-white shadow-2xl">
@@ -97,13 +100,13 @@
             </button>
         </div>
 
-        <form method="GET" action="{{ route('frontend.products') }}" id="mobileFilterForm" class="flex-1 overflow-y-auto">
-            @if(request()->filled('subcategory'))
-                <input type="hidden" name="subcategory" value="{{ request('subcategory') }}" data-subcategory-filter>
-            @endif
+        <form method="GET" action="<?php echo e(route('frontend.products')); ?>" id="mobileFilterForm" class="flex-1 overflow-y-auto">
+            <?php if(request()->filled('subcategory')): ?>
+                <input type="hidden" name="subcategory" value="<?php echo e(request('subcategory')); ?>" data-subcategory-filter>
+            <?php endif; ?>
             <div class="space-y-6 px-5 py-5">
                 <div>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search cuts, packs, combos..."
+                    <input type="text" name="search" value="<?php echo e(request('search')); ?>" placeholder="Search cuts, packs, combos..."
                            data-filter-search
                            class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-green-500 focus:bg-white">
                 </div>
@@ -111,53 +114,55 @@
                 <div class="border-b border-slate-100 pb-5">
                     <div class="mb-3 text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">Category</div>
                     <div class="space-y-1.5">
-                        @foreach($categories as $cat)
+                        <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <label class="flex cursor-pointer items-center justify-between rounded-2xl px-3 py-2.5 transition hover:bg-slate-50">
                                 <span class="flex items-center gap-3">
-                                    <input type="radio" name="category" value="{{ $cat->slug }}"
-                                           {{ request('category') == $cat->slug ? 'checked' : '' }}
+                                    <input type="radio" name="category" value="<?php echo e($cat->slug); ?>"
+                                           <?php echo e(request('category') == $cat->slug ? 'checked' : ''); ?>
+
                                            data-auto-submit data-category-filter
                                            class="h-4 w-4 border-slate-300 text-green-600 focus:ring-green-500">
-                                    <span class="text-[13px] font-semibold text-slate-700">{{ $cat->name }}</span>
+                                    <span class="text-[13px] font-semibold text-slate-700"><?php echo e($cat->name); ?></span>
                                 </span>
-                                <span class="text-[11px] font-bold text-slate-400">{{ $cat->active_products_count }}</span>
+                                <span class="text-[11px] font-bold text-slate-400"><?php echo e($cat->active_products_count); ?></span>
                             </label>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
 
                 <div class="border-b border-slate-100 pb-5">
                     <div class="mb-3 text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">Sort By</div>
                     <div class="space-y-1.5">
-                        @foreach($sortOptions as $value => $label)
+                        <?php $__currentLoopData = $sortOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $value => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <label class="flex cursor-pointer items-center gap-3 rounded-2xl px-3 py-2.5 transition hover:bg-slate-50">
-                                <input type="radio" name="sort" value="{{ $value }}"
-                                       {{ request('sort', 'latest') === $value ? 'checked' : '' }}
+                                <input type="radio" name="sort" value="<?php echo e($value); ?>"
+                                       <?php echo e(request('sort', 'latest') === $value ? 'checked' : ''); ?>
+
                                        data-auto-submit
                                        class="h-4 w-4 border-slate-300 text-green-600 focus:ring-green-500">
-                                <span class="text-[13px] font-semibold text-slate-700">{{ $label }}</span>
+                                <span class="text-[13px] font-semibold text-slate-700"><?php echo e($label); ?></span>
                             </label>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
 
                 <div class="border-b border-slate-100 pb-5">
                     <div class="mb-4 flex items-center justify-between">
                         <div class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">Price Range</div>
-                        <span class="rounded-full bg-green-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-green-700">Rs {{ $selectedMinPrice }} - <span id="mobilePriceRangeValue">{{ $selectedMaxPrice }}</span></span>
+                        <span class="rounded-full bg-green-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-green-700">Rs <?php echo e($selectedMinPrice); ?> - <span id="mobilePriceRangeValue"><?php echo e($selectedMaxPrice); ?></span></span>
                     </div>
-                    <input type="range" name="max_price" min="0" max="{{ $sidebarMaxPrice }}" value="{{ $selectedMaxPrice }}" step="10"
+                    <input type="range" name="max_price" min="0" max="<?php echo e($sidebarMaxPrice); ?>" value="<?php echo e($selectedMaxPrice); ?>" step="10"
                            id="mobileSidebarPriceRange"
                            class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-green-600">
                     <div class="mt-4 grid grid-cols-2 gap-3">
                         <div>
                             <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Min</label>
-                            <input type="number" name="min_price" min="0" max="{{ $sidebarMaxPrice }}" value="{{ $selectedMinPrice }}"
+                            <input type="number" name="min_price" min="0" max="<?php echo e($sidebarMaxPrice); ?>" value="<?php echo e($selectedMinPrice); ?>"
                                    class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-semibold text-slate-700 outline-none focus:border-green-500 focus:bg-white">
                         </div>
                         <div>
                             <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Max</label>
-                            <input type="number" min="0" max="{{ $sidebarMaxPrice }}" value="{{ $selectedMaxPrice }}"
+                            <input type="number" min="0" max="<?php echo e($sidebarMaxPrice); ?>" value="<?php echo e($selectedMaxPrice); ?>"
                                    id="mobileSidebarPriceRangeInput"
                                    class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-semibold text-slate-700 outline-none focus:border-green-500 focus:bg-white">
                         </div>
@@ -167,11 +172,12 @@
                 <div>
                     <div class="mb-3 text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">Pack Weight</div>
                     <div class="grid grid-cols-2 gap-2">
-                        @foreach($packWeights as $weight)
+                        <?php $__currentLoopData = $packWeights; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $weight): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <button type="button" class="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-left text-[12px] font-bold text-slate-600 transition hover:border-green-200 hover:bg-green-50 hover:text-green-700">
-                                {{ $weight }}
+                                <?php echo e($weight); ?>
+
                             </button>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
             </div>
@@ -187,22 +193,22 @@
 
 <div id="product-results" class="max-w-7xl mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8" style="scroll-margin-top: 150px;">
 
-    {{-- Sidebar Filters --}}
+    
     <aside class="hidden w-full flex-shrink-0 lg:block lg:w-[290px] xl:w-[310px]">
         <div class="space-y-5 lg:sticky lg:top-[150px]">
-            <form method="GET" action="{{ route('frontend.products') }}" id="filterForm">
-                @if(request()->filled('subcategory'))
-                    <input type="hidden" name="subcategory" value="{{ request('subcategory') }}" data-subcategory-filter>
-                @endif
+            <form method="GET" action="<?php echo e(route('frontend.products')); ?>" id="filterForm">
+                <?php if(request()->filled('subcategory')): ?>
+                    <input type="hidden" name="subcategory" value="<?php echo e(request('subcategory')); ?>" data-subcategory-filter>
+                <?php endif; ?>
                 <div class="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_22px_55px_rgba(15,23,42,0.08)]">
                     <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
                         <h3 class="text-[13px] font-black uppercase tracking-[0.22em] text-slate-900">Filter Products</h3>
-                        <a href="{{ route('frontend.products') }}" class="text-[11px] font-bold text-[#2d72d3] transition hover:text-[#1f5bb4]">Clear All</a>
+                        <a href="<?php echo e(route('frontend.products')); ?>" class="text-[11px] font-bold text-[#2d72d3] transition hover:text-[#1f5bb4]">Clear All</a>
                     </div>
 
                     <div class="space-y-6 px-5 py-5">
                         <div>
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search cuts, packs, combos..."
+                            <input type="text" name="search" value="<?php echo e(request('search')); ?>" placeholder="Search cuts, packs, combos..."
                                    data-filter-search
                                    class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-green-500 focus:bg-white">
                         </div>
@@ -210,53 +216,55 @@
                         <div class="border-b border-slate-100 pb-5">
                             <div class="mb-3 text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">Category</div>
                             <div class="space-y-1.5">
-                                @foreach($categories as $cat)
+                                <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <label class="flex cursor-pointer items-center justify-between rounded-2xl px-3 py-2.5 transition hover:bg-slate-50">
                                         <span class="flex items-center gap-3">
-                                            <input type="radio" name="category" value="{{ $cat->slug }}"
-                                                   {{ request('category') == $cat->slug ? 'checked' : '' }}
+                                            <input type="radio" name="category" value="<?php echo e($cat->slug); ?>"
+                                                   <?php echo e(request('category') == $cat->slug ? 'checked' : ''); ?>
+
                                                    data-auto-submit data-category-filter
                                                    class="h-4 w-4 border-slate-300 text-green-600 focus:ring-green-500">
-                                            <span class="text-[13px] font-semibold text-slate-700">{{ $cat->name }}</span>
+                                            <span class="text-[13px] font-semibold text-slate-700"><?php echo e($cat->name); ?></span>
                                         </span>
-                                        <span class="text-[11px] font-bold text-slate-400">{{ $cat->active_products_count }}</span>
+                                        <span class="text-[11px] font-bold text-slate-400"><?php echo e($cat->active_products_count); ?></span>
                                     </label>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                         </div>
 
                         <div class="border-b border-slate-100 pb-5">
                             <div class="mb-3 text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">Sort By</div>
                             <div class="space-y-1.5">
-                                @foreach($sortOptions as $value => $label)
+                                <?php $__currentLoopData = $sortOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $value => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <label class="flex cursor-pointer items-center gap-3 rounded-2xl px-3 py-2.5 transition hover:bg-slate-50">
-                                        <input type="radio" name="sort" value="{{ $value }}"
-                                               {{ request('sort', 'latest') === $value ? 'checked' : '' }}
+                                        <input type="radio" name="sort" value="<?php echo e($value); ?>"
+                                               <?php echo e(request('sort', 'latest') === $value ? 'checked' : ''); ?>
+
                                                data-auto-submit
                                                class="h-4 w-4 border-slate-300 text-green-600 focus:ring-green-500">
-                                        <span class="text-[13px] font-semibold text-slate-700">{{ $label }}</span>
+                                        <span class="text-[13px] font-semibold text-slate-700"><?php echo e($label); ?></span>
                                     </label>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                         </div>
 
                         <div class="border-b border-slate-100 pb-5">
                             <div class="mb-4 flex items-center justify-between">
                                 <div class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">Price Range</div>
-                                <span class="rounded-full bg-green-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-green-700">Rs {{ $selectedMinPrice }} - <span id="priceRangeValue">{{ $selectedMaxPrice }}</span></span>
+                                <span class="rounded-full bg-green-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-green-700">Rs <?php echo e($selectedMinPrice); ?> - <span id="priceRangeValue"><?php echo e($selectedMaxPrice); ?></span></span>
                             </div>
-                            <input type="range" name="max_price" min="0" max="{{ $sidebarMaxPrice }}" value="{{ $selectedMaxPrice }}" step="10"
+                            <input type="range" name="max_price" min="0" max="<?php echo e($sidebarMaxPrice); ?>" value="<?php echo e($selectedMaxPrice); ?>" step="10"
                                    id="sidebarPriceRange"
                                    class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-green-600">
                             <div class="mt-4 grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Min</label>
-                                    <input type="number" name="min_price" min="0" max="{{ $sidebarMaxPrice }}" value="{{ $selectedMinPrice }}"
+                                    <input type="number" name="min_price" min="0" max="<?php echo e($sidebarMaxPrice); ?>" value="<?php echo e($selectedMinPrice); ?>"
                                            class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-semibold text-slate-700 outline-none focus:border-green-500 focus:bg-white">
                                 </div>
                                 <div>
                                     <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Max</label>
-                                    <input type="number" min="0" max="{{ $sidebarMaxPrice }}" value="{{ $selectedMaxPrice }}"
+                                    <input type="number" min="0" max="<?php echo e($sidebarMaxPrice); ?>" value="<?php echo e($selectedMaxPrice); ?>"
                                            id="sidebarPriceRangeInput"
                                            class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-semibold text-slate-700 outline-none focus:border-green-500 focus:bg-white">
                                 </div>
@@ -266,11 +274,12 @@
                         <!-- <div>
                             <div class="mb-3 text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">Pack Weight</div>
                             <div class="grid grid-cols-2 gap-2">
-                                @foreach($packWeights as $weight)
+                                <?php $__currentLoopData = $packWeights; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $weight): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <button type="button" class="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-left text-[12px] font-bold text-slate-600 transition hover:border-green-200 hover:bg-green-50 hover:text-green-700">
-                                        {{ $weight }}
+                                        <?php echo e($weight); ?>
+
                                     </button>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                         </div> -->
 
@@ -287,69 +296,69 @@
                     <span class="rounded-full bg-red-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-red-500">Hot</span>
                 </div>
                 <div class="space-y-3">
-                    @forelse($sidebarBestDeals as $deal)
-                        <a href="{{ route('frontend.product.show', $deal->slug) }}" class="group flex items-center gap-3 rounded-[22px] border border-slate-100 bg-slate-50 p-2.5 transition hover:-translate-y-0.5 hover:border-green-200 hover:bg-white hover:shadow-md">
+                    <?php $__empty_1 = true; $__currentLoopData = $sidebarBestDeals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $deal): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                        <a href="<?php echo e(route('frontend.product.show', $deal->slug)); ?>" class="group flex items-center gap-3 rounded-[22px] border border-slate-100 bg-slate-50 p-2.5 transition hover:-translate-y-0.5 hover:border-green-200 hover:bg-white hover:shadow-md">
                             <div class="h-16 w-16 overflow-hidden rounded-2xl bg-slate-200">
-                                @if($deal->images && count($deal->images))
-                                    <img src="{{ asset('storage/' . $deal->images[0]) }}" alt="{{ $deal->name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
-                                @else
+                                <?php if($deal->images && count($deal->images)): ?>
+                                    <img src="<?php echo e(asset('storage/' . $deal->images[0])); ?>" alt="<?php echo e($deal->name); ?>" class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
+                                <?php else: ?>
                                     <div class="flex h-full w-full items-center justify-center text-xl text-slate-400">
                                         <i class="fa-solid fa-drumstick-bite"></i>
                                     </div>
-                                @endif
+                                <?php endif; ?>
                             </div>
                             <div class="min-w-0 flex-1">
-                                <p class="line-clamp-2 text-[12px] font-black leading-5 text-slate-900">{{ $deal->name }}</p>
+                                <p class="line-clamp-2 text-[12px] font-black leading-5 text-slate-900"><?php echo e($deal->name); ?></p>
                                 <div class="mt-1 flex items-center gap-2">
-                                    <span class="text-[12px] font-black text-green-700">₹{{ number_format($deal->price, 0) }}</span>
-                                    @if($deal->mrp && $deal->mrp > $deal->price)
-                                        <span class="text-[11px] font-bold text-slate-400 line-through">₹{{ number_format($deal->mrp, 0) }}</span>
-                                    @endif
+                                    <span class="text-[12px] font-black text-green-700">₹<?php echo e(number_format($deal->price, 0)); ?></span>
+                                    <?php if($deal->mrp && $deal->mrp > $deal->price): ?>
+                                        <span class="text-[11px] font-bold text-slate-400 line-through">₹<?php echo e(number_format($deal->mrp, 0)); ?></span>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </a>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <p class="rounded-2xl bg-slate-50 px-4 py-4 text-[13px] font-semibold text-slate-500">Deals will appear here once products with offers are available.</p>
-                    @endforelse
+                    <?php endif; ?>
                 </div>
             </div>
 
             <div class="overflow-hidden rounded-[28px] border border-slate-200 bg-white p-4 shadow-[0_20px_45px_rgba(15,23,42,0.06)]">
                 <h4 class="mb-4 text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">New Arrivals</h4>
                 <div class="space-y-3">
-                    @foreach($sidebarNewArrivals as $arrival)
-                        <a href="{{ route('frontend.product.show', $arrival->slug) }}" class="group flex items-center gap-3 rounded-[20px] px-1 py-1 transition hover:bg-slate-50">
+                    <?php $__currentLoopData = $sidebarNewArrivals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $arrival): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <a href="<?php echo e(route('frontend.product.show', $arrival->slug)); ?>" class="group flex items-center gap-3 rounded-[20px] px-1 py-1 transition hover:bg-slate-50">
                             <div class="h-12 w-12 overflow-hidden rounded-xl bg-slate-200">
-                                @if($arrival->images && count($arrival->images))
-                                    <img src="{{ asset('storage/' . $arrival->images[0]) }}" alt="{{ $arrival->name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
-                                @else
+                                <?php if($arrival->images && count($arrival->images)): ?>
+                                    <img src="<?php echo e(asset('storage/' . $arrival->images[0])); ?>" alt="<?php echo e($arrival->name); ?>" class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
+                                <?php else: ?>
                                     <div class="flex h-full w-full items-center justify-center text-sm text-slate-400">
                                         <i class="fa-solid fa-fish"></i>
                                     </div>
-                                @endif
+                                <?php endif; ?>
                             </div>
                             <div class="min-w-0 flex-1">
-                                <p class="line-clamp-2 text-[12px] font-black leading-5 text-slate-900">{{ $arrival->name }}</p>
-                                <p class="mt-1 text-[11px] font-semibold text-slate-400">{{ $arrival->category->name ?? 'Fresh cut' }}</p>
+                                <p class="line-clamp-2 text-[12px] font-black leading-5 text-slate-900"><?php echo e($arrival->name); ?></p>
+                                <p class="mt-1 text-[11px] font-semibold text-slate-400"><?php echo e($arrival->category->name ?? 'Fresh cut'); ?></p>
                             </div>
-                            <span class="text-[12px] font-black text-green-700">₹{{ number_format($arrival->price, 0) }}</span>
+                            <span class="text-[12px] font-black text-green-700">₹<?php echo e(number_format($arrival->price, 0)); ?></span>
                         </a>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </div>
 
             <div class="overflow-hidden rounded-[28px] bg-[linear-gradient(160deg,#2f8c43_0%,#1f6f34_100%)] p-5 text-white shadow-[0_20px_45px_rgba(31,111,52,0.22)]">
                 <span class="inline-flex rounded-full bg-white/16 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white/85">Need Bulk Orders?</span>
                 <p class="mt-4 text-[16px] font-black leading-7">Talk to our farm experts for the best cuts & delivery slots.</p>
-                <a href="{{ route('frontend.contact') }}" class="mt-5 inline-flex items-center justify-center rounded-2xl bg-white px-4 py-3 text-[12px] font-black uppercase tracking-[0.18em] text-[#1f6f34] transition hover:-translate-y-0.5">
+                <a href="<?php echo e(route('frontend.contact')); ?>" class="mt-5 inline-flex items-center justify-center rounded-2xl bg-white px-4 py-3 text-[12px] font-black uppercase tracking-[0.18em] text-[#1f6f34] transition hover:-translate-y-0.5">
                     Contact Now
                 </a>
             </div>
-            <a href="{{ $flashDealToggleUrl }}"
+            <a href="<?php echo e($flashDealToggleUrl); ?>"
                id="flashDealCard"
-               class="group relative block overflow-hidden rounded-[28px] bg-[#18213a] p-5 text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)] transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:border-amber-400/50 border-2 cursor-pointer {{ $isFlashDealActive ? 'border-amber-400 ring-4 ring-amber-400/30 bg-[#141b30]' : 'border-transparent' }}">
+               class="group relative block overflow-hidden rounded-[28px] bg-[#18213a] p-5 text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)] transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:border-amber-400/50 border-2 cursor-pointer <?php echo e($isFlashDealActive ? 'border-amber-400 ring-4 ring-amber-400/30 bg-[#141b30]' : 'border-transparent'); ?>">
                 
-                @if($isFlashDealActive)
+                <?php if($isFlashDealActive): ?>
                     <div class="mb-3 flex items-center justify-between rounded-xl bg-amber-400/20 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-amber-300">
                         <span class="flex items-center gap-1.5">
                             <span class="h-2 w-2 rounded-full bg-amber-400 animate-ping"></span>
@@ -357,11 +366,11 @@
                         </span>
                         <span class="hover:underline text-[11px]">Clear ✕</span>
                     </div>
-                @endif
+                <?php endif; ?>
 
                 <div class="flex items-start justify-between gap-3">
                     <div>
-                        <span class="inline-flex rounded-full {{ $isFlashDealActive ? 'bg-amber-400 text-slate-950 font-black' : 'bg-white/8 text-[#90a5d9]' }} px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em]">
+                        <span class="inline-flex rounded-full <?php echo e($isFlashDealActive ? 'bg-amber-400 text-slate-950 font-black' : 'bg-white/8 text-[#90a5d9]'); ?> px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em]">
                             Flash Deal
                         </span>
                         <div class="mt-4 text-[42px] font-black leading-none text-white flex items-baseline gap-1">
@@ -370,32 +379,33 @@
                         </div>
                         <p class="mt-2 text-[11px] font-black uppercase tracking-[0.18em] text-[#8ea0c7]">Product Discount Today</p>
                     </div>
-                    <i class="fa-solid fa-bolt text-[34px] transition-transform duration-300 group-hover:scale-125 {{ $isFlashDealActive ? 'text-amber-400 animate-bounce' : 'text-[#39466d] group-hover:text-amber-400' }}"></i>
+                    <i class="fa-solid fa-bolt text-[34px] transition-transform duration-300 group-hover:scale-125 <?php echo e($isFlashDealActive ? 'text-amber-400 animate-bounce' : 'text-[#39466d] group-hover:text-amber-400'); ?>"></i>
                 </div>
                 
                 <div class="mt-5 flex items-center justify-between border-t border-white/10 pt-3">
                     <p class="text-[12px] font-bold uppercase tracking-[0.22em] text-[#7d8fbf]">FRESH30</p>
                     <span class="text-[11px] font-bold text-amber-300 group-hover:translate-x-1 transition-transform flex items-center gap-1">
-                        {{ $isFlashDealActive ? 'Show All Products' : 'View Offer Products →' }}
+                        <?php echo e($isFlashDealActive ? 'Show All Products' : 'View Offer Products →'); ?>
+
                     </span>
                 </div>
             </a>
         </div>
     </aside>
 
-    {{-- Products Grid --}}
+    
     <div class="flex-1">
         <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-2">
-                <p class="text-sm text-gray-500 font-semibold">{{ $products->total() }} products found</p>
-                @if($isFlashDealActive)
-                    <a href="{{ route('frontend.products', request()->except(['flash_deal', 'offer', 'page'])) }}" 
+                <p class="text-sm text-gray-500 font-semibold"><?php echo e($products->total()); ?> products found</p>
+                <?php if($isFlashDealActive): ?>
+                    <a href="<?php echo e(route('frontend.products', request()->except(['flash_deal', 'offer', 'page']))); ?>" 
                        class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900 border border-amber-300 hover:bg-amber-200 transition shadow-sm">
                         <i class="fa-solid fa-bolt text-amber-600"></i>
                         <span>20% Off Offers (FRESH30)</span>
                         <span class="ml-1 text-amber-700 font-extrabold">✕</span>
                     </a>
-                @endif
+                <?php endif; ?>
             </div>
             <button type="button" onclick="openMobileFilter()" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-white lg:hidden">
                 <i class="fa-solid fa-sliders"></i>
@@ -404,8 +414,8 @@
         </div>
 
         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            @forelse($products as $product)
-            @php
+            <?php $__empty_1 = true; $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+            <?php
                 $cardVariantIndex = collect($product->variants ?? [])->search(
                     fn ($variant) => filled($variant['selling_price'] ?? null) || filled($variant['today_price'] ?? null)
                 );
@@ -415,102 +425,102 @@
                     && (float) $cardVariant['tomorrow_price'] > 0
                         ? (float) $cardVariant['tomorrow_price']
                         : null;
-            @endphp
-            @php
+            ?>
+            <?php
                 $isInWishlist = in_array($product->id, session('wishlist', []), true);
-            @endphp
+            ?>
             <div class="relative bg-white rounded-2xl border border-gray-100 hover:border-green-300 hover:shadow-lg transition overflow-hidden flex flex-col group">
-                <button onclick="toggleWishlist({{ $product->id }}, this)" 
-                        class="wishlist-btn absolute right-2.5 top-2.5 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-md backdrop-blur-sm transition hover:scale-110 {{ $isInWishlist ? 'active' : '' }}"
-                        data-product-id="{{ $product->id }}"
-                        title="{{ $isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}">
-                    <i class="{{ $isInWishlist ? 'fa-solid fa-heart text-base text-red-500' : 'fa-regular fa-heart text-base text-slate-500 hover:text-red-500' }}"></i>
+                <button onclick="toggleWishlist(<?php echo e($product->id); ?>, this)" 
+                        class="wishlist-btn absolute right-2.5 top-2.5 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-md backdrop-blur-sm transition hover:scale-110 <?php echo e($isInWishlist ? 'active' : ''); ?>"
+                        data-product-id="<?php echo e($product->id); ?>"
+                        title="<?php echo e($isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'); ?>">
+                    <i class="<?php echo e($isInWishlist ? 'fa-solid fa-heart text-base text-red-500' : 'fa-regular fa-heart text-base text-slate-500 hover:text-red-500'); ?>"></i>
                 </button>
-                <a href="{{ route('frontend.product.show', $product->slug) }}" class="block aspect-square overflow-hidden bg-gray-50 relative">
-                    @if(in_array($product->id, $newArrivalProductIds ?? [], true))
+                <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>" class="block aspect-square overflow-hidden bg-gray-50 relative">
+                    <?php if(in_array($product->id, $newArrivalProductIds ?? [], true)): ?>
                         <span class="absolute left-2 top-2 z-10 rounded-full bg-blue-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white shadow">
                             New Arrival
                         </span>
-                    @endif
-                    @if($product->images && count($product->images))
-                        <img src="{{ asset('storage/'.$product->images[0]) }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
-                    @else
+                    <?php endif; ?>
+                    <?php if($product->images && count($product->images)): ?>
+                        <img src="<?php echo e(asset('storage/'.$product->images[0])); ?>" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                    <?php else: ?>
                         <div class="w-full h-full flex items-center justify-center text-5xl">M</div>
-                    @endif
-                    @if($product->is_out_of_stock)
+                    <?php endif; ?>
+                    <?php if($product->is_out_of_stock): ?>
                         <span class="absolute left-2 top-2 z-10 rounded bg-red-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white shadow">
                             Out of Stock
                         </span>
-                    @endif
-                    @if($product->mrp && $product->mrp > $product->price)
+                    <?php endif; ?>
+                    <?php if($product->mrp && $product->mrp > $product->price): ?>
                         <span class="absolute bottom-2 right-2 bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded shadow">
-                            -{{ round((($product->mrp - $product->price) / $product->mrp) * 100) }}%
+                            -<?php echo e(round((($product->mrp - $product->price) / $product->mrp) * 100)); ?>%
                         </span>
-                    @endif
+                    <?php endif; ?>
                 </a>
                 <div class="p-3 flex flex-col flex-1">
-                    <a href="{{ route('frontend.product.show', $product->slug) }}"
-                       class="block min-h-[40px] text-sm font-bold text-gray-800 hover:text-green-700 leading-snug line-clamp-2">{{ $product->name }}</a>
-                    <p class="text-[10px] text-gray-400 mt-1">{{ $product->category->name ?? '' }}</p>
+                    <a href="<?php echo e(route('frontend.product.show', $product->slug)); ?>"
+                       class="block min-h-[40px] text-sm font-bold text-gray-800 hover:text-green-700 leading-snug line-clamp-2"><?php echo e($product->name); ?></a>
+                    <p class="text-[10px] text-gray-400 mt-1"><?php echo e($product->category->name ?? ''); ?></p>
                     <div class="mt-auto pt-1.5">
                         <div class="flex items-end justify-between gap-2">
                             <div>
                                 <p class="text-[9px] font-black uppercase tracking-wider text-emerald-600">Today</p>
-                                <p class="text-lg font-extrabold text-gray-800">Rs{{ number_format($product->display_price, 0) }}<span class="ml-1 text-xs font-semibold text-gray-400">{{ $product->display_pack_label }}</span></p>
-                                @if($product->display_mrp && $product->display_mrp > $product->display_price)
-                                    <p class="text-xs text-gray-400 line-through">Rs{{ number_format($product->display_mrp, 0) }}</p>
-                                @endif
+                                <p class="text-lg font-extrabold text-gray-800">Rs<?php echo e(number_format($product->display_price, 0)); ?><span class="ml-1 text-xs font-semibold text-gray-400"><?php echo e($product->display_pack_label); ?></span></p>
+                                <?php if($product->display_mrp && $product->display_mrp > $product->display_price): ?>
+                                    <p class="text-xs text-gray-400 line-through">Rs<?php echo e(number_format($product->display_mrp, 0)); ?></p>
+                                <?php endif; ?>
                             </div>
-                            @if(!$product->is_out_of_stock)
-                                <button onclick="addToCart({{ $product->id }}, {{ $cardVariantIndex === null ? 'null' : $cardVariantIndex }}, 'today')"
+                            <?php if(!$product->is_out_of_stock): ?>
+                                <button onclick="addToCart(<?php echo e($product->id); ?>, <?php echo e($cardVariantIndex === null ? 'null' : $cardVariantIndex); ?>, 'today')"
                                         class="flex h-9 items-center justify-center rounded-lg bg-blue-600 px-3 text-[10px] font-extrabold uppercase tracking-[0.1em] text-white transition hover:bg-blue-700 sm:w-9 sm:px-0 sm:text-sm">
                                     <span class="sm:hidden">Add to Cart</span>
                                     <i class="fa-solid fa-cart-shopping hidden sm:inline" aria-hidden="true"></i>
                                 </button>
-                            @else
+                            <?php else: ?>
                                 <span class="inline-flex rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-red-600">
                                     Out of Stock
                                 </span>
-                            @endif
+                            <?php endif; ?>
                         </div>
-                        @if(!$product->is_out_of_stock && $cardTomorrowPrice !== null)
+                        <?php if(!$product->is_out_of_stock && $cardTomorrowPrice !== null): ?>
                             <div class="mt-1 flex items-end justify-between gap-2 border-t border-dashed border-gray-100 pt-1">
                                 <div>
                                     <p class="text-[9px] font-black uppercase tracking-wider text-amber-700">Tomorrow</p>
-                                    <p class="text-lg font-extrabold text-gray-800">Rs{{ number_format($cardTomorrowPrice, 0) }}<span class="ml-1 text-xs font-semibold text-gray-400">{{ $product->display_pack_label }}</span></p>
+                                    <p class="text-lg font-extrabold text-gray-800">Rs<?php echo e(number_format($cardTomorrowPrice, 0)); ?><span class="ml-1 text-xs font-semibold text-gray-400"><?php echo e($product->display_pack_label); ?></span></p>
                                 </div>
-                                <button onclick="addToCart({{ $product->id }}, {{ $cardVariantIndex }}, 'tomorrow')"
+                                <button onclick="addToCart(<?php echo e($product->id); ?>, <?php echo e($cardVariantIndex); ?>, 'tomorrow')"
                                         class="flex h-9 items-center justify-center rounded-lg bg-amber-500 px-3 text-[10px] font-extrabold uppercase tracking-[0.1em] text-white transition hover:bg-amber-600 sm:w-9 sm:px-0 sm:text-sm"
                                         title="Add for tomorrow">
                                     <span class="sm:hidden">Add to Cart</span>
                                     <i class="fa-solid fa-cart-shopping hidden sm:inline" aria-hidden="true"></i>
                                 </button>
                             </div>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <div class="col-span-4 text-center py-16 text-gray-400">
-                @if($isFlashDealActive)
+                <?php if($isFlashDealActive): ?>
                     <i class="fa-solid fa-bolt-slash text-5xl mb-4 text-amber-400 block"></i>
                     <p class="font-semibold text-slate-700">No products with 20% Flash Deal offers found at the moment.</p>
-                    <a href="{{ route('frontend.products', request()->except(['flash_deal', 'offer', 'page'])) }}" class="text-blue-600 font-bold text-sm mt-3 inline-block hover:underline">Show All Products</a>
-                @else
+                    <a href="<?php echo e(route('frontend.products', request()->except(['flash_deal', 'offer', 'page']))); ?>" class="text-blue-600 font-bold text-sm mt-3 inline-block hover:underline">Show All Products</a>
+                <?php else: ?>
                     <i class="fa-solid fa-box-open text-5xl mb-4 block"></i>
                     <p class="font-semibold">No products found.</p>
-                    <a href="{{ route('frontend.products') }}" class="text-blue-600 text-sm mt-2 inline-block hover:underline">Clear filters</a>
-                @endif
+                    <a href="<?php echo e(route('frontend.products')); ?>" class="text-blue-600 text-sm mt-2 inline-block hover:underline">Clear filters</a>
+                <?php endif; ?>
             </div>
-            @endforelse
+            <?php endif; ?>
         </div>
 
-        <div class="mt-8">{{ $products->links() }}</div>
+        <div class="mt-8"><?php echo e($products->links()); ?></div>
 
         <div class="mt-8 space-y-5 lg:hidden">
-            <a href="{{ $flashDealToggleUrl }}"
-               class="group relative block overflow-hidden rounded-[28px] bg-[#18213a] p-5 text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)] transition-all duration-300 border-2 cursor-pointer {{ $isFlashDealActive ? 'border-amber-400 ring-4 ring-amber-400/30 bg-[#141b30]' : 'border-transparent' }}">
-                @if($isFlashDealActive)
+            <a href="<?php echo e($flashDealToggleUrl); ?>"
+               class="group relative block overflow-hidden rounded-[28px] bg-[#18213a] p-5 text-white shadow-[0_18px_40px_rgba(15,23,42,0.18)] transition-all duration-300 border-2 cursor-pointer <?php echo e($isFlashDealActive ? 'border-amber-400 ring-4 ring-amber-400/30 bg-[#141b30]' : 'border-transparent'); ?>">
+                <?php if($isFlashDealActive): ?>
                     <div class="mb-3 flex items-center justify-between rounded-xl bg-amber-400/20 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-amber-300">
                         <span class="flex items-center gap-1.5">
                             <span class="h-2 w-2 rounded-full bg-amber-400 animate-ping"></span>
@@ -518,10 +528,10 @@
                         </span>
                         <span class="hover:underline text-[11px]">Clear ✕</span>
                     </div>
-                @endif
+                <?php endif; ?>
                 <div class="flex items-start justify-between gap-3">
                     <div>
-                        <span class="inline-flex rounded-full {{ $isFlashDealActive ? 'bg-amber-400 text-slate-950 font-black' : 'bg-white/8 text-[#90a5d9]' }} px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em]">
+                        <span class="inline-flex rounded-full <?php echo e($isFlashDealActive ? 'bg-amber-400 text-slate-950 font-black' : 'bg-white/8 text-[#90a5d9]'); ?> px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em]">
                             Flash Deal
                         </span>
                         <div class="mt-4 text-[38px] font-black leading-none text-white flex items-baseline gap-1">
@@ -530,12 +540,13 @@
                         </div>
                         <p class="mt-2 text-[11px] font-black uppercase tracking-[0.18em] text-[#8ea0c7]">Product Discount Today</p>
                     </div>
-                    <i class="fa-solid fa-bolt text-[34px] {{ $isFlashDealActive ? 'text-amber-400 animate-bounce' : 'text-[#39466d]' }}"></i>
+                    <i class="fa-solid fa-bolt text-[34px] <?php echo e($isFlashDealActive ? 'text-amber-400 animate-bounce' : 'text-[#39466d]'); ?>"></i>
                 </div>
                 <div class="mt-5 flex items-center justify-between border-t border-white/10 pt-3">
                     <p class="text-[12px] font-bold uppercase tracking-[0.22em] text-[#7d8fbf]">FRESH30</p>
                     <span class="text-[11px] font-bold text-amber-300 flex items-center gap-1">
-                        {{ $isFlashDealActive ? 'Show All Products' : 'View Offer Products →' }}
+                        <?php echo e($isFlashDealActive ? 'Show All Products' : 'View Offer Products →'); ?>
+
                     </span>
                 </div>
             </a>
@@ -546,54 +557,54 @@
                     <span class="rounded-full bg-red-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-red-500">Hot</span>
                 </div>
                 <div class="space-y-3">
-                    @forelse($sidebarBestDeals as $deal)
-                        <a href="{{ route('frontend.product.show', $deal->slug) }}" class="group flex items-center gap-3 rounded-[22px] border border-slate-100 bg-slate-50 p-2.5 transition hover:-translate-y-0.5 hover:border-green-200 hover:bg-white hover:shadow-md">
+                    <?php $__empty_1 = true; $__currentLoopData = $sidebarBestDeals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $deal): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                        <a href="<?php echo e(route('frontend.product.show', $deal->slug)); ?>" class="group flex items-center gap-3 rounded-[22px] border border-slate-100 bg-slate-50 p-2.5 transition hover:-translate-y-0.5 hover:border-green-200 hover:bg-white hover:shadow-md">
                             <div class="h-16 w-16 overflow-hidden rounded-2xl bg-slate-200">
-                                @if($deal->images && count($deal->images))
-                                    <img src="{{ asset('storage/' . $deal->images[0]) }}" alt="{{ $deal->name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
-                                @else
+                                <?php if($deal->images && count($deal->images)): ?>
+                                    <img src="<?php echo e(asset('storage/' . $deal->images[0])); ?>" alt="<?php echo e($deal->name); ?>" class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
+                                <?php else: ?>
                                     <div class="flex h-full w-full items-center justify-center text-xl text-slate-400">
                                         <i class="fa-solid fa-drumstick-bite"></i>
                                     </div>
-                                @endif
+                                <?php endif; ?>
                             </div>
                             <div class="min-w-0 flex-1">
-                                <p class="line-clamp-2 text-[12px] font-black leading-5 text-slate-900">{{ $deal->name }}</p>
+                                <p class="line-clamp-2 text-[12px] font-black leading-5 text-slate-900"><?php echo e($deal->name); ?></p>
                                 <div class="mt-1 flex items-center gap-2">
-                                    <span class="text-[12px] font-black text-green-700">Rs{{ number_format($deal->display_price, 0) }}</span>
-                                    @if($deal->display_mrp && $deal->display_mrp > $deal->display_price)
-                                        <span class="text-[11px] font-bold text-slate-400 line-through">Rs{{ number_format($deal->display_mrp, 0) }}</span>
-                                    @endif
+                                    <span class="text-[12px] font-black text-green-700">Rs<?php echo e(number_format($deal->display_price, 0)); ?></span>
+                                    <?php if($deal->display_mrp && $deal->display_mrp > $deal->display_price): ?>
+                                        <span class="text-[11px] font-bold text-slate-400 line-through">Rs<?php echo e(number_format($deal->display_mrp, 0)); ?></span>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </a>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <p class="rounded-2xl bg-slate-50 px-4 py-4 text-[13px] font-semibold text-slate-500">Deals will appear here once products with offers are available.</p>
-                    @endforelse
+                    <?php endif; ?>
                 </div>
             </div>
 
             <div class="overflow-hidden rounded-[28px] border border-slate-200 bg-white p-4 shadow-[0_20px_45px_rgba(15,23,42,0.06)]">
                 <h4 class="mb-4 text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">New Arrivals</h4>
                 <div class="space-y-3">
-                    @foreach($sidebarNewArrivals as $arrival)
-                        <a href="{{ route('frontend.product.show', $arrival->slug) }}" class="group flex items-center gap-3 rounded-[20px] px-1 py-1 transition hover:bg-slate-50">
+                    <?php $__currentLoopData = $sidebarNewArrivals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $arrival): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <a href="<?php echo e(route('frontend.product.show', $arrival->slug)); ?>" class="group flex items-center gap-3 rounded-[20px] px-1 py-1 transition hover:bg-slate-50">
                             <div class="h-12 w-12 overflow-hidden rounded-xl bg-slate-200">
-                                @if($arrival->images && count($arrival->images))
-                                    <img src="{{ asset('storage/' . $arrival->images[0]) }}" alt="{{ $arrival->name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
-                                @else
+                                <?php if($arrival->images && count($arrival->images)): ?>
+                                    <img src="<?php echo e(asset('storage/' . $arrival->images[0])); ?>" alt="<?php echo e($arrival->name); ?>" class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
+                                <?php else: ?>
                                     <div class="flex h-full w-full items-center justify-center text-sm text-slate-400">
                                         <i class="fa-solid fa-fish"></i>
                                     </div>
-                                @endif
+                                <?php endif; ?>
                             </div>
                             <div class="min-w-0 flex-1">
-                                <p class="line-clamp-2 text-[12px] font-black leading-5 text-slate-900">{{ $arrival->name }}</p>
-                                <p class="mt-1 text-[11px] font-semibold text-slate-400">{{ $arrival->category->name ?? 'Fresh cut' }}</p>
+                                <p class="line-clamp-2 text-[12px] font-black leading-5 text-slate-900"><?php echo e($arrival->name); ?></p>
+                                <p class="mt-1 text-[11px] font-semibold text-slate-400"><?php echo e($arrival->category->name ?? 'Fresh cut'); ?></p>
                             </div>
-                            <span class="text-[12px] font-black text-green-700">Rs{{ number_format($arrival->display_price, 0) }}</span>
+                            <span class="text-[12px] font-black text-green-700">Rs<?php echo e(number_format($arrival->display_price, 0)); ?></span>
                         </a>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </div>
         </div>
@@ -617,12 +628,12 @@
                 </div>
 
                 <div class="flex flex-col gap-4 sm:flex-row lg:justify-end">
-                    <a href="{{ route('frontend.contact') }}"
+                    <a href="<?php echo e(route('frontend.contact')); ?>"
                        class="inline-flex items-center justify-center gap-3 rounded-[18px] bg-[#2f8c43] px-8 py-4 text-[14px] font-black uppercase tracking-[0.18em] text-white shadow-[0_16px_30px_rgba(47,140,67,0.25)] transition hover:-translate-y-0.5 hover:bg-[#247437]">
                         <i class="fa-solid fa-comment-dots text-sm"></i>
                         Talk To Us
                     </a>
-                    <a href="{{ route('frontend.contact') }}"
+                    <a href="<?php echo e(route('frontend.contact')); ?>"
                        class="inline-flex items-center justify-center rounded-[18px] border-2 border-[#243625] bg-white px-8 py-4 text-[14px] font-black uppercase tracking-[0.18em] text-[#152016] transition hover:-translate-y-0.5 hover:border-[#2f8c43] hover:text-[#2f8c43]">
                         Request A Quote
                     </a>
@@ -631,9 +642,9 @@
         </div>
     </div>
 </section>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
 <script>
 (() => {
     function setupFilterForm(formId, rangeId, rangeInputId, rangeValueId) {
@@ -691,7 +702,7 @@
     setupFilterForm('filterForm', 'sidebarPriceRange', 'sidebarPriceRangeInput', 'priceRangeValue');
     setupFilterForm('mobileFilterForm', 'mobileSidebarPriceRange', 'mobileSidebarPriceRangeInput', 'mobilePriceRangeValue');
 
-    const hasActiveProductQuery = @json($hasActiveProductQuery);
+    const hasActiveProductQuery = <?php echo json_encode($hasActiveProductQuery, 15, 512) ?>;
     if (hasActiveProductQuery) {
         window.addEventListener('load', () => {
             document.getElementById('product-results')?.scrollIntoView({ block: 'start' });
@@ -723,4 +734,6 @@ document.getElementById('mobileFilterModal')?.addEventListener('click', (event) 
     }
 });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('frontend.layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\BMDU Work\FarmSea-dashboard\resources\views/frontend/products.blade.php ENDPATH**/ ?>

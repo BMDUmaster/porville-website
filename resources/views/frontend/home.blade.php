@@ -426,13 +426,13 @@
                                     <p class="text-xs text-gray-400 line-through">Rs{{ number_format($product->display_mrp, 0) }}</p>
                                 @endif
                             </div>
-                            @if($product->is_active)
+                            @if(!$product->is_out_of_stock)
                                 <button onclick="addToCart({{ $product->id }})" class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-sm text-white transition hover:bg-blue-700">
                                     <i class="fa-solid fa-cart-shopping"></i>
                                 </button>
                             @else
-                                <span class="inline-flex h-9 items-center justify-center rounded-lg bg-red-50 px-3 text-[10px] font-extrabold uppercase tracking-[0.14em] text-red-600">
-                                    Sold Out
+                                <span class="inline-flex h-9 items-center justify-center rounded-lg border border-red-200 bg-red-50 px-2.5 text-[10px] font-extrabold uppercase tracking-[0.12em] text-red-600">
+                                    Out of Stock
                                 </span>
                             @endif
                         </div>
@@ -609,13 +609,13 @@
                                         <p class="text-xs text-slate-400 line-through">Rs{{ number_format($typeShowcaseLead->display_mrp, 0) }}</p>
                                     @endif
                                 </div>
-                                @if($typeShowcaseLead->is_active)
+                                @if(!$typeShowcaseLead->is_out_of_stock)
                                     <button onclick="addToCart({{ $typeShowcaseLead->id }})" class="inline-flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-green-800">
                                         <i class="fa-solid fa-cart-plus text-[11px]"></i>
                                         Add
                                     </button>
                                 @else
-                                    <span class="inline-flex items-center rounded-xl bg-red-50 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-red-600">
+                                    <span class="inline-flex items-center rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-red-600">
                                         Out of Stock
                                     </span>
                                 @endif
@@ -671,14 +671,14 @@
                                 </a>
                                 <div class="mt-2.5 flex items-end justify-between gap-2">
                                     <p class="text-[14px] font-black text-slate-950">Rs{{ number_format($product->display_price, 0) }}<span class="ml-1 text-[9px] font-semibold text-slate-400">{{ $product->display_pack_label }}</span></p>
-                                    @if($product->is_active)
+                                    @if(!$product->is_out_of_stock)
                                         <button onclick="addToCart({{ $product->id }})" class="inline-flex min-h-[34px] flex-shrink-0 items-center justify-center gap-1.5 rounded-lg border border-[#dbe8d7] bg-[#f8fbf6] px-2.5 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.1em] text-green-700 transition duration-300 hover:border-green-300 hover:bg-green-50 group-hover:-translate-y-0.5 group-hover:shadow-sm">
                                             <i class="fa-solid fa-cart-plus text-[14px] leading-none" aria-hidden="true"></i>
                                             <span>Add</span>
                                         </button>
                                     @else
-                                        <span class="rounded-lg bg-red-50 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-red-600">
-                                            Sold Out
+                                        <span class="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-red-600">
+                                            Out of Stock
                                         </span>
                                     @endif
                                 </div>
@@ -917,16 +917,16 @@
                                     <p class="text-xs text-slate-400 line-through">Rs{{ number_format($product->display_mrp, 0) }}</p>
                                 @endif
                                 </div>
-                                @if($product->is_active)
+                                @if(!$product->is_out_of_stock)
                                     <button onclick="addToCart({{ $product->id }}, {{ $favoriteVariantIndex === null ? 'null' : $favoriteVariantIndex }}, 'today')" aria-label="Add {{ $product->name }} for today" title="Add for today" class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-green-700 text-white transition hover:bg-green-800">
                                         <i class="fa-solid fa-cart-shopping text-[18px]" aria-hidden="true"></i>
                                     </button>
                                 @else
-                                    <span class="inline-flex items-center rounded-xl bg-red-50 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-red-600">Out of Stock</span>
+                                    <span class="inline-flex items-center rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-red-600">Out of Stock</span>
                                 @endif
                             </div>
 
-                            @if($product->is_active && $favoriteTomorrowPrice !== null)
+                            @if(!$product->is_out_of_stock && $favoriteTomorrowPrice !== null)
                                 <div class="mt-2 flex items-end justify-between gap-3 border-t border-dashed border-slate-100 pt-2">
                                     <div>
                                         <p class="text-[9px] font-black uppercase tracking-wider text-amber-700">Tomorrow</p>

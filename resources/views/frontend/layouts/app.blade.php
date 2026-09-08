@@ -140,6 +140,14 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 </head>
 <body class="min-h-screen flex flex-col" style="background:#f5f6fa;">
 
+<!-- Page Refresh / Navigation Top Progress Bar & Loader -->
+<div id="topProgressBar" class="fixed top-0 left-0 z-[9999] h-1 w-0 bg-gradient-to-r from-blue-600 via-green-500 to-amber-400 shadow-[0_0_12px_rgba(37,99,235,0.9)] transition-all duration-300 pointer-events-none"></div>
+
+<div id="pageLoaderPill" class="fixed top-4 right-4 z-[9999] hidden items-center gap-2.5 rounded-full bg-slate-900/90 px-4 py-2 text-white shadow-2xl backdrop-blur-md transition-all duration-300 pointer-events-none border border-white/10">
+    <i class="fa-solid fa-circle-notch fa-spin text-sm text-green-400"></i>
+    <span class="text-xs font-bold tracking-wide">Loading...</span>
+</div>
+
 <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
 <!-- Mobile Sidebar -->
@@ -1226,6 +1234,73 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }).observe(document.body, { childList: true, subtree: true });
 });
+
+// Page Navigation / Refresh Loader
+(function() {
+    const bar = document.getElementById('topProgressBar');
+    const pill = document.getElementById('pageLoaderPill');
+    let progressTimer = null;
+    let currentProgress = 0;
+
+    function startLoader() {
+        if (!bar) return;
+        bar.style.opacity = '1';
+        if (pill) { pill.classList.remove('hidden'); pill.classList.add('flex'); }
+
+        currentProgress = 15;
+        bar.style.width = currentProgress + '%';
+
+        clearInterval(progressTimer);
+        progressTimer = setInterval(() => {
+            if (currentProgress < 85) {
+                currentProgress += Math.random() * 15;
+                bar.style.width = currentProgress + '%';
+            }
+        }, 150);
+    }
+
+    function completeLoader() {
+        if (!bar) return;
+        clearInterval(progressTimer);
+        bar.style.width = '100%';
+        setTimeout(() => {
+            bar.style.opacity = '0';
+            setTimeout(() => {
+                bar.style.width = '0%';
+                if (pill) { pill.classList.add('hidden'); pill.classList.remove('flex'); }
+            }, 300);
+        }, 200);
+    }
+
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (!link) return;
+
+        const href = link.getAttribute('href');
+        const target = link.getAttribute('target');
+
+        if (href && !href.startsWith('#') && !href.startsWith('javascript:') && !href.startsWith('tel:') && !href.startsWith('mailto:') && target !== '_blank') {
+            if (link.hostname === window.location.hostname) {
+                startLoader();
+            }
+        }
+    });
+
+    document.addEventListener('submit', () => {
+        startLoader();
+    });
+
+    window.addEventListener('beforeunload', () => {
+        startLoader();
+    });
+
+    if (document.readyState === 'complete') {
+        completeLoader();
+    } else {
+        window.addEventListener('load', completeLoader);
+        document.addEventListener('DOMContentLoaded', () => setTimeout(completeLoader, 100));
+    }
+})();
 </script>
 @yield('scripts')
 </body>

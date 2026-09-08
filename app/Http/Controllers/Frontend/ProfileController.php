@@ -39,7 +39,6 @@ class ProfileController extends Controller
         $totalOrders = (clone $ordersQuery)->count();
         $deliveredOrders = (clone $ordersQuery)->where('status', 'delivered')->count();
         $activeOrders = (clone $ordersQuery)->whereIn('status', ['pending', 'confirmed', 'processing', 'out_for_delivery'])->count();
-        $loyaltyPoints = (int) floor($totalSpent / 10);
 
         $profileChecks = collect([
             filled($user->name),
@@ -54,7 +53,6 @@ class ProfileController extends Controller
         $stats = [
             'total_orders' => $totalOrders,
             'total_spent' => $totalSpent,
-            'loyalty_points' => $loyaltyPoints,
             'member_since' => optional($user->created_at)->format('d M Y'),
             'delivered_orders' => $deliveredOrders,
             'active_orders' => $activeOrders,

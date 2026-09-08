@@ -38,8 +38,7 @@ class Product extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('products.is_active', true)
-            ->whereHas('category', function ($q) {
+        return $query->whereHas('category', function ($q) {
                 $q->where('categories.is_active', true);
             })
             ->where(function ($q) {
@@ -48,6 +47,11 @@ class Product extends Model
                       $sq->where('categories.is_active', true);
                   });
             });
+    }
+
+    public function getIsOutOfStockAttribute(): bool
+    {
+        return !$this->is_active || ($this->stock !== null && (int) $this->stock <= 0);
     }
 
     public function getDisplayPackLabelAttribute(): string

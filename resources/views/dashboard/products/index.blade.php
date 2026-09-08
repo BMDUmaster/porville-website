@@ -1,4 +1,4 @@
-﻿@extends('layouts.dashboard')
+@extends('layouts.dashboard')
 @section('title', 'Products')
 @section('page_title', 'Product Management')
 
@@ -40,6 +40,10 @@
         <button type="button" onclick="openModal('addProductModal')"
                 class="bg-amber-400 hover:bg-amber-500 text-black px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-1">
             <i class="fa-solid fa-plus"></i> Add Product
+        </button>
+        <button type="button" onclick="openMultiEditModal()"
+                class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-layer-group"></i> Multi Edit
         </button>
     </form>
 
@@ -1088,5 +1092,247 @@ document.addEventListener('input', (event) => {
         updateVariantSaveOffer(row);
     }
 });
+</script>
+
+{{-- Multi Edit Modal --}}
+<div id="multiEditModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/50 p-4 backdrop-blur-sm sm:p-6 md:p-10">
+    <div class="relative mx-auto w-full max-w-3xl rounded-2xl bg-white shadow-2xl overflow-hidden border border-slate-200">
+        {{-- Modal Header --}}
+        <div class="flex items-center justify-between border-b bg-slate-50 px-6 py-4">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-sm">
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-extrabold text-slate-900">Multi Product Selector</h3>
+                    <p class="text-[11px] text-slate-500">Search & select multiple products to edit simultaneously.</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeModal('multiEditModal')" class="text-slate-400 hover:text-slate-600 text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        {{-- Modal Body --}}
+        <div class="p-6 space-y-5">
+            {{-- Live Search Input --}}
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Search Products</label>
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="multiEditSearch" oninput="debounceMultiEditSearch()" placeholder="Search product name, category, or subcategory..."
+                           class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-xs font-medium text-slate-900 outline-none focus:border-purple-500 focus:bg-white focus:ring-2 focus:ring-purple-100">
+                </div>
+            </div>
+
+            {{-- Search Results List --}}
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-slate-700">Search Results</span>
+                    <span id="searchResultsCount" class="text-[11px] font-semibold text-slate-500">Loading products...</span>
+                </div>
+                <div id="multiEditSearchResults" class="max-h-60 overflow-y-auto rounded-xl border bg-slate-50 p-2 space-y-2">
+                    {{-- Populated dynamically via JS --}}
+                </div>
+            </div>
+
+            {{-- Selected Products Tray --}}
+            <div class="border-t pt-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-check-double text-purple-600"></i> Selected Products (<span id="selectedCountText">0</span>)
+                    </span>
+                    <button type="button" onclick="clearSelectedProducts()" class="text-[11px] font-bold text-red-600 hover:underline">Clear All</button>
+                </div>
+                <div id="selectedProductsTray" class="min-h-[60px] max-h-36 overflow-y-auto rounded-xl border bg-purple-50/50 p-2 flex flex-wrap gap-2 items-center">
+                    <span id="noProductsSelectedPlaceholder" class="text-xs text-slate-400 italic px-2">No products selected yet. Search and click "+ Add" above.</span>
+                </div>
+            </div>
+        </div>
+
+        {{-- Modal Footer --}}
+        <div class="flex items-center justify-between border-t bg-slate-50 px-6 py-4">
+            <button type="button" onclick="closeModal('multiEditModal')" class="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800">
+                Close
+            </button>
+            <form id="openMultiEditForm" method="GET" action="{{ route('dashboard.products.multi-edit') }}">
+                <input type="hidden" name="ids" id="selectedProductIdsInput" value="">
+                <button type="submit" id="btnOpenMultiEditPage" disabled
+                        class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs font-extrabold uppercase tracking-wider shadow-md transition flex items-center gap-2">
+                    <span>Open Multi Edit Page</span>
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedProductsMap = {};
+let searchTimeout = null;
+
+function openMultiEditModal() {
+    openModal('multiEditModal');
+    const searchInput = document.getElementById('multiEditSearch');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    fetchMultiEditProducts('');
+    renderSelectedTray();
+}
+
+function debounceMultiEditSearch() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        const q = document.getElementById('multiEditSearch').value;
+        fetchMultiEditProducts(q);
+    }, 300);
+}
+
+async function fetchMultiEditProducts(q) {
+    const resultsContainer = document.getElementById('multiEditSearchResults');
+    const countSpan = document.getElementById('searchResultsCount');
+    if (!resultsContainer) return;
+
+    resultsContainer.innerHTML = '<div class="p-4 text-center text-xs text-slate-400"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Loading products...</div>';
+
+    try {
+        const url = '{{ route('dashboard.products.search-json') }}?q=' + encodeURIComponent(q);
+        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+        const data = await res.json();
+
+        if (data.success && Array.isArray(data.products)) {
+            countSpan.textContent = data.products.length + ' products found';
+            renderSearchResults(data.products);
+        } else {
+            countSpan.textContent = '0 products found';
+            resultsContainer.innerHTML = '<div class="p-4 text-center text-xs text-slate-400">No products found matching search query.</div>';
+        }
+    } catch (err) {
+        countSpan.textContent = 'Error loading products';
+        resultsContainer.innerHTML = '<div class="p-4 text-center text-xs text-red-500">Error loading search results.</div>';
+    }
+}
+
+function renderSearchResults(products) {
+    const container = document.getElementById('multiEditSearchResults');
+    if (!container) return;
+
+    if (!products.length) {
+        container.innerHTML = '<div class="p-4 text-center text-xs text-slate-400">No products found.</div>';
+        return;
+    }
+
+    let html = '';
+    products.forEach(p => {
+        const isSelected = !!selectedProductsMap[p.id];
+        const statusBadge = p.is_active
+            ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-green-100 text-green-700">Active</span>'
+            : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700">Inactive</span>';
+
+        const imgTag = p.image
+            ? `<img src="${p.image}" class="w-9 h-9 rounded-lg object-cover border bg-white">`
+            : `<div class="w-9 h-9 rounded-lg bg-slate-200 text-slate-400 flex items-center justify-center text-xs"><i class="fa-regular fa-image"></i></div>`;
+
+        const btnClass = isSelected
+            ? 'bg-green-600 text-white hover:bg-green-700'
+            : 'bg-purple-600 text-white hover:bg-purple-700';
+
+        const btnText = isSelected
+            ? '<i class="fa-solid fa-check"></i> Added'
+            : '<i class="fa-solid fa-plus"></i> Add';
+
+        const jsonString = JSON.stringify(p).replace(/'/g, "&apos;");
+
+        html += `
+            <div class="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200 hover:border-purple-300 transition">
+                <div class="flex items-center gap-3 min-w-0">
+                    ${imgTag}
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                            <h4 class="text-xs font-bold text-slate-900 truncate">${escapeHtml(p.name)}</h4>
+                            ${statusBadge}
+                        </div>
+                        <p class="text-[11px] text-slate-500 truncate">
+                            ${escapeHtml(p.category_name)} ${p.subcategory_name !== '-' ? '| ' + escapeHtml(p.subcategory_name) : ''}
+                            <span class="ml-2 font-semibold text-slate-700">₹${p.price.toFixed(2)}</span>
+                            <span class="ml-2 text-purple-600">(${p.variants_count} variants)</span>
+                        </p>
+                    </div>
+                </div>
+                <button type="button" onclick='toggleSelectProduct(${jsonString})'
+                        class="px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition ${btnClass}">
+                    ${btnText}
+                </button>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function toggleSelectProduct(product) {
+    if (selectedProductsMap[product.id]) {
+        delete selectedProductsMap[product.id];
+    } else {
+        selectedProductsMap[product.id] = product;
+    }
+    renderSelectedTray();
+    const q = document.getElementById('multiEditSearch').value;
+    fetchMultiEditProducts(q);
+}
+
+function removeSelectedProduct(id) {
+    delete selectedProductsMap[id];
+    renderSelectedTray();
+    const q = document.getElementById('multiEditSearch').value;
+    fetchMultiEditProducts(q);
+}
+
+function clearSelectedProducts() {
+    selectedProductsMap = {};
+    renderSelectedTray();
+    const q = document.getElementById('multiEditSearch').value;
+    fetchMultiEditProducts(q);
+}
+
+function renderSelectedTray() {
+    const tray = document.getElementById('selectedProductsTray');
+    const countText = document.getElementById('selectedCountText');
+    const idsInput = document.getElementById('selectedProductIdsInput');
+    const submitBtn = document.getElementById('btnOpenMultiEditPage');
+
+    const selectedList = Object.values(selectedProductsMap);
+    countText.textContent = selectedList.length;
+
+    if (selectedList.length === 0) {
+        tray.innerHTML = '<span id="noProductsSelectedPlaceholder" class="text-xs text-slate-400 italic px-2">No products selected yet. Search and click "+ Add" above.</span>';
+        idsInput.value = '';
+        submitBtn.disabled = true;
+        return;
+    }
+
+    submitBtn.disabled = false;
+    idsInput.value = selectedList.map(p => p.id).join(',');
+
+    let html = '';
+    selectedList.forEach(p => {
+        html += `
+            <span class="inline-flex items-center gap-1.5 rounded-xl bg-white border border-purple-200 px-3 py-1 text-xs font-bold text-purple-900">
+                <span>${escapeHtml(p.name)}</span>
+                <button type="button" onclick="removeSelectedProduct(${p.id})" class="text-slate-400 hover:text-red-600 transition">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </span>
+        `;
+    });
+
+    tray.innerHTML = html;
+}
 </script>
 @endsection

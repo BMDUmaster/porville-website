@@ -344,9 +344,9 @@ class CheckoutController extends Controller
         foreach ($cart as $key => $item) {
             $product = $products->get($item['product_id'] ?? null);
 
-            if (! $product || ! $product->is_active) {
+            if (! $product || $product->is_out_of_stock) {
                 throw ValidationException::withMessages([
-                    'cart' => 'One or more products in your cart are no longer available.',
+                    'cart' => 'One or more products in your cart are currently out of stock.',
                 ]);
             }
 
