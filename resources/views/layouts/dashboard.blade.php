@@ -569,6 +569,14 @@
                 window.addEventListener('load', completeLoader);
                 document.addEventListener('DOMContentLoaded', () => setTimeout(completeLoader, 100));
             }
+
+            // Back/forward navigation restores the page from bfcache without firing
+            // load/DOMContentLoaded, which left the loader stuck. Force a refresh instead.
+            window.addEventListener('pageshow', (e) => {
+                if (e.persisted) {
+                    window.location.reload();
+                }
+            });
         })();
 
         // Scroll Position Preservation for Admin Dashboard
