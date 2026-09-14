@@ -415,6 +415,10 @@
                     && (float) $cardVariant['tomorrow_price'] > 0
                         ? (float) $cardVariant['tomorrow_price']
                         : null;
+                $cardTodayPriceSet = $cardVariant && filled($cardVariant['today_price'] ?? null)
+                    && (float) $cardVariant['today_price'] > 0;
+                // Today is only hidden when Tomorrow's price was explicitly set without a matching Today price.
+                $cardTodayAvailable = $cardTodayPriceSet || $cardTomorrowPrice === null;
             @endphp
             @php
                 $isInWishlist = in_array($product->id, session('wishlist', []), true);
@@ -453,28 +457,30 @@
                        class="block min-h-[40px] text-sm font-bold text-gray-800 hover:text-green-700 leading-snug line-clamp-2">{{ $product->name }}</a>
                     <p class="text-[10px] text-gray-400 mt-1">{{ $product->category->name ?? '' }}</p>
                     <div class="mt-auto pt-1.5">
-                        <div class="flex items-end justify-between gap-2">
-                            <div>
-                                <p class="text-[9px] font-black uppercase tracking-wider text-emerald-600">Today</p>
-                                <p class="text-lg font-extrabold text-gray-800">Rs{{ number_format($product->display_price, 0) }}<span class="ml-1 text-xs font-semibold text-gray-400">{{ $product->display_pack_label }}</span></p>
-                                @if($product->display_mrp && $product->display_mrp > $product->display_price)
-                                    <p class="text-xs text-gray-400 line-through">Rs{{ number_format($product->display_mrp, 0) }}</p>
+                        @if($cardTodayAvailable)
+                            <div class="flex items-end justify-between gap-2">
+                                <div>
+                                    <p class="text-[9px] font-black uppercase tracking-wider text-emerald-600">Today</p>
+                                    <p class="text-lg font-extrabold text-gray-800">Rs{{ number_format($product->display_price, 0) }}<span class="ml-1 text-xs font-semibold text-gray-400">{{ $product->display_pack_label }}</span></p>
+                                    @if($product->display_mrp && $product->display_mrp > $product->display_price)
+                                        <p class="text-xs text-gray-400 line-through">Rs{{ number_format($product->display_mrp, 0) }}</p>
+                                    @endif
+                                </div>
+                                @if(!$product->is_out_of_stock)
+                                    <button onclick="addToCart({{ $product->id }}, {{ $cardVariantIndex === null ? 'null' : $cardVariantIndex }}, 'today')"
+                                            class="flex h-9 items-center justify-center rounded-lg bg-blue-600 px-3 text-[10px] font-extrabold uppercase tracking-[0.1em] text-white transition hover:bg-blue-700 sm:w-9 sm:px-0 sm:text-sm">
+                                        <span class="sm:hidden">Add to Cart</span>
+                                        <i class="fa-solid fa-cart-shopping hidden sm:inline" aria-hidden="true"></i>
+                                    </button>
+                                @else
+                                    <span class="inline-flex rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-red-600">
+                                        Out of Stock
+                                    </span>
                                 @endif
                             </div>
-                            @if(!$product->is_out_of_stock)
-                                <button onclick="addToCart({{ $product->id }}, {{ $cardVariantIndex === null ? 'null' : $cardVariantIndex }}, 'today')"
-                                        class="flex h-9 items-center justify-center rounded-lg bg-blue-600 px-3 text-[10px] font-extrabold uppercase tracking-[0.1em] text-white transition hover:bg-blue-700 sm:w-9 sm:px-0 sm:text-sm">
-                                    <span class="sm:hidden">Add to Cart</span>
-                                    <i class="fa-solid fa-cart-shopping hidden sm:inline" aria-hidden="true"></i>
-                                </button>
-                            @else
-                                <span class="inline-flex rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-red-600">
-                                    Out of Stock
-                                </span>
-                            @endif
-                        </div>
+                        @endif
                         @if(!$product->is_out_of_stock && $cardTomorrowPrice !== null)
-                            <div class="mt-1 flex items-end justify-between gap-2 border-t border-dashed border-gray-100 pt-1">
+                            <div class="{{ $cardTodayAvailable ? 'mt-1 border-t border-dashed border-gray-100 pt-1' : '' }} flex items-end justify-between gap-2">
                                 <div>
                                     <p class="text-[9px] font-black uppercase tracking-wider text-amber-700">Tomorrow</p>
                                     <p class="text-lg font-extrabold text-gray-800">Rs{{ number_format($cardTomorrowPrice, 0) }}<span class="ml-1 text-xs font-semibold text-gray-400">{{ $product->display_pack_label }}</span></p>
@@ -486,6 +492,11 @@
                                     <i class="fa-solid fa-cart-shopping hidden sm:inline" aria-hidden="true"></i>
                                 </button>
                             </div>
+                        @endif
+                        @if($product->is_out_of_stock && !$cardTodayAvailable)
+                            <span class="inline-flex rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-red-600">
+                                Out of Stock
+                            </span>
                         @endif
                     </div>
                 </div>

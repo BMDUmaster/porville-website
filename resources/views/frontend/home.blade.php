@@ -872,6 +872,10 @@
                         && (float) $favoriteVariant['tomorrow_price'] > 0
                             ? (float) $favoriteVariant['tomorrow_price']
                             : null;
+                    $favoriteTodayPriceSet = $favoriteVariant && filled($favoriteVariant['today_price'] ?? null)
+                        && (float) $favoriteVariant['today_price'] > 0;
+                    // Today is only hidden when Tomorrow's price was explicitly set without a matching Today price.
+                    $favoriteTodayAvailable = $favoriteTodayPriceSet || $favoriteTomorrowPrice === null;
                 @endphp
 
                 <article class="favorite-card group min-w-[255px] max-w-[255px] rounded-[28px] p-3">
@@ -909,25 +913,27 @@
                         </div>
 
                         <div class="mt-3 border-t border-dashed border-slate-100 pt-3">
-                            <div class="flex items-end justify-between gap-3">
-                                <div>
-                                    <p class="text-[9px] font-black uppercase tracking-wider text-emerald-600">Today</p>
-                                    <p class="text-[18px] font-black text-slate-950">Rs{{ number_format($product->display_price, 0) }}<span class="ml-1 text-[11px] font-semibold text-slate-400">{{ $product->display_pack_label }}</span></p>
-                                @if($product->display_mrp && $product->display_mrp > $product->display_price)
-                                    <p class="text-xs text-slate-400 line-through">Rs{{ number_format($product->display_mrp, 0) }}</p>
-                                @endif
+                            @if($favoriteTodayAvailable)
+                                <div class="flex items-end justify-between gap-3">
+                                    <div>
+                                        <p class="text-[9px] font-black uppercase tracking-wider text-emerald-600">Today</p>
+                                        <p class="text-[18px] font-black text-slate-950">Rs{{ number_format($product->display_price, 0) }}<span class="ml-1 text-[11px] font-semibold text-slate-400">{{ $product->display_pack_label }}</span></p>
+                                    @if($product->display_mrp && $product->display_mrp > $product->display_price)
+                                        <p class="text-xs text-slate-400 line-through">Rs{{ number_format($product->display_mrp, 0) }}</p>
+                                    @endif
+                                    </div>
+                                    @if(!$product->is_out_of_stock)
+                                        <button onclick="addToCart({{ $product->id }}, {{ $favoriteVariantIndex === null ? 'null' : $favoriteVariantIndex }}, 'today')" aria-label="Add {{ $product->name }} for today" title="Add for today" class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-green-700 text-white transition hover:bg-green-800">
+                                            <i class="fa-solid fa-cart-shopping text-[18px]" aria-hidden="true"></i>
+                                        </button>
+                                    @else
+                                        <span class="inline-flex items-center rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-red-600">Out of Stock</span>
+                                    @endif
                                 </div>
-                                @if(!$product->is_out_of_stock)
-                                    <button onclick="addToCart({{ $product->id }}, {{ $favoriteVariantIndex === null ? 'null' : $favoriteVariantIndex }}, 'today')" aria-label="Add {{ $product->name }} for today" title="Add for today" class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-green-700 text-white transition hover:bg-green-800">
-                                        <i class="fa-solid fa-cart-shopping text-[18px]" aria-hidden="true"></i>
-                                    </button>
-                                @else
-                                    <span class="inline-flex items-center rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-red-600">Out of Stock</span>
-                                @endif
-                            </div>
+                            @endif
 
                             @if(!$product->is_out_of_stock && $favoriteTomorrowPrice !== null)
-                                <div class="mt-2 flex items-end justify-between gap-3 border-t border-dashed border-slate-100 pt-2">
+                                <div class="{{ $favoriteTodayAvailable ? 'mt-2 border-t border-dashed border-slate-100 pt-2' : '' }} flex items-end justify-between gap-3">
                                     <div>
                                         <p class="text-[9px] font-black uppercase tracking-wider text-amber-700">Tomorrow</p>
                                         <p class="text-[18px] font-black text-slate-950">Rs{{ number_format($favoriteTomorrowPrice, 0) }}<span class="ml-1 text-[11px] font-semibold text-slate-400">{{ $product->display_pack_label }}</span></p>
@@ -936,6 +942,10 @@
                                         <i class="fa-solid fa-cart-shopping text-[18px]" aria-hidden="true"></i>
                                     </button>
                                 </div>
+                            @endif
+
+                            @if($product->is_out_of_stock && !$favoriteTodayAvailable)
+                                <span class="inline-flex items-center rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-red-600">Out of Stock</span>
                             @endif
                         </div>
                     </div>

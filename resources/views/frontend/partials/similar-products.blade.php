@@ -21,6 +21,10 @@
                         && (float) $similarVariant['tomorrow_price'] > 0
                             ? (float) $similarVariant['tomorrow_price']
                             : null;
+                    $similarTodayPriceSet = $similarVariant && filled($similarVariant['today_price'] ?? null)
+                        && (float) $similarVariant['today_price'] > 0;
+                    // Today is only hidden when Tomorrow's price was explicitly set without a matching Today price.
+                    $similarTodayAvailable = $similarTodayPriceSet || $similarTomorrowPrice === null;
                     $similarInWishlist = in_array($item->id, session('wishlist', []), true);
                 @endphp
                 <article class="group relative flex flex-col overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-green-200 hover:shadow-[0_18px_35px_rgba(15,23,42,0.1)]">
@@ -54,23 +58,25 @@
                         <a href="{{ route('frontend.product.show', $item->slug) }}" class="mt-2 line-clamp-2 min-h-[40px] text-[13px] font-black leading-5 text-slate-900 transition hover:text-green-700">{{ $item->name }}</a>
 
                         <div class="mt-auto pt-3">
-                            <div class="flex items-end justify-between gap-2 border-t border-dashed border-slate-100 pt-3">
-                                <div>
-                                    <p class="text-[9px] font-black uppercase tracking-wider text-emerald-600">Today</p>
-                                    <p class="text-[16px] font-black text-slate-900">Rs{{ number_format($item->display_price, 0) }}<span class="ml-1 text-[11px] font-semibold text-slate-400">{{ $item->display_pack_label }}</span></p>
-                                    @if($item->display_mrp && $item->display_mrp > $item->display_price)
-                                        <p class="text-[11px] font-bold text-slate-400 line-through">Rs{{ number_format($item->display_mrp, 0) }}</p>
+                            @if($similarTodayAvailable)
+                                <div class="flex items-end justify-between gap-2 border-t border-dashed border-slate-100 pt-3">
+                                    <div>
+                                        <p class="text-[9px] font-black uppercase tracking-wider text-emerald-600">Today</p>
+                                        <p class="text-[16px] font-black text-slate-900">Rs{{ number_format($item->display_price, 0) }}<span class="ml-1 text-[11px] font-semibold text-slate-400">{{ $item->display_pack_label }}</span></p>
+                                        @if($item->display_mrp && $item->display_mrp > $item->display_price)
+                                            <p class="text-[11px] font-bold text-slate-400 line-through">Rs{{ number_format($item->display_mrp, 0) }}</p>
+                                        @endif
+                                    </div>
+                                    @if(!$item->is_out_of_stock)
+                                        <button type="button" onclick="addToCart({{ $item->id }}, {{ $similarVariantIndex === null ? 'null' : $similarVariantIndex }}, 'today')" aria-label="Add {{ $item->name }} for today" title="Add for today" class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-green-700 text-white transition hover:bg-green-800">
+                                            <i class="fa-solid fa-cart-shopping"></i>
+                                        </button>
                                     @endif
                                 </div>
-                                @if(!$item->is_out_of_stock)
-                                    <button type="button" onclick="addToCart({{ $item->id }}, {{ $similarVariantIndex === null ? 'null' : $similarVariantIndex }}, 'today')" aria-label="Add {{ $item->name }} for today" title="Add for today" class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-green-700 text-white transition hover:bg-green-800">
-                                        <i class="fa-solid fa-cart-shopping"></i>
-                                    </button>
-                                @endif
-                            </div>
+                            @endif
 
                             @if(!$item->is_out_of_stock && $similarTomorrowPrice !== null)
-                                <div class="mt-2 flex items-end justify-between gap-2 border-t border-dashed border-slate-100 pt-2">
+                                <div class="{{ $similarTodayAvailable ? 'mt-2 border-t border-dashed border-slate-100 pt-2' : 'border-t border-dashed border-slate-100 pt-3' }} flex items-end justify-between gap-2">
                                     <div>
                                         <p class="text-[9px] font-black uppercase tracking-wider text-amber-700">Tomorrow</p>
                                         <p class="text-[16px] font-black text-slate-900">Rs{{ number_format($similarTomorrowPrice, 0) }}<span class="ml-1 text-[11px] font-semibold text-slate-400">{{ $item->display_pack_label }}</span></p>

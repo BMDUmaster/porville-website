@@ -75,6 +75,11 @@
         $mrp = (float) ($variant['mrp'] ?? $baseSellingPrice);
         $rawTomorrowPrice = $variant['tomorrow_price'] ?? null;
         $tomorrowAvailable = $rawTomorrowPrice !== null && $rawTomorrowPrice !== '' && (float) $rawTomorrowPrice > 0;
+        $rawTodayPrice = $variant['today_price'] ?? null;
+        $todayPriceSet = $rawTodayPrice !== null && $rawTodayPrice !== '' && (float) $rawTodayPrice > 0;
+        // Today is only hidden when Tomorrow's price was explicitly set without a matching Today price;
+        // if neither day price is used at all, fall back to the normal selling price under Today.
+        $todayAvailable = $todayPriceSet || ! $tomorrowAvailable;
         $todayPrice = \App\Support\ProductDayPricing::sellingPrice($variant, 'today', $baseSellingPrice);
         $tomorrowPrice = \App\Support\ProductDayPricing::sellingPrice($variant, 'tomorrow', $baseSellingPrice);
 
@@ -88,6 +93,7 @@
             'mrp' => $mrp,
             'today_price' => $todayPrice,
             'tomorrow_price' => $tomorrowPrice,
+            'today_available' => $todayAvailable,
             'tomorrow_available' => $tomorrowAvailable,
             'today_offer' => round(\App\Support\ProductDayPricing::saveOfferPercent($variant, 'today', $mrp)),
             'tomorrow_offer' => round(\App\Support\ProductDayPricing::saveOfferPercent($variant, 'tomorrow', $mrp)),
@@ -95,11 +101,18 @@
     })->values();
 
     $defaultVariant = $variantPayload->first();
-    $defaultPricingDay = 'today';
+    $defaultPricingDay = ($defaultVariant && ! ($defaultVariant['today_available'] ?? true) && ($defaultVariant['tomorrow_available'] ?? false))
+        ? 'tomorrow'
+        : 'today';
+    $defaultVariantIndex = $variantPayload->search(function ($variant) use ($defaultPricingDay) {
+        return $variant[$defaultPricingDay . '_available'] ?? true;
+    });
+    $defaultVariantIndex = $defaultVariantIndex === false ? 0 : $defaultVariantIndex;
+    $defaultVariant = $variantPayload[$defaultVariantIndex] ?? $defaultVariant;
     $selectedPackLabel = filled($product->weight)
         ? trim((string) $product->weight)
         : ($defaultVariant['label'] ?: (($product->weight ?: '1') . ' ' . ($product->unit ?: 'unit')));
-    $defaultDisplayedPrice = (float) ($defaultVariant['today_price'] ?? $defaultVariant['selling_price'] ?? $product->price);
+    $defaultDisplayedPrice = (float) ($defaultVariant[$defaultPricingDay . '_price'] ?? $defaultVariant['selling_price'] ?? $product->price);
     $selectedSaveAmount = max(($defaultVariant['mrp'] ?? 0) - $defaultDisplayedPrice, 0);
     $hasProductDescription = filled(trim(strip_tags((string) ($product->description ?? ''))));
     $productDescriptionText = trim(preg_replace('/\s+/', ' ', strip_tags((string) ($product->description ?? ''))));
@@ -498,10 +511,10 @@
             <div class="min-w-0 rounded-[24px] border border-[#bce8c3] bg-[#f2fbf3] p-4 shadow-[0_18px_45px_rgba(47,140,67,0.08)] sm:p-5">
                 <div class="mb-4 flex flex-wrap items-center gap-2">
                     <span class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Choose Day</span>
-                    <button type="button" data-pricing-day="today" class="pricing-day-button is-active rounded-full border border-green-500 bg-white px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-green-700 shadow-sm transition hover:border-green-400">
+                    <button type="button" data-pricing-day="today" class="pricing-day-button {{ $defaultPricingDay === 'today' ? 'is-active' : '' }} {{ ($defaultVariant['today_available'] ?? true) ? '' : 'hidden' }} rounded-full border border-green-500 bg-white px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-green-700 shadow-sm transition hover:border-green-400">
                         Today
                     </button>
-                    <button type="button" data-pricing-day="tomorrow" class="pricing-day-button rounded-full border border-transparent bg-white/70 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-slate-500 transition hover:border-green-200 hover:text-green-700">
+                    <button type="button" data-pricing-day="tomorrow" class="pricing-day-button {{ $defaultPricingDay === 'tomorrow' ? 'is-active' : '' }} {{ ($defaultVariant['tomorrow_available'] ?? false) ? '' : 'hidden' }} rounded-full border border-transparent bg-white/70 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-slate-500 transition hover:border-green-200 hover:text-green-700">
                         Tomorrow
                     </button>
                 </div>
@@ -515,7 +528,7 @@
                             ₹{{ number_format($defaultVariant['mrp'] ?? $product->mrp, 0) }}
                         </span>
                         <span id="detailOffer" class="rounded-full bg-[#ff6d5e] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white">
-                            -{{ (int) ($defaultVariant['today_offer'] ?? 0) }}% off
+                            -{{ (int) ($defaultVariant[$defaultPricingDay . '_offer'] ?? 0) }}% off
                         </span>
                     </span>
                 </div>
@@ -559,10 +572,12 @@
                             type="button"
                             id="variant-btn-{{ $index }}"
                             onclick="selectVariant({{ $index }})"
-                            class="variant-card {{ $index === 0 ? 'is-active' : '' }} min-w-[84px] rounded-[16px] border border-slate-200 bg-white px-3 py-3 text-left shadow-sm transition duration-200 hover:-translate-y-1 hover:border-green-400 hover:bg-green-50 hover:shadow-[0_14px_28px_rgba(47,140,67,0.16)] active:translate-y-0 active:scale-[0.98]"
+                            data-today-available="{{ ($variant['today_available'] ?? true) ? '1' : '0' }}"
+                            data-tomorrow-available="{{ ($variant['tomorrow_available'] ?? false) ? '1' : '0' }}"
+                            class="variant-card {{ $index === $defaultVariantIndex ? 'is-active' : '' }} {{ ($variant[$defaultPricingDay . '_available'] ?? true) ? '' : 'hidden' }} min-w-[84px] rounded-[16px] border border-slate-200 bg-white px-3 py-3 text-left shadow-sm transition duration-200 hover:-translate-y-1 hover:border-green-400 hover:bg-green-50 hover:shadow-[0_14px_28px_rgba(47,140,67,0.16)] active:translate-y-0 active:scale-[0.98]"
                         >
                             <div class="text-[11px] font-black text-slate-800">{{ $variant['label'] ?: 'Standard Pack' }}</div>
-                            <div class="mt-1 text-[10px] font-semibold text-slate-400" data-variant-day-price="{{ $index }}">₹{{ number_format($variant['today_price'], 0) }}</div>
+                            <div class="mt-1 text-[10px] font-semibold text-slate-400" data-variant-day-price="{{ $index }}">₹{{ number_format($variant[$defaultPricingDay . '_price'], 0) }}</div>
                         </button>
                     @endforeach
                 </div>
@@ -829,7 +844,7 @@ const detailGalleryMedia = @json($detailMedia);
 const detailVariants = @json($variantPayload);
 
 let currentQty = 1;
-let selectedVariant = 0;
+let selectedVariant = {{ $defaultVariantIndex }};
 let selectedPricingDay = '{{ $defaultPricingDay }}';
 let galleryIndex = 0;
 let galleryZoomLevel = 1;
@@ -973,10 +988,22 @@ function isTomorrowAvailable(variant) {
     return variant.tomorrow_available === true;
 }
 
+function isTodayAvailable(variant) {
+    if (!variant) return true;
+
+    return variant.today_available !== false;
+}
+
 function syncPricingDayButtons() {
     const variant = detailVariants[selectedVariant];
+    const todayButton = document.querySelector('[data-pricing-day="today"]');
     const tomorrowButton = document.querySelector('[data-pricing-day="tomorrow"]');
+    const todayAvailable = isTodayAvailable(variant);
     const tomorrowAvailable = isTomorrowAvailable(variant);
+
+    if (todayButton) {
+        todayButton.classList.toggle('hidden', !todayAvailable);
+    }
 
     if (tomorrowButton) {
         tomorrowButton.classList.toggle('hidden', !tomorrowAvailable);
@@ -984,6 +1011,10 @@ function syncPricingDayButtons() {
 
     if (!tomorrowAvailable && selectedPricingDay === 'tomorrow') {
         selectedPricingDay = 'today';
+    }
+
+    if (!todayAvailable && selectedPricingDay === 'today') {
+        selectedPricingDay = tomorrowAvailable ? 'tomorrow' : 'today';
     }
 
     document.querySelectorAll('[data-pricing-day]').forEach((button) => {
@@ -1015,9 +1046,31 @@ function refreshVariantDayPrices() {
     });
 }
 
+function isVariantAvailableForDay(variant, pricingDay) {
+    return pricingDay === 'tomorrow' ? isTomorrowAvailable(variant) : isTodayAvailable(variant);
+}
+
+function syncVariantCardVisibility() {
+    let firstVisibleIndex = null;
+
+    document.querySelectorAll('.variant-card').forEach((card, index) => {
+        const available = isVariantAvailableForDay(detailVariants[index], selectedPricingDay);
+        card.classList.toggle('hidden', !available);
+
+        if (available && firstVisibleIndex === null) {
+            firstVisibleIndex = index;
+        }
+    });
+
+    if (firstVisibleIndex !== null && !isVariantAvailableForDay(detailVariants[selectedVariant], selectedPricingDay)) {
+        selectedVariant = firstVisibleIndex;
+    }
+}
+
 function selectPricingDay(pricingDay) {
     selectedPricingDay = pricingDay === 'tomorrow' ? 'tomorrow' : 'today';
     syncPricingDayButtons();
+    syncVariantCardVisibility();
 
     refreshVariantDayPrices();
     selectVariant(selectedVariant);
