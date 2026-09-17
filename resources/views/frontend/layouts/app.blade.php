@@ -566,7 +566,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                 </a>
                 <div class="flex items-center gap-3.5 text-[15px] text-[#c9b896]">
                     <a href="https://wa.me/919217577006" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-                    <a href="https://www.instagram.com/porville" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://www.instagram.com/porville_1986?stkn=MXFsNHc5dTZxdGRnaA%3D%3D" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
                     <a href="#" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
                 </div>
             </div>
