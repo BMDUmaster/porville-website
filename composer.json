@@ -1,7 +1,7 @@
 {
-    "name": "farmsea/dashboard",
+    "name": "porville/dashboard",
     "type": "project",
-    "description": "FarmSea Vendor Dashboard - Laravel Application",
+    "description": "Porville Dashboard - Laravel Application",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {

@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 @section('title', 'Orders')
-@section('page_title', 'FarmSea Orders')
+@section('page_title', 'Porville Orders')
 
 @section('content')
 @php
@@ -64,7 +64,7 @@
         <h1 class="text-2xl font-bold text-gray-800">Live Orders</h1>
         <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:justify-end">
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search customer / ID..."
-                   class="w-full rounded border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 sm:w-auto">
+                   class="w-full rounded border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-amber-500 sm:w-auto">
             <select name="status" class="border rounded px-3 py-1.5 text-sm outline-none">
                 <option value="">All Status</option>
                 @foreach($statusOptions as $status)
@@ -80,12 +80,12 @@
             </select>
             <div id="orderCustomDateFields" class="{{ request('date_filter') === 'custom' ? 'flex' : 'hidden' }} flex-col gap-2 sm:flex-row sm:items-center">
                 <input type="date" name="date_from" value="{{ request('date_from') }}"
-                       class="rounded border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                       class="rounded border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-amber-500">
                 <span class="hidden text-xs font-bold uppercase tracking-[0.14em] text-gray-400 sm:inline">to</span>
                 <input type="date" name="date_to" value="{{ request('date_to') }}"
-                       class="rounded border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                       class="rounded border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-amber-500">
             </div>
-            <button type="submit" class="rounded bg-blue-600 px-4 py-1.5 text-sm text-white">Filter</button>
+            <button type="submit" class="rounded bg-amber-600 px-4 py-1.5 text-sm text-white">Filter</button>
             <a href="{{ route('dashboard.orders') }}" class="rounded bg-gray-200 px-4 py-1.5 text-sm text-gray-700">Reset</a>
         </div>
     </form>
@@ -96,7 +96,7 @@
             <article class="rounded-2xl border bg-white p-4 shadow-sm">
                 <div class="flex items-start justify-between gap-3">
                     <div class="min-w-0">
-                        <p class="break-all text-sm font-bold text-blue-600">#ORD-{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</p>
+                        <p class="break-all text-sm font-bold text-amber-600">#ORD-{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</p>
                         <p class="mt-1 text-xs text-gray-400">{{ $order->created_at->format('d M Y, h:i A') }}</p>
                     </div>
                     <span class="rounded-full px-2 py-1 text-[10px] font-bold uppercase {{ $order->status_badge_class }}">
@@ -147,7 +147,7 @@
 
                 <div class="mt-4 space-y-3">
                     <a href="{{ route('dashboard.orders.show', $order) }}"
-                       class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-50 px-3 py-2.5 text-xs font-bold text-blue-600 hover:bg-blue-100">
+                       class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-amber-50 px-3 py-2.5 text-xs font-bold text-amber-600 hover:bg-amber-100">
                         <i class="fa-solid fa-eye"></i> View
                     </a>
 
@@ -177,7 +177,7 @@
                                 @endforeach
                             </select>
 
-                            <button type="submit" class="w-full rounded bg-blue-600 px-3 py-2 text-[11px] font-bold text-white hover:bg-blue-700">
+                            <button type="submit" class="w-full rounded bg-amber-600 px-3 py-2 text-[11px] font-bold text-white hover:bg-amber-700">
                                 Save Status
                             </button>
                         </form>
@@ -210,7 +210,7 @@
                 @forelse($orders as $order)
                     <tr class="transition hover:bg-slate-50">
                         <td class="px-4 py-4 text-sm font-semibold text-gray-600">{{ $orders->firstItem() + $loop->index }}</td>
-                        <td class="px-4 py-4 text-sm font-bold text-blue-600">#ORD-{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</td>
+                        <td class="px-4 py-4 text-sm font-bold text-amber-600">#ORD-{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</td>
                         <td class="px-4 py-4 text-sm text-gray-600">
                             <p>{{ $order->created_at->format('d M Y') }}</p>
                             <p class="text-xs text-gray-400">{{ $order->created_at->format('h:i A') }}</p>
@@ -253,7 +253,7 @@
                             @endphp
                             <div class="flex items-center justify-center gap-2">
                                 <a href="{{ route('dashboard.orders.show', $order) }}"
-                                   class="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-100">
+                                   class="rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-600 hover:bg-amber-100">
                                     <i class="fa-solid fa-eye"></i> View
                                 </a>
 
@@ -280,7 +280,7 @@
                                             @endforeach
                                         </select>
 
-                                        <button type="submit" class="rounded bg-blue-600 px-3 py-1 text-[11px] font-bold text-white hover:bg-blue-700">
+                                        <button type="submit" class="rounded bg-amber-600 px-3 py-1 text-[11px] font-bold text-white hover:bg-amber-700">
                                             Save
                                         </button>
                                     </form>

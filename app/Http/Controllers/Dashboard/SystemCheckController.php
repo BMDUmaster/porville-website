@@ -19,7 +19,7 @@ class SystemCheckController extends Controller
             'database' => $this->checkDatabase(),
             'storage_writable' => is_writable(storage_path('app/public')),
             'storage_link' => File::exists(public_path('storage')) || true,
-            'logo_file' => File::exists(public_path('images/Farmsea.webp')),
+            'logo_file' => File::exists(public_path('images/porville-logo.jpg')),
             'app_url' => config('app.url'),
             'migrations' => $this->pendingMigrations(),
             'required_columns' => $this->requiredColumns(),

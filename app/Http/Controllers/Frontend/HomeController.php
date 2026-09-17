@@ -13,7 +13,7 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $newArrivalProductIds = Product::active()
+        $newArrivalProductIds = Product::active()->notEnquiryOnly()
             ->latest('created_at')
             ->latest('id')
             ->take(5)
@@ -31,7 +31,7 @@ class HomeController extends Controller
             ->withCount(['products' => fn($q) => $q->active()])
             ->get();
 
-        $latestProducts = Product::active()->with('category')
+        $latestProducts = Product::active()->notEnquiryOnly()->with('category')
             ->orderByDesc('created_at')
             ->orderByDesc('id');
 
@@ -40,14 +40,14 @@ class HomeController extends Controller
             ->get();
 
         if ($newArrivals->isEmpty()) {
-            $newArrivals = Product::active()->with('category')
+            $newArrivals = Product::active()->notEnquiryOnly()->with('category')
                 ->orderByDesc('created_at')
                 ->orderByDesc('id')
                 ->take(8)
                 ->get();
         }
 
-        $featuredProducts = Product::active()->with('category')
+        $featuredProducts = Product::active()->notEnquiryOnly()->with('category')
             ->inRandomOrder()
             ->take(4)
             ->get();
@@ -56,7 +56,7 @@ class HomeController extends Controller
             $featuredProducts = $newArrivals->take(4)->values();
         }
 
-        $bestSellers = Product::active()->with('category')
+        $bestSellers = Product::active()->notEnquiryOnly()->with('category')
             ->withSum([
                 'orderItems as ordered_quantity' => fn($query) => $query->whereHas(
                     'order',
@@ -86,6 +86,16 @@ class HomeController extends Controller
                 ->get()
             : collect();
 
-        return view('frontend.home', compact('categories', 'newArrivals', 'featuredProducts', 'bestSellers', 'newArrivalProductIds', 'homeBanners', 'homeReviews'));
+        $liveStockCategory = Category::where('is_enquiry_only', true)->where('is_active', true)->first();
+
+        $liveStockProducts = $liveStockCategory
+            ? Product::active()->with('category')
+                ->where('category_id', $liveStockCategory->id)
+                ->latest('id')
+                ->take(6)
+                ->get()
+            : collect();
+
+        return view('frontend.home', compact('categories', 'newArrivals', 'featuredProducts', 'bestSellers', 'newArrivalProductIds', 'homeBanners', 'homeReviews', 'liveStockCategory', 'liveStockProducts'));
     }
 }

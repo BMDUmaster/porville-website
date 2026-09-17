@@ -1,42 +1,132 @@
 @extends('frontend.layouts.app')
-@section('title', 'Return & Refund Policy')
+@section('title', 'Refund & Cancellation Policy — Porville')
+
 @section('content')
-<div class="max-w-3xl mx-auto px-6 py-12 md:py-16">
-    <div class="bg-white rounded-3xl border border-slate-100 p-6 md:p-10 shadow-sm">
-        <h1 class="nunito font-extrabold text-3xl text-slate-900 mb-6 flex items-center gap-2">
-            <i class="fa-solid fa-rotate-left text-green-600"></i> Return & Refund Policy
-        </h1>
-        
-        <div class="prose prose-slate max-w-none space-y-6 text-sm text-slate-600 leading-relaxed">
-            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl">
-                <p class="font-bold text-red-800 text-[13px] uppercase tracking-wide">Important Notice: Perishable Goods Policy</p>
-                <p class="mt-1 text-red-700">Due to the perishable, temperature-controlled, and hygienic nature of fresh meat, poultry, and seafood products, <strong>all sales are final. These items are strictly non-returnable and non-exchangeable</strong> once delivered.</p>
-            </div>
 
-            <h3 class="text-lg font-bold text-slate-800 pt-2">1. Freshness & Quality Assurance</h3>
-            <p>At FarmSea, we maintain strict cold-chain protocols and quality controls from source to doorstep. We encourage you to inspect the products at the time of delivery. If you receive a product that is not fresh, or has damaged packaging, please notify our delivery executive immediately or contact our customer support team within <strong>2 hours of delivery</strong>.</p>
+<section class="bg-black py-14 md:py-20">
+    <div class="mx-auto max-w-4xl px-4 text-center">
+        <p class="text-[11px] font-extrabold uppercase tracking-[0.3em] text-amber-400">Legal</p>
+        <h1 class="font-classic mt-3 text-4xl font-bold text-white md:text-5xl">Refund &amp; Cancellation Policy</h1>
+        <p class="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-stone-400">Last Updated: June 2026</p>
+    </div>
+</section>
 
-            <h3 class="text-lg font-bold text-slate-800 pt-2">2. Eligible Cases for Refund or Replacement</h3>
-            <p>While we do not accept physical returns of food products, we may issue a refund or a replacement under the following conditions:</p>
-            <ul class="list-disc pl-5 space-y-2">
-                <li><strong>Wrong Item Received:</strong> If the delivered item does not match your order details.</li>
-                <li><strong>Quality Issues:</strong> In the rare event that the product delivered is spoiled, damaged, or has expired.</li>
-                <li><strong>Missing Items:</strong> If any item listed in your invoice was not delivered.</li>
-            </ul>
+<section class="bg-white py-14 md:py-16">
+    <div class="mx-auto max-w-3xl px-4">
+        <p class="mb-10 text-[15px] leading-8 text-slate-600">
+            Porville deals in fresh and perishable food products. This policy explains our complaint window,
+            product condition requirements, cancellation rules for Cash on Delivery and prepaid orders, and how
+            approved refunds are processed.
+        </p>
 
-            <h3 class="text-lg font-bold text-slate-800 pt-2">3. How to Request a Refund/Replacement</h3>
-            <p>To report a quality issue or discrepancies in your order:</p>
-            <ol class="list-decimal pl-5 space-y-2">
-                <li>Contact our Customer Support via phone or email (<strong>support@farmsea.com</strong>) within <strong>2 hours</strong> of receipt of the order.</li>
-                <li>Provide your order number, clear photographs, and details of the issue.</li>
-                <li>Our team will investigate and verify the complaint. If approved, a replacement or refund will be processed.</li>
-            </ol>
+        @php
+            $sections = [
+                [
+                    'title' => 'A. Complaint Window and Product Condition Policy',
+                    'body' => [
+                        'Porville deals in fresh and perishable food products. Any complaint regarding an order must be raised within 2 hours of delivery / receipt.',
+                        'Complaints received after 2 hours may not be eligible for return, replacement, or refund, unless required under applicable law.',
+                        'For complaints raised within 2 hours, the product must be:',
+                    ],
+                    'list' => [
+                        'Stored at the recommended temperature;',
+                        'Not consumed, eaten, altered, cooked, washed, mixed, or used;',
+                        'Preserved in original condition for inspection;',
+                        'Supported with proof such as order ID, bill/invoice, photos, videos, payment confirmation, and delivery details.',
+                    ],
+                    'outro' => ['If the product has been consumed, cooked, improperly stored, altered, damaged after delivery, or is unavailable for inspection, the complaint may be rejected after verification.'],
+                ],
+                [
+                    'title' => 'B. Fresh and Perishable Product Disclaimer',
+                    'body' => [
+                        'All meat, poultry, eggs, ready-to-eat items, and similar food products sold by Porville are perishable.',
+                        'Porville is not responsible for product deterioration caused by:',
+                    ],
+                    'list' => [
+                        'Delay in receiving the order by the customer;',
+                        'Incorrect address or unavailable customer;',
+                        'Improper storage after delivery;',
+                        'Cooking, reheating, washing, or handling after delivery;',
+                        'Complaint raised after the allowed complaint window.',
+                    ],
+                ],
+                [
+                    'title' => 'C. Cash on Delivery Dispatch & Cancellation Policy',
+                    'body' => [
+                        'For COD orders, customers should cancel before preparation / dispatch if they no longer want the order.',
+                        'Once a COD order is prepared, packed, or dispatched, cancellation may not be accepted except in genuine cases like wrong order details, unavoidable emergency, or delivery issue.',
+                        'If a customer cancels or refuses a COD order after dispatch, Porville may:',
+                    ],
+                    'list' => [
+                        'Recover reasonable delivery, packaging, and handling charges where applicable;',
+                        'Restrict or disable COD for future orders;',
+                        'Require advance payment for future purchases;',
+                        'Cancel repeated COD orders in case of misuse, fake orders, or repeated refusals.',
+                    ],
+                ],
+                [
+                    'title' => 'D. Prepaid Order Cancellation and Refund Policy',
+                    'body' => [
+                        'All prepaid orders placed through Razorpay or any online payment gateway are considered confirmed once payment is successful and the order is placed.',
+                        'Once a prepaid order is confirmed, especially for fresh / perishable products, cancellation may not be accepted if the order has been prepared, packed, or dispatched.',
+                        'Refund, replacement, or store credit may be considered only in genuine verified cases:',
+                    ],
+                    'list' => [
+                        'Non-delivery due to reasons attributable to Porville;',
+                        'Wrong product delivered;',
+                        'Product received spoiled, damaged, or defective, subject to verification;',
+                        'Duplicate payment or payment gateway error;',
+                        'Any situation where a refund is required under applicable law.',
+                    ],
+                    'outro' => [
+                        'A customer cannot claim a refund only because they changed their mind after successful payment / order confirmation, unless cancellation is accepted before preparation or dispatch.',
+                        'Razorpay is only the payment gateway. Refund approval / rejection will be governed by Porville policy, subject to applicable law.',
+                    ],
+                ],
+                [
+                    'title' => 'E. Refund Processing',
+                    'body' => ['If a refund is approved after verification, it may be processed through:'],
+                    'list' => [
+                        'Original payment method;',
+                        'Store credit;',
+                        'Coupon;',
+                        'Wallet credit;',
+                        'Any other mode decided by Porville depending on the case.',
+                    ],
+                    'outro' => ['Refund processing time may depend on the payment gateway, bank, or service provider.'],
+                ],
+            ];
+        @endphp
 
-            <h3 class="text-lg font-bold text-slate-800 pt-2">4. Processing of Refunds</h3>
-            <p>Once a refund is approved, it will be processed and credited back to your original payment method or wallet within 5-7 business days, depending on your bank's policy.</p>
-
-            <p class="text-xs text-slate-400 border-t pt-4">Last Updated: July 2026. FarmSea reserves the right to modify this policy at any time without prior notice.</p>
+        <div class="space-y-10">
+            @foreach($sections as $section)
+                <div class="rounded-2xl border border-amber-100 bg-[#faf7f0] p-6 md:p-7">
+                    <h2 class="font-classic text-xl font-bold text-slate-900">{{ $section['title'] }}</h2>
+                    <div class="mt-3 space-y-3">
+                        @foreach($section['body'] as $para)
+                            <p class="text-[14px] leading-7 text-slate-600">{{ $para }}</p>
+                        @endforeach
+                    </div>
+                    @if(!empty($section['list']))
+                        <ul class="mt-4 space-y-2">
+                            @foreach($section['list'] as $item)
+                                <li class="flex items-start gap-2.5 text-[14px] leading-6 text-slate-600">
+                                    <i class="fa-solid fa-check mt-1 text-[11px] text-amber-500"></i>
+                                    <span>{{ $item }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                    @if(!empty($section['outro']))
+                        <div class="mt-4 space-y-3">
+                            @foreach($section['outro'] as $para)
+                                <p class="text-[14px] leading-7 text-slate-600">{{ $para }}</p>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            @endforeach
         </div>
     </div>
-</div>
+</section>
 @endsection

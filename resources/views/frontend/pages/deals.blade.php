@@ -12,7 +12,7 @@
                         <i class="fa-solid fa-bolt"></i> Live Savings
                     </span>
                     <h1 class="mt-4 text-3xl font-black tracking-tight md:text-5xl">Coupons &amp; Offers</h1>
-                    <p class="mt-3 max-w-2xl text-sm font-medium leading-6 text-blue-100 md:text-base">Saare currently active aur valid FarmSea deals ek hi jagah. Offer choose karo aur fresh products par save karo.</p>
+                    <p class="mt-3 max-w-2xl text-sm font-medium leading-6 text-blue-100 md:text-base">Saare currently active aur valid Porville deals ek hi jagah. Offer choose karo aur fresh products par save karo.</p>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div class="rounded-2xl bg-white/10 px-5 py-4 text-center ring-1 ring-white/15"><p class="text-2xl font-black">{{ $offers->count() }}</p><p class="text-[10px] font-bold uppercase tracking-wider text-blue-100">Offers</p></div>
@@ -41,7 +41,7 @@
                     </div>
                     <p class="mt-4 text-2xl font-black text-amber-600">{{ $offerDiscount }}</p>
                     <h3 class="mt-2 text-lg font-black text-slate-900">{{ $offer->title ?: 'Special Offer' }}</h3>
-                    <p class="mt-2 line-clamp-3 text-[13px] font-medium leading-6 text-slate-500">{{ $offer->description ?: 'Limited-time savings on fresh FarmSea products.' }}</p>
+                    <p class="mt-2 line-clamp-3 text-[13px] font-medium leading-6 text-slate-500">{{ $offer->description ?: 'Limited-time savings on fresh Porville products.' }}</p>
                     <div class="mt-4 flex flex-wrap gap-2 text-[10px] font-bold">
                         <span class="rounded-lg bg-slate-100 px-2.5 py-1.5 text-slate-600"><i class="fa-solid fa-box mr-1"></i>{{ $offer->product?->name ?: 'All Products' }}</span>
                         @if($offer->expires_at)<span class="rounded-lg bg-red-50 px-2.5 py-1.5 text-red-600"><i class="fa-regular fa-clock mr-1"></i>Ends {{ $offer->expires_at->format('d M Y') }}</span>@endif

@@ -5,7 +5,7 @@
 @section('content')
 <div class="p-4 md:p-8 space-y-6">
 
-    <a href="{{ route('dashboard.users') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:underline">
+    <a href="{{ route('dashboard.users') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-amber-600 hover:underline">
         <i class="fa-solid fa-arrow-left text-xs"></i> Back to Customers
     </a>
 
@@ -13,7 +13,7 @@
         <div class="grid gap-6 p-6 lg:grid-cols-[minmax(0,1.15fr)_360px] lg:p-8">
             <div>
                 <div class="flex flex-wrap items-start gap-4">
-                    <div class="flex h-20 w-20 items-center justify-center rounded-3xl bg-blue-600 text-3xl font-black text-white shadow-lg">
+                    <div class="flex h-20 w-20 items-center justify-center rounded-3xl bg-amber-600 text-3xl font-black text-white shadow-lg">
                         {{ strtoupper(substr($user->name, 0, 1)) }}
                     </div>
                     <div class="min-w-0 flex-1">
@@ -24,7 +24,7 @@
                             <span class="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] {{ $user->status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
                                 {{ ucfirst($user->status ?? 'active') }}
                             </span>
-                            <span class="rounded-full bg-blue-100 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-blue-700">
+                            <span class="rounded-full bg-amber-100 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-amber-700">
                                 {{ ucfirst($user->role) }}
                             </span>
                         </div>
@@ -58,7 +58,7 @@
                     </div>
                     <div class="rounded-2xl border bg-white p-4 shadow-sm">
                         <p class="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Total Spent</p>
-                        <p class="mt-2 text-3xl font-black text-indigo-600">Rs{{ number_format($stats['total_spent'], 2) }}</p>
+                        <p class="mt-2 text-3xl font-black text-amber-600">Rs{{ number_format($stats['total_spent'], 2) }}</p>
                     </div>
                 </div>
             </div>
@@ -99,10 +99,10 @@
                             <input type="number" id="customerDeliveryCharge" name="delivery_charge" min="0" step="0.01"
                                    value="{{ $user->delivery_charge !== null ? number_format($user->delivery_charge, 2, '.', '') : '' }}"
                                    placeholder="{{ number_format($globalDeliveryCharge, 2, '.', '') }}"
-                                   class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 outline-none transition focus:border-blue-500">
+                                   class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 outline-none transition focus:border-amber-500">
                         </div>
                         <div class="grid gap-3 sm:grid-cols-2">
-                            <button type="submit" class="rounded-xl bg-blue-600 px-4 py-3 text-sm font-black text-white hover:bg-blue-700">
+                            <button type="submit" class="rounded-xl bg-amber-600 px-4 py-3 text-sm font-black text-white hover:bg-amber-700">
                                 Save Custom Charge
                             </button>
                             <button type="submit" name="clear_delivery_charge" value="1" class="rounded-xl bg-slate-200 px-4 py-3 text-sm font-black text-slate-700 hover:bg-slate-300">
@@ -118,7 +118,7 @@
                         <div class="mt-4 space-y-3 text-sm">
                             <div class="flex items-center justify-between">
                                 <span class="text-slate-500">Order</span>
-                                <a href="{{ route('dashboard.orders.show', $latestOrder) }}" class="font-black text-blue-600 hover:underline">
+                                <a href="{{ route('dashboard.orders.show', $latestOrder) }}" class="font-black text-amber-600 hover:underline">
                                     {{ $latestOrder->order_number ?? '#ORD-' . str_pad($latestOrder->id, 4, '0', STR_PAD_LEFT) }}
                                 </a>
                             </div>
@@ -166,7 +166,7 @@
                     <article class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 shadow-sm">
                         <div class="flex items-start justify-between gap-3">
                             <div class="min-w-0">
-                                <div class="font-black text-blue-600 break-all">{{ $order->order_number ?? '#ORD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</div>
+                                <div class="font-black text-amber-600 break-all">{{ $order->order_number ?? '#ORD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</div>
                                 <div class="mt-1 text-xs text-slate-400">ID {{ $order->id }}</div>
                             </div>
                             <span class="shrink-0 rounded-full px-3 py-1 text-xs font-black {{ $order->status_badge_class }}">
@@ -208,7 +208,7 @@
                         </div>
 
                         <a href="{{ route('dashboard.orders.show', $order) }}"
-                           class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-50 px-3 py-3 text-xs font-black text-blue-600 hover:bg-blue-100">
+                           class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-50 px-3 py-3 text-xs font-black text-amber-600 hover:bg-amber-100">
                             <i class="fa-solid fa-eye"></i> View Order
                         </a>
                     </article>
@@ -237,7 +237,7 @@
                         @forelse($user->orders as $order)
                             <tr class="hover:bg-slate-50/80">
                                 <td class="px-4 py-4">
-                                    <div class="font-black text-blue-600">{{ $order->order_number ?? '#ORD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</div>
+                                    <div class="font-black text-amber-600">{{ $order->order_number ?? '#ORD-' . str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</div>
                                     <div class="mt-1 text-xs text-slate-400">ID {{ $order->id }}</div>
                                 </td>
                                 <td class="px-4 py-4 text-slate-600">
@@ -270,7 +270,7 @@
                                 </td>
                                 <td class="px-4 py-4">
                                     <a href="{{ route('dashboard.orders.show', $order) }}"
-                                       class="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-3 py-2 text-xs font-black text-blue-600 hover:bg-blue-100">
+                                       class="inline-flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-2 text-xs font-black text-amber-600 hover:bg-amber-100">
                                         <i class="fa-solid fa-eye"></i> View Order
                                     </a>
                                 </td>
@@ -329,7 +329,7 @@
                     </div>
                     <div class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
                         <span class="text-slate-500">Lifetime Spend</span>
-                        <span class="font-black text-indigo-600">Rs{{ number_format($stats['total_spent'], 2) }}</span>
+                        <span class="font-black text-amber-600">Rs{{ number_format($stats['total_spent'], 2) }}</span>
                     </div>
                 </div>
             </div>

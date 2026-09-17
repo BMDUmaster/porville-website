@@ -6,7 +6,7 @@
 <div class="max-w-7xl">
 
     {{-- Header Banner --}}
-    <div class="bg-gradient-to-r from-mayview-blue via-mayview-accent to-blue-500 text-white px-6 py-8">
+    <div class="bg-gradient-to-r from-porville-gold to-porville-black text-white px-6 py-8">
         <p class="opacity-90 mt-2">Category & Sub-category Sales Overview</p>
     </div>
 
@@ -17,22 +17,22 @@
             <div class="flex items-center gap-2 w-full md:w-auto">
                 <label class="text-sm font-medium text-gray-600">Select Date:</label>
                 <input type="date" name="date" value="{{ $date }}"
-                       class="border rounded-lg px-3 py-2 text-sm w-full md:w-auto outline-none focus:border-blue-500">
+                       class="border rounded-lg px-3 py-2 text-sm w-full md:w-auto outline-none focus:border-amber-500">
             </div>
-            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm">Apply</button>
+            <button type="submit" class="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm">Apply</button>
         </form>
 
         {{-- Summary Cards --}}
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            <div class="bg-gradient-to-r from-green-500 to-emerald-500 text-white p-6 rounded-xl shadow">
+            <div class="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white p-6 rounded-xl shadow">
                 <p class="text-sm opacity-80">Total Sales</p>
                 <h3 class="text-3xl font-bold mt-2">₹{{ number_format($totalSales, 2) }}</h3>
             </div>
-            <div class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white p-6 rounded-xl shadow">
+            <div class="bg-gradient-to-r from-porville-black to-neutral-700 text-white p-6 rounded-xl shadow">
                 <p class="text-sm opacity-80">Total Quantity</p>
                 <h3 class="text-3xl font-bold mt-2">{{ $totalQty }} Kg</h3>
             </div>
-            <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6 rounded-xl shadow">
+            <div class="bg-gradient-to-r from-amber-600 to-porville-gold text-white p-6 rounded-xl shadow">
                 <p class="text-sm opacity-80">Categories</p>
                 <h3 class="text-3xl font-bold mt-2">{{ count($byCategory) }}</h3>
             </div>
@@ -44,12 +44,12 @@
             <h2 class="text-lg font-semibold mb-4">Category-wise Sales</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 @foreach($byCategory as $cat => $data)
-                <div class="p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 hover:shadow-lg hover:scale-[1.02] transition cursor-pointer">
+                <div class="p-4 rounded-xl border border-amber-100 bg-amber-50/60 hover:shadow-lg hover:border-amber-300 hover:scale-[1.02] transition cursor-pointer">
                     <div class="flex justify-between items-center">
                         <h3 class="font-semibold text-gray-700">{{ $cat }}</h3>
                         <span class="text-sm text-gray-500">₹{{ number_format($data['amount'], 2) }}</span>
                     </div>
-                    <p class="text-xl font-bold text-indigo-600 mt-2">{{ $data['qty'] }} Kg</p>
+                    <p class="text-xl font-bold text-amber-600 mt-2">{{ $data['qty'] }} Kg</p>
                 </div>
                 @endforeach
             </div>

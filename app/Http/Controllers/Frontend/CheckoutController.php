@@ -10,9 +10,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\RazorpayPayment;
 use App\Support\DeliverySlotManager;
-use App\Support\DeliveryAreaManager;
 use App\Support\OrderPricing;
-use App\Support\OrderingManager;
 use App\Support\ProductDayPricing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -53,13 +51,22 @@ class CheckoutController extends Controller
 
         $subtotal = collect($items)->sum('subtotal');
         $checkoutDefaults = $this->checkoutDefaults();
-        $pinSectors = self::pinSectors();
-        $selectedDeliverySlot = old('delivery_slot', session('selected_delivery_slot_' . $checkoutDay));
-        $deliverySlotOptions = $this->deliverySlotOptionsForCart($cart);
+
+        $upcomingDates = DeliverySlotManager::upcomingDatesForCustomer();
+        $allowedDates = array_column($upcomingDates, 'date');
+        // Checkout always defaults to the nearest available date, not whatever was last picked on the cart page.
+        $selectedDeliveryDate = old('delivery_date', $allowedDates[0] ?? null);
+        if (! in_array($selectedDeliveryDate, $allowedDates, true)) {
+            $selectedDeliveryDate = $allowedDates[0] ?? null;
+        }
+        session(['selected_delivery_date' => $selectedDeliveryDate]);
+
+        $deliverySlotOptions = collect($upcomingDates)->firstWhere('date', $selectedDeliveryDate)['options'] ?? [];
+        $selectedDeliverySlot = old('delivery_slot', session('selected_delivery_slot'));
 
         if (! in_array($selectedDeliverySlot, array_column($deliverySlotOptions, 'value'), true)) {
             $selectedDeliverySlot = $deliverySlotOptions[0]['value'] ?? null;
-            session(['selected_delivery_slot_' . $checkoutDay => $selectedDeliverySlot]);
+            session(['selected_delivery_slot' => $selectedDeliverySlot]);
         }
 
         $pricing = OrderPricing::summary($subtotal, auth('web_frontend')->user(), $this->pricingDayForCart($cart));
@@ -71,7 +78,7 @@ class CheckoutController extends Controller
             ->get();
 
         $cartProductIds = collect($items)->pluck('product_id')->filter()->unique();
-        $checkoutNewArrivals = Product::active()
+        $checkoutNewArrivals = Product::active()->notEnquiryOnly()
             ->with('category')
             ->when($cartProductIds->isNotEmpty(), fn ($query) => $query->whereNotIn('id', $cartProductIds))
             ->latest()
@@ -86,7 +93,7 @@ class CheckoutController extends Controller
         $excludedRecommendationIds = $cartProductIds
             ->merge($checkoutNewArrivals->pluck('id'))
             ->unique();
-        $checkoutSimilarProducts = Product::active()
+        $checkoutSimilarProducts = Product::active()->notEnquiryOnly()
             ->with('category')
             ->when($cartCategoryIds->isNotEmpty(), fn ($query) => $query->whereIn('category_id', $cartCategoryIds))
             ->when($excludedRecommendationIds->isNotEmpty(), fn ($query) => $query->whereNotIn('id', $excludedRecommendationIds))
@@ -98,7 +105,7 @@ class CheckoutController extends Controller
             $fallbackExcludedIds = $excludedRecommendationIds
                 ->merge($checkoutSimilarProducts->pluck('id'))
                 ->unique();
-            $fallbackProducts = Product::active()
+            $fallbackProducts = Product::active()->notEnquiryOnly()
                 ->with('category')
                 ->when($fallbackExcludedIds->isNotEmpty(), fn ($query) => $query->whereNotIn('id', $fallbackExcludedIds))
                 ->latest()
@@ -130,12 +137,7 @@ class CheckoutController extends Controller
                 ->all();
         }
 
-        return view('frontend.checkout', compact('items', 'subtotal', 'checkoutDefaults', 'selectedDeliverySlot', 'pricing', 'availableCoupons', 'pastAddresses', 'pinSectors', 'checkoutNewArrivals', 'checkoutSimilarProducts'))
-            ->with([
-                'orderingActive'          => OrderingManager::isActiveForDay($checkoutDay),
-                'orderingInactiveTitle'   => OrderingManager::inactiveTitle(),
-                'orderingInactiveMessage' => OrderingManager::inactiveMessage(),
-            ]);
+        return view('frontend.checkout', compact('items', 'subtotal', 'checkoutDefaults', 'selectedDeliverySlot', 'selectedDeliveryDate', 'upcomingDates', 'deliverySlotOptions', 'pricing', 'availableCoupons', 'pastAddresses', 'checkoutNewArrivals', 'checkoutSimilarProducts'));
     }
 
     /** POST /checkout */
@@ -149,13 +151,8 @@ class CheckoutController extends Controller
         $checkoutDay = ProductDayPricing::normalizeDay(session('checkout_delivery_day', 'today'));
         $cart = $this->cartForDay($fullCart, $checkoutDay);
 
-        // Block order only for the selected delivery day.
-        if (! OrderingManager::isActiveForDay($checkoutDay)) {
-            return back()->with('ordering_inactive', true);
-        }
-
-        $pinSectors = self::pinSectors();
-        $allowedPins = array_keys($pinSectors);
+        $upcomingDates = DeliverySlotManager::upcomingDatesForCustomer();
+        $allowedDates = array_column($upcomingDates, 'date');
 
         $data = $request->validate([
             'first_name'       => 'required|string|max:60',
@@ -165,29 +162,24 @@ class CheckoutController extends Controller
             'address'          => 'required|string',
             'city'             => 'required|string',
             'state'            => 'required|string',
-            'pincode'          => ['required', 'string', Rule::in($allowedPins)],
-            'sector'           => [
-                'required',
-                'string',
-                function ($attribute, $value, $fail) use ($request, $pinSectors) {
-                    $pin = $request->input('pincode');
-                    if ($pin && isset($pinSectors[$pin])) {
-                        if (!in_array($value, $pinSectors[$pin], true)) {
-                            $fail('The selected sector is invalid for the chosen PIN Code.');
-                        }
-                    } else {
-                        $fail('Please select a valid PIN Code first.');
-                    }
-                }
-            ],
-            'delivery_slot'    => ['required', 'string', Rule::in(array_column($this->deliverySlotOptionsForCart($cart), 'value'))],
+            'pincode'          => ['required', 'regex:/^\d{6}$/'],
+            'sector'           => ['nullable', 'string'],
+            'delivery_date'    => ['required', 'string', Rule::in($allowedDates)],
             'payment_method'   => 'required|in:COD,online',
             'coupon_code'      => 'nullable|string',
         ], [
             'phone.regex' => 'Phone number must be exactly 10 digits.',
         ]);
 
-        session(['selected_delivery_slot_' . $checkoutDay => $data['delivery_slot']]);
+        $dayOptions = collect($upcomingDates)->firstWhere('date', $data['delivery_date'])['options'] ?? [];
+        $data += $request->validate([
+            'delivery_slot' => ['required', 'string', Rule::in(array_column($dayOptions, 'value'))],
+        ]);
+
+        session([
+            'selected_delivery_date' => $data['delivery_date'],
+            'selected_delivery_slot' => $data['delivery_slot'],
+        ]);
 
         if (empty($cart)) {
             return redirect()->route('frontend.cart');
@@ -248,6 +240,7 @@ class CheckoutController extends Controller
                 'payment_method'   => $data['payment_method'],
                 'payment_status'   => 'pending',
                 'delivery_slot'    => $data['delivery_slot'],
+                'delivery_date'    => $data['delivery_date'],
                 'delivery_day'     => $checkoutDay,
             ]);
 
@@ -538,15 +531,6 @@ class CheckoutController extends Controller
         return $unit;
     }
 
-    private function deliverySlotOptionsForCart(array $cart): array
-    {
-        $day = $this->usesTomorrowDelivery($cart) ? 'tomorrow' : 'today';
-
-        return $day === 'tomorrow'
-            ? DeliverySlotManager::options('tomorrow')
-            : DeliverySlotManager::availableOptions('today');
-    }
-
     private function usesTomorrowDelivery(array $cart): bool
     {
         $days = collect($cart)
@@ -580,10 +564,5 @@ class CheckoutController extends Controller
             $cart,
             fn ($item) => ProductDayPricing::normalizeDay($item['pricing_day'] ?? 'today') === $day
         );
-    }
-
-    public static function pinSectors(): array
-    {
-        return DeliveryAreaManager::pinSectors();
     }
 }

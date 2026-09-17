@@ -6,23 +6,23 @@
 <div class="p-4 sm:p-6 space-y-6">
 
     {{-- Top Header Action Bar --}}
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border shadow-sm">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm">
         <div>
             <div class="flex items-center gap-3">
-                <a href="{{ route('dashboard.products') }}" class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+                <a href="{{ route('dashboard.products') }}" class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-neutral-900 text-amber-400 hover:bg-neutral-800 transition">
                     <i class="fa-solid fa-arrow-left text-sm"></i>
                 </a>
-                <h2 class="text-xl font-extrabold text-slate-900">Editing {{ count($products) }} Products</h2>
+                <h2 class="text-xl font-extrabold text-neutral-900">Editing {{ count($products) }} Products</h2>
             </div>
-            <p class="mt-1 text-xs text-slate-500 pl-12">Update details, status, prices, and variants for all selected products together.</p>
+            <p class="mt-1 text-xs text-neutral-500 pl-12">Update details, status, prices, and variants for all selected products together.</p>
         </div>
 
         <div class="flex items-center gap-3">
-            <a href="{{ route('dashboard.products') }}" class="px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 text-xs font-bold hover:bg-slate-100 transition">
+            <a href="{{ route('dashboard.products') }}" class="px-4 py-2.5 rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-700 text-xs font-bold hover:bg-neutral-100 transition">
                 Cancel
             </a>
-            <button type="submit" form="multiUpdateForm" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold uppercase tracking-wider shadow-md transition flex items-center gap-2">
-                <i class="fa-solid fa-floppy-disk"></i>
+            <button type="submit" form="multiUpdateForm" class="px-5 py-2.5 rounded-xl border border-amber-500 bg-black hover:bg-neutral-900 text-white text-xs font-extrabold uppercase tracking-wider shadow-md transition flex items-center gap-2">
+                <i class="fa-solid fa-floppy-disk text-amber-400"></i>
                 <span>Save All Changes</span>
             </button>
         </div>
@@ -48,30 +48,30 @@
                 $firstImg = ($product->images && count($product->images)) ? asset('storage/' . $product->images[0]) : null;
             @endphp
 
-            <div class="bg-white rounded-2xl border shadow-sm overflow-hidden border-slate-200">
+            <div class="bg-white rounded-2xl border shadow-sm overflow-hidden border-neutral-200">
                 {{-- Product Card Header --}}
-                <div class="bg-slate-50 border-b px-5 py-4 flex flex-wrap items-center justify-between gap-3">
+                <div class="bg-neutral-950 border-b border-neutral-800 px-5 py-4 flex flex-wrap items-center justify-between gap-3">
                     <div class="flex items-center gap-3">
-                        <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 font-extrabold text-xs flex items-center justify-center">
+                        <span class="w-7 h-7 rounded-lg bg-amber-500/15 text-amber-400 font-extrabold text-xs flex items-center justify-center">
                             #{{ $pIndex + 1 }}
                         </span>
 
                         @if($firstImg)
-                            <img src="{{ $firstImg }}" class="h-10 w-10 rounded-lg object-cover border bg-white">
+                            <img src="{{ $firstImg }}" class="h-10 w-10 rounded-lg object-cover border border-neutral-700 bg-white">
                         @else
-                            <div class="h-10 w-10 rounded-lg bg-slate-200 text-slate-400 flex items-center justify-center text-sm">
+                            <div class="h-10 w-10 rounded-lg bg-neutral-800 text-neutral-500 flex items-center justify-center text-sm">
                                 <i class="fa-regular fa-image"></i>
                             </div>
                         @endif
 
                         <div>
-                            <h3 class="text-sm font-bold text-slate-900">{{ $product->name }}</h3>
-                            <p class="text-[11px] text-slate-500">ID: {{ $product->id }} | SKU/Slug: {{ $product->slug }}</p>
+                            <h3 class="text-sm font-bold text-white">{{ $product->name }}</h3>
+                            <p class="text-[11px] text-neutral-400">ID: {{ $product->id }} | SKU/Slug: {{ $product->slug }}</p>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-3">
-                        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider {{ $product->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider {{ $product->is_active ? 'bg-amber-500/15 text-amber-400' : 'bg-red-500/15 text-red-400' }}">
                             {{ $product->is_active ? 'Active' : 'Inactive' }}
                         </span>
                     </div>
@@ -82,22 +82,23 @@
 
                 {{-- Product Fields --}}
                 <div class="p-5 space-y-5">
+                    @php($isEnquiryProduct = $product->category?->is_enquiry_only ?? false)
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {{-- Name --}}
                         <div class="sm:col-span-2">
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Product Name *</label>
+                            <label class="block text-xs font-bold text-neutral-700 mb-1">Product Name *</label>
                             <input type="text" name="products[{{ $pIndex }}][name]" value="{{ old("products.{$pIndex}.name", $product->name) }}" required
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100">
+                                   class="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-neutral-900 outline-none focus:border-amber-500 focus:bg-white focus:ring-2 focus:ring-amber-100">
                         </div>
 
                         {{-- Category --}}
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Category *</label>
-                            <select name="products[{{ $pIndex }}][category_id]" onchange="onCategoryChange({{ $pIndex }}, this.value)" required
-                                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-blue-500 focus:bg-white">
+                            <label class="block text-xs font-bold text-neutral-700 mb-1">Category *</label>
+                            <select name="products[{{ $pIndex }}][category_id]" onchange="onCategoryChange({{ $pIndex }}, this.value); toggleMultiEnquiryMode({{ $pIndex }}, this)" required
+                                    class="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-xs font-semibold text-neutral-900 outline-none focus:border-amber-500 focus:bg-white">
                                 <option value="">Select Category</option>
                                 @foreach($categories as $cat)
-                                    <option value="{{ $cat->id }}" {{ old("products.{$pIndex}.category_id", $product->category_id) == $cat->id ? 'selected' : '' }}>
+                                    <option value="{{ $cat->id }}" data-enquiry="{{ $cat->is_enquiry_only ? 1 : 0 }}" {{ old("products.{$pIndex}.category_id", $product->category_id) == $cat->id ? 'selected' : '' }}>
                                         {{ $cat->name }}
                                     </option>
                                 @endforeach
@@ -106,9 +107,9 @@
 
                         {{-- Subcategory --}}
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Subcategory</label>
+                            <label class="block text-xs font-bold text-neutral-700 mb-1">Subcategory</label>
                             <select id="subcat_select_{{ $pIndex }}" name="products[{{ $pIndex }}][subcategory_id]"
-                                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-blue-500 focus:bg-white">
+                                    class="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-xs font-semibold text-neutral-900 outline-none focus:border-amber-500 focus:bg-white">
                                 <option value="">None / Direct Category</option>
                                 @foreach($subcategories as $sub)
                                     <option value="{{ $sub->id }}" data-parent="{{ $sub->parent_id }}" {{ old("products.{$pIndex}.subcategory_id", $product->subcategory_id) == $sub->id ? 'selected' : '' }}>
@@ -120,52 +121,76 @@
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {{-- Base Price --}}
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Selling Price (Rs) *</label>
-                            <input type="number" step="0.01" min="0" name="products[{{ $pIndex }}][price]" value="{{ old("products.{$pIndex}.price", $product->price) }}" required
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-blue-500 focus:bg-white">
-                        </div>
-
-                        {{-- MRP --}}
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">MRP (Rs)</label>
-                            <input type="number" step="0.01" min="0" name="products[{{ $pIndex }}][mrp]" value="{{ old("products.{$pIndex}.mrp", $product->mrp) }}"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-blue-500 focus:bg-white">
-                        </div>
-
                         {{-- Status --}}
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Status *</label>
+                            <label class="block text-xs font-bold text-neutral-700 mb-1">Status *</label>
                             <select name="products[{{ $pIndex }}][is_active]" required
-                                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 outline-none focus:border-blue-500 focus:bg-white">
+                                    class="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-xs font-bold text-neutral-900 outline-none focus:border-amber-500 focus:bg-white">
                                 <option value="1" {{ old("products.{$pIndex}.is_active", $product->is_active) ? 'selected' : '' }}>Active (In Stock)</option>
                                 <option value="0" {{ !old("products.{$pIndex}.is_active", $product->is_active) ? 'selected' : '' }}>Inactive (Out of Stock)</option>
                             </select>
                         </div>
 
-                        {{-- Weight/Pack Description --}}
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Weight / Unit Label</label>
-                            <input type="text" name="products[{{ $pIndex }}][weight]" value="{{ old("products.{$pIndex}.weight", $product->weight) }}" placeholder="e.g. 500g / 1kg"
-                                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-blue-500 focus:bg-white">
+                        <div id="pricing_fields_{{ $pIndex }}" class="{{ $isEnquiryProduct ? 'hidden' : '' }} contents">
+                            {{-- Base Price --}}
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">Selling Price (Rs) *</label>
+                                <input type="number" step="0.01" min="0" name="products[{{ $pIndex }}][price]" value="{{ old("products.{$pIndex}.price", $product->price) }}"
+                                       class="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-neutral-900 outline-none focus:border-amber-500 focus:bg-white">
+                            </div>
+
+                            {{-- MRP --}}
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">MRP (Rs)</label>
+                                <input type="number" step="0.01" min="0" name="products[{{ $pIndex }}][mrp]" value="{{ old("products.{$pIndex}.mrp", $product->mrp) }}"
+                                       class="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-neutral-900 outline-none focus:border-amber-500 focus:bg-white">
+                            </div>
+
+                            {{-- Weight/Pack Description --}}
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">Weight / Unit Label</label>
+                                <input type="text" name="products[{{ $pIndex }}][weight]" value="{{ old("products.{$pIndex}.weight", $product->weight) }}" placeholder="e.g. 500g / 1kg"
+                                       class="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-neutral-900 outline-none focus:border-amber-500 focus:bg-white">
+                            </div>
                         </div>
                     </div>
 
                     {{-- Description --}}
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Description</label>
+                        <label class="block text-xs font-bold text-neutral-700 mb-1">Description</label>
                         <textarea name="products[{{ $pIndex }}][description]" rows="2"
-                                  class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-900 outline-none focus:border-blue-500 focus:bg-white">{{ old("products.{$pIndex}.description", $product->description) }}</textarea>
+                                  class="w-full bg-neutral-50 border border-neutral-200 rounded-xl p-3 text-xs font-medium text-neutral-900 outline-none focus:border-amber-500 focus:bg-white">{{ old("products.{$pIndex}.description", $product->description) }}</textarea>
+                    </div>
+
+                    {{-- Enquiry-only fields (e.g. Live Stock) --}}
+                    <div id="enquiry_fields_{{ $pIndex }}" class="{{ $isEnquiryProduct ? '' : 'hidden' }} rounded-xl border border-amber-200 bg-amber-50 p-4 space-y-4">
+                        <p class="text-xs font-semibold text-amber-700">This category is enquiry-only — customers call to order, no cart pricing needed.</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">Contact Number</label>
+                                <input type="text" name="products[{{ $pIndex }}][contact_number]" value="{{ old("products.{$pIndex}.contact_number", $product->contact_number) }}" placeholder="e.g. 9876543210"
+                                       class="w-full bg-white border border-neutral-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-neutral-900 outline-none focus:border-amber-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">Processing</label>
+                                <input type="text" name="products[{{ $pIndex }}][processing_note]" value="{{ old("products.{$pIndex}.processing_note", $product->processing_note) }}" placeholder="e.g. Hand-cleaned on order"
+                                       class="w-full bg-white border border-neutral-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-neutral-900 outline-none focus:border-amber-500">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-bold text-neutral-700 mb-1">Delivery Note</label>
+                                <input type="text" name="products[{{ $pIndex }}][delivery_note]" value="{{ old("products.{$pIndex}.delivery_note", $product->delivery_note) }}" placeholder="e.g. Delivered live within 24 hrs"
+                                       class="w-full bg-white border border-neutral-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-neutral-900 outline-none focus:border-amber-500">
+                            </div>
+                        </div>
                     </div>
 
                     {{-- VARIANTS TABLE --}}
-                    <div class="border rounded-xl p-4 bg-slate-50/50 space-y-3">
+                    <div id="variants_section_{{ $pIndex }}" class="{{ $isEnquiryProduct ? 'hidden' : '' }} border rounded-xl p-4 bg-neutral-50/50 space-y-3">
                         <div class="flex items-center justify-between">
-                            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-2">
-                                <i class="fa-solid fa-tags text-blue-600"></i> Variants Management
+                            <h4 class="text-xs font-extrabold uppercase tracking-wider text-neutral-700 flex items-center gap-2">
+                                <i class="fa-solid fa-tags text-amber-600"></i> Variants Management
                             </h4>
-                            <button type="button" onclick="addVariantRow({{ $pIndex }})" class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-bold flex items-center gap-1 transition">
+                            <button type="button" onclick="addVariantRow({{ $pIndex }})" class="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 text-xs font-bold flex items-center gap-1 transition">
                                 <i class="fa-solid fa-plus text-[10px]"></i> Add Variant Row
                             </button>
                         </div>
@@ -173,27 +198,25 @@
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead>
-                                    <tr class="border-b text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
+                                    <tr class="border-b border-neutral-200 text-[10px] font-extrabold uppercase tracking-wider text-neutral-500">
                                         <th class="py-2 px-2">Qty</th>
                                         <th class="py-2 px-2">Unit</th>
                                         <th class="py-2 px-2">Piece Info</th>
                                         <th class="py-2 px-2">MRP (Rs)</th>
                                         <th class="py-2 px-2">Selling Price (Rs)</th>
-                                        <th class="py-2 px-2">Today Price (Rs)</th>
-                                        <th class="py-2 px-2">Tomorrow Price (Rs)</th>
                                         <th class="py-2 px-2">Save / Offer</th>
                                         <th class="py-2 px-2 text-center">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody id="variants_body_{{ $pIndex }}" class="divide-y divide-slate-200">
+                                <tbody id="variants_body_{{ $pIndex }}" class="divide-y divide-neutral-200">
                                     @forelse($variants as $vIndex => $variant)
                                         <tr>
                                             <td class="p-1">
                                                 <input type="text" name="products[{{ $pIndex }}][variants][{{ $vIndex }}][quantity]" value="{{ $variant['quantity'] ?? '' }}" placeholder="500"
-                                                       class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs">
+                                                       class="w-full bg-white border border-neutral-200 rounded-lg px-2 py-1 text-xs">
                                             </td>
                                             <td class="p-1">
-                                                <select name="products[{{ $pIndex }}][variants][{{ $vIndex }}][unit]" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs">
+                                                <select name="products[{{ $pIndex }}][variants][{{ $vIndex }}][unit]" class="w-full bg-white border border-neutral-200 rounded-lg px-2 py-1 text-xs">
                                                     @foreach(['Gram','Kg','Piece','Pack','Litre','Ml'] as $u)
                                                         <option value="{{ $u }}" {{ ($variant['unit'] ?? '') === $u ? 'selected' : '' }}>{{ $u }}</option>
                                                     @endforeach
@@ -201,27 +224,19 @@
                                             </td>
                                             <td class="p-1">
                                                 <input type="text" name="products[{{ $pIndex }}][variants][{{ $vIndex }}][piece]" value="{{ $variant['piece'] ?? '' }}" placeholder="4-6 Pcs"
-                                                       class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs">
+                                                       class="w-full bg-white border border-neutral-200 rounded-lg px-2 py-1 text-xs">
                                             </td>
                                             <td class="p-1">
                                                 <input type="number" step="0.01" min="0" data-type="mrp" name="products[{{ $pIndex }}][variants][{{ $vIndex }}][mrp]" value="{{ $variant['mrp'] ?? '' }}" placeholder="0.00"
-                                                       class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs">
+                                                       class="w-full bg-white border border-neutral-200 rounded-lg px-2 py-1 text-xs">
                                             </td>
                                             <td class="p-1">
                                                 <input type="number" step="0.01" min="0" data-type="selling_price" name="products[{{ $pIndex }}][variants][{{ $vIndex }}][selling_price]" value="{{ $variant['selling_price'] ?? '' }}" placeholder="0.00"
-                                                       class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-blue-700">
-                                            </td>
-                                            <td class="p-1">
-                                                <input type="number" step="0.01" min="0" data-type="today_price" name="products[{{ $pIndex }}][variants][{{ $vIndex }}][today_price]" value="{{ $variant['today_price'] ?? '' }}" placeholder="0.00"
-                                                       class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs">
-                                            </td>
-                                            <td class="p-1">
-                                                <input type="number" step="0.01" min="0" data-type="tomorrow_price" name="products[{{ $pIndex }}][variants][{{ $vIndex }}][tomorrow_price]" value="{{ $variant['tomorrow_price'] ?? '' }}" placeholder="0.00"
-                                                       class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs">
+                                                       class="w-full bg-white border border-neutral-200 rounded-lg px-2 py-1 text-xs font-bold text-amber-700">
                                             </td>
                                             <td class="p-1">
                                                 <input type="text" data-type="save_offer" name="products[{{ $pIndex }}][variants][{{ $vIndex }}][save_offer]" value="{{ $variant['save_offer'] ?? '' }}" placeholder="Auto e.g. 10% OFF"
-                                                       class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-green-700">
+                                                       class="w-full bg-neutral-50 border border-neutral-200 rounded-lg px-2 py-1 text-xs font-bold text-emerald-700">
                                             </td>
                                             <td class="p-1 text-center">
                                                 <button type="button" onclick="this.closest('tr').remove()" class="p-1 text-red-500 hover:text-red-700">
@@ -231,7 +246,7 @@
                                         </tr>
                                     @empty
                                         <tr class="no-variant-row">
-                                            <td colspan="9" class="py-3 text-center text-slate-400 italic">No variants added yet. Click "+ Add Variant Row" to add one.</td>
+                                            <td colspan="7" class="py-3 text-center text-neutral-400 italic">No variants added yet. Click "+ Add Variant Row" to add one.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -244,12 +259,12 @@
         @endforeach
 
         {{-- Bottom Submit Bar --}}
-        <div class="flex items-center justify-between gap-4 bg-white p-5 rounded-2xl border shadow-sm">
-            <a href="{{ route('dashboard.products') }}" class="px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 text-xs font-bold hover:bg-slate-100 transition">
+        <div class="flex items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm">
+            <a href="{{ route('dashboard.products') }}" class="px-4 py-2.5 rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-700 text-xs font-bold hover:bg-neutral-100 transition">
                 Cancel
             </a>
-            <button type="submit" class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold uppercase tracking-wider shadow-md transition flex items-center gap-2">
-                <i class="fa-solid fa-floppy-disk"></i>
+            <button type="submit" class="px-6 py-3 rounded-xl border border-amber-500 bg-black hover:bg-neutral-900 text-white text-xs font-extrabold uppercase tracking-wider shadow-md transition flex items-center gap-2">
+                <i class="fa-solid fa-floppy-disk text-amber-400"></i>
                 <span>Save All Changes</span>
             </button>
         </div>
@@ -277,6 +292,19 @@ function onCategoryChange(pIndex, catId) {
     select.value = '';
 }
 
+function toggleMultiEnquiryMode(pIndex, selectEl) {
+    const selectedOption = selectEl?.options?.[selectEl.selectedIndex];
+    const isEnquiry = selectedOption?.dataset?.enquiry === '1';
+
+    const pricingFields = document.getElementById('pricing_fields_' + pIndex);
+    const enquiryFields = document.getElementById('enquiry_fields_' + pIndex);
+    const variantsSection = document.getElementById('variants_section_' + pIndex);
+
+    if (pricingFields) pricingFields.classList.toggle('hidden', isEnquiry);
+    if (enquiryFields) enquiryFields.classList.toggle('hidden', !isEnquiry);
+    if (variantsSection) variantsSection.classList.toggle('hidden', isEnquiry);
+}
+
 function addVariantRow(pIndex) {
     const tbody = document.getElementById('variants_body_' + pIndex);
     if (!tbody) return;
@@ -290,10 +318,10 @@ function addVariantRow(pIndex) {
     tr.innerHTML = `
         <td class="p-1">
             <input type="text" name="products[${pIndex}][variants][${vIndex}][quantity]" placeholder="500"
-                   class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs">
+                   class="w-full bg-white border border-neutral-200 rounded-lg px-2 py-1 text-xs">
         </td>
         <td class="p-1">
-            <select name="products[${pIndex}][variants][${vIndex}][unit]" class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs">
+            <select name="products[${pIndex}][variants][${vIndex}][unit]" class="w-full bg-white border border-neutral-200 rounded-lg px-2 py-1 text-xs">
                 <option value="Gram">Gram</option>
                 <option value="Kg">Kg</option>
                 <option value="Piece">Piece</option>
@@ -304,27 +332,19 @@ function addVariantRow(pIndex) {
         </td>
         <td class="p-1">
             <input type="text" name="products[${pIndex}][variants][${vIndex}][piece]" placeholder="4-6 Pcs"
-                   class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs">
+                   class="w-full bg-white border border-neutral-200 rounded-lg px-2 py-1 text-xs">
         </td>
         <td class="p-1">
             <input type="number" step="0.01" min="0" data-type="mrp" name="products[${pIndex}][variants][${vIndex}][mrp]" placeholder="0.00"
-                   class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs">
+                   class="w-full bg-white border border-neutral-200 rounded-lg px-2 py-1 text-xs">
         </td>
         <td class="p-1">
             <input type="number" step="0.01" min="0" data-type="selling_price" name="products[${pIndex}][variants][${vIndex}][selling_price]" placeholder="0.00"
-                   class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-blue-700">
-        </td>
-        <td class="p-1">
-            <input type="number" step="0.01" min="0" data-type="today_price" name="products[${pIndex}][variants][${vIndex}][today_price]" placeholder="0.00"
-                   class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs">
-        </td>
-        <td class="p-1">
-            <input type="number" step="0.01" min="0" data-type="tomorrow_price" name="products[${pIndex}][variants][${vIndex}][tomorrow_price]" placeholder="0.00"
-                   class="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs">
+                   class="w-full bg-white border border-neutral-200 rounded-lg px-2 py-1 text-xs font-bold text-amber-700">
         </td>
         <td class="p-1">
             <input type="text" data-type="save_offer" name="products[${pIndex}][variants][${vIndex}][save_offer]" placeholder="Auto e.g. 10% OFF"
-                   class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-green-700">
+                   class="w-full bg-neutral-50 border border-neutral-200 rounded-lg px-2 py-1 text-xs font-bold text-emerald-700">
         </td>
         <td class="p-1 text-center">
             <button type="button" onclick="this.closest('tr').remove()" class="p-1 text-red-500 hover:text-red-700">
@@ -338,18 +358,12 @@ function addVariantRow(pIndex) {
 function autoCalculateSaveOffer(row) {
     const mrpInput = row.querySelector('[data-type="mrp"]');
     const sellingPriceInput = row.querySelector('[data-type="selling_price"]');
-    const todayPriceInput = row.querySelector('[data-type="today_price"]');
-    const tomorrowPriceInput = row.querySelector('[data-type="tomorrow_price"]');
     const saveOfferInput = row.querySelector('[data-type="save_offer"]');
 
     if (!mrpInput || !saveOfferInput) return;
 
     const mrp = parseFloat(mrpInput.value) || 0;
-    const todayPrice = parseFloat(todayPriceInput ? todayPriceInput.value : 0) || 0;
-    const sellingPrice = parseFloat(sellingPriceInput ? sellingPriceInput.value : 0) || 0;
-    const tomorrowPrice = parseFloat(tomorrowPriceInput ? tomorrowPriceInput.value : 0) || 0;
-
-    const effectivePrice = todayPrice > 0 ? todayPrice : (sellingPrice > 0 ? sellingPrice : (tomorrowPrice > 0 ? tomorrowPrice : 0));
+    const effectivePrice = parseFloat(sellingPriceInput ? sellingPriceInput.value : 0) || 0;
 
     if (mrp > 0 && effectivePrice > 0 && effectivePrice < mrp) {
         const pct = ((mrp - effectivePrice) / mrp) * 100;
@@ -361,7 +375,7 @@ function autoCalculateSaveOffer(row) {
 }
 
 document.addEventListener('input', (event) => {
-    if (event.target.matches('[data-type="mrp"], [data-type="selling_price"], [data-type="today_price"], [data-type="tomorrow_price"]')) {
+    if (event.target.matches('[data-type="mrp"], [data-type="selling_price"]')) {
         const row = event.target.closest('tr');
         if (row) {
             autoCalculateSaveOffer(row);

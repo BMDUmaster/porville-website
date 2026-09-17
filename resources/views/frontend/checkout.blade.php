@@ -12,7 +12,7 @@
     .checkout-summary-sticky {
         position: -webkit-sticky;
         position: sticky;
-        top: 178px;
+        top: 130px;
         z-index: 20;
     }
 }
@@ -36,40 +36,12 @@
 <div class="checkout-page max-w-5xl mx-auto px-4 py-8">
     <h1 class="nunito font-extrabold text-2xl text-gray-800 mb-6">Checkout</h1>
 
-    {{-- Noida Delivery Notice Banner --}}
-    <div class="mb-6 overflow-hidden rounded-2xl border border-amber-300/60 bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 p-5 text-white shadow-xl relative">
-        <div class="absolute -right-6 -top-6 h-28 w-28 rounded-full bg-amber-400/10 blur-xl"></div>
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
-            <div class="flex items-start gap-3.5">
-                <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-amber-400 text-slate-950 shadow-lg text-lg">
-                    <i class="fa-solid fa-truck-fast"></i>
-                </div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-amber-300 border border-amber-400/30">
-                            <span class="h-2 w-2 rounded-full bg-amber-400 animate-ping"></span>
-                            Noida Delivery Only
-                        </span>
-                    </div>
-                    <h3 class="mt-1 text-base font-extrabold text-white">Abhi Delivery Exclusively Noida Me Available Hai</h3>
-                    <p class="mt-1 text-xs text-slate-300 leading-relaxed max-w-2xl">
-                        Hum filhal <strong>Noida</strong> me hi fresh delivery kar rahe hain. Bohot hi jaldi aapke paas bhi apni nayi branch open karenge! Thank you for choosing FarmSea. 💚
-                    </p>
-                </div>
-            </div>
-            <div class="flex-shrink-0 self-end sm:self-center">
-                <span class="inline-flex rounded-xl bg-white/10 px-3.5 py-2 text-xs font-bold text-amber-300 backdrop-blur-md border border-white/10">
-                    🚀 Expanding Soon
-                </span>
-            </div>
-        </div>
-    </div>
-
     <div id="checkoutGrid" class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div class="flex-1 space-y-5">
             <form method="POST" action="{{ route('frontend.checkout.store') }}" id="checkoutForm">
                 @csrf
-                <input type="hidden" name="delivery_slot" value="{{ $selectedDeliverySlot }}">
+                <input type="hidden" name="delivery_slot" id="checkoutDeliverySlotInput" value="{{ $selectedDeliverySlot }}">
+                <input type="hidden" name="delivery_date" id="checkoutDeliveryDateInput" value="{{ $selectedDeliveryDate }}">
 
                 @if($errors->any())
                 <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
@@ -78,9 +50,46 @@
                 @endif
 
                 <div class="overflow-hidden rounded-2xl border bg-white">
+                    <div class="flex items-center gap-2 border-b px-6 py-4">
+                        <div class="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-800 text-xs font-bold text-white"><i class="fa-regular fa-clock text-[11px]"></i></div>
+                        <h2 class="nunito text-base font-extrabold text-gray-800">Delivery Timing</h2>
+                    </div>
+                    <div class="space-y-4 px-6 py-5">
+                        <div>
+                            <p class="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-gray-500">Choose a delivery date</p>
+                            <div class="flex flex-wrap gap-2" id="checkoutDeliveryDateTabs">
+                                @forelse($upcomingDates as $day)
+                                    <button type="button" onclick="selectCheckoutDeliveryDate('{{ $day['date'] }}')"
+                                            data-checkout-delivery-date="{{ $day['date'] }}"
+                                            class="checkout-delivery-date-chip {{ $selectedDeliveryDate === $day['date'] ? 'border-neutral-800 bg-neutral-800 text-white' : 'border-gray-200 bg-white text-gray-600' }} rounded-xl border px-3.5 py-2.5 text-xs font-bold transition hover:border-neutral-500">
+                                        {{ $day['date_label'] }}
+                                    </button>
+                                @empty
+                                    <span class="text-xs font-semibold text-gray-400">No delivery slots configured yet.</span>
+                                @endforelse
+                            </div>
+                        </div>
+                        <div>
+                            <p class="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-gray-500">Choose a time slot</p>
+                            <div class="flex flex-wrap gap-2" id="checkoutDeliverySlotTabs">
+                                @forelse($deliverySlotOptions as $slot)
+                                    <button type="button" onclick="selectCheckoutDeliverySlot('{{ $slot['value'] }}')"
+                                            data-checkout-delivery-slot="{{ $slot['value'] }}"
+                                            class="checkout-delivery-slot-chip {{ $selectedDeliverySlot === $slot['value'] ? 'border-amber-600 bg-amber-50 text-amber-700' : 'border-gray-200 bg-white text-gray-600' }} rounded-xl border px-3.5 py-2.5 text-xs font-bold transition hover:border-amber-400">
+                                        {{ $slot['label'] }}
+                                    </button>
+                                @empty
+                                    <span class="rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-xs font-bold text-amber-700">No slots left for this date</span>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-hidden rounded-2xl border bg-white">
                     <button type="button" id="contactInfoToggle" class="w-full flex items-center justify-between border-b px-6 py-4 hover:bg-gray-50 transition">
                         <div class="flex items-center gap-2">
-                            <div class="flex h-7 w-7 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">1</div>
+                            <div class="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-800 text-xs font-bold text-white">1</div>
                             <h2 class="nunito text-base font-extrabold text-gray-800">Contact Information</h2>
                         </div>
                         <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform" id="contactInfoChevron"></i>
@@ -131,7 +140,7 @@
                                placeholder="Enter 10-digit mobile number"
                                title="Enter exactly 10-digit mobile number"
                                oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)"
-                               class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-100">
+                               class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-neutral-600 focus:ring-1 focus:ring-amber-100">
                         <p class="mt-1 text-xs text-gray-400" id="phoneHint">
                             <span id="phoneCounter">{{ strlen($checkoutDefaults['phone'] ?? '') }}</span>/10 digits entered
                         </p>
@@ -141,12 +150,12 @@
                 <div class="overflow-hidden rounded-2xl border bg-white">
                     <div class="flex items-center justify-between border-b px-6 py-4">
                         <div class="flex items-center gap-2">
-                            <div class="flex h-7 w-7 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">2</div>
+                            <div class="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-800 text-xs font-bold text-white">2</div>
                             <h2 class="nunito text-base font-extrabold text-gray-800">Shipping Address</h2>
                         </div>
                         @if(!empty($pastAddresses))
                             <button type="button" onclick="showNewAddressForm()" id="addNewAddressBtn"
-                                    class="text-xs font-bold text-blue-700 hover:text-blue-800 flex items-center gap-1">
+                                    class="text-xs font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1">
                                 <i class="fa-solid fa-plus text-[10px]"></i> Add New
                             </button>
                         @endif
@@ -155,13 +164,13 @@
                         @if(!empty($pastAddresses))
                             <div id="savedAddressesContainer" class="space-y-2 mb-4">
                                 @foreach($pastAddresses as $index => $addr)
-                                    <div class="address-card border rounded-xl p-3 cursor-pointer relative hover:border-blue-500 transition-all duration-200 flex items-center justify-between gap-3"
+                                    <div class="address-card border rounded-xl p-3 cursor-pointer relative hover:border-neutral-600 transition-all duration-200 flex items-center justify-between gap-3"
                                          data-index="{{ $index }}"
                                          onclick="selectAddressCard({{ $index }})">
                                          <div class="min-w-0 flex-1">
                                              <div class="flex items-center justify-between gap-2">
                                                  <p class="text-sm font-bold text-gray-800 truncate">{{ $addr['name'] ?? '' }}</p>
-                                                 <span class="text-[10px] font-bold text-green-700 select-badge items-center gap-1 hidden flex-shrink-0">
+                                                 <span class="text-[10px] font-bold text-amber-700 select-badge items-center gap-1 hidden flex-shrink-0">
                                                      <i class="fa-solid fa-circle-check text-[10px]"></i> Selected
                                                  </span>
                                              </div>
@@ -169,7 +178,7 @@
                                              <p class="text-xs text-gray-500 line-clamp-1">{{ $addr['city'] }}, {{ $addr['state'] }} - {{ $addr['pincode'] }}@if(!empty($addr['phone'])) • {{ $addr['phone'] }}@endif</p>
                                          </div>
                                          <button type="button" onclick="editAddressCard(event, {{ $index }})" 
-                                                 class="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1 flex-shrink-0">
+                                                 class="text-xs text-amber-600 hover:text-amber-800 font-semibold flex items-center gap-1 flex-shrink-0">
                                                  <i class="fa-regular fa-pen-to-square text-[10px]"></i>
                                          </button>
                                     </div>
@@ -190,38 +199,30 @@
                             <div>
                                 <label class="mb-1 block text-xs font-semibold text-gray-600">Street Address *</label>
                                 <input type="text" name="address" id="shippingAddressInput" required
-                                       class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500">
+                                       class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-neutral-600">
                             </div>
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div>
                                     <label class="mb-1 block text-xs font-semibold text-gray-600">City *</label>
-                                    <input type="text" name="city" id="shippingCityInput" value="Noida" required readonly
-                                           class="w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm font-semibold text-gray-700 outline-none">
+                                    <input type="text" name="city" id="shippingCityInput" required
+                                           class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-neutral-600">
                                 </div>
                                 <div>
                                     <label class="mb-1 block text-xs font-semibold text-gray-600">State *</label>
-                                    <input type="text" name="state" id="shippingStateInput" value="UP" required readonly
-                                           class="w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm font-semibold text-gray-700 outline-none">
+                                    <input type="text" name="state" id="shippingStateInput" required
+                                           class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-neutral-600">
                                 </div>
                             </div>
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div>
-                                  <label class="mb-1 block text-xs font-semibold text-gray-600">Sector *</label>
-                                 <div class="relative">
-                                    <input type="text" id="shippingSectorSearchInput" placeholder="Search sector or PIN code..."
-                                           autocomplete="off"
-                                                 class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-100">
-                                                 <input type="hidden" name="sector" id="shippingSectorInput">
-                                   <div id="sectorDropdown" class="hidden absolute bottom-full left-0 right-0 mb-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-72 overflow-y-auto">
-        <!-- Sectors will be populated by JS -->
-    </div>
-</div>
+                                    <label class="mb-1 block text-xs font-semibold text-gray-600">Area / Sector</label>
+                                    <input type="text" name="sector" id="shippingSectorInput" placeholder="e.g. Sangam Vihar"
+                                           class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-neutral-600">
                                 </div>
                                 <div>
                                     <label class="mb-1 block text-xs font-semibold text-gray-600">PIN Code *</label>
-                                    <input type="text" name="pincode" id="shippingPincodeInput" required readonly
-                                           placeholder="Auto-filled from Sector"
-                                           class="w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm font-semibold text-gray-700 outline-none">
+                                    <input type="text" name="pincode" id="shippingPincodeInput" required maxlength="6" inputmode="numeric" placeholder="110080"
+                                           class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 outline-none focus:border-neutral-600">
                                 </div>
                             </div>
                         </div>
@@ -230,7 +231,7 @@
 
                 <div class="overflow-hidden rounded-2xl border bg-white">
                     <div class="flex items-center gap-2 border-b px-6 py-4">
-                        <div class="flex h-7 w-7 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">3</div>
+                        <div class="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-800 text-xs font-bold text-white">3</div>
                         <h2 class="nunito text-base font-extrabold text-gray-800">Payment Method</h2>
                     </div>
                     <div class="space-y-3 px-6 py-5">
@@ -240,8 +241,8 @@
                             </div>
                         @endunless
                         @foreach($paymentOptions as $val => $label)
-                        <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 p-4 transition hover:border-blue-500">
-                            <input type="radio" name="payment_method" value="{{ $val }}" {{ $selectedPaymentMethod === $val ? 'checked' : '' }} class="accent-blue-600">
+                        <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 p-4 transition hover:border-neutral-600">
+                            <input type="radio" name="payment_method" value="{{ $val }}" {{ $selectedPaymentMethod === $val ? 'checked' : '' }} class="accent-amber-600">
                             <span class="text-sm font-semibold text-gray-700">{{ $label }}</span>
                         </label>
                         @endforeach
@@ -252,9 +253,9 @@
                     <label class="mb-2 block text-xs font-semibold text-gray-600">Coupon Code (optional)</label>
                     <div class="flex gap-2">
                         <input type="text" name="coupon_code" id="couponCodeInput" value="{{ $initialCouponCode }}" placeholder="Enter coupon code"
-                               class="min-w-0 flex-1 rounded-xl border border-gray-200 px-3 py-2.5 text-sm uppercase outline-none focus:border-blue-500 sm:px-4">
+                               class="min-w-0 flex-1 rounded-xl border border-gray-200 px-3 py-2.5 text-sm uppercase outline-none focus:border-neutral-600 sm:px-4">
                         <button type="button" id="applyCouponButton"
-                                class="{{ $initialCouponCode ? '' : 'hidden' }} flex-shrink-0 rounded-xl bg-green-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-700 sm:px-5">
+                                class="{{ $initialCouponCode ? '' : 'hidden' }} flex-shrink-0 rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-amber-700 sm:px-5">
                             Apply
                         </button>
                     </div>
@@ -265,7 +266,7 @@
                             @foreach($availableCoupons as $coupon)
                                 <button type="button"
                                         data-coupon-code="{{ $coupon->code }}"
-                                        class="coupon-chip rounded-full border border-green-200 bg-green-50 px-2.5 py-1 text-[10px] font-bold text-green-700 transition hover:border-green-500 hover:bg-white sm:px-3 sm:py-1.5 sm:text-[11px]">
+                                        class="coupon-chip rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-bold text-amber-700 transition hover:border-amber-500 hover:bg-white sm:px-3 sm:py-1.5 sm:text-[11px]">
                                     {{ $coupon->code }}
                                 </button>
                             @endforeach
@@ -273,99 +274,68 @@
                     @endif
                 </div>
 
-                {{-- Order Summary --}}
-                <div id="checkoutOrderSummary" class="overflow-hidden rounded-2xl border bg-white shadow-sm">
-                    <div class="h-1 bg-gradient-to-r from-blue-700 to-orange-400"></div>
-                    <div class="border-b px-5 py-4">
-                        <h2 class="nunito text-base font-extrabold text-gray-800">Order Summary</h2>
-                    </div>
-                    <div class="max-h-64 space-y-3 overflow-y-auto border-b px-5 py-4">
-                        @foreach($items as $item)
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-100">
-                                @if($item['image'])
-                                    <img src="{{ asset('storage/' . $item['image']) }}" class="h-full w-full object-cover" alt="{{ $item['name'] }}">
-                                @else
-                                    <i class="fa-solid fa-basket-shopping text-sm text-gray-400"></i>
-                                @endif
-                            </div>
-                            <div class="min-w-0 flex-1">
-                                <p class="truncate text-xs font-semibold text-gray-800">{{ $item['name'] }}</p>
-                                <div class="mt-1 flex items-center gap-2">
-                                    <span class="text-[10px] text-gray-400">Qty: {{ $item['quantity'] }}</span>
-                                    <span class="inline-flex items-center rounded border px-1.5 py-0.5 text-[8px] font-extrabold uppercase tracking-wider {{ ($item['pricing_day'] ?? 'today') === 'tomorrow' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100' }}">
-                                        {{ ($item['pricing_day'] ?? 'today') === 'tomorrow' ? 'Tomorrow' : 'Today' }}
-                                    </span>
-                                </div>
-                            </div>
-                            <span class="flex-shrink-0 text-xs font-bold text-gray-800">&#8377;{{ number_format($item['subtotal'], 2) }}</span>
-                        </div>
-                        @endforeach
-                    </div>
-                    <div class="space-y-2 px-5 py-4 text-sm">
-                        <div class="flex justify-between"><span class="text-gray-500">Subtotal</span><span>&#8377;{{ number_format($pricing['subtotal'], 2) }}</span></div>
-                        @if((float) ($pricing['delivery_charge'] ?? 0) > 0)
-                            <div class="flex justify-between"><span class="text-gray-500">Delivery</span><span>&#8377;{{ number_format($pricing['delivery_charge'], 2) }}</span></div>
-                        @endif
-                        @if((float) ($pricing['service_charge'] ?? 0) > 0)
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">&#8505;&#65039; Service Charge</span>
-                            <span>&#8377;{{ number_format($pricing['service_charge'], 2) }}</span>
-                        </div>
-                        @endif
-                        <div id="checkoutDiscountRow" class="hidden justify-between text-green-600">
-                            <span>Discount</span>
-                            <span id="checkoutDiscountAmount">-&#8377;0.00</span>
-                        </div>
-                        <hr class="border-gray-100">
-                        <div class="flex justify-between text-base font-bold text-gray-800">
-                            <span>Total</span>
-                            <span id="checkoutFinalTotal" class="text-blue-700">&#8377;{{ number_format($pricing['total'], 2) }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <button type="submit" id="placeOrderButton"
-                        onclick="return checkOrderingActive(event)"
-                        class="flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-700 py-4 text-sm font-bold text-white transition hover:bg-blue-800">
-                    <i class="fa-solid fa-lock text-xs"></i>
-                    Place Order - <span id="placeOrderTotal">&#8377;{{ number_format($pricing['total'], 2) }}</span>
-                </button>
             </form>
-
-{{-- Ordering Inactive Popup --}}
-<div id="orderingInactiveModal"
-     class="fixed inset-0 z-[10100] {{ (session('ordering_inactive') || !($orderingActive ?? true)) ? 'flex' : 'hidden' }} items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-    <div class="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl">
-        {{-- Dark header --}}
-        <div class="bg-gradient-to-br from-slate-900 to-slate-800 px-7 py-7 text-center">
-            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-500/20 ring-2 ring-orange-400/30">
-                <i class="fa-solid fa-store-slash text-2xl text-orange-400"></i>
-            </div>
-            <h2 class="text-xl font-black text-white">{{ $orderingInactiveTitle ?? 'Orders Temporarily Paused' }}</h2>
-            <p class="mt-3 text-sm leading-relaxed text-slate-300">{{ $orderingInactiveMessage ?? 'We are currently not accepting new orders. Please check back soon.' }}</p>
-        </div>
-        {{-- Footer --}}
-        <div class="flex gap-3 bg-slate-50 px-7 py-5">
-            <a href="{{ route('frontend.home') }}"
-               class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-slate-900 py-3 text-sm font-bold text-white transition hover:bg-slate-700">
-                <i class="fa-solid fa-house text-xs"></i> Go Home
-            </a>
-            <button type="button"
-                    onclick="document.getElementById('orderingInactiveModal').classList.add('hidden'); document.getElementById('orderingInactiveModal').classList.remove('flex');"
-                    class="flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-100">
-                <i class="fa-solid fa-xmark text-xs"></i> Close
-            </button>
-        </div>
-    </div>
-</div>
         </div>
 
         <aside id="checkoutSideColumn" class="w-full lg:self-stretch">
-            <div id="checkoutPromoCard" class="group relative overflow-hidden rounded-[24px] border border-emerald-100 bg-white shadow-md">
+            {{-- Order Summary --}}
+            <div id="checkoutOrderSummary" class="checkout-summary-sticky overflow-hidden rounded-2xl border bg-white shadow-sm">
+                <div class="h-1 bg-gradient-to-r from-amber-700 to-amber-400"></div>
+                <div class="border-b px-4 py-3">
+                    <h2 class="nunito text-sm font-extrabold text-gray-800">Order Summary</h2>
+                </div>
+                <div class="max-h-44 space-y-2.5 overflow-y-auto border-b px-4 py-3">
+                    @foreach($items as $item)
+                    <div class="flex items-center gap-2.5">
+                        <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-100">
+                            @if($item['image'])
+                                <img src="{{ asset('storage/' . $item['image']) }}" class="h-full w-full object-cover" alt="{{ $item['name'] }}">
+                            @else
+                                <i class="fa-solid fa-basket-shopping text-xs text-gray-400"></i>
+                            @endif
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="truncate text-[11px] font-semibold text-gray-800">{{ $item['name'] }}</p>
+                            <span class="text-[9px] text-gray-400">Qty: {{ $item['quantity'] }}</span>
+                        </div>
+                        <span class="flex-shrink-0 text-[11px] font-bold text-gray-800">&#8377;{{ number_format($item['subtotal'], 2) }}</span>
+                    </div>
+                    @endforeach
+                </div>
+                <div class="space-y-1.5 px-4 py-3 text-xs">
+                    <div class="flex justify-between"><span class="text-gray-500">Subtotal</span><span>&#8377;{{ number_format($pricing['subtotal'], 2) }}</span></div>
+                    @if((float) ($pricing['delivery_charge'] ?? 0) > 0)
+                        <div class="flex justify-between"><span class="text-gray-500">Delivery</span><span>&#8377;{{ number_format($pricing['delivery_charge'], 2) }}</span></div>
+                    @endif
+                    @if((float) ($pricing['service_charge'] ?? 0) > 0)
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">&#8505;&#65039; Service Charge</span>
+                        <span>&#8377;{{ number_format($pricing['service_charge'], 2) }}</span>
+                    </div>
+                    @endif
+                    <div id="checkoutDiscountRow" class="hidden justify-between text-amber-600">
+                        <span>Discount</span>
+                        <span id="checkoutDiscountAmount">-&#8377;0.00</span>
+                    </div>
+                    <hr class="border-gray-100">
+                    <div class="flex justify-between text-sm font-bold text-gray-800">
+                        <span>Total</span>
+                        <span id="checkoutFinalTotal" class="text-amber-700">&#8377;{{ number_format($pricing['total'], 2) }}</span>
+                    </div>
+                </div>
+                <div class="px-4 pb-4">
+                    <button type="submit" form="checkoutForm" id="placeOrderButton"
+                            class="flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-800 py-3 text-xs font-bold text-white transition hover:bg-black">
+                        <i class="fa-solid fa-lock text-xs"></i>
+                        Place Order - <span id="placeOrderTotal">&#8377;{{ number_format($pricing['total'], 2) }}</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="checkoutPromoCard" class="group relative mt-6 overflow-hidden rounded-[24px] border border-emerald-100 bg-white shadow-md">
                 <img src="{{ asset('images/checkout/fresh-delivery-banner.png') }}" alt="Fresh meat and seafood packed for delivery" class="h-48 w-full object-cover transition duration-700 group-hover:scale-105">
                 <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 via-slate-900/55 to-transparent px-5 pb-4 pt-12 text-white">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-300">FarmSea Fresh Promise</p>
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-300">Porville Fresh Promise</p>
                     <h3 class="mt-1 text-lg font-black">Freshness packed with care</h3>
                     <p class="mt-1 text-[11px] font-semibold text-slate-200">Temperature-controlled packing &amp; safe doorstep delivery.</p>
                 </div>
@@ -375,10 +345,10 @@
                 <div id="checkoutNewArrivals" class="mt-6 rounded-[22px] border border-slate-200 bg-white p-3 shadow-sm">
                     <div class="mb-3 flex items-center justify-between px-1">
                         <div>
-                            <p class="text-[9px] font-black uppercase tracking-[0.18em] text-blue-600">Just In</p>
+                            <p class="text-[9px] font-black uppercase tracking-[0.18em] text-amber-600">Just In</p>
                             <h3 class="text-sm font-black text-slate-900">New Arrivals</h3>
                         </div>
-                        <a href="{{ route('frontend.products', ['sort' => 'latest']) }}" class="text-[9px] font-black uppercase tracking-wider text-blue-600 hover:underline">View All</a>
+                        <a href="{{ route('frontend.products', ['sort' => 'latest']) }}" class="text-[9px] font-black uppercase tracking-wider text-amber-600 hover:underline">View All</a>
                     </div>
 
                     <div class="space-y-2.5">
@@ -390,7 +360,7 @@
                                 $arrivalVariantIndex = $arrivalVariantIndex === false ? null : $arrivalVariantIndex;
                                 $arrivalImage = $arrival->images && count($arrival->images) ? asset('storage/' . $arrival->images[0]) : null;
                             @endphp
-                            <article class="group/item flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50/70 p-2 transition hover:border-green-200 hover:bg-green-50/50">
+                            <article class="group/item flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50/70 p-2 transition hover:border-amber-200 hover:bg-amber-50/50">
                                 <a href="{{ route('frontend.product.show', $arrival->slug) }}" class="h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-white">
                                     @if($arrivalImage)
                                         <img src="{{ $arrivalImage }}" alt="{{ $arrival->name }}" class="h-full w-full object-cover transition duration-300 group-hover/item:scale-105">
@@ -400,10 +370,10 @@
                                 </a>
                                 <div class="min-w-0 flex-1">
                                     <p class="truncate text-[9px] font-black uppercase tracking-wider text-emerald-600">{{ $arrival->category->name ?? 'Fresh' }}</p>
-                                    <a href="{{ route('frontend.product.show', $arrival->slug) }}" class="mt-0.5 block truncate text-[11px] font-black text-slate-900 hover:text-green-700">{{ $arrival->name }}</a>
+                                    <a href="{{ route('frontend.product.show', $arrival->slug) }}" class="mt-0.5 block truncate text-[11px] font-black text-slate-900 hover:text-amber-700">{{ $arrival->name }}</a>
                                     <p class="mt-1 text-xs font-black text-slate-900">Rs{{ number_format($arrival->display_price, 0) }} <span class="text-[9px] font-semibold text-slate-400">{{ $arrival->display_pack_label }}</span></p>
                                 </div>
-                                <button type="button" onclick="addToCart({{ $arrival->id }}, {{ $arrivalVariantIndex === null ? 'null' : $arrivalVariantIndex }}, 'today')" aria-label="Add {{ $arrival->name }} to cart" title="Add to cart" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-green-700 text-white shadow-sm transition hover:bg-green-800">
+                                <button type="button" onclick="addToCart({{ $arrival->id }}, {{ $arrivalVariantIndex === null ? 'null' : $arrivalVariantIndex }}, 'today')" aria-label="Add {{ $arrival->name }} to cart" title="Add to cart" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-amber-700 text-white shadow-sm transition hover:bg-amber-800">
                                     <i class="fa-solid fa-cart-plus text-xs"></i>
                                 </button>
                             </article>
@@ -423,9 +393,9 @@
             </a>
 
             <div id="checkoutTrustCard" class="mt-6 overflow-hidden rounded-[22px] border border-emerald-100 bg-white shadow-sm">
-                <div class="bg-gradient-to-r from-emerald-700 to-green-600 px-4 py-3 text-white">
+                <div class="bg-gradient-to-r from-emerald-700 to-emerald-500 px-4 py-3 text-white">
                     <p class="text-[9px] font-black uppercase tracking-[0.18em] text-emerald-100">Shop With Confidence</p>
-                    <h3 class="mt-0.5 text-sm font-black">Why customers trust FarmSea</h3>
+                    <h3 class="mt-0.5 text-sm font-black">Why customers trust Porville</h3>
                 </div>
                 <div class="divide-y divide-slate-100 px-3">
                     <div class="flex items-center gap-3 py-3">
@@ -507,10 +477,60 @@ function checkoutCurrency(amount) {
     return '₹' + Number(amount || 0).toFixed(2);
 }
 
+function selectCheckoutDeliveryDate(date) {
+    fetch('{{ route("frontend.cart.delivery-date") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+        body: JSON.stringify({ delivery_date: date })
+    }).then(r => r.json()).then(d => {
+        if (!d.success) return;
+
+        document.getElementById('checkoutDeliveryDateInput').value = date;
+        document.querySelectorAll('[data-checkout-delivery-date]').forEach((chip) => {
+            const isActive = chip.dataset.checkoutDeliveryDate === date;
+            chip.classList.toggle('border-neutral-800', isActive);
+            chip.classList.toggle('bg-neutral-800', isActive);
+            chip.classList.toggle('text-white', isActive);
+            chip.classList.toggle('border-gray-200', !isActive);
+            chip.classList.toggle('bg-white', !isActive);
+            chip.classList.toggle('text-gray-600', !isActive);
+        });
+
+        const container = document.getElementById('checkoutDeliverySlotTabs');
+        if (container) {
+            if (!d.options.length) {
+                container.innerHTML = '<span class="rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-xs font-bold text-amber-700">No slots left for this date</span>';
+            } else {
+                container.innerHTML = d.options.map((slot) => `
+                    <button type="button" onclick="selectCheckoutDeliverySlot('${slot.value}')" data-checkout-delivery-slot="${slot.value}"
+                            class="checkout-delivery-slot-chip border-gray-200 bg-white text-gray-600 rounded-xl border px-3.5 py-2.5 text-xs font-bold transition hover:border-amber-400">
+                        ${slot.label}
+                    </button>
+                `).join('');
+            }
+        }
+
+        document.getElementById('checkoutDeliverySlotInput').value = d.selected_delivery_slot || '';
+    });
+}
+
+function selectCheckoutDeliverySlot(value) {
+    document.getElementById('checkoutDeliverySlotInput').value = value;
+    document.querySelectorAll('[data-checkout-delivery-slot]').forEach((chip) => {
+        const isActive = chip.dataset.checkoutDeliverySlot === value;
+        chip.classList.toggle('border-amber-600', isActive);
+        chip.classList.toggle('bg-amber-50', isActive);
+        chip.classList.toggle('text-amber-700', isActive);
+        chip.classList.toggle('border-gray-200', !isActive);
+        chip.classList.toggle('bg-white', !isActive);
+        chip.classList.toggle('text-gray-600', !isActive);
+    });
+}
+
 function setCouponMessage(message, isSuccess = false) {
     couponMessage.textContent = message;
-    couponMessage.classList.remove('hidden', 'text-green-600', 'text-red-600');
-    couponMessage.classList.add(isSuccess ? 'text-green-600' : 'text-red-600');
+    couponMessage.classList.remove('hidden', 'text-amber-600', 'text-red-600');
+    couponMessage.classList.add(isSuccess ? 'text-amber-600' : 'text-red-600');
 }
 
 function updateCouponButton() {
@@ -610,12 +630,12 @@ function sanitizeCheckoutPhone() {
     // Visual feedback: green border when exactly 10 digits, red when not
     if (digits.length === 10) {
         phoneInput.classList.remove('border-red-400', 'focus:border-red-400');
-        phoneInput.classList.add('border-green-400', 'focus:border-green-400');
+        phoneInput.classList.add('border-amber-400', 'focus:border-amber-400');
     } else if (digits.length > 0) {
-        phoneInput.classList.remove('border-green-400', 'focus:border-green-400');
+        phoneInput.classList.remove('border-amber-400', 'focus:border-amber-400');
         phoneInput.classList.add('border-red-400', 'focus:border-red-400');
     } else {
-        phoneInput.classList.remove('border-green-400', 'border-red-400', 'focus:border-green-400', 'focus:border-red-400');
+        phoneInput.classList.remove('border-amber-400', 'border-red-400', 'focus:border-amber-400', 'focus:border-red-400');
     }
 }
 
@@ -638,227 +658,17 @@ const cityInput = document.getElementById('shippingCityInput');
 const stateInput = document.getElementById('shippingStateInput');
 const pincodeInput = document.getElementById('shippingPincodeInput');
 const sectorInput = document.getElementById('shippingSectorInput');
-const sectorSearchInput = document.getElementById('shippingSectorSearchInput');
-const sectorDropdown = document.getElementById('sectorDropdown');
-
-const pinToSectors = @json($pinSectors);
-
-// Build mapping: sector+pincode -> pincode, and all sector options
-const sectorToPinMap = {};
-const sectorOptions = [];
-
-Object.entries(pinToSectors).forEach(([pin, sectors]) => {
-    sectors.forEach(sector => {
-        const optionLabel = `${sector} (${pin})`;
-        sectorToPinMap[optionLabel] = pin;
-        sectorOptions.push({
-            display: optionLabel,
-            sector: sector,
-            pincode: pin
-        });
-    });
-});
-
-// Sort by sector name, then by pincode
-sectorOptions.sort((a, b) => {
-    if (a.sector !== b.sector) {
-        return a.sector.localeCompare(b.sector, undefined, { numeric: true });
-    }
-    return a.pincode.localeCompare(b.pincode);
-});
-
-console.log('Total sectors loaded:', sectorOptions.length, 'options:', sectorOptions.slice(0, 5), '...');
-console.log('sectorSearchInput:', sectorSearchInput);
-console.log('sectorDropdown:', sectorDropdown);
-console.log('sectorInput:', sectorInput);
-console.log('pincodeInput:', pincodeInput);
-
-// Populate all sectors
-function populateAllSectors() {
-    if (!sectorDropdown) {
-        console.error('sectorDropdown element not found');
-        return;
-    }
-    
-    sectorDropdown.innerHTML = '';
-    if (sectorOptions.length === 0) {
-        console.warn('No sector options available');
-        const noResult = document.createElement('div');
-        noResult.className = 'px-4 py-2.5 text-sm text-gray-500 text-center';
-        noResult.textContent = 'No sectors available';
-        sectorDropdown.appendChild(noResult);
-        return;
-    }
-    
-    sectorOptions.forEach((option, idx) => {
-        const div = document.createElement('div');
-        div.className = 'px-4 py-2.5 text-sm cursor-pointer hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0 text-gray-700 font-medium';
-        div.innerHTML = `<span class="font-semibold">${option.sector}</span><span class="text-gray-400 ml-2 text-xs">${option.pincode}</span>`;
-        div.dataset.sectorIndex = idx; // Store the index as data attribute
-        div.onclick = (e) => {
-            e.stopPropagation();
-            selectSectorFromDropdown(option.sector, option.pincode);
-        };
-        sectorDropdown.appendChild(div);
-    });
-}
-
-function selectSectorFromDropdown(sector, pincode) {
-    // Focus: hamesha current text ke hisab se fresh list dikhao (stale list bug fix)
-sectorSearchInput?.addEventListener('focus', () => {
-    sectorDropdown.classList.remove('hidden');
-    filterSectors();
-});
-
-sectorSearchInput?.addEventListener('input', () => {
-    sectorDropdown.classList.remove('hidden');
-    filterSectors();
-});
-
-sectorSearchInput?.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        sectorDropdown.classList.add('hidden');
-    }
-});
-    
-    sectorSearchInput.value = sector;
-    sectorInput.value = sector;
-    pincodeInput.value = pincode;
-    sectorDropdown.classList.add('hidden');
-    
-    // Trigger change event for form validation
-    sectorInput.dispatchEvent(new Event('change'));
-    pincodeInput.dispatchEvent(new Event('change'));
-    
-    console.log('Sector selected:', sector, 'Pincode:', pincode);
-}
-
-function filterSectors() {
-    if (!sectorSearchInput || !sectorDropdown) {
-        console.error('Required elements not found for filterSectors');
-        return;
-    }
-    
-    const searchTerm = sectorSearchInput.value.toLowerCase().trim();
-    
-    if (searchTerm === '') {
-        // Show all sectors
-        populateAllSectors();
-        return;
-    }
-    
-    // Filter the options
-    const filteredOptions = sectorOptions.filter(option => {
-        const sectorName = option.sector.toLowerCase();
-        const pincode = option.pincode.toLowerCase();
-        return sectorName.includes(searchTerm) || pincode.includes(searchTerm);
-    });
-    
-    // Re-populate dropdown with filtered results
-    sectorDropdown.innerHTML = '';
-    
-    if (filteredOptions.length === 0) {
-        const noResult = document.createElement('div');
-        noResult.className = 'px-4 py-2.5 text-sm text-gray-500 text-center';
-        noResult.textContent = 'No sectors found';
-        sectorDropdown.appendChild(noResult);
-        return;
-    }
-    
-    filteredOptions.forEach((option, idx) => {
-        const div = document.createElement('div');
-        div.className = 'px-4 py-2.5 text-sm cursor-pointer hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0 text-gray-700 font-medium';
-        div.innerHTML = `<span class="font-semibold">${option.sector}</span><span class="text-gray-400 ml-2 text-xs">${option.pincode}</span>`;
-        div.onclick = (e) => {
-            e.stopPropagation();
-            selectSectorFromDropdown(option.sector, option.pincode);
-        };
-        sectorDropdown.appendChild(div);
-    });
-}
-
-// Event listeners for sector search
-sectorSearchInput?.addEventListener('focus', () => {
-    sectorDropdown.classList.remove('hidden');
-    if (sectorDropdown.innerHTML === '') {
-        populateAllSectors();
-    }
-});
-
-sectorSearchInput?.addEventListener('input', () => {
-    // Make sure dropdown is visible when typing
-    sectorDropdown.classList.remove('hidden');
-    if (sectorDropdown.innerHTML === '') {
-        populateAllSectors();
-    }
-    filterSectors();
-});
-
-sectorSearchInput?.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        sectorDropdown.classList.add('hidden');
-    }
-});
-
-// Close the sector list whenever the customer clicks outside its input/list.
-document.addEventListener('click', (event) => {
-    if (!sectorDropdown || !sectorSearchInput) return;
-
-    const sectorPicker = sectorSearchInput.closest('.relative');
-    if (sectorPicker && !sectorPicker.contains(event.target)) {
-        sectorDropdown.classList.add('hidden');
-    }
-});
-
-document.getElementById('checkoutForm')?.addEventListener('submit', function (e) {
-    const isFormMode = selectedAddressIndex === -1; // naya address add/edit ho raha hai
-    if (isFormMode && !sectorInput.value) {
-        e.preventDefault();
-        sectorSearchInput.classList.add('border-red-400');
-        sectorSearchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        sectorSearchInput.focus();
-        alert('Kripya apna sector select karein.');
-    }
-});
-
-// Initialize sectors on page load
-if (sectorSearchInput && sectorDropdown && sectorOptions.length > 0) {
-    // Pre-populate the dropdown so it's ready immediately
-    populateAllSectors();
-    // If a default sector is set, show the dropdown initially
-    if (sectorSearchInput.value) {
-        // Already has a value, keep dropdown closed
-    }
-} else if (!sectorSearchInput) {
-    console.error('sectorSearchInput element not found');
-}
-
-function populateSectors(pincode, selectedSector) {
-    // This function is kept for backward compatibility
-    // Now we populate all sectors regardless of pincode
-    if (selectedSector) {
-        sectorSearchInput.value = selectedSector;
-        sectorInput.value = selectedSector;
-        
-        // Find the pincode for this sector
-        const matchingOption = sectorOptions.find(opt => opt.sector === selectedSector && opt.pincode === pincode);
-        if (matchingOption) {
-            pincodeInput.value = matchingOption.pincode;
-        }
-    }
-}
 
 function updateAddressSelectionUI() {
     const isCardSelected = selectedAddressIndex >= 0;
 
     addressCards.forEach((card, idx) => {
         const isSelected = isCardSelected && idx === selectedAddressIndex;
-        card.classList.toggle('border-blue-600', isSelected);
-        card.classList.toggle('bg-blue-50/20', isSelected);
+        card.classList.toggle('border-neutral-700', isSelected);
+        card.classList.toggle('bg-amber-50/20', isSelected);
         card.classList.toggle('shadow-sm', isSelected);
-        // Only reset border if not selected — avoid overriding blue border
         if (!isSelected) {
-            card.classList.remove('border-blue-600', 'bg-blue-50/20', 'shadow-sm');
+            card.classList.remove('border-neutral-700', 'bg-amber-50/20', 'shadow-sm');
         }
 
         const badge = card.querySelector('.select-badge');
@@ -872,31 +682,22 @@ function updateAddressSelectionUI() {
         // Saved address selected — populate hidden inputs and hide form
         const addr = pastAddresses[selectedAddressIndex];
         streetInput.value = addr.address || '';
-        cityInput.value = addr.city || 'Noida';
-        stateInput.value = addr.state || 'UP';
-
-        // Set sector and pincode from saved address
-        const sector = addr.sector || '';
-        const pin = addr.pincode || '';
-        if (sector) {
-            sectorSearchInput.value = sector;
-            sectorInput.value = sector;
-            pincodeInput.value = pin;
-        }
+        cityInput.value = addr.city || '';
+        stateInput.value = addr.state || '';
+        sectorInput.value = addr.sector || '';
+        pincodeInput.value = addr.pincode || '';
 
         formContainer.classList.add('hidden');
-        // Disable required on hidden form inputs to prevent form submission block
-        [streetInput, pincodeInput, sectorInput, sectorSearchInput].forEach(el => {
+        [streetInput, cityInput, stateInput, pincodeInput].forEach(el => {
             if (el) el.removeAttribute('required');
         });
         addNewBtn?.classList.remove('hidden');
     } else {
         // Form mode (add new or edit)
         formContainer.classList.remove('hidden');
-        // Restore required attributes
-        if (streetInput) streetInput.setAttribute('required', '');
-        if (pincodeInput) pincodeInput.setAttribute('required', '');
-        if (sectorInput) sectorInput.setAttribute('required', '');
+        [streetInput, cityInput, stateInput, pincodeInput].forEach(el => {
+            if (el) el.setAttribute('required', '');
+        });
         addNewBtn?.classList.add('hidden');
     }
 }
@@ -910,17 +711,15 @@ function showNewAddressForm() {
     selectedAddressIndex = -1;
 
     streetInput.value = '';
-    cityInput.value = 'Noida';
-    stateInput.value = 'UP';
-    sectorSearchInput.value = '';
+    cityInput.value = '';
+    stateInput.value = '';
     sectorInput.value = '';
     pincodeInput.value = '';
-    sectorDropdown.classList.add('hidden');
 
     if (formActionTitle) formActionTitle.textContent = 'Add New Address';
 
     updateAddressSelectionUI();
-    sectorSearchInput.focus();
+    streetInput.focus();
 }
 
 function editAddressCard(event, index) {
@@ -929,14 +728,10 @@ function editAddressCard(event, index) {
 
     const addr = pastAddresses[index];
     streetInput.value = addr.address || '';
-    cityInput.value = addr.city || 'Noida';
-    stateInput.value = addr.state || 'UP';
-    
-    const sector = addr.sector || '';
-    const pin = addr.pincode || '';
-    sectorSearchInput.value = sector;
-    sectorInput.value = sector;
-    pincodeInput.value = pin;
+    cityInput.value = addr.city || '';
+    stateInput.value = addr.state || '';
+    sectorInput.value = addr.sector || '';
+    pincodeInput.value = addr.pincode || '';
 
     if (formActionTitle) formActionTitle.textContent = 'Edit Address';
 
@@ -959,13 +754,10 @@ if (pastAddresses.length > 0 && !hasErrors) {
     formContainer?.classList.remove('hidden');
     addNewBtn?.classList.add('hidden');
     streetInput.value = @json(old('address', $checkoutDefaults['address'] ?? ''));
-    cityInput.value = 'Noida';
-    stateInput.value = 'UP';
-    const defaultPin = @json(old('pincode', $checkoutDefaults['pincode'] ?? ''));
-    const defaultSector = @json(old('sector', $checkoutDefaults['sector'] ?? ''));
-    sectorSearchInput.value = defaultSector;
-    sectorInput.value = defaultSector;
-    pincodeInput.value = defaultPin;
+    cityInput.value = @json(old('city', $checkoutDefaults['city'] ?? ''));
+    stateInput.value = @json(old('state', $checkoutDefaults['state'] ?? ''));
+    sectorInput.value = @json(old('sector', $checkoutDefaults['sector'] ?? ''));
+    pincodeInput.value = @json(old('pincode', $checkoutDefaults['pincode'] ?? ''));
 }
 
 // Contact Information Toggle
@@ -980,18 +772,5 @@ if (contactToggle) {
     });
 }
 
-// Ordering active check — show popup if ordering is off
-const orderingActive = {{ ($orderingActive ?? true) ? 'true' : 'false' }};
-
-function checkOrderingActive(e) {
-    if (!orderingActive) {
-        e.preventDefault();
-        const modal = document.getElementById('orderingInactiveModal');
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        return false;
-    }
-    return true;
-}
 </script>
 @endsection

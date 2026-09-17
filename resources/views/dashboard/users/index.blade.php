@@ -7,7 +7,7 @@
 
     {{-- Stats --}}
     <div class="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-        @foreach([['Total Customers',$stats['total'],'blue-500'],['Active Customers',$stats['active'],'green-500'],['Blocked Customers',$stats['blocked'],'red-500']] as [$label,$val,$color])
+        @foreach([['Total Customers',$stats['total'],'amber-500'],['Active Customers',$stats['active'],'green-500'],['Blocked Customers',$stats['blocked'],'red-500']] as [$label,$val,$color])
         <div class="flex items-center gap-4 rounded-2xl bg-white p-5 shadow">
             <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-{{ $color }} text-xl font-bold text-white">
                 {{ $label === 'Total Customers' ? 'C' : ($label === 'Active Customers' ? 'A' : 'B') }}
@@ -29,7 +29,7 @@
             <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
             <option value="blocked" {{ request('status') === 'blocked' ? 'selected' : '' }}>Blocked</option>
         </select>
-        <button type="submit" class="rounded-full bg-blue-600 px-4 py-2 text-sm text-white">Filter</button>
+        <button type="submit" class="rounded-full bg-amber-600 px-4 py-2 text-sm text-white">Filter</button>
         <a href="{{ route('dashboard.users') }}" class="rounded-full bg-gray-200 px-4 py-2 text-sm text-gray-700">Reset</a>
     </form>
 
@@ -55,7 +55,7 @@
                     </div>
                     <div>
                         <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Orders</p>
-                        <p class="mt-1 text-sm font-bold text-indigo-600">{{ $user->orders_count }}</p>
+                        <p class="mt-1 text-sm font-bold text-amber-600">{{ $user->orders_count }}</p>
                     </div>
                     <div>
                         <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">DOB / Gender</p>
@@ -75,8 +75,8 @@
                         <input type="number" name="delivery_charge" min="0" step="0.01"
                                value="{{ $user->delivery_charge !== null ? number_format($user->delivery_charge, 2, '.', '') : '' }}"
                                placeholder="{{ number_format($globalDeliveryCharge, 2, '.', '') }}"
-                               class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium text-slate-800 outline-none transition focus:border-blue-500">
-                        <button type="submit" class="rounded-xl bg-blue-600 px-3 py-2 text-xs font-bold text-white hover:bg-blue-700">
+                               class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium text-slate-800 outline-none transition focus:border-amber-500">
+                        <button type="submit" class="rounded-xl bg-amber-600 px-3 py-2 text-xs font-bold text-white hover:bg-amber-700">
                             Save
                         </button>
                     </form>
@@ -84,7 +84,7 @@
 
                 <div class="mt-4 flex flex-col gap-2 sm:flex-row">
                     <a href="{{ route('dashboard.users.show', $user) }}"
-                       class="inline-flex w-full items-center justify-center rounded-xl bg-blue-50 px-3 py-2 text-xs font-bold text-blue-600 hover:bg-blue-100 sm:w-auto">
+                       class="inline-flex w-full items-center justify-center rounded-xl bg-amber-50 px-3 py-2 text-xs font-bold text-amber-600 hover:bg-amber-100 sm:w-auto">
                         View
                     </a>
                     <form method="POST" action="{{ route('dashboard.users.toggle', $user) }}" class="w-full sm:w-auto">
@@ -117,7 +117,7 @@
                 <col style="width: 110px">
                 <col style="width: 165px">
             </colgroup>
-            <thead class="bg-blue-600 text-white">
+            <thead class="bg-amber-600 text-white">
                 <tr>
                     <th class="whitespace-nowrap px-3 py-3 text-left">Sr. No.</th>
                     <th class="whitespace-nowrap px-3 py-3 text-left">Customer ID</th>
@@ -143,11 +143,11 @@
                         <p>{{ $user->date_of_birth?->format('d M Y') ?: '-' }}</p>
                         <p class="mt-1 text-xs text-gray-400">{{ $user->gender ? ucfirst(str_replace('_', ' ', $user->gender)) : 'Not set' }}</p>
                     </td>
-                    <td class="px-3 py-3 text-center font-bold text-indigo-600">{{ $user->orders_count }}</td>
+                    <td class="px-3 py-3 text-center font-bold text-amber-600">{{ $user->orders_count }}</td>
                     <td class="px-3 py-3">
                         <div>
                             @if($user->delivery_charge !== null)
-                                <p class="text-xs font-bold text-blue-600">Custom Rs{{ number_format($user->delivery_charge, 2) }}</p>
+                                <p class="text-xs font-bold text-amber-600">Custom Rs{{ number_format($user->delivery_charge, 2) }}</p>
                             @endif
                             <form method="POST" action="{{ route('dashboard.users.delivery-charge', $user) }}" class="mt-2 flex items-center gap-2 whitespace-nowrap">
                                 @csrf
@@ -155,8 +155,8 @@
                                 <input type="number" name="delivery_charge" min="0" step="0.01"
                                        value="{{ $user->delivery_charge !== null ? number_format($user->delivery_charge, 2, '.', '') : '' }}"
                                        placeholder="{{ number_format($globalDeliveryCharge, 2, '.', '') }}"
-                                       class="w-24 rounded-lg border border-slate-300 px-2 py-1.5 text-xs font-semibold text-slate-800 outline-none transition focus:border-blue-500">
-                                <button type="submit" class="rounded-lg bg-blue-600 px-2.5 py-1.5 text-xs font-bold text-white hover:bg-blue-700">
+                                       class="w-24 rounded-lg border border-slate-300 px-2 py-1.5 text-xs font-semibold text-slate-800 outline-none transition focus:border-amber-500">
+                                <button type="submit" class="rounded-lg bg-amber-600 px-2.5 py-1.5 text-xs font-bold text-white hover:bg-amber-700">
                                     Save
                                 </button>
                             </form>
@@ -170,7 +170,7 @@
                     <td class="px-3 py-3">
                         <div class="flex items-center gap-2 whitespace-nowrap">
                             <a href="{{ route('dashboard.users.show', $user) }}"
-                               class="text-xs font-bold text-blue-600 hover:underline">View</a>
+                               class="text-xs font-bold text-amber-600 hover:underline">View</a>
                             <form method="POST" action="{{ route('dashboard.users.toggle', $user) }}">
                                 @csrf
                                 @method('PATCH')
@@ -198,7 +198,7 @@
             @endif
 
             @foreach($users->getUrlRange(max(1, $users->currentPage() - 2), min($users->lastPage(), $users->currentPage() + 2)) as $page => $url)
-                <a href="{{ $url }}" class="flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-bold transition {{ $page === $users->currentPage() ? 'bg-blue-600 text-white shadow-sm' : 'border border-slate-300 text-slate-700 hover:bg-slate-50' }}">{{ $page }}</a>
+                <a href="{{ $url }}" class="flex h-9 min-w-9 items-center justify-center rounded-lg px-2 text-sm font-bold transition {{ $page === $users->currentPage() ? 'bg-amber-600 text-white shadow-sm' : 'border border-slate-300 text-slate-700 hover:bg-slate-50' }}">{{ $page }}</a>
             @endforeach
 
             @if($users->hasMorePages())

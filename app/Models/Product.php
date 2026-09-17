@@ -11,7 +11,7 @@ class Product extends Model
 
     protected $fillable = [
         'category_id', 'subcategory_id', 'name', 'slug', 'description',
-        'price', 'mrp', 'weight', 'unit', 'stock', 'images', 'videos', 'variants', 'is_active',
+        'price', 'mrp', 'weight', 'unit', 'contact_number', 'processing_note', 'delivery_note', 'stock', 'images', 'videos', 'variants', 'is_active',
     ];
 
     protected $casts = [
@@ -49,9 +49,29 @@ class Product extends Model
             });
     }
 
+    /**
+     * Excludes enquiry-only products (e.g. Live Stock) from algorithmic picks
+     * like New Arrivals / Featured / Best Sellers, which assume normal cart pricing.
+     */
+    public function scopeNotEnquiryOnly($query)
+    {
+        return $query->whereHas('category', function ($q) {
+            $q->where('is_enquiry_only', false);
+        });
+    }
+
     public function getIsOutOfStockAttribute(): bool
     {
         return !$this->is_active || ($this->stock !== null && (int) $this->stock <= 0);
+    }
+
+    /**
+     * Enquiry-only products (e.g. Live Stock) aren't sold through the cart —
+     * storefront shows a "Call to Order" button using contact_number instead.
+     */
+    public function getIsEnquiryOnlyAttribute(): bool
+    {
+        return (bool) ($this->category?->is_enquiry_only ?? $this->subcategory?->is_enquiry_only ?? false);
     }
 
     public function getDisplayPackLabelAttribute(): string
@@ -88,6 +108,43 @@ class Product extends Model
             ->first(fn ($item) => filled($item['mrp'] ?? null));
 
         return (float) ($variant['mrp'] ?? $this->mrp ?? $this->display_price);
+    }
+
+    /**
+     * Normalized list of purchasable pack options for product cards, one entry
+     * per variant that has a valid today price (falls back to the base
+     * price/pack when the product has no variants at all).
+     */
+    public function getCardVariantOptionsAttribute(): array
+    {
+        $variants = collect($this->variants ?? [])
+            ->filter(fn ($variant) => filled($variant['selling_price'] ?? null) || filled($variant['today_price'] ?? null))
+            ->values();
+
+        if ($variants->isEmpty()) {
+            return [[
+                'index' => null,
+                'label' => $this->formatPackLabel($this->weight ?? null, $this->unit ?? null, null),
+                'price' => (float) $this->price,
+                'mrp' => (float) ($this->mrp ?? $this->price),
+            ]];
+        }
+
+        return $variants->map(function ($variant, $i) {
+            $originalIndex = collect($this->variants)->search($variant, true);
+
+            return [
+                'index' => $originalIndex,
+                'label' => $this->formatPackLabel($variant['quantity'] ?? null, $variant['unit'] ?? $this->unit, $variant['piece'] ?? null),
+                'price' => \App\Support\ProductDayPricing::sellingPrice($variant, 'today', (float) $this->price),
+                'mrp' => \App\Support\ProductDayPricing::mrp($variant, (float) ($this->mrp ?? $this->price)),
+            ];
+        })->values()->all();
+    }
+
+    public function getCardFromPriceAttribute(): float
+    {
+        return collect($this->card_variant_options)->min('price') ?? (float) $this->price;
     }
 
     private function formatPackLabel($quantity, $unit, $piece): string

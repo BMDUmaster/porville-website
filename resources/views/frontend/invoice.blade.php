@@ -77,10 +77,10 @@ body > footer {
             <div class="flex items-start justify-between gap-4">
                 <div class="flex min-w-0 items-center gap-3">
                     <div class="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-white/10">
-                        <img src="{{ $brandLogoUrl }}" alt="FarmSea" class="h-10 w-10 object-contain">
+                        <img src="{{ $brandLogoUrl }}" alt="Porville" class="h-10 w-10 object-contain">
                     </div>
                     <div>
-                        <h1 class="mt-1 text-xl font-black tracking-[-0.03em] md:text-2xl">FarmSea Invoice</h1>
+                        <h1 class="mt-1 text-xl font-black tracking-[-0.03em] md:text-2xl">Porville Invoice</h1>
                         <p class="mt-1 text-xs text-white/80">Order invoice</p>
                     </div>
                 </div>

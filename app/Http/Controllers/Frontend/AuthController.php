@@ -369,11 +369,11 @@ class AuthController extends Controller
             return response()->json([
                 'success' => true,
                 'redirect_url' => session()->pull('url.intended', route('frontend.profile')),
-                'message' => 'Account created successfully! Welcome to FarmSea.',
+                'message' => 'Account created successfully! Welcome to Porville.',
             ]);
         }
 
-        return redirect()->intended(route('frontend.profile'))->with('success', 'Account created successfully! Welcome to FarmSea.');
+        return redirect()->intended(route('frontend.profile'))->with('success', 'Account created successfully! Welcome to Porville.');
     }
 
     /** POST /account/logout */
@@ -405,17 +405,17 @@ class AuthController extends Controller
     {
         $this->ensureMailIsConfigured();
 
-        $subject = 'FarmSea OTP for ' . ucwords($purpose);
+        $subject = 'Porville OTP for ' . ucwords($purpose);
         $body = implode("\n", [
             'Hello,',
             '',
-            "Your FarmSea OTP for {$purpose} is: {$otp}",
+            "Your Porville OTP for {$purpose} is: {$otp}",
             '',
             "This OTP is valid for {$ttlMinutes} minutes.",
             'If you did not request this, please ignore this email.',
             '',
             'Regards,',
-            'FarmSea Team',
+            'Porville Team',
         ]);
 
         Mail::raw($body, function ($message) use ($email, $subject) {

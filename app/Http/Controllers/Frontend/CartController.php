@@ -9,6 +9,7 @@ use App\Support\DeliverySlotManager;
 use App\Support\OrderPricing;
 use App\Support\ProductDayPricing;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 
 class CartController extends Controller
@@ -29,16 +30,34 @@ class CartController extends Controller
         $couponData = $this->couponData($subtotal, $selectedDay);
         $pricing['discount'] = $couponData['discount'];
         $pricing['total'] = max(0, $pricing['total'] - $couponData['discount']);
-        $deliverySlotOptions = $this->deliverySlotOptionsForCart($cart);
-        $selectedDeliverySlot = session('selected_delivery_slot_' . $selectedDay);
+
+        $upcomingDates = DeliverySlotManager::upcomingDatesForCustomer();
+        $selectedDeliveryDate = $this->resolveSelectedDate($upcomingDates);
+        $deliverySlotOptions = collect($upcomingDates)->firstWhere('date', $selectedDeliveryDate)['options'] ?? [];
+        $selectedDeliverySlot = session('selected_delivery_slot');
 
         if (! in_array($selectedDeliverySlot, array_column($deliverySlotOptions, 'value'), true)) {
             $selectedDeliverySlot = $deliverySlotOptions[0]['value'] ?? null;
-            session(['selected_delivery_slot_' . $selectedDay => $selectedDeliverySlot]);
+            session(['selected_delivery_slot' => $selectedDeliverySlot]);
         }
-        $deliveryDayLabel = $this->deliveryDayLabelForCart($cart);
 
-        return view('frontend.cart', compact('items', 'pricing', 'deliverySlotOptions', 'selectedDeliverySlot', 'deliveryDayLabel', 'availableDays', 'selectedDay', 'couponData'));
+        return view('frontend.cart', compact('items', 'pricing', 'deliverySlotOptions', 'selectedDeliverySlot', 'upcomingDates', 'selectedDeliveryDate', 'availableDays', 'selectedDay', 'couponData'));
+    }
+
+    /** Session-backed selected delivery date, validated against what's actually available. */
+    private function resolveSelectedDate(array $upcomingDates): ?string
+    {
+        $dates = array_column($upcomingDates, 'date');
+        $selected = session('selected_delivery_date');
+
+        if ($selected && in_array($selected, $dates, true)) {
+            return $selected;
+        }
+
+        $default = $dates[0] ?? null;
+        session(['selected_delivery_date' => $default]);
+
+        return $default;
     }
 
     /** POST /cart/add */
@@ -53,6 +72,20 @@ class CartController extends Controller
         ]);
 
         $product      = Product::findOrFail($request->product_id);
+
+        if ($product->is_enquiry_only) {
+            $message = 'This product is enquiry-only. Please call to order.';
+
+            if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                ], 422);
+            }
+
+            return back()->with('error', $message);
+        }
+
         $qty          = $request->get('quantity', 1);
         $variantIndex = $request->filled('variant_index') ? (int) $request->input('variant_index') : null;
         if ($variantIndex === null && ! empty($product->variants ?? [])) {
@@ -74,41 +107,6 @@ class CartController extends Controller
             )
         ) {
             $pricingDay = 'today';
-        }
-
-        $slotSettings = DeliverySlotManager::settings();
-        $availableTodaySlots = DeliverySlotManager::availableOptions('today');
-        $availableTomorrowSlots = DeliverySlotManager::availableOptions('tomorrow');
-
-        $isTodayUnavailable = empty($availableTodaySlots);
-        $isTomorrowUnavailable = empty($availableTomorrowSlots)
-            || ! $variant
-            || ! array_key_exists('tomorrow_price', $variant)
-            || $variant['tomorrow_price'] === null
-            || $variant['tomorrow_price'] === ''
-            || (float) $variant['tomorrow_price'] <= 0;
-
-        $slotUnavailable = false;
-        if ($pricingDay === 'today' && $isTodayUnavailable) {
-            $slotUnavailable = true;
-        } elseif ($pricingDay === 'tomorrow' && $isTomorrowUnavailable) {
-            $slotUnavailable = true;
-        }
-
-        if ($slotUnavailable) {
-            $title = $slotSettings['no_slot_popup_title'] ?: 'Delivery Slots Unavailable';
-            $message = $slotSettings['no_slot_popup_description'] ?: 'Delivery slots for Today or Tomorrow are currently unavailable for this item. Please try again later.';
-
-            if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'success'          => false,
-                    'slot_unavailable' => true,
-                    'title'            => $title,
-                    'message'          => $message,
-                ]);
-            }
-
-            return back()->with('error', $message);
         }
 
         if ($product->is_out_of_stock) {
@@ -213,23 +211,59 @@ class CartController extends Controller
     /** POST /cart/delivery-slot */
     public function updateDeliverySlot(Request $request)
     {
-        $day = ProductDayPricing::normalizeDay($request->input('delivery_day'));
+        $upcomingDates = DeliverySlotManager::upcomingDatesForCustomer();
+        $allowedDates = array_column($upcomingDates, 'date');
+
         $data = $request->validate([
-            'delivery_day' => ['nullable', 'string', Rule::in(['today', 'tomorrow'])],
-            'delivery_slot' => ['required', 'string', Rule::in(array_column($this->deliverySlotOptionsForDay($day), 'value'))],
+            'delivery_date' => ['required', 'string', Rule::in($allowedDates)],
         ]);
 
-        session(['selected_delivery_slot_' . $day => $data['delivery_slot']]);
+        $dayOptions = collect($upcomingDates)->firstWhere('date', $data['delivery_date'])['options'] ?? [];
+
+        $data += $request->validate([
+            'delivery_slot' => ['required', 'string', Rule::in(array_column($dayOptions, 'value'))],
+        ]);
+
+        session([
+            'selected_delivery_date' => $data['delivery_date'],
+            'selected_delivery_slot' => $data['delivery_slot'],
+        ]);
 
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
+                'delivery_date' => $data['delivery_date'],
                 'delivery_slot' => $data['delivery_slot'],
                 'delivery_slot_label' => DeliverySlotManager::label($data['delivery_slot']),
             ]);
         }
 
         return back()->with('success', 'Delivery slot updated.');
+    }
+
+    /** POST /cart/delivery-date — switch which date's slots are shown, without picking a slot yet. */
+    public function updateDeliveryDate(Request $request)
+    {
+        $upcomingDates = DeliverySlotManager::upcomingDatesForCustomer();
+        $allowedDates = array_column($upcomingDates, 'date');
+
+        $data = $request->validate([
+            'delivery_date' => ['required', 'string', Rule::in($allowedDates)],
+        ]);
+
+        $dayOptions = collect($upcomingDates)->firstWhere('date', $data['delivery_date'])['options'] ?? [];
+
+        session([
+            'selected_delivery_date' => $data['delivery_date'],
+            'selected_delivery_slot' => $dayOptions[0]['value'] ?? null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'delivery_date' => $data['delivery_date'],
+            'options' => $dayOptions,
+            'selected_delivery_slot' => $dayOptions[0]['value'] ?? null,
+        ]);
     }
 
     /** POST /cart/remove */
@@ -291,12 +325,15 @@ class CartController extends Controller
         $pricing = OrderPricing::summary($subtotal, auth('web_frontend')->user(), $selectedDay);
         $couponData = $this->couponData($subtotal, $selectedDay);
         $pricing['total'] = max(0, $pricing['total'] - $couponData['discount']);
-        $selectedDeliverySlot = session('selected_delivery_slot_' . $selectedDay);
-        $deliverySlotOptions = $this->deliverySlotOptionsForDay($selectedDay);
+
+        $upcomingDates = DeliverySlotManager::upcomingDatesForCustomer();
+        $selectedDeliveryDate = $this->resolveSelectedDate($upcomingDates);
+        $deliverySlotOptions = collect($upcomingDates)->firstWhere('date', $selectedDeliveryDate)['options'] ?? [];
+        $selectedDeliverySlot = session('selected_delivery_slot');
 
         if (! in_array($selectedDeliverySlot, array_column($deliverySlotOptions, 'value'), true)) {
             $selectedDeliverySlot = $deliverySlotOptions[0]['value'] ?? null;
-            session(['selected_delivery_slot_' . $selectedDay => $selectedDeliverySlot]);
+            session(['selected_delivery_slot' => $selectedDeliverySlot]);
         }
 
         return response()->json([
@@ -310,6 +347,7 @@ class CartController extends Controller
             'total' => $pricing['total'],
             'selected_delivery_slot' => $selectedDeliverySlot,
             'selected_delivery_slot_label' => DeliverySlotManager::label($selectedDeliverySlot),
+            'selected_delivery_date' => $selectedDeliveryDate,
             'delivery_slot_options' => $deliverySlotOptions,
             'delivery_day' => $selectedDay,
             'delivery_day_label' => ucfirst($selectedDay),
@@ -359,20 +397,6 @@ class CartController extends Controller
         return $unit;
     }
 
-    private function deliverySlotOptionsForCart(array $cart): array
-    {
-        return $this->usesTomorrowDelivery($cart)
-            ? DeliverySlotManager::options()
-            : DeliverySlotManager::availableOptions();
-    }
-
-    private function deliverySlotOptionsForDay(string $day): array
-    {
-        return $day === 'tomorrow'
-            ? DeliverySlotManager::options()
-            : DeliverySlotManager::availableOptions();
-    }
-
     private function usesTomorrowDelivery(array $cart): bool
     {
         $days = collect($cart)
@@ -381,11 +405,6 @@ class CartController extends Controller
             ->values();
 
         return $days->contains('tomorrow') && ! $days->contains('today');
-    }
-
-    private function deliveryDayLabelForCart(array $cart): string
-    {
-        return $this->usesTomorrowDelivery($cart) ? 'Tomorrow' : 'Today';
     }
 
     private function pricingDayForCart(array $cart): string

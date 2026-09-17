@@ -12,6 +12,19 @@ class PageController extends Controller
     public function about()        { return view('frontend.pages.about-us'); }
     public function farms()        { return view('frontend.pages.our-farms'); }
     public function contact()      { return view('frontend.pages.contact-us'); }
+    public function faq()
+    {
+        $categories = \App\Models\FaqCategory::query()
+            ->where('is_active', true)
+            ->with(['faqs' => fn ($q) => $q->where('is_active', true)])
+            ->orderBy('sort_order')
+            ->orderBy('title')
+            ->get()
+            ->filter(fn ($category) => $category->faqs->isNotEmpty())
+            ->values();
+
+        return view('frontend.pages.faq', compact('categories'));
+    }
     public function submitContact(Request $request)
     {
         $data = $request->validate([

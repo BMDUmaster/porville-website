@@ -19,7 +19,7 @@ class ServerDiagnostics
             'storage_writable' => is_writable(storage_path('app/public')),
             'bootstrap_cache_writable' => is_writable(base_path('bootstrap/cache')),
             'public_storage_link' => file_exists($public . '/storage'),
-            'logo' => file_exists($public . '/images/Farmsea.webp'),
+            'logo' => file_exists($public . '/images/porville-logo.jpg'),
             'app_url_env' => null,
             'db_database_env' => null,
             'laravel_boot' => true,

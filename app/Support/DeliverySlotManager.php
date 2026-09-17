@@ -2,255 +2,140 @@
 
 namespace App\Support;
 
-use App\Models\AppSetting;
-use DateInterval;
-use DateTimeImmutable;
+use App\Models\DeliverySlot;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
 
 class DeliverySlotManager
 {
-    private const CACHE_KEY = 'delivery_slot_settings';
-    private const FIXED_SLOTS_KEY = 'delivery_fixed_slots';
-    private const EVENING_START_KEY = 'delivery_evening_slot_start';
-    private const LAST_END_KEY = 'delivery_last_slot_end';
-    private const DURATION_HOURS_KEY = 'delivery_slot_duration_hours';
-
-    private const TOMORROW_FIXED_SLOTS_KEY = 'tomorrow_delivery_fixed_slots';
-    private const TOMORROW_EVENING_START_KEY = 'tomorrow_delivery_evening_slot_start';
-    private const TOMORROW_LAST_END_KEY = 'tomorrow_delivery_last_slot_end';
-    private const TOMORROW_DURATION_HOURS_KEY = 'tomorrow_delivery_slot_duration_hours';
-
-    private const NO_SLOT_POPUP_TITLE_KEY = 'no_slot_popup_title';
-    private const NO_SLOT_POPUP_DESC_KEY = 'no_slot_popup_description';
-
+    /**
+     * Admin can add slots for any calendar date. "today"/"tomorrow" here are
+     * just the two labels the storefront currently lets a customer pick —
+     * they resolve to the real calendar date and look up whatever the admin
+     * configured for that date.
+     */
     public static function options(string $day = 'today'): array
     {
-        $day = strtolower($day) === 'tomorrow' ? 'tomorrow' : 'today';
-        $slots = [];
-        $settings = self::settings();
+        return self::optionsForDate(self::resolveDate($day));
+    }
 
-        $fixedSlotsKey = $day === 'tomorrow' ? 'tomorrow_fixed_slots' : 'fixed_slots';
-        $durationHoursKey = $day === 'tomorrow' ? 'tomorrow_slot_duration_hours' : 'slot_duration_hours';
-        $eveningStartKey = $day === 'tomorrow' ? 'tomorrow_evening_start' : 'evening_start';
-        $lastEndKey = $day === 'tomorrow' ? 'tomorrow_last_end' : 'last_end';
-
-        foreach ($settings[$fixedSlotsKey] as $slot) {
-            $normalized = self::normalizeSlot($slot['start'] ?? null, $slot['end'] ?? null);
-
-            if ($normalized) {
-                $slots[$normalized['value']] = $normalized;
-            }
-        }
-
-        $durationHours = max(1, (int) ($settings[$durationHoursKey] ?? 2));
-        $eveningStart = self::parseTime($settings[$eveningStartKey] ?? null);
-        $lastEnd = self::parseTime($settings[$lastEndKey] ?? null);
-
-        if ($eveningStart && $lastEnd && $lastEnd > $eveningStart) {
-            $interval = new DateInterval('PT' . $durationHours . 'H');
-            $current = $eveningStart;
-
-            while ($current < $lastEnd) {
-                $end = $current->add($interval);
-
-                if ($end > $lastEnd) {
-                    break;
-                }
-
-                $normalized = self::normalizeSlot($current->format('H:i'), $end->format('H:i'));
-
-                if ($normalized) {
-                    $slots[$normalized['value']] = $normalized;
-                }
-
-                $current = $end;
-            }
-        }
-
-        return array_values($slots);
+    public static function optionsForDate(Carbon $date): array
+    {
+        return DeliverySlot::query()
+            ->whereDate('date', $date->toDateString())
+            ->where('is_active', true)
+            ->orderBy('start_time')
+            ->get()
+            ->map(fn (DeliverySlot $slot) => self::formatSlot($slot))
+            ->values()
+            ->all();
     }
 
     public static function availableOptions(string $day = 'today', ?Carbon $now = null): array
     {
         $day = strtolower($day) === 'tomorrow' ? 'tomorrow' : 'today';
-        $options = self::options($day);
-        if ($day === 'tomorrow') {
+
+        return self::availableOptionsForDate(self::resolveDate($day, $now), $now);
+    }
+
+    /**
+     * Same as optionsForDate(), but drops any slot whose start time has already
+     * passed — only relevant when $date is today; future dates are unaffected.
+     */
+    public static function availableOptionsForDate(Carbon $date, ?Carbon $now = null): array
+    {
+        $options = self::optionsForDate($date);
+        $now = ($now ?: Carbon::now(self::timezone()))->copy()->timezone(self::timezone());
+
+        if (! $date->isSameDay($now)) {
             return $options;
         }
 
-        $now = ($now ?: Carbon::now(self::timezone()))->copy()->timezone(self::timezone());
-
-        return array_values(array_filter($options, function (array $slot) use ($now) {
+        return array_values(array_filter($options, function (array $slot) use ($now, $date) {
             [$start] = array_pad(explode('-', (string) ($slot['value'] ?? ''), 2), 2, null);
 
             if (! $start) {
                 return false;
             }
 
-            $slotStart = Carbon::createFromFormat('Y-m-d H:i', $now->toDateString() . ' ' . $start, self::timezone());
+            $slotStart = Carbon::createFromFormat('Y-m-d H:i', $date->toDateString() . ' ' . $start, self::timezone());
 
             return $slotStart && $slotStart->greaterThan($now);
         }));
     }
 
-    public static function settings(): array
+    public static function resolveDate(string $day, ?Carbon $now = null): Carbon
     {
-        return Cache::rememberForever(self::CACHE_KEY, function () {
-            $defaults = self::defaultSettings();
-            $storedSettings = AppSetting::query()
-                ->whereIn('key', [
-                    self::FIXED_SLOTS_KEY,
-                    self::EVENING_START_KEY,
-                    self::LAST_END_KEY,
-                    self::DURATION_HOURS_KEY,
-                    self::TOMORROW_FIXED_SLOTS_KEY,
-                    self::TOMORROW_EVENING_START_KEY,
-                    self::TOMORROW_LAST_END_KEY,
-                    self::TOMORROW_DURATION_HOURS_KEY,
-                    self::NO_SLOT_POPUP_TITLE_KEY,
-                    self::NO_SLOT_POPUP_DESC_KEY,
-                ])
-                ->pluck('value', 'key');
+        $now = ($now ?: Carbon::now(self::timezone()))->copy()->timezone(self::timezone())->startOfDay();
 
-            $fixedSlots = self::decodeFixedSlots($storedSettings->get(self::FIXED_SLOTS_KEY));
-            $eveningStart = self::normalizeTimeValue($storedSettings->get(self::EVENING_START_KEY));
-            $lastEnd = self::normalizeTimeValue($storedSettings->get(self::LAST_END_KEY));
-            $durationHours = filter_var($storedSettings->get(self::DURATION_HOURS_KEY), FILTER_VALIDATE_INT);
-
-            $tFixedSlots = self::decodeFixedSlots($storedSettings->get(self::TOMORROW_FIXED_SLOTS_KEY));
-            $tEveningStart = self::normalizeTimeValue($storedSettings->get(self::TOMORROW_EVENING_START_KEY));
-            $tLastEnd = self::normalizeTimeValue($storedSettings->get(self::TOMORROW_LAST_END_KEY));
-            $tDurationHours = filter_var($storedSettings->get(self::TOMORROW_DURATION_HOURS_KEY), FILTER_VALIDATE_INT);
-
-            return [
-                'fixed_slots' => $storedSettings->has(self::FIXED_SLOTS_KEY) ? $fixedSlots : $defaults['fixed_slots'],
-                'fixed_slots_text' => self::fixedSlotsToText($storedSettings->has(self::FIXED_SLOTS_KEY) ? $fixedSlots : $defaults['fixed_slots']),
-                'evening_start' => $storedSettings->has(self::EVENING_START_KEY) ? $eveningStart : $defaults['evening_start'],
-                'last_end' => $storedSettings->has(self::LAST_END_KEY) ? $lastEnd : $defaults['last_end'],
-                'slot_duration_hours' => $storedSettings->has(self::DURATION_HOURS_KEY) && $durationHours && $durationHours > 0
-                    ? $durationHours
-                    : $defaults['slot_duration_hours'],
-
-                'tomorrow_fixed_slots' => $storedSettings->has(self::TOMORROW_FIXED_SLOTS_KEY) ? $tFixedSlots : $defaults['fixed_slots'],
-                'tomorrow_fixed_slots_text' => self::fixedSlotsToText($storedSettings->has(self::TOMORROW_FIXED_SLOTS_KEY) ? $tFixedSlots : $defaults['fixed_slots']),
-                'tomorrow_evening_start' => $storedSettings->has(self::TOMORROW_EVENING_START_KEY) ? $tEveningStart : $defaults['evening_start'],
-                'tomorrow_last_end' => $storedSettings->has(self::TOMORROW_LAST_END_KEY) ? $tLastEnd : $defaults['last_end'],
-                'tomorrow_slot_duration_hours' => $storedSettings->has(self::TOMORROW_DURATION_HOURS_KEY) && $tDurationHours && $tDurationHours > 0
-                    ? $tDurationHours
-                    : $defaults['slot_duration_hours'],
-
-                'no_slot_popup_title' => $storedSettings->has(self::NO_SLOT_POPUP_TITLE_KEY) && filled($storedSettings->get(self::NO_SLOT_POPUP_TITLE_KEY))
-                    ? $storedSettings->get(self::NO_SLOT_POPUP_TITLE_KEY)
-                    : 'Delivery Slots Unavailable',
-                'no_slot_popup_description' => $storedSettings->has(self::NO_SLOT_POPUP_DESC_KEY) && filled($storedSettings->get(self::NO_SLOT_POPUP_DESC_KEY))
-                    ? $storedSettings->get(self::NO_SLOT_POPUP_DESC_KEY)
-                    : 'Sorry! Delivery slots for Today or Tomorrow are currently unavailable for this item. Please try again later.',
-            ];
-        });
+        return strtolower($day) === 'tomorrow' ? $now->addDay() : $now;
     }
 
-    public static function defaultSettings(): array
+    /**
+     * All upcoming (today onward) dates that have at least one configured slot,
+     * for the admin panel — grouped so the admin can see/manage each date at a glance.
+     */
+    public static function datesWithSlots()
     {
-        $fixedSlots = [];
-
-        foreach (config('delivery.fixed_slots', []) as $slot) {
-            $normalized = self::normalizeSlot($slot['start'] ?? null, $slot['end'] ?? null);
-
-            if ($normalized) {
-                $fixedSlots[] = [
-                    'start' => substr($normalized['value'], 0, 5),
-                    'end' => substr($normalized['value'], 6, 5),
-                ];
-            }
-        }
-
-        return [
-            'fixed_slots' => $fixedSlots,
-            'fixed_slots_text' => self::fixedSlotsToText($fixedSlots),
-            'evening_start' => self::normalizeTimeValue((string) config('delivery.evening_slots.start', '16:00')) ?? '16:00',
-            'last_end' => self::normalizeTimeValue((string) config('delivery.evening_slots.last_end', '20:00')) ?? '20:00',
-            'slot_duration_hours' => max(1, (int) config('delivery.slot_duration_hours', 2)),
-        ];
+        return DeliverySlot::query()
+            ->where('date', '>=', Carbon::now(self::timezone())->toDateString())
+            ->orderBy('date')
+            ->orderBy('start_time')
+            ->get()
+            ->groupBy(fn (DeliverySlot $slot) => $slot->date->toDateString())
+            ->map(fn ($slots, $date) => [
+                'date' => $date,
+                'date_label' => Carbon::parse($date)->format('D, d M Y'),
+                'slots' => $slots->map(fn (DeliverySlot $slot) => [
+                    'id' => $slot->id,
+                    'label' => self::formatSlot($slot)['label'],
+                ])->values(),
+            ])
+            ->values();
     }
 
-    public static function updateSettings(array $settings): array
+    /**
+     * Upcoming dates a customer can actually pick from at checkout — only dates
+     * that still have at least one active, not-yet-passed slot.
+     */
+    public static function upcomingDatesForCustomer(?Carbon $now = null): array
     {
-        $fixedSlots = array_values(array_map(fn (array $slot) => [
-            'start' => $slot['start'],
-            'end' => $slot['end'],
-        ], $settings['fixed_slots'] ?? []));
+        $now = $now ?: Carbon::now(self::timezone());
 
-        $tomorrowFixedSlots = array_values(array_map(fn (array $slot) => [
-            'start' => $slot['start'],
-            'end' => $slot['end'],
-        ], $settings['tomorrow_fixed_slots'] ?? []));
-
-        AppSetting::query()->updateOrCreate(
-            ['key' => self::FIXED_SLOTS_KEY],
-            ['value' => json_encode($fixedSlots)]
-        );
-
-        AppSetting::query()->updateOrCreate(
-            ['key' => self::EVENING_START_KEY],
-            ['value' => $settings['evening_start'] ?: null]
-        );
-
-        AppSetting::query()->updateOrCreate(
-            ['key' => self::LAST_END_KEY],
-            ['value' => $settings['last_end'] ?: null]
-        );
-
-        AppSetting::query()->updateOrCreate(
-            ['key' => self::DURATION_HOURS_KEY],
-            ['value' => (string) max(1, (int) ($settings['slot_duration_hours'] ?? 2))]
-        );
-
-        AppSetting::query()->updateOrCreate(
-            ['key' => self::TOMORROW_FIXED_SLOTS_KEY],
-            ['value' => json_encode($tomorrowFixedSlots)]
-        );
-
-        AppSetting::query()->updateOrCreate(
-            ['key' => self::TOMORROW_EVENING_START_KEY],
-            ['value' => $settings['tomorrow_evening_start'] ?: null]
-        );
-
-        AppSetting::query()->updateOrCreate(
-            ['key' => self::TOMORROW_LAST_END_KEY],
-            ['value' => $settings['tomorrow_last_end'] ?: null]
-        );
-
-        AppSetting::query()->updateOrCreate(
-            ['key' => self::TOMORROW_DURATION_HOURS_KEY],
-            ['value' => (string) max(1, (int) ($settings['tomorrow_slot_duration_hours'] ?? 2))]
-        );
-
-        if (array_key_exists('no_slot_popup_title', $settings)) {
-            AppSetting::query()->updateOrCreate(
-                ['key' => self::NO_SLOT_POPUP_TITLE_KEY],
-                ['value' => $settings['no_slot_popup_title'] ?: null]
-            );
-        }
-
-        if (array_key_exists('no_slot_popup_description', $settings)) {
-            AppSetting::query()->updateOrCreate(
-                ['key' => self::NO_SLOT_POPUP_DESC_KEY],
-                ['value' => $settings['no_slot_popup_description'] ?: null]
-            );
-        }
-
-        Cache::forget(self::CACHE_KEY);
-
-        return self::settings();
+        return DeliverySlot::query()
+            ->where('date', '>=', $now->toDateString())
+            ->where('is_active', true)
+            ->orderBy('date')
+            ->get()
+            ->groupBy(fn (DeliverySlot $slot) => $slot->date->toDateString())
+            ->map(fn ($slots, $date) => [
+                'date' => $date,
+                'date_label' => Carbon::parse($date)->isSameDay($now) ? 'Today' : Carbon::parse($date)->format('D, d M'),
+                'options' => self::availableOptionsForDate(Carbon::parse($date, self::timezone()), $now),
+            ])
+            ->filter(fn (array $day) => ! empty($day['options']))
+            ->values()
+            ->all();
     }
 
-    public static function fixedSlotsToText(array $fixedSlots): string
+    public static function addSlot(string $date, string $start, string $end): DeliverySlot
     {
-        return collect($fixedSlots)
-            ->map(fn (array $slot) => ($slot['start'] ?? '') . '-' . ($slot['end'] ?? ''))
-            ->filter(fn (string $line) => $line !== '-')
-            ->implode(PHP_EOL);
+        return DeliverySlot::query()->firstOrCreate([
+            'date' => $date,
+            'start_time' => $start,
+            'end_time' => $end,
+        ], [
+            'is_active' => true,
+        ]);
+    }
+
+    public static function deleteSlot(int $id): void
+    {
+        DeliverySlot::query()->whereKey($id)->delete();
+    }
+
+    public static function deleteDate(string $date): void
+    {
+        DeliverySlot::query()->whereDate('date', $date)->delete();
     }
 
     public static function values(string $day = 'today'): array
@@ -298,6 +183,13 @@ class DeliverySlotManager
         return self::normalizeSlot($start, $end)['label'] ?? null;
     }
 
+    private static function formatSlot(DeliverySlot $slot): array
+    {
+        return self::normalizeSlot(
+            substr((string) $slot->start_time, 0, 5),
+            substr((string) $slot->end_time, 0, 5)
+        ) ?? ['value' => null, 'label' => null];
+    }
 
     private static function normalizeSlot(?string $start, ?string $end): ?array
     {
@@ -314,48 +206,13 @@ class DeliverySlotManager
         ];
     }
 
-    private static function decodeFixedSlots(mixed $value): array
-    {
-        if (! is_string($value) || trim($value) === '') {
-            return [];
-        }
-
-        $decoded = json_decode($value, true);
-
-        if (! is_array($decoded)) {
-            return [];
-        }
-
-        $slots = [];
-
-        foreach ($decoded as $slot) {
-            $normalized = self::normalizeSlot($slot['start'] ?? null, $slot['end'] ?? null);
-
-            if ($normalized) {
-                $slots[] = [
-                    'start' => substr($normalized['value'], 0, 5),
-                    'end' => substr($normalized['value'], 6, 5),
-                ];
-            }
-        }
-
-        return $slots;
-    }
-
-    private static function normalizeTimeValue(?string $time): ?string
-    {
-        $parsed = self::parseTime($time);
-
-        return $parsed?->format('H:i');
-    }
-
-    private static function parseTime(?string $time): ?DateTimeImmutable
+    private static function parseTime(?string $time): ?\DateTimeImmutable
     {
         if (! $time) {
             return null;
         }
 
-        $parsed = DateTimeImmutable::createFromFormat('!H:i', $time);
+        $parsed = \DateTimeImmutable::createFromFormat('!H:i', $time);
 
         return $parsed ?: null;
     }

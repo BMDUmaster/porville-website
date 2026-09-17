@@ -1,149 +1,76 @@
 @extends('frontend.layouts.app')
-@section('title', 'About Us')
+@section('title', 'About Us — Porville')
 
 @section('content')
-<section class="bg-white py-12 md:py-16">
-    <div class="mx-auto max-w-6xl px-4">
-        <div class="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
-            <div>
-                <h1 class="nunito max-w-[460px] text-4xl font-extrabold leading-[0.95] text-slate-900 md:text-5xl">
-                    Fresh From Farm<br><span class="text-green-500">To Your Home</span>
-                </h1>
-                <p class="mt-5 max-w-[520px] text-[15px] leading-7 text-slate-600">
-                    FarmSea brings you fresh vegetables, fruits, meat, and seafood directly from trusted farms and suppliers.
-                    Quality, hygiene, and freshness delivered at your doorstep.
-                </p>
-                <a href="{{ route('frontend.products') }}" class="mt-7 inline-flex rounded-xl bg-green-600 px-6 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-green-700 hover:shadow-lg">
-                    Shop Now
-                </a>
-            </div>
 
-            <div class="justify-self-end">
-                <div class="group relative overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.08)] transition duration-300 hover:-translate-y-1 hover:border-green-200 hover:shadow-[0_24px_56px_rgba(15,23,42,0.14)]">
-                    <img
-                        src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80"
-                        alt="Fresh produce display"
-                        class="h-[260px] w-full object-cover transition duration-700 group-hover:scale-105 md:h-[290px] lg:w-[500px]"
-                    >
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/20 via-transparent to-transparent opacity-0 transition duration-300 group-hover:opacity-100"></div>
-                    <div class="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.18em] text-slate-900 shadow-sm transition duration-300 group-hover:-translate-y-0.5">
-                        Fresh & Hygienic
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="mt-14 grid gap-4 md:grid-cols-3">
-            <div class="rounded-2xl border border-slate-200 bg-white px-5 py-5 shadow-sm transition hover:-translate-y-1 hover:border-green-200 hover:shadow-lg">
-                <h3 class="text-[15px] font-extrabold text-slate-900">Farm Fresh Products</h3>
-                <p class="mt-2 text-[13px] leading-6 text-slate-500">Directly sourced from local farms.</p>
-            </div>
-            <div class="rounded-2xl border border-slate-200 bg-white px-5 py-5 shadow-sm transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg">
-                <h3 class="text-[15px] font-extrabold text-slate-900">Fast Delivery</h3>
-                <p class="mt-2 text-[13px] leading-6 text-slate-500">Quick and hygienic doorstep delivery.</p>
-            </div>
-            <div class="rounded-2xl border border-slate-200 bg-white px-5 py-5 shadow-sm transition hover:-translate-y-1 hover:border-amber-200 hover:shadow-lg">
-                <h3 class="text-[15px] font-extrabold text-slate-900">Best Quality</h3>
-                <p class="mt-2 text-[13px] leading-6 text-slate-500">Fresh, clean, and high-quality food items.</p>
-            </div>
-        </div>
+<section class="bg-black py-16 md:py-24">
+    <div class="mx-auto max-w-4xl px-4 text-center">
+        <p class="text-[11px] font-extrabold uppercase tracking-[0.3em] text-amber-400">About Porville</p>
+        <h1 class="font-classic mt-4 text-4xl font-bold leading-tight text-white md:text-5xl">
+            Fresh Cut. Pure Standards.
+        </h1>
+        <p class="mt-3 text-sm font-semibold uppercase tracking-[0.2em] text-stone-400">Since 1986</p>
     </div>
 </section>
 
-<section class="bg-[#fafbfc] py-14 md:py-16">
-    <div class="mx-auto max-w-6xl px-4">
-        <div class="grid items-center gap-10 lg:grid-cols-[0.95fr_1.05fr]">
-            <div>
-                <div class="group relative overflow-hidden rounded-[20px] border border-slate-200 bg-white shadow-[0_12px_32px_rgba(15,23,42,0.08)] transition duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_22px_48px_rgba(15,23,42,0.14)]">
-                    <img
-                        src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80"
-                        alt="Farm landscape"
-                        class="h-[250px] w-full object-cover transition duration-700 group-hover:scale-105 md:h-[300px]"
-                    >
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/25 via-transparent to-transparent opacity-0 transition duration-300 group-hover:opacity-100"></div>
-                    <div class="absolute bottom-4 left-4 rounded-2xl bg-white/92 px-4 py-3 shadow-lg backdrop-blur transition duration-300 group-hover:translate-y-0.5">
-                        <p class="text-[11px] font-extrabold uppercase tracking-[0.2em] text-green-600">FarmSea Promise</p>
-                        <p class="mt-1 text-sm font-bold text-slate-900">Fresh sourcing with reliable delivery</p>
-                    </div>
-                </div>
-                <p class="mt-5 max-w-[520px] text-[14px] leading-7 text-slate-600">
-                    FarmSea is a modern marketplace connecting farmers and consumers directly. We ensure fresh produce,
-                    fair pricing, and reliable delivery for all your daily needs.
-                </p>
-            </div>
+<section class="bg-white py-14 md:py-20">
+    <div class="mx-auto max-w-3xl space-y-6 px-4 text-[15px] leading-8 text-slate-700">
+        <p>
+            Porville was founded on a simple promise: to elevate the quality of meat available to families in Delhi.
+            Sourced under strict quality guidelines, prepared in advanced temperature-controlled clean facilities, and
+            custom-sliced fresh for every order, we have redefined freshness standards.
+        </p>
+        <p>
+            We believe that the best meals start with the finest ingredients. That is why our chickens are
+            pasture-raised on local farms without antibiotic feeds, our mutton is selected from grass-fed mountain
+            goats, and our farm-fresh eggs are collected daily.
+        </p>
+        <p>
+            Unlike standard supermarkets, we do not package or freeze our meat in advance. When you order from
+            Porville, our master butchers cut the meat exactly to your specifications (curry cuts, steaks, boneless
+            cubes, etc.) only after your order is confirmed.
+        </p>
+        <p>
+            We seal the meat vacuum-tight to protect its natural moisture and flavor, shipping it inside
+            temperature-controlled chilled bags to keep it pristine and fresh. That is the Porville standard.
+        </p>
+    </div>
+</section>
 
-            <div>
-                <h2 class="nunito text-3xl font-extrabold text-slate-900 md:text-4xl">About FarmSea</h2>
-                <p class="mt-4 text-[15px] leading-8 text-slate-600">
-                    We are building a cleaner and smarter way to buy everyday essentials. From farm produce to premium
-                    meat and seafood, our goal is to make fresh food more accessible, more reliable, and more affordable.
-                </p>
-
-                <div class="mt-8 space-y-4">
-                    <div class="flex items-start gap-3 rounded-2xl bg-white px-4 py-4 shadow-sm">
-                        <i class="fa-solid fa-check mt-1 text-green-600"></i>
-                        <div>
-                            <p class="font-bold text-slate-900">Fresh Vegetables & Fruits</p>
-                            <p class="text-sm text-slate-500">Seasonal produce sourced from trusted growers.</p>
-                        </div>
+<section class="bg-[#faf7f0] py-14 md:py-16">
+    <div class="mx-auto max-w-3xl px-4">
+        <div class="rounded-2xl border border-amber-100 bg-white p-7 shadow-sm md:p-9">
+            <div class="flex items-start gap-4">
+                <span class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+                    <i class="fa-solid fa-shield-halved text-xl"></i>
+                </span>
+                <div>
+                    <h2 class="font-classic text-2xl font-bold text-slate-900">FSSAI Food Safety Registered</h2>
+                    <p class="mt-3 text-[14px] leading-7 text-slate-600">
+                        Porville operates under FSSAI (Food Safety and Standards Authority of India) food safety
+                        guidelines. Our business is registered with the Government of Delhi, Department of Food Safety.
+                    </p>
+                    <div class="mt-4 grid gap-2 text-[13px] text-slate-600 sm:grid-cols-2">
+                        <p><span class="font-bold text-slate-900">FoSCoS Reference No:</span> 30260223123490898</p>
+                        <p><span class="font-bold text-slate-900">Registration Date:</span> 23-02-2026</p>
                     </div>
-                    <div class="flex items-start gap-3 rounded-2xl bg-white px-4 py-4 shadow-sm">
-                        <i class="fa-solid fa-check mt-1 text-green-600"></i>
-                        <div>
-                            <p class="font-bold text-slate-900">Premium Meat & Seafood</p>
-                            <p class="text-sm text-slate-500">Handled hygienically and delivered in fresh condition.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start gap-3 rounded-2xl bg-white px-4 py-4 shadow-sm">
-                        <i class="fa-solid fa-check mt-1 text-green-600"></i>
-                        <div>
-                            <p class="font-bold text-slate-900">Daily & Dairy Essentials</p>
-                            <p class="text-sm text-slate-500">Everyday staples delivered quickly and safely.</p>
-                        </div>
-                    </div>
+                    <p class="mt-4 text-[13px] leading-6 text-slate-500">
+                        For food-safety and ordering questions, see our <a href="{{ route('frontend.faq') }}" class="font-bold text-amber-700 hover:underline">FAQs</a>.
+                        Private certificate details are not displayed online.
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section id="faq" class="bg-white py-14 md:py-16">
-    <div class="mx-auto max-w-4xl px-4">
-        <div class="mb-8 text-center">
-            <h2 class="nunito text-3xl font-extrabold text-slate-900 md:text-4xl">FAQs</h2>
-        </div>
-
-        <div class="space-y-4">
-            <details class="group rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition open:shadow-md">
-                <summary class="flex cursor-pointer list-none items-center justify-between text-[15px] font-bold text-slate-900">
-                    <span>Where do products come from?</span>
-                    <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition group-open:rotate-180"></i>
-                </summary>
-                <p class="pt-4 text-[14px] leading-7 text-slate-600">
-                    Our products come from trusted farms, fisheries, and verified suppliers who meet our hygiene and quality standards.
-                </p>
-            </details>
-
-            <details class="group rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition open:shadow-md">
-                <summary class="flex cursor-pointer list-none items-center justify-between text-[15px] font-bold text-slate-900">
-                    <span>Do you deliver daily?</span>
-                    <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition group-open:rotate-180"></i>
-                </summary>
-                <p class="pt-4 text-[14px] leading-7 text-slate-600">
-                    Yes, we support regular delivery slots in serviceable areas so you can get fresh essentials on time.
-                </p>
-            </details>
-
-            <details class="group rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition open:shadow-md">
-                <summary class="flex cursor-pointer list-none items-center justify-between text-[15px] font-bold text-slate-900">
-                    <span>How do you maintain freshness?</span>
-                    <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition group-open:rotate-180"></i>
-                </summary>
-                <p class="pt-4 text-[14px] leading-7 text-slate-600">
-                    We use hygienic handling, careful packaging, and a cold-chain aware delivery process for meat and seafood products.
-                </p>
-            </details>
-        </div>
+<section class="bg-white py-14 md:py-16">
+    <div class="mx-auto max-w-5xl px-4 text-center">
+        <h2 class="font-classic text-2xl font-bold text-slate-900 md:text-3xl">Ready to taste the difference?</h2>
+        <p class="mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-500">Order fresh-cut meat, delivered chilled to your door.</p>
+        <a href="{{ route('frontend.products') }}" class="mt-6 inline-flex items-center gap-2 rounded-xl border border-amber-500 bg-black px-7 py-3.5 text-[12px] font-bold uppercase tracking-[0.14em] text-white transition hover:bg-neutral-900">
+            <i class="fa-solid fa-cart-shopping text-amber-400"></i> Shop Fresh Cuts
+        </a>
     </div>
 </section>
 @endsection

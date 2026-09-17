@@ -8,7 +8,7 @@
     {{-- Stats --}}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-6">
         <div class="bg-white border rounded-2xl p-5 flex items-center gap-4">
-            <div class="w-14 h-14 rounded-full bg-purple-500 flex items-center justify-center text-white text-xl"><i class="fa-solid fa-trophy"></i></div>
+            <div class="w-14 h-14 rounded-full bg-amber-500 flex items-center justify-center text-white text-xl"><i class="fa-solid fa-trophy"></i></div>
             <div><p class="text-xs text-gray-500 mb-1">Total Sub Categories</p><p class="text-3xl font-extrabold">{{ $stats['total'] }}</p></div>
         </div>
         <div class="bg-white border rounded-2xl p-5 flex items-center gap-4">
@@ -37,7 +37,7 @@
             <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
         </select>
         <button type="submit"
-                class="bg-blue-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 transition hover:bg-blue-700">
+                class="bg-amber-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 transition hover:bg-amber-700">
             <i class="fa-solid fa-filter text-xs"></i> Filter
         </button>
         <a href="{{ route('dashboard.subcategories') }}" class="bg-red-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl text-center">Reset</a>
@@ -132,7 +132,7 @@
                 <label class="block text-sm text-gray-700 mb-1">Select Category</label>
                 <div class="relative">
                     <select name="parent_id" required
-                            class="w-full appearance-none border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 bg-white outline-none focus:border-blue-400 pr-8">
+                            class="w-full appearance-none border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 bg-white outline-none focus:border-amber-400 pr-8">
                         <option value="">Select category</option>
                         @foreach($parent_categories as $cat)
                             <option value="{{ $cat->id }}">{{ $cat->name }}</option>
@@ -159,14 +159,14 @@
             <div>
                 <label class="block text-sm text-gray-700 mb-1">Sub-Category Name</label>
                 <input type="text" name="name" required placeholder="Enter sub-category name"
-                       class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-blue-400">
+                       class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-amber-400">
             </div>
 
             {{-- Description --}}
             <div>
                 <label class="block text-sm text-gray-700 mb-1">Description</label>
                 <textarea name="description" rows="4" placeholder="Enter sub-category description"
-                          class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none resize-none focus:border-blue-400"></textarea>
+                          class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none resize-none focus:border-amber-400"></textarea>
             </div>
 
             {{-- Status --}}
@@ -174,7 +174,7 @@
                 <label class="block text-sm text-gray-700 mb-1">Status</label>
                 <div class="relative">
                     <select name="is_active"
-                            class="w-full appearance-none border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 bg-white outline-none focus:border-blue-400 pr-8">
+                            class="w-full appearance-none border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 bg-white outline-none focus:border-amber-400 pr-8">
                         <option value="1">Active</option>
                         <option value="0">Inactive</option>
                     </select>
@@ -212,7 +212,7 @@
                 <label class="block text-sm text-gray-700 mb-1">Select Category</label>
                 <div class="relative">
                     <select name="parent_id" id="editParent" required
-                            class="w-full appearance-none border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 bg-white outline-none focus:border-blue-400 pr-8">
+                            class="w-full appearance-none border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 bg-white outline-none focus:border-amber-400 pr-8">
                         @foreach($parent_categories as $cat)
                             <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                         @endforeach
@@ -238,14 +238,14 @@
             <div>
                 <label class="block text-sm text-gray-700 mb-1">Sub-Category Name</label>
                 <input type="text" name="name" id="editName" required placeholder="Enter sub-category name"
-                       class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-blue-400">
+                       class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-amber-400">
             </div>
 
             {{-- Description --}}
             <div>
                 <label class="block text-sm text-gray-700 mb-1">Description</label>
                 <textarea name="description" id="editDesc" rows="4" placeholder="Enter sub-category description"
-                          class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none resize-none focus:border-blue-400"></textarea>
+                          class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none resize-none focus:border-amber-400"></textarea>
             </div>
 
             {{-- Status --}}
@@ -253,7 +253,7 @@
                 <label class="block text-sm text-gray-700 mb-1">Status</label>
                 <div class="relative">
                     <select name="is_active" id="editStatus"
-                            class="w-full appearance-none border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 bg-white outline-none focus:border-blue-400 pr-8">
+                            class="w-full appearance-none border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 bg-white outline-none focus:border-amber-400 pr-8">
                         <option value="1">Active</option>
                         <option value="0">Inactive</option>
                     </select>

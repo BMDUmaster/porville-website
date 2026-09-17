@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FarmSea Server Check</title>
+    <title>Porville Server Check</title>
     <style>
         body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; background: #f8fafc; color: #0f172a; }
         h1 { color: #15803d; }
@@ -16,7 +16,7 @@
     </style>
 </head>
 <body>
-    <h1>FarmSea Server Check</h1>
+    <h1>Porville Server Check</h1>
     <p>Laravel route — works even when <code>server-check.php</code> file gives 404.</p>
 
     <div class="box">
@@ -42,8 +42,8 @@
     </div>
 
     <p class="note">
-        Admin login ke baad full check: <code>/farmsea/dashboard/system-check</code><br>
-        Setup command (SSH): <code>php artisan farmsea:setup</code>
+        Admin login ke baad full check: <code>/porville/dashboard/system-check</code><br>
+        Setup command (SSH): <code>php artisan porville:setup</code>
     </p>
 </body>
 </html>

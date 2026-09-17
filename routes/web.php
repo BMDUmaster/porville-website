@@ -160,13 +160,21 @@ Route::middleware('admin')->group(function () {
 
     // Settings
     Route::get('/settings/service-charge', [ServiceChargeController::class, 'index'])->name('dashboard.settings.service-charge');
-    Route::put('/settings/service-charge', [ServiceChargeController::class, 'update'])->name('dashboard.settings.service-charge.update');
+    Route::post('/settings/service-charge/tier', [ServiceChargeController::class, 'storeTier'])->name('dashboard.settings.service-charge.tier.store');
+    Route::delete('/settings/service-charge/tier/{tier}', [ServiceChargeController::class, 'destroyTier'])->name('dashboard.settings.service-charge.tier.destroy');
     Route::get('/settings/delivery-slots', [DeliverySlotController::class, 'index'])->name('dashboard.settings.delivery-slots');
     Route::put('/settings/delivery-slots', [DeliverySlotController::class, 'update'])->name('dashboard.settings.delivery-slots.update');
-    Route::get('/settings/delivery-areas', [\App\Http\Controllers\Dashboard\DeliveryAreaController::class, 'index'])->name('dashboard.settings.delivery-areas');
-    Route::put('/settings/delivery-areas', [\App\Http\Controllers\Dashboard\DeliveryAreaController::class, 'update'])->name('dashboard.settings.delivery-areas.update');
-    Route::get('/settings/ordering',  [\App\Http\Controllers\Dashboard\OrderingSettingController::class, 'index'])->name('dashboard.settings.ordering');
-    Route::put('/settings/ordering',  [\App\Http\Controllers\Dashboard\OrderingSettingController::class, 'update'])->name('dashboard.settings.ordering.update');
+    Route::post('/settings/delivery-slots/slot', [DeliverySlotController::class, 'storeSlot'])->name('dashboard.settings.delivery-slots.slot.store');
+    Route::delete('/settings/delivery-slots/slot/{slot}', [DeliverySlotController::class, 'destroySlot'])->name('dashboard.settings.delivery-slots.slot.destroy');
+    Route::delete('/settings/delivery-slots/date/{date}', [DeliverySlotController::class, 'destroyDate'])->name('dashboard.settings.delivery-slots.date.destroy');
+    // FAQs
+    Route::get('/faqs', [\App\Http\Controllers\Dashboard\FaqController::class, 'index'])->name('dashboard.faqs');
+    Route::post('/faqs/categories', [\App\Http\Controllers\Dashboard\FaqController::class, 'storeCategory'])->name('dashboard.faqs.categories.store');
+    Route::put('/faqs/categories/{category}', [\App\Http\Controllers\Dashboard\FaqController::class, 'updateCategory'])->name('dashboard.faqs.categories.update');
+    Route::delete('/faqs/categories/{category}', [\App\Http\Controllers\Dashboard\FaqController::class, 'destroyCategory'])->name('dashboard.faqs.categories.destroy');
+    Route::post('/faqs/items', [\App\Http\Controllers\Dashboard\FaqController::class, 'storeFaq'])->name('dashboard.faqs.items.store');
+    Route::put('/faqs/items/{faq}', [\App\Http\Controllers\Dashboard\FaqController::class, 'updateFaq'])->name('dashboard.faqs.items.update');
+    Route::delete('/faqs/items/{faq}', [\App\Http\Controllers\Dashboard\FaqController::class, 'destroyFaq'])->name('dashboard.faqs.items.destroy');
 });
 
 
@@ -184,6 +192,7 @@ Route::get('/cart',          [CartController::class, 'index'])->name('frontend.c
 Route::post('/cart/add',     [CartController::class, 'add'])->name('frontend.cart.add');
 Route::post('/cart/update',  [CartController::class, 'update'])->name('frontend.cart.update');
 Route::post('/cart/delivery-slot', [CartController::class, 'updateDeliverySlot'])->name('frontend.cart.delivery-slot');
+Route::post('/cart/delivery-date', [CartController::class, 'updateDeliveryDate'])->name('frontend.cart.delivery-date');
 Route::post('/cart/coupon', [CartController::class, 'applyCoupon'])->name('frontend.cart.coupon.apply');
 Route::delete('/cart/coupon', [CartController::class, 'removeCoupon'])->name('frontend.cart.coupon.remove');
 Route::post('/cart/remove',  [CartController::class, 'remove'])->name('frontend.cart.remove');
@@ -220,6 +229,7 @@ Route::middleware('auth:web_frontend')->group(function () {
     Route::get('/account/profile',      [FrontProfileController::class, 'index'])->name('frontend.profile');
     Route::put('/account/profile',      [FrontProfileController::class, 'update'])->name('frontend.profile.update');
     Route::put('/account/password',     [FrontProfileController::class, 'updatePassword'])->name('frontend.profile.password');
+    Route::get('/account/notifications', [FrontProfileController::class, 'notifications'])->name('frontend.notifications');
     Route::post('/account/notifications/read', [FrontProfileController::class, 'markNotificationsRead'])->name('frontend.notifications.read');
     Route::post('/account/notifications/{notification}/read', [FrontProfileController::class, 'markNotificationRead'])->name('frontend.notifications.mark-read');
     Route::delete('/account/notifications/{notification}', [FrontProfileController::class, 'deleteNotification'])->name('frontend.notifications.delete');
@@ -250,6 +260,7 @@ Route::get('/track-order', [FrontOrderController::class, 'track'])->name('fronte
 Route::get('/about-us',             [PageController::class, 'about'])->name('frontend.about');
 Route::get('/our-farms',            [PageController::class, 'farms'])->name('frontend.farms');
 Route::get('/contact-us',           [PageController::class, 'contact'])->name('frontend.contact');
+Route::get('/faq',                  [PageController::class, 'faq'])->name('frontend.faq');
 Route::post('/contact-us',          [PageController::class, 'submitContact'])->middleware('throttle:5,1')->name('frontend.contact.submit');
 Route::get('/privacy-policy',       [PageController::class, 'privacy'])->name('frontend.privacy');
 Route::get('/terms-of-service',     [PageController::class, 'terms'])->name('frontend.terms');

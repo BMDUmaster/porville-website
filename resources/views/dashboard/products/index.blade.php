@@ -23,7 +23,7 @@
     {{-- Filters --}}
     <form method="GET" class="mb-6 flex flex-col gap-3 rounded-2xl border bg-white p-4 shadow-sm sm:flex-row sm:flex-wrap sm:items-center">
         <input type="text" name="search" value="{{ request('search') }}" placeholder="Search products..."
-               class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm outline-none focus:border-indigo-500 sm:min-w-[150px] sm:flex-1">
+               class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm outline-none focus:border-amber-500 sm:min-w-[150px] sm:flex-1">
         <select name="category" class="bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm outline-none">
             <option value="">All Categories</option>
             @foreach($categories as $cat)
@@ -36,13 +36,13 @@
             <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
         </select>
         <a href="{{ route('dashboard.products') }}" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-bold">Reset</a>
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold">Filter</button>
+        <button type="submit" class="bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-bold">Filter</button>
         <button type="button" onclick="openModal('addProductModal')"
                 class="bg-amber-400 hover:bg-amber-500 text-black px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-1">
             <i class="fa-solid fa-plus"></i> Add Product
         </button>
         <button type="button" onclick="openMultiEditModal()"
-                class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-1.5 shadow-sm">
+                class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-1.5 shadow-sm">
             <i class="fa-solid fa-layer-group"></i> Multi Edit
         </button>
     </form>
@@ -80,7 +80,7 @@
 
             <div class="mt-4 flex flex-wrap gap-2">
                 <a href="{{ route('dashboard.products.show', $product) }}"
-                   class="inline-flex items-center rounded-lg bg-blue-50 p-2 text-xs text-blue-600 hover:bg-blue-100">
+                   class="inline-flex items-center rounded-lg bg-amber-50 p-2 text-xs text-amber-600 hover:bg-amber-100">
                     <i class="fa-solid fa-eye"></i>
                 </a>
                 @php
@@ -91,6 +91,9 @@
                         'subcategory_id' => $product->subcategory_id,
                         'description' => $product->description,
                         'weight' => $product->weight,
+                        'contact_number' => $product->contact_number,
+                        'processing_note' => $product->processing_note,
+                        'delivery_note' => $product->delivery_note,
                         'price' => $product->price,
                         'is_active' => $product->is_active ? 1 : 0,
                         'images_count' => is_array($product->images) ? count($product->images) : 0,
@@ -102,7 +105,7 @@
                 <button type="button"
                         data-product='@json($editProductPayload, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG)'
                         onclick="openEditModal(this)"
-                        class="inline-flex items-center rounded-lg bg-indigo-50 p-2 text-xs text-indigo-600 hover:bg-indigo-100">
+                        class="inline-flex items-center rounded-lg bg-amber-50 p-2 text-xs text-amber-600 hover:bg-amber-100">
                     <i class="fa-solid fa-pen-to-square"></i>
                 </button>
                 <form method="POST" action="{{ route('dashboard.products.destroy', $product) }}"
@@ -160,7 +163,7 @@
                     <td class="px-6 py-4 text-right">
                         <div class="flex justify-end gap-2">
                             <a href="{{ route('dashboard.products.show', $product) }}"
-                               class="p-2 hover:bg-blue-100 text-blue-600 rounded-lg text-xs">
+                               class="p-2 hover:bg-amber-100 text-amber-600 rounded-lg text-xs">
                                 <i class="fa-solid fa-eye"></i>
                             </a>
                             @php
@@ -171,6 +174,9 @@
                                     'subcategory_id' => $product->subcategory_id,
                                     'description' => $product->description,
                                     'weight' => $product->weight,
+                                    'contact_number' => $product->contact_number,
+                                    'processing_note' => $product->processing_note,
+                                    'delivery_note' => $product->delivery_note,
                                     'price' => $product->price,
                                     'is_active' => $product->is_active ? 1 : 0,
                                     'images_count' => is_array($product->images) ? count($product->images) : 0,
@@ -182,7 +188,7 @@
                             <button type="button"
                                     data-product='@json($editProductPayload, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG)'
                                     onclick="openEditModal(this)"
-                                    class="p-2 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs">
+                                    class="p-2 hover:bg-amber-100 text-amber-600 rounded-lg text-xs">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
                             <form method="POST" action="{{ route('dashboard.products.destroy', $product) }}"
@@ -223,11 +229,11 @@
             <div>
                 <label class="block text-sm text-gray-700 mb-1">Select Category</label>
                 <div class="relative">
-                    <select name="category_id" id="addCategorySelect" required onchange="loadSubcategories(this.value)"
-                            class="w-full appearance-none border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 bg-white outline-none focus:border-blue-400 pr-8">
+                    <select name="category_id" id="addCategorySelect" required onchange="loadSubcategories(this.value); toggleEnquiryMode('add', this)"
+                            class="w-full appearance-none border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 bg-white outline-none focus:border-amber-400 pr-8">
                         <option value="">Select category</option>
                         @foreach($categories as $cat)
-                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                            <option value="{{ $cat->id }}" data-enquiry="{{ $cat->is_enquiry_only ? 1 : 0 }}">{{ $cat->name }}</option>
                         @endforeach
                     </select>
                     <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">&#9660;</span>
@@ -239,7 +245,7 @@
                 <label class="block text-sm text-gray-700 mb-1">Select Sub Category</label>
                 <div class="relative">
                     <select name="subcategory_id" id="addSubcategorySelect"
-                            class="w-full appearance-none border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 bg-white outline-none focus:border-blue-400 pr-8">
+                            class="w-full appearance-none border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 bg-white outline-none focus:border-amber-400 pr-8">
                         <option value="">Select sub category</option>
                         @foreach($subcategories as $sub)
                             <option value="{{ $sub->id }}" data-parent="{{ $sub->parent_id }}">{{ $sub->name }}</option>
@@ -267,7 +273,7 @@
             <div>
                 <label class="block text-sm text-gray-700 mb-1">Product Video</label>
                 <input type="file" name="videos[]" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska"
-                       class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-blue-400">
+                       class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-amber-400">
                 <p class="mt-1 text-[11px] text-gray-400">Ek product video upload karo. MP4/WebM/MOV supported, max 50MB.</p>
             </div>
 
@@ -275,13 +281,13 @@
             <div>
                 <label class="block text-sm text-gray-700 mb-1">Product Name</label>
                 <input type="text" name="name" required placeholder="Enter product name"
-                       class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-blue-400">
+                       class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-amber-400">
             </div>
 
-            <div>
+            <div id="addWeightField">
                 <label class="block text-sm text-gray-700 mb-1">Pack Weight</label>
                 <input type="text" name="weight" placeholder="e.g. 1 Kg, 500 Gram, 6-8 pieces"
-                       class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-blue-400">
+                       class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-amber-400">
                 <p class="mt-1 text-[11px] text-gray-400">Ye product details page ke Pack Weight row mein show hoga.</p>
             </div>
 
@@ -289,20 +295,41 @@
             <div>
                 <label class="block text-sm text-gray-700 mb-1">Product Description</label>
                 <textarea name="description" rows="4" placeholder="Enter Product Description"
-                          class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none resize-none focus:border-blue-400"></textarea>
+                          class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none resize-none focus:border-amber-400"></textarea>
             </div>
 
             <div>
                 <label class="block text-sm text-gray-700 mb-1">Stock Status</label>
                 <select name="is_active"
-                        class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-blue-400">
+                        class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-amber-400">
                     <option value="1">Active</option>
                     <option value="0">Inactive</option>
                 </select>
             </div>
 
+            {{-- Enquiry-only fields (Live Stock style categories) --}}
+            <div id="addEnquiryFields" class="hidden space-y-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                <p class="text-xs font-semibold text-amber-700">This category is enquiry-only — customers call to order, no cart pricing needed.</p>
+                <div>
+                    <label class="block text-sm text-gray-700 mb-1">Contact Number</label>
+                    <input type="text" name="contact_number" placeholder="e.g. 9876543210"
+                           class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-amber-400">
+                    <p class="mt-1 text-[11px] text-gray-400">Customers will call this number using the "Call to Order" button.</p>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-700 mb-1">Processing</label>
+                    <input type="text" name="processing_note" placeholder="e.g. Hand-cleaned and semi-dressed on order"
+                           class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-amber-400">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-700 mb-1">Delivery Note</label>
+                    <input type="text" name="delivery_note" placeholder="e.g. Delivered live in ventilated crates within 24 hrs"
+                           class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-amber-400">
+                </div>
+            </div>
+
             {{-- Product Variants --}}
-            <div>
+            <div id="addVariantsSection">
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-sm font-semibold text-gray-800">Product Variants</span>
                     <button type="button" onclick="addVariant()"
@@ -314,11 +341,11 @@
                 <div id="variantsContainer" class="space-y-3 overflow-x-auto pb-1">
                     {{-- Initial variant row --}}
                     <div class="variant-row border border-gray-200 rounded p-3">
-                        <div class="mb-2 grid min-w-[960px] grid-cols-[0.9fr_1.05fr_0.75fr_0.75fr_0.85fr_0.85fr_0.85fr_0.72fr_22px] items-end gap-2">
+                        <div class="mb-2 grid min-w-[720px] grid-cols-[0.9fr_1.05fr_0.75fr_0.85fr_0.85fr_0.72fr_22px] items-end gap-2">
                             <div class="min-w-0">
                                 <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Quantity</p>
                                 <input type="text" name="variants[0][quantity]" placeholder="e.g. 500-600"
-                                       class="w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
+                                       class="w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-amber-400">
                             </div>
                             <div class="min-w-0">
                                 <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Unit</p>
@@ -333,14 +360,14 @@
                             <div class="min-w-0">
                                 <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Piece</p>
                                 <input type="text" name="variants[0][piece]" placeholder="e.g. 6-8 pieces"
-                                       class="w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
+                                       class="w-full border border-gray-300 rounded px-2 py-2 text-sm outline-none focus:border-amber-400">
                             </div>
                             <div class="min-w-0">
                                 <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">MRP</p>
                                 <div class="relative">
                                     <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
                                     <input type="number" name="variants[0][mrp]" min="0" step="0.01" data-variant-mrp
-                                           class="w-full border border-gray-300 rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
+                                           class="w-full border border-gray-300 rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-amber-400">
                                 </div>
                             </div>
                             <div class="min-w-0">
@@ -348,30 +375,14 @@
                                 <div class="relative">
                                     <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
                                     <input type="number" name="variants[0][selling_price]" min="0" step="0.01" data-variant-selling-price
-                                           class="w-full border border-gray-300 rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
-                                </div>
-                            </div>
-                            <div class="min-w-0">
-                                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Today Price</p>
-                                <div class="relative">
-                                    <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
-                                    <input type="number" name="variants[0][today_price]" min="0" step="0.01"
-                                           class="w-full border border-gray-300 rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
-                                </div>
-                            </div>
-                            <div class="min-w-0">
-                                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Tomorrow Price</p>
-                                <div class="relative">
-                                    <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
-                                    <input type="number" name="variants[0][tomorrow_price]" min="0" step="0.01"
-                                           class="w-full border border-gray-300 rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
+                                           class="w-full border border-gray-300 rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-amber-400">
                                 </div>
                             </div>
                             <div class="min-w-0">
                                 <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Save Offer</p>
                                 <div class="relative">
                                     <input type="number" name="variants[0][save_offer]" min="0" max="100" step="0.1" data-variant-save-offer readonly
-                                           class="w-full border border-gray-300 rounded bg-slate-50 px-2 pr-5 py-2 text-sm outline-none focus:border-blue-400">
+                                           class="w-full border border-gray-300 rounded bg-slate-50 px-2 pr-5 py-2 text-sm outline-none focus:border-amber-400">
                                     <span class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">%</span>
                                 </div>
                             </div>
@@ -404,11 +415,11 @@
             @csrf @method('PUT')
             <div>
                 <label class="text-xs font-bold text-slate-600 block mb-1">Category</label>
-                <select name="category_id" id="editCatId" onchange="loadSubcategories(this.value, 'editSubcategoryId')"
+                <select name="category_id" id="editCatId" onchange="loadSubcategories(this.value, 'editSubcategoryId'); toggleEnquiryMode('edit', this)"
                         class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
                     <option value="">Select category</option>
                     @foreach($categories as $cat)
-                        <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                        <option value="{{ $cat->id }}" data-enquiry="{{ $cat->is_enquiry_only ? 1 : 0 }}">{{ $cat->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -427,7 +438,7 @@
                 <input type="text" name="name" id="editProductName" required
                        class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
             </div>
-            <div>
+            <div id="editWeightField">
                 <label class="text-xs font-bold text-slate-600 block mb-1">Pack Weight</label>
                 <input type="text" name="weight" id="editProductWeight" placeholder="e.g. 1 Kg, 500 Gram, 6-8 pieces"
                        class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
@@ -443,7 +454,7 @@
                 <div class="flex items-start gap-2">
                     <div id="editImagePickerRow" class="flex-1"></div>
                     <button type="button" onclick="addSelectedEditImage()"
-                            class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded whitespace-nowrap">
+                            class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded whitespace-nowrap">
                         Add
                     </button>
                 </div>
@@ -467,7 +478,7 @@
                 <p id="editVideoHint" class="mt-1 text-[11px] text-slate-400">New video choose karoge to old video update ho jayega.</p>
             </div>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
+                <div id="editPriceField">
                     <label class="text-xs font-bold text-slate-600 block mb-1">Price (₹)</label>
                     <input type="number" name="price" id="editPrice" min="0" step="0.01"
                            class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
@@ -480,7 +491,28 @@
                     </select>
                 </div>
             </div>
-            <div>
+
+            {{-- Enquiry-only fields (Live Stock style categories) --}}
+            <div id="editEnquiryFields" class="hidden space-y-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                <p class="text-xs font-semibold text-amber-700">This category is enquiry-only — customers call to order, no cart pricing needed.</p>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">Contact Number</label>
+                    <input type="text" name="contact_number" id="editContactNumber" placeholder="e.g. 9876543210"
+                           class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">Processing</label>
+                    <input type="text" name="processing_note" id="editProcessingNote" placeholder="e.g. Hand-cleaned and semi-dressed on order"
+                           class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 block mb-1">Delivery Note</label>
+                    <input type="text" name="delivery_note" id="editDeliveryNote" placeholder="e.g. Delivered live in ventilated crates within 24 hrs"
+                           class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
+                </div>
+            </div>
+
+            <div id="editVariantsSection">
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-sm font-semibold text-slate-800">Product Variants</span>
                     <button type="button" onclick="addEditVariant()"
@@ -492,7 +524,7 @@
                 <div id="editVariantsContainer" class="space-y-3 overflow-x-auto pb-1"></div>
             </div>
             <div class="flex justify-end gap-3 pt-4">
-                <button type="submit" class="bg-indigo-600 text-white px-8 py-2.5 rounded-lg font-bold text-sm">Update</button>
+                <button type="submit" class="bg-amber-600 text-white px-8 py-2.5 rounded-lg font-bold text-sm">Update</button>
                 <button type="button" onclick="closeModal('editProductModal')"
                         class="bg-slate-500 text-white px-8 py-2.5 rounded-lg font-bold text-sm">Cancel</button>
             </div>
@@ -521,6 +553,8 @@ function closeModal(id) {
 
     if (id === 'addProductModal') {
         resetAddProductImages();
+        document.getElementById('addProductForm')?.reset();
+        toggleEnquiryMode('add', document.getElementById('addCategorySelect'));
     }
 
     if (id === 'editProductModal') {
@@ -668,8 +702,6 @@ function openEditModal(source) {
                 piece: variant?.piece ?? '',
                 mrp: variant?.mrp ?? '',
                 selling_price: variant?.selling_price ?? '',
-                today_price: variant?.today_price ?? '',
-                tomorrow_price: variant?.tomorrow_price ?? '',
                 save_offer: variant?.save_offer ?? '',
                 admin_amount: variant?.admin_amount ?? '',
                 vendor_amount: variant?.vendor_amount ?? '',
@@ -683,6 +715,10 @@ function openEditModal(source) {
     document.getElementById('editDescription').value  = product.description ?? '';
     document.getElementById('editPrice').value        = product.price ?? '';
     document.getElementById('editIsActive').value     = product.is_active ?? 1;
+    document.getElementById('editContactNumber').value = product.contact_number ?? '';
+    document.getElementById('editProcessingNote').value = product.processing_note ?? '';
+    document.getElementById('editDeliveryNote').value = product.delivery_note ?? '';
+    toggleEnquiryMode('edit', document.getElementById('editCatId'));
     document.getElementById('editVideoHint').textContent = (product.videos ?? []).length
         ? 'Current video saved hai. New video choose karoge to old video update ho jayega.'
         : 'Abhi video saved nahi hai. Ek video choose karke update kar sakte ho.';
@@ -937,6 +973,22 @@ function loadSubcategories(categoryId, selectId = 'addSubcategorySelect', select
     select.value = hasSelectedOption ? selectedValue : '';
 }
 
+// Toggle simplified enquiry-only fields (e.g. Live Stock category) vs normal pricing fields
+function toggleEnquiryMode(prefix, selectEl) {
+    const selectedOption = selectEl?.options?.[selectEl.selectedIndex];
+    const isEnquiry = selectedOption?.dataset?.enquiry === '1';
+
+    const weightField = document.getElementById(prefix + 'WeightField');
+    const variantsSection = document.getElementById(prefix + 'VariantsSection');
+    const enquiryFields = document.getElementById(prefix + 'EnquiryFields');
+    const priceField = document.getElementById('editPriceField');
+
+    if (weightField) weightField.classList.toggle('hidden', isEnquiry);
+    if (variantsSection) variantsSection.classList.toggle('hidden', isEnquiry);
+    if (enquiryFields) enquiryFields.classList.toggle('hidden', !isEnquiry);
+    if (prefix === 'edit' && priceField) priceField.classList.toggle('hidden', isEnquiry);
+}
+
 // Variant management
 let variantIndex = 1;
 let editVariantIndex = 0;
@@ -951,16 +1003,14 @@ function getVariantRowTemplate(idx, tone = 'gray', values = {}) {
     const piece = values.piece ?? '';
     const mrp = values.mrp ?? '';
     const sellingPrice = values.selling_price ?? '';
-    const todayPrice = values.today_price ?? '';
-    const tomorrowPrice = values.tomorrow_price ?? '';
     const saveOffer = values.save_offer ?? '';
 
     return `
-        <div class="grid min-w-[960px] grid-cols-[0.9fr_1.05fr_0.75fr_0.75fr_0.85fr_0.85fr_0.85fr_0.72fr_22px] items-end gap-2 mb-2">
+        <div class="grid min-w-[720px] grid-cols-[0.9fr_1.05fr_0.75fr_0.85fr_0.85fr_0.72fr_22px] items-end gap-2 mb-2">
             <div class="min-w-0">
                 <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Quantity (Optional)</p>
                 <input type="text" name="variants[${idx}][quantity]" value="${quantity}" placeholder="e.g. 500-600"
-                       class="w-full border ${inputBorderClass} rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
+                       class="w-full border ${inputBorderClass} rounded px-2 py-2 text-sm outline-none focus:border-amber-400">
             </div>
             <div class="min-w-0">
                 <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Unit</p>
@@ -978,14 +1028,14 @@ function getVariantRowTemplate(idx, tone = 'gray', values = {}) {
             <div class="min-w-0">
                 <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Piece</p>
                 <input type="text" name="variants[${idx}][piece]" value="${piece}" placeholder="e.g. 6-8 pieces"
-                       class="w-full border ${inputBorderClass} rounded px-2 py-2 text-sm outline-none focus:border-blue-400">
+                       class="w-full border ${inputBorderClass} rounded px-2 py-2 text-sm outline-none focus:border-amber-400">
             </div>
             <div class="min-w-0">
                 <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">MRP</p>
                 <div class="relative">
                     <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
                     <input type="number" name="variants[${idx}][mrp]" value="${mrp}" min="0" step="0.01" data-variant-mrp
-                           class="w-full border ${inputBorderClass} rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
+                           class="w-full border ${inputBorderClass} rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-amber-400">
                 </div>
             </div>
             <div class="min-w-0">
@@ -993,30 +1043,14 @@ function getVariantRowTemplate(idx, tone = 'gray', values = {}) {
                 <div class="relative">
                     <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
                     <input type="number" name="variants[${idx}][selling_price]" value="${sellingPrice}" min="0" step="0.01" data-variant-selling-price
-                           class="w-full border ${inputBorderClass} rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
-                </div>
-            </div>
-            <div class="min-w-0">
-                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Today Price</p>
-                <div class="relative">
-                    <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
-                    <input type="number" name="variants[${idx}][today_price]" value="${todayPrice}" min="0" step="0.01"
-                           class="w-full border ${inputBorderClass} rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
-                </div>
-            </div>
-            <div class="min-w-0">
-                <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Tomorrow Price</p>
-                <div class="relative">
-                    <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
-                    <input type="number" name="variants[${idx}][tomorrow_price]" value="${tomorrowPrice}" min="0" step="0.01"
-                           class="w-full border ${inputBorderClass} rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-blue-400">
+                           class="w-full border ${inputBorderClass} rounded pl-5 pr-2 py-2 text-sm outline-none focus:border-amber-400">
                 </div>
             </div>
             <div class="min-w-0">
                 <p class="mb-1 flex min-h-[38px] items-end text-xs text-gray-500">Save Offer</p>
                 <div class="relative">
                     <input type="number" name="variants[${idx}][save_offer]" value="${saveOffer}" min="0" max="100" step="0.1" data-variant-save-offer readonly
-                           class="w-full border ${inputBorderClass} rounded ${inputBgClass} px-2 pr-5 py-2 text-sm outline-none focus:border-blue-400">
+                           class="w-full border ${inputBorderClass} rounded ${inputBgClass} px-2 pr-5 py-2 text-sm outline-none focus:border-amber-400">
                     <span class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">%</span>
                 </div>
             </div>
@@ -1100,7 +1134,7 @@ document.addEventListener('input', (event) => {
         {{-- Modal Header --}}
         <div class="flex items-center justify-between border-b bg-slate-50 px-6 py-4 flex-shrink-0">
             <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-sm">
+                <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm">
                     <i class="fa-solid fa-layer-group"></i>
                 </div>
                 <div>
@@ -1121,7 +1155,7 @@ document.addEventListener('input', (event) => {
                 <div class="relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                     <input type="text" id="multiEditSearch" oninput="debounceMultiEditSearch()" placeholder="Search product name, category, or subcategory..."
-                           class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-xs font-medium text-slate-900 outline-none focus:border-purple-500 focus:bg-white focus:ring-2 focus:ring-purple-100">
+                           class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-xs font-medium text-slate-900 outline-none focus:border-amber-500 focus:bg-white focus:ring-2 focus:ring-amber-100">
                 </div>
             </div>
 
@@ -1140,11 +1174,11 @@ document.addEventListener('input', (event) => {
             <div class="border-t pt-3">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-check-double text-purple-600"></i> Selected Products (<span id="selectedCountText">0</span>)
+                        <i class="fa-solid fa-check-double text-amber-600"></i> Selected Products (<span id="selectedCountText">0</span>)
                     </span>
                     <button type="button" onclick="clearSelectedProducts()" class="text-[11px] font-bold text-red-600 hover:underline">Clear All</button>
                 </div>
-                <div id="selectedProductsTray" class="min-h-[50px] max-h-32 overflow-y-auto rounded-xl border bg-purple-50/50 p-2 flex flex-wrap gap-2 items-center">
+                <div id="selectedProductsTray" class="min-h-[50px] max-h-32 overflow-y-auto rounded-xl border bg-amber-50/50 p-2 flex flex-wrap gap-2 items-center">
                     <span id="noProductsSelectedPlaceholder" class="text-xs text-slate-400 italic px-2">No products selected yet. Search and click "+ Add" above.</span>
                 </div>
             </div>
@@ -1158,7 +1192,7 @@ document.addEventListener('input', (event) => {
             <form id="openMultiEditForm" method="GET" action="{{ route('dashboard.products.multi-edit') }}">
                 <input type="hidden" name="ids" id="selectedProductIdsInput" value="">
                 <button type="submit" id="btnOpenMultiEditPage" disabled
-                        class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs font-extrabold uppercase tracking-wider shadow-md transition flex items-center gap-2">
+                        class="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs font-extrabold uppercase tracking-wider shadow-md transition flex items-center gap-2">
                     <span>Open Multi Edit Page</span>
                     <i class="fa-solid fa-arrow-right text-[10px]"></i>
                 </button>
@@ -1236,7 +1270,7 @@ function renderSearchResults(products) {
 
         const btnClass = isSelected
             ? 'bg-green-600 text-white hover:bg-green-700'
-            : 'bg-purple-600 text-white hover:bg-purple-700';
+            : 'bg-amber-600 text-white hover:bg-amber-700';
 
         const btnText = isSelected
             ? '<i class="fa-solid fa-check"></i> Added'
@@ -1245,7 +1279,7 @@ function renderSearchResults(products) {
         const jsonString = JSON.stringify(p).replace(/'/g, "&apos;");
 
         html += `
-            <div class="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200 hover:border-purple-300 transition">
+            <div class="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200 hover:border-amber-300 transition">
                 <div class="flex items-center gap-3 min-w-0">
                     ${imgTag}
                     <div class="min-w-0">
@@ -1256,7 +1290,7 @@ function renderSearchResults(products) {
                         <p class="text-[11px] text-slate-500 truncate">
                             ${escapeHtml(p.category_name)} ${p.subcategory_name !== '-' ? '| ' + escapeHtml(p.subcategory_name) : ''}
                             <span class="ml-2 font-semibold text-slate-700">₹${p.price.toFixed(2)}</span>
-                            <span class="ml-2 text-purple-600">(${p.variants_count} variants)</span>
+                            <span class="ml-2 text-amber-600">(${p.variants_count} variants)</span>
                         </p>
                     </div>
                 </div>
@@ -1323,7 +1357,7 @@ function renderSelectedTray() {
     let html = '';
     selectedList.forEach(p => {
         html += `
-            <span class="inline-flex items-center gap-1.5 rounded-xl bg-white border border-purple-200 px-3 py-1 text-xs font-bold text-purple-900">
+            <span class="inline-flex items-center gap-1.5 rounded-xl bg-white border border-amber-200 px-3 py-1 text-xs font-bold text-amber-900">
                 <span>${escapeHtml(p.name)}</span>
                 <button type="button" onclick="removeSelectedProduct(${p.id})" class="text-slate-400 hover:text-red-600 transition">
                     <i class="fa-solid fa-xmark text-xs"></i>

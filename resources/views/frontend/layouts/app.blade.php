@@ -3,17 +3,18 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>@yield('title', 'FarmSea') — Fresh Meat & Seafood</title>
+<title>@yield('title', 'Porville — Fresh Cut Pure Standards')</title>
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<link rel="icon" type="image/webp" href="{{ $brandLogoUrl }}">
+<link rel="icon" type="image/jpeg" href="{{ $brandLogoUrl }}">
 <link rel="shortcut icon" href="{{ $brandLogoUrl }}">
 <link rel="apple-touch-icon" href="{{ $brandLogoUrl }}">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@600;700;800&family=Playfair+Display:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>
 * { font-family: 'Poppins', sans-serif; box-sizing: border-box; }
 .nunito { font-family: 'Nunito', sans-serif; }
+.font-classic, h1, h2, .brand-wordmark { font-family: 'Playfair Display', serif; }
 .sidebar-transition { transition: transform .3s ease; }
 .sidebar-open { transform: translateX(0) !important; }
 #sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:90; }
@@ -155,24 +156,16 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 </head>
 <body class="min-h-screen flex flex-col" style="background:#f5f6fa;">
 
-<!-- Page Refresh / Navigation Top Progress Bar & Loader -->
-<div id="topProgressBar" class="fixed top-0 left-0 z-[9999] h-1 w-0 bg-gradient-to-r from-blue-600 via-green-500 to-amber-400 shadow-[0_0_12px_rgba(37,99,235,0.9)] transition-all duration-300 pointer-events-none"></div>
-
-<div id="pageLoaderPill" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] hidden items-center gap-3 rounded-2xl bg-slate-900/90 px-6 py-3.5 text-white shadow-2xl backdrop-blur-md transition-all duration-300 pointer-events-none border border-white/15">
-    <i class="fa-solid fa-circle-notch fa-spin text-base text-green-400"></i>
-    <span class="text-xs font-bold tracking-wide">Loading...</span>
-</div>
-
 <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
 <!-- Mobile Sidebar -->
 <div id="mobile-sidebar" class="fixed inset-y-0 left-0 z-[100] w-72 bg-white shadow-2xl transform -translate-x-full sidebar-transition">
-    <div class="p-5 border-b flex justify-between items-center bg-green-700 text-white">
-        <span class="font-bold uppercase tracking-wider">FarmSea Menu</span>
+    <div class="p-5 border-b flex justify-between items-center bg-amber-700 text-white">
+        <span class="font-bold uppercase tracking-wider">Porville Menu</span>
         <button onclick="toggleSidebar()"><i class="fa-solid fa-xmark text-2xl"></i></button>
     </div>
     <div class="p-4 overflow-y-auto h-full pb-20">
-        <h3 class="text-green-700 font-bold mb-3 mt-2">Categories</h3>
+        <h3 class="text-amber-500 font-bold mb-3 mt-2">Categories</h3>
         <ul class="space-y-1 text-gray-700 text-sm mb-5">
             @forelse($frontendNavCategories ?? collect() as $category)
                 <li>
@@ -183,17 +176,17 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                             class="flex w-full items-center justify-between rounded p-2 text-left font-semibold hover:bg-gray-100"
                         >
                             <span>{{ $category->name }}</span>
-                            <i id="mobile-category-icon-{{ $category->id }}" class="fa-solid fa-chevron-down text-[10px] text-green-700 transition-transform"></i>
+                            <i id="mobile-category-icon-{{ $category->id }}" class="fa-solid fa-chevron-down text-[10px] text-amber-500 transition-transform"></i>
                         </button>
-                        <ul id="mobile-category-{{ $category->id }}" class="ml-3 hidden border-l border-green-100 pl-2">
+                        <ul id="mobile-category-{{ $category->id }}" class="ml-3 hidden border-l border-amber-100 pl-2">
                             <li>
-                                <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="block rounded p-2 text-xs font-semibold text-green-700 hover:bg-gray-100">
+                                <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="block rounded p-2 text-xs font-semibold text-amber-500 hover:bg-gray-100">
                                     View all {{ $category->name }}
                                 </a>
                             </li>
                             @foreach($category->children as $subcategory)
                                 <li>
-                                    <a href="{{ route('frontend.products', ['category' => $category->slug, 'subcategory' => $subcategory->slug]) }}" class="block p-2 text-xs text-gray-500 hover:bg-gray-100 hover:text-green-700 rounded">{{ $subcategory->name }}</a>
+                                    <a href="{{ route('frontend.products', ['category' => $category->slug, 'subcategory' => $subcategory->slug]) }}" class="block p-2 text-xs text-gray-500 hover:bg-gray-100 hover:text-amber-500 rounded">{{ $subcategory->name }}</a>
                                 </li>
                             @endforeach
                         </ul>
@@ -206,12 +199,12 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
             @endforelse
         </ul>
         <hr class="my-4">
-        <a href="{{ route('frontend.track') }}" class="block p-2 font-bold text-blue-600">Track Order</a>
+        <a href="{{ route('frontend.track') }}" class="block p-2 font-bold text-amber-600">Track Order</a>
         @auth('web_frontend')
-            <a href="{{ route('frontend.profile') }}" class="block p-2 font-bold text-green-700">My Profile</a>
-            <a href="{{ route('frontend.orders') }}" class="block p-2 font-bold text-green-700">My Orders</a>
+            <a href="{{ route('frontend.profile') }}" class="block p-2 font-bold text-amber-500">My Profile</a>
+            <a href="{{ route('frontend.orders') }}" class="block p-2 font-bold text-amber-500">My Orders</a>
         @else
-            <a href="{{ route('frontend.login') }}" class="block p-2 font-bold text-blue-600">Login / Register</a>
+            <a href="{{ route('frontend.login') }}" class="block p-2 font-bold text-amber-600">Login / Register</a>
         @endauth
     </div>
 </div>
@@ -237,9 +230,9 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 <div id="cart-drawer" class="fixed top-0 right-0 h-full w-[420px] max-w-[95vw] bg-white shadow-2xl z-[9999] flex flex-col">
     <div class="flex items-center justify-between px-5 py-4 border-b">
         <div class="flex items-center gap-2">
-            <i class="fa-solid fa-cart-shopping text-blue-700"></i>
+            <i class="fa-solid fa-cart-shopping text-amber-500"></i>
             <span class="nunito font-extrabold text-base">Your Cart</span>
-            <span id="cart-badge-drawer" class="bg-blue-700 text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+            <span id="cart-badge-drawer" class="bg-amber-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
             <div id="cart-day-tabs" class="hidden items-center rounded-full bg-slate-100 p-1">
                 <button type="button" data-cart-day-tab="today" onclick="selectCartDrawerDay('today')" class="rounded-full px-2.5 py-1 text-[10px] font-black uppercase">Today</button>
                 <button type="button" data-cart-day-tab="tomorrow" onclick="selectCartDrawerDay('tomorrow')" class="rounded-full px-2.5 py-1 text-[10px] font-black uppercase">Tomorrow</button>
@@ -251,44 +244,14 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
         <p class="text-center text-gray-400 py-8">Your cart is empty</p>
     </div>
     <div class="px-5 py-4 border-t bg-white">
-        <div id="cart-coupon-wrap" class="mb-3 hidden rounded-2xl border border-blue-100 bg-blue-50/60">
+        <div id="cart-coupon-wrap" class="mb-3 hidden rounded-2xl border border-amber-100 bg-amber-50/60">
             <button type="button" onclick="toggleCartDropdown('cart-coupon-panel', 'cart-coupon-chevron')" class="flex w-full items-center justify-between gap-3 px-3 py-3 text-left">
-                <span class="text-xs font-black uppercase tracking-[0.16em] text-blue-700">
+                <span class="text-xs font-black uppercase tracking-[0.16em] text-amber-500">
                     <i class="fa-solid fa-tag mr-1"></i> Offers &amp; Coupons
                 </span>
-                <i id="cart-coupon-chevron" class="fa-solid fa-chevron-down text-[10px] text-blue-700 transition"></i>
+                <i id="cart-coupon-chevron" class="fa-solid fa-chevron-down text-[10px] text-amber-500 transition"></i>
             </button>
-            <div id="cart-coupon-panel" class="hidden border-t border-blue-100 px-3 py-3"></div>
-        </div>
-        <div class="mb-3 rounded-2xl border border-green-100 bg-green-50/60">
-            <button type="button" onclick="toggleCartDropdown('drawer-delivery-slot-options', 'cart-slot-chevron')" class="flex w-full items-center justify-between gap-3 px-3 py-3 text-left">
-                <span class="text-xs font-black uppercase tracking-[0.16em] text-slate-600">
-                    Delivery Slot
-                    <span id="drawer-delivery-day-label" class="ml-1 rounded-full bg-white px-2 py-1 text-[9px] tracking-[0.12em] text-green-700">
-                        {{ $drawerDeliveryDayLabel }}
-                    </span>
-                </span>
-                <span id="drawer-delivery-slot-label" class="text-[10px] font-bold text-green-700">
-                    {{ \App\Support\DeliverySlotManager::label($drawerSelectedDeliverySlot) }}
-                </span>
-                <i id="cart-slot-chevron" class="fa-solid fa-chevron-down text-[10px] text-green-700 transition"></i>
-            </button>
-            <div id="drawer-delivery-slot-options" class="hidden flex-wrap gap-2 border-t border-green-100 px-3 py-3">
-                @forelse($drawerDeliverySlotOptions as $slot)
-                    <button
-                        type="button"
-                        onclick="updateCartDrawerDeliverySlot('{{ $slot['value'] }}')"
-                        data-drawer-delivery-slot="{{ $slot['value'] }}"
-                        class="drawer-delivery-slot-chip {{ $drawerSelectedDeliverySlot === $slot['value'] ? 'border-green-600 bg-white text-green-700 shadow-sm' : 'border-green-100 bg-white/80 text-slate-600' }} rounded-full border px-2.5 py-2 text-[10px] font-bold leading-none transition hover:border-green-400 hover:text-green-700"
-                    >
-                        {{ $slot['label'] }}
-                    </button>
-                @empty
-                    <span class="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-2 text-[10px] font-bold leading-none text-amber-700">
-                        No slots left for today
-                    </span>
-                @endforelse
-            </div>
+            <div id="cart-coupon-panel" class="hidden border-t border-amber-100 px-3 py-3"></div>
         </div>
         <div class="mb-3 rounded-2xl border border-slate-200 bg-slate-50/70">
             <button type="button" onclick="toggleCartDropdown('cart-amount-details', 'cart-amount-chevron')" class="flex w-full items-center justify-between gap-3 px-3 py-3 text-left">
@@ -318,13 +281,9 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
         </div>
             </div>
         </div>
-        <a id="cart-checkout-link" href="{{ route('frontend.checkout') }}"
-           class="flex items-center justify-center gap-2 w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl text-sm mb-2">
+        <a href="{{ route('frontend.checkout') }}"
+           class="flex items-center justify-center gap-2 w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl text-sm">
             <i class="fa-solid fa-lock text-xs"></i> Proceed to Checkout
-        </a>
-        <a href="{{ route('frontend.cart') }}"
-           class="flex items-center justify-center gap-2 w-full border border-gray-200 text-blue-700 font-semibold py-2.5 rounded-xl text-sm hover:bg-gray-50">
-            View Full Cart
         </a>
     </div>
 </div>
@@ -338,82 +297,56 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
             <button type="button" onclick="closeCartAddedPopup()" class="text-lg leading-none text-slate-400 hover:text-slate-700" aria-label="Close cart preview">&times;</button>
         </div>
         <div id="cart-added-popup-items" class="max-h-[420px] space-y-3 overflow-y-auto px-4 py-3"></div>
-        <button type="button" onclick="openCartFromPreview()" class="m-3 mt-0 rounded-xl border border-blue-200 px-4 py-3 text-sm font-black text-blue-700 transition hover:bg-blue-50">Go to Cart <i class="fa-solid fa-angle-right ml-1"></i></button>
+        <button type="button" onclick="openCartFromPreview()" class="m-3 mt-0 rounded-xl border border-amber-200 px-4 py-3 text-sm font-black text-amber-500 transition hover:bg-amber-50">Go to Cart <i class="fa-solid fa-angle-right ml-1"></i></button>
     </div>
 </aside>
 
-@php
-    $noSlotSettings = \App\Support\DeliverySlotManager::settings();
-@endphp
-<!-- Out of Slot / No Slot Available Modal Popup -->
-<div id="no-slot-modal" class="fixed inset-0 z-[10060] hidden items-center justify-center p-4" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 opacity-0" id="no-slot-modal-backdrop" onclick="closeNoSlotModal()"></div>
-    <div class="relative w-full max-w-md scale-95 overflow-hidden rounded-3xl bg-white shadow-2xl transition-all duration-300 opacity-0" id="no-slot-modal-card">
-        <div class="h-1.5 w-full running-color-line"></div>
-        <div class="p-6 text-center">
-            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-100 text-amber-600 shadow-inner">
-                <i class="fa-solid fa-clock-rotate-left text-2xl"></i>
-            </div>
-            <h3 id="no-slot-modal-title" class="text-xl font-black text-slate-900">
-                {{ $noSlotSettings['no_slot_popup_title'] ?? 'Delivery Slots Unavailable' }}
-            </h3>
-            <p id="no-slot-modal-message" class="mt-2.5 text-sm leading-relaxed text-slate-600">
-                {{ $noSlotSettings['no_slot_popup_description'] ?? 'Sorry! Delivery slots for Today or Tomorrow are currently unavailable for this item. Please try again later.' }}
-            </p>
-            <div class="mt-6 flex items-center justify-center">
-                <button type="button" onclick="closeNoSlotModal()" class="w-full rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 px-6 py-3.5 text-sm font-bold text-white shadow-lg transition hover:from-slate-800 hover:to-slate-700 active:scale-[0.98]">
-                    Understand & Close
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Header -->
-<header class="fixed inset-x-0 top-0 z-[9997] bg-white shadow-sm">
-    <div class="hidden relative flex h-8 items-center overflow-hidden bg-blue-900 pr-[108px] text-white sm:pr-[162px]">
+<header id="siteHeader" class="fixed inset-x-0 top-0 z-[9997] bg-black shadow-sm">
+    <div class="hidden relative flex h-8 items-center overflow-hidden bg-neutral-950 pr-[108px] text-white sm:pr-[162px]">
         <div class="announcement-track items-center whitespace-nowrap text-[10px] font-bold sm:text-[11px]">
             @for($copy = 0; $copy < 2; $copy++)
                 <div class="flex items-center gap-10 pr-10">
-                    <span><i class="fa-solid fa-leaf mr-2 text-green-300"></i>Farm Fresh. Ocean Fresh. Delivered to Your Door.</span>
+                    <span><i class="fa-solid fa-leaf mr-2 text-amber-400"></i>Fresh Cut. Pure Standards. Delivered to Your Door.</span>
                     @if($frontendTickerOffer ?? null)
-                        <a href="{{ route('frontend.products', ['offer' => 'flash_deal']) }}" class="text-yellow-300 hover:text-yellow-200">
+                        <a href="{{ route('frontend.products', ['offer' => 'flash_deal']) }}" class="text-amber-300 hover:text-amber-200">
                             <i class="fa-solid fa-bolt mr-2"></i>{{ $frontendTickerOffer->title ?: $frontendTickerOffer->description ?: 'Special offer available now' }}
                         </a>
                     @else
-                        <span class="text-yellow-300"><i class="fa-solid fa-bolt mr-2"></i>Fresh deals available every day</span>
+                        <span class="text-amber-300"><i class="fa-solid fa-bolt mr-2"></i>Fresh deals available every day</span>
                     @endif
                     @if($frontendTickerProduct ?? null)
-                        <a href="{{ route('frontend.product.show', $frontendTickerProduct->slug) }}" class="hover:text-green-200">
-                            <i class="fa-solid fa-star mr-2 text-yellow-300"></i>New Arrival: {{ $frontendTickerProduct->name }} — Shop Now
+                        <a href="{{ route('frontend.product.show', $frontendTickerProduct->slug) }}" class="hover:text-amber-200">
+                            <i class="fa-solid fa-star mr-2 text-amber-300"></i>New Arrival: {{ $frontendTickerProduct->name }} — Shop Now
                         </a>
                     @endif
                 </div>
             @endfor
         </div>
-        <a href="{{ route('frontend.deals') }}" class="absolute inset-y-0 right-0 z-10 flex items-center gap-1.5 border-l border-white/20 bg-gradient-to-r from-blue-800 to-indigo-950 px-3 text-[9px] font-black uppercase tracking-wider text-yellow-300 shadow-[-10px_0_18px_rgba(30,58,138,0.9)] transition hover:text-white sm:px-4 sm:text-[10px]">
+        <a href="{{ route('frontend.deals') }}" class="absolute inset-y-0 right-0 z-10 flex items-center gap-1.5 border-l border-white/20 bg-gradient-to-r from-amber-700 to-amber-900 px-3 text-[9px] font-black uppercase tracking-wider text-amber-100 shadow-[-10px_0_18px_rgba(0,0,0,0.6)] transition hover:text-white sm:px-4 sm:text-[10px]">
             <i class="fa-solid fa-ticket"></i>
             <span class="sm:hidden">Deals</span>
             <span class="hidden sm:inline">Coupons &amp; Offers</span>
         </a>
     </div>
-    <div class="w-full px-3 py-2.5 sm:px-3 md:px-4 lg:py-3 flex items-center justify-between gap-2 lg:gap-4">
-        <button onclick="toggleSidebar()" aria-label="Open menu" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-gray-700 text-lg lg:hidden">
+    <div class="w-full px-3 py-2 sm:px-3 md:px-4 lg:py-2.5 flex items-center justify-between gap-2 lg:gap-4">
+        <button onclick="toggleSidebar()" aria-label="Open menu" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-stone-200 text-lg lg:hidden">
             <i class="fa-solid fa-bars"></i>
         </button>
-        <a href="{{ route('frontend.home') }}" class="relative flex flex-shrink-0 items-center">
+        <a href="{{ route('frontend.home') }}" class="relative flex flex-shrink-0 items-center gap-2.5 sm:gap-3">
             <img src="{{ $brandLogoUrl }}"
-                 alt="FarmSea"
-                 class="h-10 w-auto object-contain sm:h-12 md:h-14 lg:h-20"
-                 onerror="this.style.display='none'; document.getElementById('header-logo-fallback').style.display='inline-flex'">
-            <span class="logo-fish-flight" aria-hidden="true"><i class="fa-solid fa-fish-fins"></i></span>
-            <span class="logo-fish-flight logo-fish-flight--second" aria-hidden="true"><i class="fa-solid fa-fish-fins"></i></span>
-            <span id="header-logo-fallback" class="hidden text-xl font-extrabold text-green-700">FarmSea</span>
+                 alt="Porville"
+                 class="h-9 w-9 flex-shrink-0 rounded-full object-cover ring-1 ring-amber-500/40 sm:h-10 sm:w-10 md:h-12 md:w-12"
+                 onerror="this.style.display='none'">
+            <span class="flex flex-col leading-none">
+                <span class="font-classic text-lg font-bold tracking-wide text-amber-300 sm:text-xl md:text-2xl">PORVILLE</span>
+                <span class="mt-1 hidden text-[8px] font-semibold uppercase tracking-[0.22em] text-stone-300 sm:block md:text-[9px]">Fresh Cut Pure Standards</span>
+            </span>
         </a>
         <form action="{{ route('frontend.products') }}" method="GET" class="relative mx-2 hidden max-w-lg flex-grow md:flex lg:mx-4">
             <input type="text" name="search" placeholder="Search Chicken Mutton Fish Items"
-                   class="w-full border border-gray-200 rounded-xl px-5 py-2.5 text-sm focus:outline-none focus:border-green-500 transition">
-            <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-600">
+                   class="w-full border border-neutral-700 bg-neutral-900 text-white placeholder:text-neutral-400 rounded-xl px-5 py-2.5 text-sm focus:outline-none focus:border-amber-500 transition">
+            <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-amber-400">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
         </form>
@@ -431,12 +364,12 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                             ->count();
                     @endphp
                 @endauth
-                <button onclick="toggleAccountMenu()" class="text-gray-700 flex flex-col items-center group">
+                <button onclick="toggleAccountMenu()" class="text-stone-200 flex flex-col items-center group">
                     <span class="relative">
-                        <i class="fa-regular fa-user text-xl group-hover:text-blue-600"></i>
+                        <i class="fa-regular fa-user text-xl group-hover:text-amber-400"></i>
                         @auth('web_frontend')
                             @if($frontendUnreadNotifications > 0)
-                                <span class="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-black leading-none text-white ring-2 ring-white">
+                                <span class="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-black leading-none text-white ring-2 ring-black">
                                     {{ $frontendUnreadNotifications > 99 ? '99+' : $frontendUnreadNotifications }}
                                 </span>
                             @endif
@@ -446,36 +379,40 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                         @auth('web_frontend') Hello, {{ Str::limit(auth('web_frontend')->user()->name, 12) }} @else Sign in/Account @endauth
                     </span>
                 </button>
-                <div id="accountMenu" class="hidden absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-3 z-50">
+                <div id="accountMenu" class="hidden absolute right-0 mt-3 w-60 overflow-hidden rounded-2xl border border-amber-500/30 bg-neutral-950 py-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50">
                     @auth('web_frontend')
-                        <a href="{{ route('frontend.profile') }}" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
-                            <i class="fa-regular fa-user text-gray-500"></i> My Profile
+                        <div class="border-b border-white/10 px-5 py-3">
+                            <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-stone-400">Signed in as</p>
+                            <p class="mt-0.5 truncate text-sm font-bold text-amber-300">{{ auth('web_frontend')->user()->name }}</p>
+                        </div>
+                        <a href="{{ route('frontend.profile') }}" class="flex items-center gap-3 px-5 py-2.5 text-sm font-semibold text-stone-200 transition hover:bg-amber-500/10 hover:text-amber-300">
+                            <i class="fa-regular fa-user w-4 text-amber-500"></i> My Profile
                         </a>
-                        <a href="{{ route('frontend.profile') }}#notifications-panel" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
-                            <i class="fa-regular fa-bell text-gray-500"></i>
+                        <a href="{{ route('frontend.notifications') }}" class="flex items-center gap-3 px-5 py-2.5 text-sm font-semibold text-stone-200 transition hover:bg-amber-500/10 hover:text-amber-300">
+                            <i class="fa-regular fa-bell w-4 text-amber-500"></i>
                             Notifications
                             @if($frontendTotalNotifications > 0)
-                                <span class="ml-auto rounded-full {{ $frontendUnreadNotifications > 0 ? 'bg-red-500 text-white' : 'bg-slate-100 text-slate-600' }} px-2 py-0.5 text-[10px] font-bold">
+                                <span class="ml-auto rounded-full {{ $frontendUnreadNotifications > 0 ? 'bg-red-500 text-white' : 'bg-white/10 text-stone-300' }} px-2 py-0.5 text-[10px] font-bold">
                                     {{ $frontendTotalNotifications > 99 ? '99+' : $frontendTotalNotifications }}
                                 </span>
                             @endif
                         </a>
-                        <a href="{{ route('frontend.orders') }}" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
-                            <i class="fa-solid fa-box text-gray-500"></i> My Orders
+                        <a href="{{ route('frontend.orders') }}" class="flex items-center gap-3 px-5 py-2.5 text-sm font-semibold text-stone-200 transition hover:bg-amber-500/10 hover:text-amber-300">
+                            <i class="fa-solid fa-box w-4 text-amber-500"></i> My Orders
                         </a>
-                        <hr class="my-2">
+                        <hr class="my-2 border-white/10">
                         <form method="POST" action="{{ route('frontend.logout') }}">
                             @csrf
-                            <button type="submit" class="w-full flex items-center gap-3 px-5 py-2 text-red-500 hover:bg-red-50 text-sm">
-                                <i class="fa-solid fa-right-from-bracket"></i> Logout
+                            <button type="submit" class="flex w-full items-center gap-3 px-5 py-2.5 text-sm font-semibold text-red-400 transition hover:bg-red-500/10">
+                                <i class="fa-solid fa-right-from-bracket w-4"></i> Logout
                             </button>
                         </form>
                     @else
-                        <a href="{{ route('frontend.login') }}" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
-                            <i class="fa-solid fa-right-to-bracket text-gray-500"></i> Sign In
+                        <a href="{{ route('frontend.login') }}" class="flex items-center gap-3 px-5 py-2.5 text-sm font-semibold text-stone-200 transition hover:bg-amber-500/10 hover:text-amber-300">
+                            <i class="fa-solid fa-right-to-bracket w-4 text-amber-500"></i> Sign In
                         </a>
-                        <a href="{{ route('frontend.register') }}" class="flex items-center gap-3 px-5 py-2 hover:bg-gray-100 text-sm">
-                            <i class="fa-solid fa-user-plus text-gray-500"></i> Register
+                        <a href="{{ route('frontend.register') }}" class="flex items-center gap-3 px-5 py-2.5 text-sm font-semibold text-stone-200 transition hover:bg-amber-500/10 hover:text-amber-300">
+                            <i class="fa-solid fa-user-plus w-4 text-amber-500"></i> Register
                         </a>
                     @endauth
                 </div>
@@ -485,22 +422,22 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                 $initialWishlist = session('wishlist', []);
                 $initialWishlistCount = count($initialWishlist);
             @endphp
-            <a href="{{ route('frontend.wishlist') }}" class="text-gray-700 relative flex flex-col items-center group transition hover:text-red-500">
+            <a href="{{ route('frontend.wishlist') }}" class="text-stone-200 relative flex flex-col items-center group transition hover:text-red-400">
                 <div class="relative">
-                    <i class="fa-regular fa-heart text-xl group-hover:text-red-500 transition"></i>
+                    <i class="fa-regular fa-heart text-xl group-hover:text-red-400 transition"></i>
                     <span id="header-wishlist-badge"
-                          class="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-black border border-white {{ $initialWishlistCount > 0 ? '' : 'hidden' }}">
+                          class="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-black border border-black {{ $initialWishlistCount > 0 ? '' : 'hidden' }}">
                         {{ $initialWishlistCount }}
                     </span>
                 </div>
                 <span class="text-[10px] font-bold mt-0.5 hidden md:block">Wishlist</span>
             </a>
             <!-- Cart -->
-            <button onclick="openCart()" class="text-blue-700 relative flex flex-col items-center group">
+            <button onclick="openCart()" class="text-amber-400 relative flex flex-col items-center group">
                 <div class="relative">
-                    <i class="fa-solid fa-cart-shopping text-xl group-hover:text-blue-800"></i>
+                    <i class="fa-solid fa-cart-shopping text-xl group-hover:text-amber-300"></i>
                     <span id="header-cart-badge"
-                          class="absolute -top-2 -right-2 bg-yellow-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-black border border-white {{ $initialCartItemCount > 0 ? '' : 'hidden' }}">{{ $initialCartItemCount }}</span>
+                          class="absolute -top-2 -right-2 bg-amber-500 text-black text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-black border border-black {{ $initialCartItemCount > 0 ? '' : 'hidden' }}">{{ $initialCartItemCount }}</span>
                 </div>
                 <span class="text-[10px] font-bold mt-0.5 hidden md:block">Cart</span>
             </button>
@@ -509,48 +446,48 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
     <div class="px-3 pb-2.5 md:hidden">
         <form action="{{ route('frontend.products') }}" method="GET" class="relative">
             <input type="text" name="search" placeholder="Search fresh items"
-                   class="w-full rounded-xl border border-gray-200 px-3.5 py-2 pr-10 text-xs focus:border-green-500 focus:outline-none transition">
-            <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-600">
+                   class="w-full rounded-xl border border-neutral-700 bg-neutral-900 text-white placeholder:text-neutral-400 px-3.5 py-2 pr-10 text-xs focus:border-amber-500 focus:outline-none transition">
+            <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-amber-400">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
         </form>
     </div>
     <!-- Nav strip -->
-    <div class="border-t border-gray-100 hidden md:block overflow-visible bg-white">
+    <div class="border-t border-neutral-800 hidden md:block overflow-visible bg-black">
         <div class="flex h-10 w-full items-center gap-1 overflow-visible px-3 text-sm scrollbar-hide sm:px-3 md:px-4">
-            <a href="{{ route('frontend.products') }}" class="px-3 py-1.5 bg-gray-100 text-gray-600 font-semibold whitespace-nowrap rounded-md flex-shrink-0">All Products</a>
+            <a href="{{ route('frontend.products') }}" class="px-3 py-1.5 bg-neutral-900 text-stone-200 font-semibold whitespace-nowrap rounded-md flex-shrink-0">All Products</a>
             @foreach($frontendNavCategories ?? collect() as $category)
                 @if($category->children->isNotEmpty())
                     <div class="header-nav-group relative mr-2 flex-shrink-0">
-                        <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="inline-flex items-center gap-2 rounded-md bg-green-50 px-3 py-1.5 font-medium text-green-700 transition hover:bg-green-100">
+                        <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="inline-flex items-center gap-2 rounded-md bg-neutral-900 px-3 py-1.5 font-medium text-amber-400 transition hover:bg-neutral-800">
                             {{ $category->name }}
                             <i class="fa-solid fa-angle-down text-xs"></i>
                         </a>
-                        <div class="header-nav-dropdown absolute left-0 top-full z-[10010] mt-3 min-w-[230px] space-y-1 rounded-2xl border border-green-100 bg-white p-2 shadow-[0_20px_40px_rgba(15,23,42,0.14)]">
-                            <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="block rounded-xl px-4 py-3 text-[15px] font-semibold text-green-700 transition hover:bg-green-50">All {{ $category->name }}</a>
+                        <div class="header-nav-dropdown absolute left-0 top-full z-[10010] mt-3 min-w-[230px] space-y-1 rounded-2xl border border-amber-900/30 bg-white p-2 shadow-[0_20px_40px_rgba(15,23,42,0.14)]">
+                            <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="block rounded-xl px-4 py-3 text-[15px] font-semibold text-amber-700 transition hover:bg-amber-50">All {{ $category->name }}</a>
                             @foreach($category->children as $subcategory)
-                                <a href="{{ route('frontend.products', ['category' => $category->slug, 'subcategory' => $subcategory->slug]) }}" class="block rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 transition hover:bg-green-50 hover:text-green-700">{{ $subcategory->name }}</a>
+                                <a href="{{ route('frontend.products', ['category' => $category->slug, 'subcategory' => $subcategory->slug]) }}" class="block rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 transition hover:bg-amber-50 hover:text-amber-700">{{ $subcategory->name }}</a>
                             @endforeach
                         </div>
                     </div>
                 @else
-                    <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="px-3 py-1.5 text-gray-700 whitespace-nowrap hover:bg-green-50 rounded-md flex-shrink-0">{{ $category->name }}</a>
+                    <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="px-3 py-1.5 text-stone-200 whitespace-nowrap hover:bg-neutral-900 hover:text-amber-400 rounded-md flex-shrink-0">{{ $category->name }}</a>
                 @endif
             @endforeach
             <span class="ml-auto"></span>
-            <a href="{{ route('frontend.orders') }}" class="inline-flex items-center gap-2 px-3 py-1.5 font-extrabold text-green-700 whitespace-nowrap rounded-md transition hover:bg-green-50">
+            <a href="{{ route('frontend.orders') }}" class="inline-flex items-center gap-2 px-3 py-1.5 font-extrabold text-amber-400 whitespace-nowrap rounded-md transition hover:bg-neutral-900">
                 <i class="fa-solid fa-rotate-left text-[13px]"></i>
                 View Order
             </a>
-            <a href="{{ route('frontend.products', ['sort' => 'latest']) }}" class="px-3 py-1.5 text-slate-700 font-semibold whitespace-nowrap rounded-md transition hover:bg-slate-100">Latest</a>
+            <a href="{{ route('frontend.products', ['sort' => 'latest']) }}" class="px-3 py-1.5 text-stone-200 font-semibold whitespace-nowrap rounded-md transition hover:bg-neutral-900">Latest</a>
         </div>
     </div>
 </header>
 
-<div class="pt-[103px] md:pt-[122px] lg:pt-[146px]">
+<div id="pageContentWrapper" class="pt-[95px] md:pt-[106px] lg:pt-[118px]">
     <!-- Flash Messages -->
     @if(session('success'))
-        <div data-auto-dismiss="3000" class="mx-4 mt-3 flex items-center gap-2 rounded-lg bg-green-100 p-3 text-sm text-green-700 transition-all duration-500">
+        <div data-auto-dismiss="3000" class="mx-4 mt-3 flex items-center gap-2 rounded-lg bg-amber-100 p-3 text-sm text-amber-500 transition-all duration-500">
             <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
         </div>
     @endif
@@ -571,7 +508,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                     <h2 id="accountBlockedTitle" class="text-xl font-extrabold text-slate-900">Your account is blocked</h2>
                     <p class="mt-3 text-sm leading-6 text-slate-600">You cannot place an order while your account is blocked. Please contact our support team for help.</p>
                     <div class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <a href="{{ route('frontend.contact') }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-green-700"><i class="fa-solid fa-headset"></i> Contact Us</a>
+                        <a href="{{ route('frontend.contact') }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-amber-700"><i class="fa-solid fa-headset"></i> Contact Us</a>
                         <button type="button" data-close-account-blocked class="rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50">Go Back</button>
                     </div>
                 </div>
@@ -586,72 +523,76 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 </div>
 
 <!-- Footer -->
-<footer class="relative overflow-hidden bg-[#0f172b] pt-10 md:pt-12 lg:pt-14 pb-5 md:pb-6 lg:pb-7 text-white" style="font-family:'Poppins',sans-serif;">
+<footer class="relative overflow-hidden bg-black pt-10 md:pt-12 lg:pt-14 pb-5 md:pb-6 lg:pb-7 text-white" style="font-family:'Poppins',sans-serif;">
     <div class="relative z-10 mx-auto max-w-[1220px] px-5 sm:px-6 lg:px-8">
         <div class="grid grid-cols-2 gap-x-6 gap-y-7 pb-6 lg:grid-cols-[1fr_1fr_1fr_1fr_180px] lg:gap-x-8 lg:gap-y-6 lg:pb-7">
             <div>
-                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Info</h4>
+                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-amber-400">Info</h4>
                 <ul class="space-y-3.5">
-                    <li><a href="{{ route('frontend.about') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">About Us</a></li>
-                    <li><a href="{{ route('frontend.contact') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Contact Us</a></li>
-                    <li><a href="{{ route('frontend.about') }}#faq" class="text-[14px] text-[#9bb0cf] transition hover:text-white">FAQ</a></li>
-                   <li>
-   <span class="inline-flex items-center gap-1.5 text-[14px] text-[#9bb0cf]">
-    <img src="{{ asset('images/fssai-logo.png') }}" alt="FSSAI" class="h-6 w-10 object-contain sm:h-10 sm:w-[60px]">
-    22726924000264
-</span>
-</li>
+                    <li><a href="{{ route('frontend.about') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">About Us</a></li>
+                    <li><a href="{{ route('frontend.contact') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Contact Us</a></li>
+                    <li><a href="{{ route('frontend.faq') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">FAQ</a></li>
                 </ul>
             </div>
 
             <div>
-                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Useful Links</h4>
+                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-amber-400">Useful Links</h4>
                 <ul class="space-y-3.5">
-                    <li><a href="{{ route('frontend.contact') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Help Center</a></li>
-                    <li><a href="{{ route('frontend.shipping') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Shipping Info</a></li>
-                    <li><a href="{{ route('frontend.returns') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Return Policy</a></li>
-                    <li><a href="{{ route('frontend.privacy') }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Privacy Policy</a></li>
+                    <li><a href="{{ route('frontend.contact') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Help Center</a></li>
+                    <li><a href="{{ route('frontend.shipping') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Shipping Info</a></li>
+                    <li><a href="{{ route('frontend.returns') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Return Policy</a></li>
+                    <li><a href="{{ route('frontend.privacy') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Privacy Policy</a></li>
                 </ul>
             </div>
 
             <div>
-                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Categories</h4>
+                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-amber-400">Categories</h4>
                 <ul class="space-y-3.5">
-                    <li><a href="{{ route('frontend.products', ['category' => 'Chicken']) }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Chicken</a></li>
-                    <li><a href="{{ route('frontend.products', ['category' => 'Mutton']) }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Mutton</a></li>
-                    <li><a href="{{ route('frontend.products', ['category' => 'Fish']) }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">Fish &amp; Seafood</a></li>
-                    <li><a href="{{ route('frontend.products', ['category' => 'Fruits']) }}" class="text-[14px] text-[#9bb0cf] transition hover:text-white">fruits</a></li>
+                    <li><a href="{{ route('frontend.products', ['category' => 'Chicken']) }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Chicken</a></li>
+                    <li><a href="{{ route('frontend.products', ['category' => 'Mutton']) }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Mutton</a></li>
+                    <li><a href="{{ route('frontend.products', ['category' => 'Eggs']) }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Eggs</a></li>
+                    <li><a href="{{ route('frontend.products', ['category' => 'Ready To Eat']) }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Ready To Eat</a></li>
                 </ul>
             </div>
 
             <div>
-                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-white">Reach Us</h4>
-                <p class="mb-3 text-[14px] text-[#9bb0cf]">Delhi NCR, India</p>
-                <a href="tel:8796937990" class="mb-2 inline-flex min-h-9 items-center gap-2 rounded-lg pr-3 text-[15px] font-semibold text-white transition hover:text-[#26c95a]">
-                    <i class="fa-solid fa-phone text-[#26c95a] text-xs"></i> +91 87969 37990
+                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-amber-400">Reach Us</h4>
+                <p class="mb-3 text-[14px] text-[#c9b896]">D-1b/1028, Sangam Vihar-110080</p>
+                <a href="tel:9217577006" class="mb-2 inline-flex min-h-9 items-center gap-2 rounded-lg pr-3 text-[15px] font-semibold text-white transition hover:text-amber-400">
+                    <i class="fa-solid fa-phone text-amber-400 text-xs"></i> +91 92175 77006
                 </a>
-                <a href="mailto:info@farmsea.in" class="mb-4 flex items-center gap-2 text-[14px] text-[#9bb0cf] transition hover:text-white">
-                    <i class="fa-regular fa-envelope text-xs"></i> info@farmsea.in
+                <a href="mailto:porville1986@gmail.com" class="mb-4 flex items-center gap-2 text-[14px] text-[#c9b896] transition hover:text-white">
+                    <i class="fa-regular fa-envelope text-xs"></i> porville1986@gmail.com
                 </a>
-                <div class="flex items-center gap-3.5 text-[15px] text-[#9bb0cf]">
-                    <a href="https://wa.me/918796937990" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-                    <a href="https://www.instagram.com/farmsea.in?igsh=MXA1NXRzYjlsNXJ5OQ==" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://www.facebook.com/profile.php?id=61575413880421" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                <div class="flex items-center gap-3.5 text-[15px] text-[#c9b896]">
+                    <a href="https://wa.me/919217577006" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                    <a href="https://www.instagram.com/porville" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
                 </div>
             </div>
 
             <div class="col-span-2 lg:col-span-1">
-                <div class="flex h-full min-h-[140px] flex-col items-center justify-center rounded-[14px] border border-[#175f49] bg-[#112d35] px-5 py-6 text-center">
-                    <i class="fa-solid fa-drumstick-bite mb-3 text-[22px] text-[#1dd15a]"></i>
+                <div class="flex h-full min-h-[140px] flex-col items-center justify-center rounded-[14px] border border-amber-900/40 bg-[#141210] px-5 py-6 text-center">
+                    <i class="fa-solid fa-drumstick-bite mb-3 text-[22px] text-amber-400"></i>
                     <h5 class="text-[13px] font-bold uppercase leading-none text-white">Fresh &amp; Hygienic</h5>
-                    <p class="mt-2 text-[12px] text-[#8ba7ba]">Farm to Home Delivery</p>
+                    <p class="mt-2 text-[12px] text-[#c9b896]">Fresh Cut Pure Standards</p>
                 </div>
             </div>
         </div>
 
+        <div class="mb-5 flex items-center gap-3 rounded-2xl border border-emerald-800/40 bg-emerald-950/30 px-4 py-3">
+            <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400">
+                <i class="fa-solid fa-shield-halved"></i>
+            </span>
+            <div class="text-left">
+                <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-emerald-400">FSSAI Food Safety Registered</p>
+                <p class="text-[11px] text-[#c9b896]"><span class="font-semibold text-[#e7dcc2]">FoSCoS Ref No:</span> 30260223123490898 | <span class="font-semibold text-[#e7dcc2]">Date:</span> 23-02-2026</p>
+            </div>
+        </div>
+
         <div class="flex flex-col gap-4 border-t border-white/6 pt-4 text-center sm:pt-5 md:flex-row md:items-center md:justify-between md:text-left">
-            <p class="text-[10px] uppercase tracking-[0.2em] text-[#84a0c3]">
-                &copy; {{ date('Y') }} FarmSea Fresh Limited Liability Partnership .
+            <p class="text-[10px] uppercase tracking-[0.2em] text-[#c9b896]">
+                &copy; {{ date('Y') }} Porville. All Rights Reserved. Branding: "Fresh Cut Pure Standards".
             </p>
             <a
                 href="https://digitalutilization.com/"
@@ -660,7 +601,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                 class="group inline-flex items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 transition hover:border-[#38bdf8]/40 hover:bg-white/[0.08] md:justify-end"
                 aria-label="Developed by BMDU - visit Digital Utilization"
             >
-                <span class="text-[10px] font-bold uppercase tracking-[0.16em] text-[#9bb0cf] transition group-hover:text-white">Developed By</span>
+                <span class="text-[10px] font-bold uppercase tracking-[0.16em] text-[#c9b896] transition group-hover:text-white">Developed By</span>
                 <img
                     src="{{ asset('images/bmdu-logo.webp') }}"
                     class="block h-8 w-auto max-w-[120px] object-contain transition duration-200 group-hover:scale-[1.03]"
@@ -812,47 +753,6 @@ function updateHeaderCartBadge(count) {
     badge.classList.toggle('hidden', itemCount === 0);
 }
 
-function openNoSlotModal(title, message) {
-    const modal = document.getElementById('no-slot-modal');
-    const backdrop = document.getElementById('no-slot-modal-backdrop');
-    const card = document.getElementById('no-slot-modal-card');
-    const titleEl = document.getElementById('no-slot-modal-title');
-    const msgEl = document.getElementById('no-slot-modal-message');
-
-    if (!modal) return;
-
-    if (title && titleEl) titleEl.textContent = title;
-    if (message && msgEl) msgEl.textContent = message;
-
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-
-    requestAnimationFrame(() => {
-        backdrop?.classList.remove('opacity-0');
-        backdrop?.classList.add('opacity-100');
-        card?.classList.remove('opacity-0', 'scale-95');
-        card?.classList.add('opacity-100', 'scale-100');
-    });
-}
-
-function closeNoSlotModal() {
-    const modal = document.getElementById('no-slot-modal');
-    const backdrop = document.getElementById('no-slot-modal-backdrop');
-    const card = document.getElementById('no-slot-modal-card');
-
-    if (!modal) return;
-
-    backdrop?.classList.remove('opacity-100');
-    backdrop?.classList.add('opacity-0');
-    card?.classList.remove('opacity-100', 'scale-100');
-    card?.classList.add('opacity-0', 'scale-95');
-
-    setTimeout(() => {
-        modal.classList.remove('flex');
-        modal.classList.add('hidden');
-    }, 250);
-}
-
 function addToCart(productId, variantIndex, pricingDay = 'today') {
     fetch('{{ route("frontend.cart.add") }}', {
         method: 'POST',
@@ -866,11 +766,7 @@ function addToCart(productId, variantIndex, pricingDay = 'today') {
     .then(r => r.json())
     .then(data => {
         if (!data.success) {
-            if (data.slot_unavailable) {
-                openNoSlotModal(data.title, data.message);
-            } else {
-                alert(data.message || 'This product is currently unavailable.');
-            }
+            alert(data.message || 'This product is currently unavailable.');
             return;
         }
 
@@ -883,6 +779,32 @@ function addToCart(productId, variantIndex, pricingDay = 'today') {
 }
 function formatCartCurrency(amount) {
     return '₹' + Number(amount || 0).toFixed(2);
+}
+// Product card pack-size dropdown + single Add to Cart button (see partials/product-card.blade.php)
+function updateProductCardPrice(cardUid) {
+    const select = document.getElementById(cardUid);
+    const priceEl = document.getElementById(cardUid + '-price');
+    if (!select || !priceEl) return;
+    const option = select.options[select.selectedIndex];
+    const price = option?.dataset.price;
+    if (price === undefined) return;
+    priceEl.textContent = 'From Rs' + Math.round(Number(price)).toLocaleString('en-IN');
+
+    const mrpEl = document.getElementById(cardUid + '-mrp');
+    const mrp = Number(option?.dataset.mrp || 0);
+    if (mrpEl) {
+        if (mrp > Number(price)) {
+            mrpEl.textContent = 'Rs' + Math.round(mrp).toLocaleString('en-IN');
+            mrpEl.classList.remove('hidden');
+        } else {
+            mrpEl.classList.add('hidden');
+        }
+    }
+}
+function addProductCardToCart(productId, cardUid) {
+    const control = document.getElementById(cardUid);
+    const variantIndex = control && control.value !== '' ? parseInt(control.value, 10) : null;
+    addToCart(productId, variantIndex, 'today');
 }
 let selectedCartDrawerDay = 'today';
 
@@ -939,10 +861,10 @@ function renderCartCoupons(data) {
         </div>`;
         return;
     }
-    panel.innerHTML = `<p class="mb-2 text-[10px] font-black uppercase tracking-wider text-blue-700">Available offers</p>` +
+    panel.innerHTML = `<p class="mb-2 text-[10px] font-black uppercase tracking-wider text-amber-500">Available offers</p>` +
         available.map(coupon => `<div class="mb-2 flex items-center justify-between gap-2 rounded-xl bg-white p-2 last:mb-0">
             <div class="min-w-0"><p class="truncate text-xs font-bold text-slate-800">${escapeHtml(coupon.title)}</p><p class="text-[10px] text-slate-500">${coupon.type === 'percent' ? coupon.value + '%' : '₹' + coupon.value} off</p></div>
-            <button type="button" onclick="applyCartCoupon('${escapeHtml(coupon.code)}')" class="rounded-lg bg-blue-700 px-3 py-1.5 text-[10px] font-black text-white">Apply</button>
+            <button type="button" onclick="applyCartCoupon('${escapeHtml(coupon.code)}')" class="rounded-lg bg-amber-600 px-3 py-1.5 text-[10px] font-black text-white">Apply</button>
         </div>`).join('');
 }
 function renderCartDrawerItems(items) {
@@ -963,20 +885,13 @@ function renderCartDrawerItems(items) {
                 </a>
                 <div class="min-w-0 flex-1">
                     <div class="flex items-start justify-between gap-2">
-                        <a href="${item.product_url}" class="line-clamp-2 text-[13px] font-bold leading-4 text-slate-900 hover:text-blue-700">
+                        <a href="${item.product_url}" class="line-clamp-2 text-[13px] font-bold leading-4 text-slate-900 hover:text-amber-500">
                             ${item.name}
                         </a>
                     </div>
                     <div class="mt-0.5 flex flex-wrap items-center gap-1">
                         <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
                             ${item.variant_label || item.unit || 'Fresh Cut'}
-                        </span>
-                        <span class="inline-flex items-center rounded border px-1 py-0.5 text-[8px] font-bold uppercase tracking-wider ${
-                            item.pricing_day === 'tomorrow'
-                                ? 'bg-amber-50 text-amber-700 border-amber-100'
-                                : 'bg-emerald-50 text-emerald-700 border-emerald-100'
-                        }">
-                            ${item.pricing_day === 'tomorrow' ? 'Tomorrow' : 'Today'}
                         </span>
                     </div>
                     <div class="mt-2 flex items-end justify-between gap-2">
@@ -989,13 +904,13 @@ function renderCartDrawerItems(items) {
                                 <span class="flex h-7 min-w-[28px] items-center justify-center border-x border-gray-200 px-1.5 text-[11px] font-bold text-slate-700">
                                     ${item.quantity}
                                 </span>
-                                <button onclick="updateCartDrawerQty('${item.key}', ${item.quantity + 1})" class="flex h-7 w-7 items-center justify-center text-gray-500 transition hover:bg-gray-50 hover:text-green-600">
+                                <button onclick="updateCartDrawerQty('${item.key}', ${item.quantity + 1})" class="flex h-7 w-7 items-center justify-center text-gray-500 transition hover:bg-gray-50 hover:text-amber-600">
                                     <i class="fa-solid fa-plus text-[8px]"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <p class="text-xs font-extrabold text-blue-700">${formatCartCurrency(item.subtotal)}</p>
+                            <p class="text-xs font-extrabold text-amber-500">${formatCartCurrency(item.subtotal)}</p>
                             <button type="button" onclick="removeCartDrawerItem('${item.key}')" class="inline-flex items-center gap-1 rounded-md bg-red-500 px-2.5 py-1.5 text-[9px] font-black uppercase tracking-wide text-white transition hover:bg-red-600" title="Remove item">
                                 <i class="fa-solid fa-trash-can"></i>
                                 Remove
@@ -1088,15 +1003,15 @@ function renderDrawerDeliverySlots(options = [], selectedValue = '') {
     container.innerHTML = options.map((slot) => {
         const isActive = slot.value === selectedValue;
         const classes = isActive
-            ? 'border-green-600 bg-white text-green-700 shadow-sm'
-            : 'border-green-100 bg-white/80 text-slate-600';
+            ? 'border-amber-600 bg-white text-amber-500 shadow-sm'
+            : 'border-amber-100 bg-white/80 text-slate-600';
 
         return `
             <button
                 type="button"
                 onclick="updateCartDrawerDeliverySlot('${escapeHtml(slot.value)}')"
                 data-drawer-delivery-slot="${escapeHtml(slot.value)}"
-                class="drawer-delivery-slot-chip ${classes} rounded-full border px-2.5 py-2 text-[10px] font-bold leading-none transition hover:border-green-400 hover:text-green-700"
+                class="drawer-delivery-slot-chip ${classes} rounded-full border px-2.5 py-2 text-[10px] font-bold leading-none transition hover:border-amber-400 hover:text-amber-500"
             >
                 ${escapeHtml(slot.label)}
             </button>
@@ -1144,7 +1059,7 @@ function refreshCartDrawer() {
             dayTabs?.classList.toggle('flex', availableDays.length >= 2);
             document.querySelectorAll('[data-cart-day-tab]').forEach((tab) => {
                 const isActive = tab.dataset.cartDayTab === selectedCartDrawerDay;
-                tab.classList.toggle('bg-blue-700', isActive);
+                tab.classList.toggle('bg-amber-600', isActive);
                 tab.classList.toggle('text-white', isActive);
                 tab.classList.toggle('text-slate-500', !isActive);
             });
@@ -1155,11 +1070,11 @@ function refreshCartDrawer() {
             renderDrawerDeliverySlots(data.delivery_slot_options || [], data.selected_delivery_slot || '');
             document.querySelectorAll('[data-drawer-delivery-slot]').forEach((chip) => {
                 const isActive = chip.dataset.drawerDeliverySlot === data.selected_delivery_slot;
-                chip.classList.toggle('border-green-600', isActive);
+                chip.classList.toggle('border-amber-600', isActive);
                 chip.classList.toggle('bg-white', isActive);
-                chip.classList.toggle('text-green-700', isActive);
+                chip.classList.toggle('text-amber-500', isActive);
                 chip.classList.toggle('shadow-sm', isActive);
-                chip.classList.toggle('border-green-100', !isActive);
+                chip.classList.toggle('border-amber-100', !isActive);
                 chip.classList.toggle('bg-white/80', !isActive);
                 chip.classList.toggle('text-slate-600', !isActive);
             });
@@ -1262,6 +1177,18 @@ function formatVisibleRupeeSymbols(root = document.body) {
     });
 }
 
+function syncHeaderOffset() {
+    const header = document.getElementById('siteHeader');
+    const wrapper = document.getElementById('pageContentWrapper');
+    if (!header || !wrapper) return;
+
+    wrapper.style.paddingTop = header.offsetHeight + 'px';
+}
+
+window.addEventListener('load', syncHeaderOffset);
+window.addEventListener('resize', syncHeaderOffset);
+document.addEventListener('DOMContentLoaded', syncHeaderOffset);
+
 document.addEventListener('DOMContentLoaded', () => {
     const accountBlockedModal = document.getElementById('accountBlockedModal');
     if (accountBlockedModal) {
@@ -1325,80 +1252,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }).observe(document.body, { childList: true, subtree: true });
 });
 
-// Page Navigation / Refresh Loader
-(function() {
-    const bar = document.getElementById('topProgressBar');
-    const pill = document.getElementById('pageLoaderPill');
-    let progressTimer = null;
-    let currentProgress = 0;
-
-    function startLoader() {
-        if (!bar) return;
-        bar.style.opacity = '1';
-        if (pill) { pill.classList.remove('hidden'); pill.classList.add('flex'); }
-
-        currentProgress = 15;
-        bar.style.width = currentProgress + '%';
-
-        clearInterval(progressTimer);
-        progressTimer = setInterval(() => {
-            if (currentProgress < 85) {
-                currentProgress += Math.random() * 15;
-                bar.style.width = currentProgress + '%';
-            }
-        }, 150);
-    }
-
-    function completeLoader() {
-        if (!bar) return;
-        clearInterval(progressTimer);
-        bar.style.width = '100%';
-        setTimeout(() => {
-            bar.style.opacity = '0';
-            setTimeout(() => {
-                bar.style.width = '0%';
-                if (pill) { pill.classList.add('hidden'); pill.classList.remove('flex'); }
-            }, 300);
-        }, 200);
-    }
-
-    document.addEventListener('click', (e) => {
-        const link = e.target.closest('a');
-        if (!link) return;
-
-        const href = link.getAttribute('href');
-        const target = link.getAttribute('target');
-
-        if (href && !href.startsWith('#') && !href.startsWith('javascript:') && !href.startsWith('tel:') && !href.startsWith('mailto:') && target !== '_blank') {
-            if (link.hostname === window.location.hostname) {
-                startLoader();
-            }
-        }
-    });
-
-    document.addEventListener('submit', () => {
-        startLoader();
-    });
-
-    window.addEventListener('beforeunload', () => {
-        startLoader();
-    });
-
-    if (document.readyState === 'complete') {
-        completeLoader();
-    } else {
-        window.addEventListener('load', completeLoader);
-        document.addEventListener('DOMContentLoaded', () => setTimeout(completeLoader, 100));
-    }
-
-    // Back/forward navigation restores the page from bfcache without firing
-    // load/DOMContentLoaded, which left the loader stuck. Force a refresh instead.
-    window.addEventListener('pageshow', (e) => {
-        if (e.persisted) {
-            window.location.reload();
-        }
-    });
-})();
 </script>
 @yield('scripts')
 </body>

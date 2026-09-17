@@ -3,167 +3,120 @@
 @section('page_title', 'Delivery Slot Settings')
 
 @section('content')
-<div class="p-4 md:p-6">
-    <form method="POST" action="{{ route('dashboard.settings.delivery-slots.update') }}" id="deliverySlotForm" class="mx-auto max-w-4xl space-y-5">
+<div class="p-4 md:p-6 mx-auto max-w-4xl space-y-5">
+
+    @if(session('success'))
+        <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            {{ session('success') }}
+        </div>
+    @endif
+    @if($errors->any())
+        <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {{ $errors->first() }}
+        </div>
+    @endif
+
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h1 class="text-xl font-black text-slate-900">Manage Delivery Slots</h1>
+        <p class="mt-1 text-sm text-slate-500">Pick a date, add a start and end time, done. Customers picking "Today" or "Tomorrow" at checkout see whatever slots you've added for that calendar date.</p>
+    </div>
+
+    {{-- Add a slot for any date --}}
+    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
+            <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+                <i class="fa-regular fa-calendar-plus"></i>
+            </span>
+            <div>
+                <h2 class="text-lg font-black text-slate-900">Add a Slot</h2>
+                <p class="text-xs text-slate-500">Works for today, tomorrow, or any future date.</p>
+            </div>
+        </div>
+
+        <form method="POST" action="{{ route('dashboard.settings.delivery-slots.slot.store') }}" class="mt-4 grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end">
+            @csrf
+            <div>
+                <label class="mb-1.5 block text-xs font-bold text-slate-600">Date</label>
+                <input type="date" name="date" min="{{ now()->toDateString() }}" value="{{ old('date', now()->toDateString()) }}" required
+                       class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-amber-500">
+            </div>
+            <div>
+                <label class="mb-1.5 block text-xs font-bold text-slate-600">Start Time</label>
+                <input type="time" name="start_time" required
+                       class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-amber-500">
+            </div>
+            <div>
+                <label class="mb-1.5 block text-xs font-bold text-slate-600">End Time</label>
+                <input type="time" name="end_time" required
+                       class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-amber-500">
+            </div>
+            <button type="submit" class="inline-flex h-[42px] items-center justify-center gap-2 rounded-xl bg-black px-5 text-sm font-bold text-white hover:bg-neutral-800">
+                <i class="fa-solid fa-plus"></i> Add Slot
+            </button>
+        </form>
+    </section>
+
+    {{-- Existing dates & slots --}}
+    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
+            <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                <i class="fa-regular fa-clock"></i>
+            </span>
+            <div>
+                <h2 class="text-lg font-black text-slate-900">Upcoming Slots</h2>
+                <p class="text-xs text-slate-500">Today's date is always what customers see under "Today"; the next date is "Tomorrow".</p>
+            </div>
+        </div>
+
+        <div class="mt-4 space-y-4">
+            @forelse($dates as $day)
+                <div class="rounded-xl border border-slate-200 p-4">
+                    <div class="flex items-center justify-between">
+                        <p class="text-sm font-black text-slate-900">
+                            {{ $day['date_label'] }}
+                            @if($day['date'] === now()->toDateString())
+                                <span class="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase text-amber-700">Today</span>
+                            @elseif($day['date'] === now()->addDay()->toDateString())
+                                <span class="ml-2 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase text-emerald-700">Tomorrow</span>
+                            @endif
+                        </p>
+                        <form method="POST" action="{{ route('dashboard.settings.delivery-slots.date.destroy', $day['date']) }}" onsubmit="return confirm('Remove all slots for {{ $day['date_label'] }}?');">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="text-xs font-bold text-red-500 hover:text-red-700"><i class="fa-solid fa-trash-can mr-1"></i>Clear date</button>
+                        </form>
+                    </div>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        @foreach($day['slots'] as $slot)
+                            <span class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700">
+                                <i class="fa-regular fa-clock text-amber-600"></i>{{ $slot['label'] }}
+                                <form method="POST" action="{{ route('dashboard.settings.delivery-slots.slot.destroy', $slot['id']) }}" class="inline">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="text-red-400 hover:text-red-600" aria-label="Remove slot"><i class="fa-solid fa-xmark"></i></button>
+                                </form>
+                            </span>
+                        @endforeach
+                    </div>
+                </div>
+            @empty
+                <p class="rounded-xl border border-dashed border-slate-300 px-4 py-6 text-center text-sm text-slate-400">No slots added yet. Add one above.</p>
+            @endforelse
+        </div>
+    </section>
+
+    <form method="POST" action="{{ route('dashboard.settings.delivery-slots.update') }}">
         @csrf
         @method('PUT')
 
-        <div class="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-            <div>
-                <h1 class="text-xl font-black text-slate-900">Manage Delivery Slots</h1>
-                <p class="mt-1 text-sm text-slate-500">Select start and end time, then click Add Slot.</p>
-            </div>
-            <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-700">
-                <i class="fa-solid fa-floppy-disk"></i> Save Changes
-            </button>
-        </div>
-
-        @if($errors->any())
-            <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                {{ $errors->first() }}
-            </div>
-        @endif
-
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <label for="deliveryCharge" class="block text-sm font-bold text-slate-800">Delivery Charge (Rs)</label>
             <p class="mt-1 text-xs text-slate-500">This amount is added during checkout.</p>
             <input type="number" id="deliveryCharge" name="delivery_charge" min="0" step="0.01"
                    value="{{ old('delivery_charge', number_format($deliveryCharge, 2, '.', '')) }}"
-                   class="mt-3 w-full max-w-xs rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold outline-none focus:border-blue-500">
-        </div>
-
-        @foreach([
-            ['key' => 'today', 'title' => "Today's Slots", 'textName' => 'fixed_slots_text', 'value' => old('fixed_slots_text', $settings['fixed_slots_text']), 'color' => 'blue'],
-            ['key' => 'tomorrow', 'title' => "Tomorrow's Slots", 'textName' => 'tomorrow_fixed_slots_text', 'value' => old('tomorrow_fixed_slots_text', $settings['tomorrow_fixed_slots_text']), 'color' => 'emerald'],
-        ] as $day)
-            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-xl {{ $day['color'] === 'blue' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600' }}">
-                        <i class="fa-regular fa-clock"></i>
-                    </span>
-                    <div>
-                        <h2 class="text-lg font-black text-slate-900">{{ $day['title'] }}</h2>
-                        <p class="text-xs text-slate-500">Add as many delivery slots as needed.</p>
-                    </div>
-                </div>
-
-                <textarea name="{{ $day['textName'] }}" id="{{ $day['key'] }}SlotsText" class="hidden">{{ $day['value'] }}</textarea>
-                <div id="{{ $day['key'] }}SlotList" class="mt-4 space-y-2"></div>
-
-                <div class="mt-4 grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
-                    <div>
-                        <label class="mb-1.5 block text-xs font-bold text-slate-600">Start Time</label>
-                        <input type="time" id="{{ $day['key'] }}Start" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="mb-1.5 block text-xs font-bold text-slate-600">End Time</label>
-                        <input type="time" id="{{ $day['key'] }}End" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-blue-500">
-                    </div>
-                    <button type="button" onclick="addSlot('{{ $day['key'] }}')" class="inline-flex h-[42px] items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 text-sm font-bold text-white hover:bg-slate-700">
-                        <i class="fa-solid fa-plus"></i> Add Slot
-                    </button>
-                </div>
-
-                @if($day['key'] === 'today')
-                    <input type="hidden" name="evening_start" value="">
-                    <input type="hidden" name="last_end" value="">
-                    <input type="hidden" name="slot_duration_hours" value="{{ (int) $settings['slot_duration_hours'] ?: 2 }}">
-                @else
-                    <input type="hidden" name="tomorrow_evening_start" value="">
-                    <input type="hidden" name="tomorrow_last_end" value="">
-                    <input type="hidden" name="tomorrow_slot_duration_hours" value="{{ (int) $settings['tomorrow_slot_duration_hours'] ?: 2 }}">
-                @endif
-            </section>
-        @endforeach
-
-        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
-            <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
-                <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                </span>
-                <div>
-                    <h2 class="text-lg font-black text-slate-900">Out of Slot Popup Notification</h2>
-                    <p class="text-xs text-slate-500">Dynamic Title and Description when Today or Tomorrow delivery slots are unavailable.</p>
-                </div>
-            </div>
-
-            <div>
-                <label for="noSlotPopupTitle" class="block text-sm font-bold text-slate-800">Popup Title</label>
-                <p class="mt-0.5 text-xs text-slate-500">Dynamic popup modal title shown to customer.</p>
-                <input type="text" id="noSlotPopupTitle" name="no_slot_popup_title"
-                       value="{{ old('no_slot_popup_title', $settings['no_slot_popup_title'] ?? '') }}"
-                       placeholder="e.g. Delivery Slots Unavailable"
-                       class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold outline-none focus:border-blue-500">
-            </div>
-
-            <div>
-                <label for="noSlotPopupDesc" class="block text-sm font-bold text-slate-800">Popup Description / Message</label>
-                <p class="mt-0.5 text-xs text-slate-500">Dynamic message content displayed when clicking Add to Cart without available slots.</p>
-                <textarea id="noSlotPopupDesc" name="no_slot_popup_description" rows="3"
-                          placeholder="e.g. Delivery slots for Today or Tomorrow are currently unavailable for this item. Please try again later."
-                          class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold outline-none focus:border-blue-500">{{ old('no_slot_popup_description', $settings['no_slot_popup_description'] ?? '') }}</textarea>
-            </div>
+                   class="mt-3 w-full max-w-xs rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold outline-none focus:border-amber-500">
+            <button type="submit" class="mt-4 inline-flex items-center justify-center gap-2 rounded-xl bg-black px-6 py-3 text-sm font-bold text-white hover:bg-neutral-800">
+                <i class="fa-solid fa-floppy-disk"></i> Save
+            </button>
         </section>
-
-        <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-blue-700">
-            <i class="fa-solid fa-floppy-disk"></i> Save Delivery Settings
-        </button>
     </form>
 </div>
-
-<script>
-const slotState = { today: [], tomorrow: [] };
-
-function initialiseSlots(day) {
-    const raw = document.getElementById(`${day}SlotsText`).value.trim();
-    slotState[day] = raw ? raw.split(/\r?\n/).map(value => value.trim()).filter(Boolean) : [];
-    renderSlots(day);
-}
-
-function renderSlots(day) {
-    const list = document.getElementById(`${day}SlotList`);
-    document.getElementById(`${day}SlotsText`).value = slotState[day].join('\n');
-
-    if (!slotState[day].length) {
-        list.innerHTML = '<p class="rounded-xl border border-dashed border-slate-300 px-4 py-4 text-center text-sm text-slate-400">No fixed slots added.</p>';
-        return;
-    }
-
-    list.innerHTML = slotState[day].map((slot, index) => {
-        const [start, end] = slot.split('-');
-        return `<div class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-            <span class="text-sm font-bold text-slate-800"><i class="fa-regular fa-clock mr-2 text-blue-600"></i>${start} to ${end}</span>
-            <button type="button" onclick="removeSlot('${day}', ${index})" class="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-100" aria-label="Remove slot"><i class="fa-solid fa-trash-can"></i></button>
-        </div>`;
-    }).join('');
-}
-
-function addSlot(day) {
-    const startInput = document.getElementById(`${day}Start`);
-    const endInput = document.getElementById(`${day}End`);
-    if (!startInput.value || !endInput.value) {
-        alert('Please select both start and end time.');
-        return;
-    }
-    if (startInput.value >= endInput.value) {
-        alert('End time must be after start time.');
-        return;
-    }
-    const slot = `${startInput.value}-${endInput.value}`;
-    if (!slotState[day].includes(slot)) slotState[day].push(slot);
-    startInput.value = '';
-    endInput.value = '';
-    renderSlots(day);
-}
-
-function removeSlot(day, index) {
-    slotState[day].splice(index, 1);
-    renderSlots(day);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    initialiseSlots('today');
-    initialiseSlots('tomorrow');
-});
-</script>
 @endsection

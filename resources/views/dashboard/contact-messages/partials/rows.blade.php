@@ -3,7 +3,7 @@
         <td class="px-4 py-3 text-sm text-gray-500">{{ $messages->firstItem() + $index }}</td>
         <td class="px-4 py-3">
             <p class="text-sm font-bold text-slate-900">{{ $message->name }}</p>
-            <a href="mailto:{{ $message->email }}" class="text-xs font-semibold text-blue-600">{{ $message->email }}</a>
+            <a href="mailto:{{ $message->email }}" class="text-xs font-semibold text-amber-600">{{ $message->email }}</a>
         </td>
         <td class="px-4 py-3 text-sm font-semibold text-slate-700">{{ $message->department }}</td>
         <td class="px-4 py-3">
@@ -18,7 +18,7 @@
         <td class="px-4 py-3">
             <div class="flex justify-center gap-2">
                 <a href="{{ route('dashboard.contact-messages.show', $message) }}"
-                   class="rounded-lg p-2 text-xs text-blue-600 hover:bg-blue-100">
+                   class="rounded-lg p-2 text-xs text-amber-600 hover:bg-amber-100">
                     <i class="fa-regular fa-eye"></i>
                 </a>
                 @unless($message->read_at)

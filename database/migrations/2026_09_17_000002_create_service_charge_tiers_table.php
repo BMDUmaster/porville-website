@@ -1,0 +1,24 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('service_charge_tiers', function (Blueprint $table) {
+            $table->id();
+            $table->decimal('min_amount', 10, 2)->default(0);
+            $table->decimal('max_amount', 10, 2)->nullable(); // null = no upper limit
+            $table->decimal('percent', 5, 2);
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('service_charge_tiers');
+    }
+};

@@ -91,7 +91,7 @@
         @foreach($quickActions as $action)
             <button type="button"
                     onclick='openCouponModal(@json($action["payload"]))'
-                    class="flex items-center gap-4 rounded-[20px] border border-slate-200 bg-white px-5 py-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md">
+                    class="flex items-center gap-4 rounded-[20px] border border-slate-200 bg-white px-5 py-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-md">
                 <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-{{ $action['color'] }}-100 text-{{ $action['color'] }}-600">
                     <i class="fa-solid {{ $action['icon'] }} text-lg"></i>
                 </span>
@@ -107,27 +107,27 @@
         <form method="GET" class="grid gap-3 md:grid-cols-2 xl:grid-cols-[1.3fr_1fr_1fr_1.1fr_1.1fr_1.05fr_1.15fr]">
             <input type="hidden" name="segment" value="{{ $activeSegment }}">
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by code/name"
-                   class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500">
-            <select name="entry_type" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500">
+                   class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-amber-500">
+            <select name="entry_type" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-amber-500">
                 <option value="">All Types</option>
                 <option value="coupon" {{ request('entry_type') === 'coupon' ? 'selected' : '' }}>Coupons</option>
                 <option value="offer" {{ request('entry_type') === 'offer' ? 'selected' : '' }}>Offers</option>
             </select>
-            <select name="status" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500">
+            <select name="status" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-amber-500">
                 <option value="">All Status</option>
                 <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
                 <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
             </select>
             <input type="date" name="date_from" value="{{ request('date_from') }}"
-                   class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500">
+                   class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-amber-500">
             <input type="date" name="date_to" value="{{ request('date_to') }}"
-                   class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500">
+                   class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-amber-500">
             <a href="{{ route('dashboard.coupons') }}"
                class="inline-flex items-center justify-center rounded-2xl bg-slate-100 px-4 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-200">
                 Reset Filters
             </a>
             <button type="submit"
-                    class="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-indigo-700">
+                    class="inline-flex items-center justify-center rounded-2xl bg-amber-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-amber-700">
                 Apply Filters
             </button>
         </form>
@@ -141,7 +141,7 @@
                 $isActive = $activeSegment === $segment;
             @endphp
             <a href="{{ $tabUrl }}"
-               class="inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-sm font-bold transition {{ $isActive ? 'border-indigo-600 bg-indigo-600 text-white shadow-md' : 'border-slate-200 bg-white text-slate-600 hover:border-indigo-200 hover:text-indigo-600' }}">
+               class="inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-sm font-bold transition {{ $isActive ? 'border-amber-600 bg-amber-600 text-white shadow-md' : 'border-slate-200 bg-white text-slate-600 hover:border-amber-200 hover:text-amber-600' }}">
                 <i class="fa-solid {{ $tab['icon'] }}"></i>
                 {{ $tab['label'] }}
             </a>
@@ -153,7 +153,7 @@
         <div class="flex flex-col gap-4 border-b border-slate-200 px-5 py-5 md:flex-row md:items-center md:justify-between">
             <h2 class="text-2xl font-black tracking-tight text-slate-900 md:text-[28px]">{{ $tableTitle }}</h2>
             <button type="button" onclick="openCouponModal()"
-                    class="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-indigo-700">
+                    class="inline-flex items-center justify-center gap-2 rounded-2xl bg-amber-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-amber-700">
                 <i class="fa-solid fa-circle-plus"></i>
                 Create Coupon
             </button>
@@ -210,7 +210,7 @@
                         <tr class="transition hover:bg-slate-50/60">
                             <td class="px-6 py-5 align-top">
                                 <div class="max-w-[220px]">
-                                    <p class="break-all text-[15px] font-black text-indigo-600">{{ $displayCode }}</p>
+                                    <p class="break-all text-[15px] font-black text-amber-600">{{ $displayCode }}</p>
                                     <p class="mt-1 max-h-14 overflow-y-auto break-all pr-2 text-xs leading-5 text-slate-400 coupon-scrollbar">{{ $displaySubtext }}</p>
                                 </div>
                             </td>
@@ -250,12 +250,12 @@
                             <td class="px-6 py-5">
                                 <div class="flex items-center justify-center gap-4 text-lg">
                                     <button type="button" onclick='openCouponModal(@json($payload))'
-                                            class="text-indigo-500 transition hover:text-indigo-700">
+                                            class="text-amber-500 transition hover:text-amber-700">
                                         <i class="fa-solid fa-pen"></i>
                                     </button>
                                     <button type="button"
                                             onclick='copyCouponCode(@json($coupon->code))'
-                                            class="text-blue-500 transition hover:text-blue-700">
+                                            class="text-amber-500 transition hover:text-amber-700">
                                         <i class="fa-regular fa-copy"></i>
                                     </button>
                                     <form method="POST" action="{{ route('dashboard.coupons.destroy', $coupon) }}"
@@ -291,9 +291,9 @@
 
 <div id="couponModal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
     <div class="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-[28px] bg-white shadow-2xl coupon-scrollbar">
-        <div id="couponModalHeader" class="flex items-center justify-between border-b border-slate-100 bg-gradient-to-r from-indigo-50 to-white px-6 py-5">
+        <div id="couponModalHeader" class="flex items-center justify-between border-b border-slate-100 bg-gradient-to-r from-amber-50 to-white px-6 py-5">
             <div class="flex items-center gap-3">
-                <span id="couponModalIcon" class="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-200"><i class="fa-solid fa-tags"></i></span>
+                <span id="couponModalIcon" class="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-600 text-white shadow-lg shadow-amber-200"><i class="fa-solid fa-tags"></i></span>
                 <div>
                     <h2 id="couponModalTitle" class="text-xl font-black text-slate-900">Create Coupon</h2>
                     <p id="couponModalSubtitle" class="mt-0.5 text-xs font-semibold text-slate-400">Create a new customer discount</p>
@@ -309,7 +309,7 @@
             <div>
                 <label class="mb-1 block text-sm font-bold text-slate-700">Entry Type</label>
                 <select name="entry_type" id="couponEntryType" onchange="toggleCouponFields()"
-                        class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
+                        class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-amber-500">
                     <option value="coupon">Coupon</option>
                     <option value="offer">Offer</option>
                 </select>
@@ -319,12 +319,12 @@
                 <div class="md:col-span-2">
                     <label class="mb-1 block text-sm font-bold text-slate-700">Offer Title</label>
                     <input type="text" name="title" id="couponTitle" maxlength="120"
-                           class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
+                           class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-amber-500">
                 </div>
                 <div class="md:col-span-2">
                     <label class="mb-1 block text-sm font-bold text-slate-700">Description</label>
                     <textarea name="description" id="couponDescription" rows="3" maxlength="500"
-                              class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500"></textarea>
+                              class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-amber-500"></textarea>
                 </div>
                 <div class="md:col-span-2 rounded-2xl border border-amber-100 bg-amber-50/60 p-4">
                     <label class="mb-2 block text-sm font-black text-slate-700">Related Product</label>
@@ -350,13 +350,13 @@
                 <div id="couponCodeWrap">
                     <label class="mb-1 block text-sm font-bold text-slate-700">Code</label>
                     <input type="text" name="code" id="couponCode" maxlength="50"
-                           class="w-full rounded-xl border px-4 py-2.5 text-sm uppercase outline-none focus:border-indigo-500">
+                           class="w-full rounded-xl border px-4 py-2.5 text-sm uppercase outline-none focus:border-amber-500">
                     <p class="mt-1 text-xs text-slate-400">Offer ke liye blank chhodoge to auto code ban jayega.</p>
                 </div>
                 <div id="couponTypeWrap">
                     <label class="mb-1 block text-sm font-bold text-slate-700">Discount Type</label>
                     <select name="type" id="couponType"
-                            class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
+                            class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-amber-500">
                         <option value="percent">Percentage (%)</option>
                         <option value="flat">Flat (Rs)</option>
                     </select>
@@ -364,39 +364,39 @@
                 <div id="couponValueWrap">
                     <label class="mb-1 block text-sm font-bold text-slate-700">Value</label>
                     <input type="number" name="value" id="couponValue" min="0" step="0.01"
-                           class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
+                           class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-amber-500">
                 </div>
                 <div id="couponMinOrderWrap">
                     <label class="mb-1 block text-sm font-bold text-slate-700">Min Order Amount</label>
                     <input type="number" name="min_order_amount" id="couponMinOrder" min="0" step="0.01"
-                           class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
+                           class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-amber-500">
                 </div>
                 <div id="couponMaxUsesWrap">
                     <label class="mb-1 block text-sm font-bold text-slate-700">Total Uses Limit</label>
                     <input type="number" name="max_uses" id="couponMaxUses" min="1"
-                           class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
+                           class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-amber-500">
                     <p class="mt-1 text-xs text-slate-400">Blank means unlimited total redemptions.</p>
                 </div>
                 <div id="couponPerUserWrap">
                     <label class="mb-1 block text-sm font-bold text-slate-700">Uses Per User Limit</label>
                     <input type="number" name="per_user_limit" id="couponPerUserLimit" min="1"
-                           class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
+                           class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-amber-500">
                     <p class="mt-1 text-xs text-slate-400">Blank means unlimited per customer.</p>
                 </div>
                 <div id="couponExpiresWrap">
                     <label class="mb-1 block text-sm font-bold text-slate-700">Expires At</label>
                     <input type="datetime-local" name="expires_at" id="couponExpiresAt"
-                           class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-indigo-500">
+                           class="w-full rounded-xl border px-4 py-2.5 text-sm outline-none focus:border-amber-500">
                 </div>
             </div>
 
             <label class="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700">
                 <span><i class="fa-solid fa-toggle-on mr-2 text-emerald-500"></i>Status</span>
-                <span class="flex items-center gap-2"><input type="checkbox" name="is_active" id="couponIsActive" value="1" class="h-5 w-5 accent-indigo-600" checked> Active</span>
+                <span class="flex items-center gap-2"><input type="checkbox" name="is_active" id="couponIsActive" value="1" class="h-5 w-5 accent-amber-600" checked> Active</span>
             </label>
 
             <div class="flex flex-col gap-3 pt-2 sm:flex-row">
-                <button id="couponSubmitButton" type="submit" class="flex-1 rounded-xl bg-indigo-600 py-3 text-sm font-bold text-white transition hover:bg-indigo-700">Save Entry</button>
+                <button id="couponSubmitButton" type="submit" class="flex-1 rounded-xl bg-amber-600 py-3 text-sm font-bold text-white transition hover:bg-amber-700">Save Entry</button>
                 <button type="button" onclick="closeCouponModal()" class="flex-1 rounded-xl bg-slate-100 py-3 text-sm font-bold text-slate-600">Cancel</button>
             </div>
         </form>
@@ -480,8 +480,8 @@ function toggleCouponFields() {
     title.textContent = editing ? (isCoupon ? 'Edit Coupon' : 'Edit Offer') : (isCoupon ? 'Add New Coupon' : 'Add New Offer');
     subtitle.textContent = isCoupon ? 'Create a customer coupon code' : 'Choose where and when this offer will appear';
     submit.textContent = editing ? (isCoupon ? 'Update Coupon' : 'Update Offer') : (isCoupon ? 'Save Coupon' : 'Save Offer');
-    submit.className = `flex-1 rounded-xl py-3 text-sm font-bold text-white transition ${isCoupon ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-amber-500 hover:bg-amber-600'}`;
-    icon.className = `flex h-11 w-11 items-center justify-center rounded-2xl text-white shadow-lg ${isCoupon ? 'bg-indigo-600 shadow-indigo-200' : 'bg-amber-500 shadow-amber-200'}`;
+    submit.className = `flex-1 rounded-xl py-3 text-sm font-bold text-white transition ${isCoupon ? 'bg-amber-600 hover:bg-amber-700' : 'bg-amber-500 hover:bg-amber-600'}`;
+    icon.className = `flex h-11 w-11 items-center justify-center rounded-2xl text-white shadow-lg ${isCoupon ? 'bg-amber-600 shadow-amber-200' : 'bg-amber-500 shadow-amber-200'}`;
     icon.innerHTML = `<i class="fa-solid ${isCoupon ? 'fa-tags' : 'fa-bolt'}"></i>`;
 }
 

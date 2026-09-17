@@ -25,7 +25,7 @@ class RazorpayService
      * Create a Razorpay order.
      *
      * @param  int    $amountPaise  Total in paise (rupees × 100)
-     * @param  string $receipt      FarmSea order_number used as receipt identifier
+     * @param  string $receipt      Porville order_number used as receipt identifier
      * @return array{id: string, amount: int, currency: string}
      */
     public function createOrder(int $amountPaise, string $receipt): array

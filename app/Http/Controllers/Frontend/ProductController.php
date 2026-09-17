@@ -29,15 +29,17 @@ class ProductController extends Controller
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
+        $activeCategory = null;
+
         if ($request->filled('category')) {
-            $cat = Category::parents()
+            $activeCategory = Category::parents()
                 ->where(function ($q) use ($request) {
                     $q->where('slug', $request->category)
                       ->orWhere('name', $request->category);
                 })
                 ->first();
-            if ($cat) {
-                $query->where('products.category_id', $cat->id);
+            if ($activeCategory) {
+                $query->where('products.category_id', $activeCategory->id);
             }
         }
 
@@ -80,20 +82,6 @@ class ProductController extends Controller
             ])
             ->get();
 
-        $sidebarBestDeals = Product::with('category')
-            ->active()
-            ->whereNotNull('mrp')
-            ->whereColumn('mrp', '>', 'price')
-            ->orderByRaw('(mrp - price) DESC')
-            ->take(2)
-            ->get();
-
-        $sidebarNewArrivals = Product::with('category')
-            ->active()
-            ->latest()
-            ->take(3)
-            ->get();
-
         $sidebarMaxPrice = (int) ceil((Product::max('price') ?? 500) / 50) * 50;
         $sidebarMaxPrice = max($sidebarMaxPrice, 500);
 
@@ -108,11 +96,10 @@ class ProductController extends Controller
         return view('frontend.products', compact(
             'products',
             'categories',
-            'sidebarBestDeals',
-            'sidebarNewArrivals',
             'sidebarMaxPrice',
             'newArrivalProductIds',
-            'sharedHeroBanner'
+            'sharedHeroBanner',
+            'activeCategory'
         ));
     }
 

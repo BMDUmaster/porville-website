@@ -46,7 +46,7 @@
                                 <option value="home" {{ $review->display_on === 'home' ? 'selected' : '' }}>Home Page</option>
                                 <option value="product" {{ $review->display_on === 'product' ? 'selected' : '' }}>Product Page</option>
                             </select>
-                            <button class="rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white">Update</button>
+                            <button class="rounded-xl bg-amber-600 px-4 py-2 text-xs font-bold text-white">Update</button>
                         </form>
                         <form method="POST" action="{{ route('dashboard.reviews.destroy', $review) }}" onsubmit="return confirm('Delete this review?')">
                             @csrf @method('DELETE')

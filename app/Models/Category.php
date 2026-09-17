@@ -9,10 +9,11 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'slug', 'description', 'image', 'parent_id', 'is_active'];
+    protected $fillable = ['name', 'slug', 'description', 'image', 'parent_id', 'is_active', 'is_enquiry_only'];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_enquiry_only' => 'boolean',
     ];
 
     public function parent()

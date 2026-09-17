@@ -113,7 +113,10 @@ class ProductController extends Controller
             'products.*.subcategory_id'            => ['nullable', 'integer', Rule::exists('categories', 'id')],
             'products.*.description'               => 'nullable|string',
             'products.*.weight'                    => 'nullable|string|max:100',
-            'products.*.price'                     => 'required|numeric|min:0|max:99999999.99',
+            'products.*.contact_number'            => 'nullable|string|max:20',
+            'products.*.processing_note'           => 'nullable|string|max:255',
+            'products.*.delivery_note'             => 'nullable|string|max:255',
+            'products.*.price'                     => 'nullable|numeric|min:0|max:99999999.99',
             'products.*.mrp'                       => 'nullable|numeric|min:0|max:99999999.99',
             'products.*.is_active'                 => 'required|boolean',
             'products.*.variants'                  => 'nullable|array',
@@ -137,27 +140,38 @@ class ProductController extends Controller
 
                 $slug = $this->generateUniqueSlug($productInput['name'], $product->id);
                 $isActive = (bool) $productInput['is_active'];
-                $variants = $this->normalizeVariants($productInput['variants'] ?? []);
+                $isEnquiryOnly = (bool) Category::whereKey($productInput['category_id'])->value('is_enquiry_only');
 
-                $unit = ! empty($variants) ? (string) ($variants[0]['unit'] ?? 'Unit') : ($product->unit ?: 'Unit');
-                $price = ! empty($variants)
-                    ? ProductDayPricing::sellingPrice($variants[0], 'today', (float) $productInput['price'])
-                    : (float) $productInput['price'];
-                $mrp = ! empty($variants) ? (float) ($variants[0]['mrp'] ?? $productInput['mrp'] ?? 0) : (float) ($productInput['mrp'] ?? 0);
+                if ($isEnquiryOnly) {
+                    $variants = [];
+                    $unit = $product->unit ?: 'Unit';
+                    $price = 0;
+                    $mrp = 0;
+                } else {
+                    $variants = $this->normalizeVariants($productInput['variants'] ?? []);
+                    $unit = ! empty($variants) ? (string) ($variants[0]['unit'] ?? 'Unit') : ($product->unit ?: 'Unit');
+                    $price = ! empty($variants)
+                        ? ProductDayPricing::sellingPrice($variants[0], 'today', (float) ($productInput['price'] ?? 0))
+                        : (float) ($productInput['price'] ?? 0);
+                    $mrp = ! empty($variants) ? (float) ($variants[0]['mrp'] ?? $productInput['mrp'] ?? 0) : (float) ($productInput['mrp'] ?? 0);
+                }
 
                 $product->update([
-                    'name'           => $productInput['name'],
-                    'slug'           => $slug,
-                    'category_id'    => $productInput['category_id'],
-                    'subcategory_id' => $productInput['subcategory_id'] ?? null,
-                    'description'    => $productInput['description'] ?? null,
-                    'weight'         => $productInput['weight'] ?? null,
-                    'price'          => $price,
-                    'mrp'            => $mrp,
-                    'unit'           => $unit,
-                    'is_active'      => $isActive,
-                    'stock'          => $isActive ? 1 : 0,
-                    'variants'       => $variants,
+                    'name'             => $productInput['name'],
+                    'slug'             => $slug,
+                    'category_id'      => $productInput['category_id'],
+                    'subcategory_id'   => $productInput['subcategory_id'] ?? null,
+                    'description'      => $productInput['description'] ?? null,
+                    'weight'           => $productInput['weight'] ?? null,
+                    'contact_number'   => $productInput['contact_number'] ?? null,
+                    'processing_note'  => $productInput['processing_note'] ?? null,
+                    'delivery_note'    => $productInput['delivery_note'] ?? null,
+                    'price'            => $price,
+                    'mrp'              => $mrp,
+                    'unit'             => $unit,
+                    'is_active'        => $isActive,
+                    'stock'            => $isActive ? 1 : 0,
+                    'variants'         => $variants,
                 ]);
             }
         });
@@ -197,6 +211,9 @@ class ProductController extends Controller
             'subcategory_id'        => ['nullable', 'integer', Rule::exists('categories', 'id')],
             'description'           => 'nullable|string',
             'weight'                => 'nullable|string|max:100',
+            'contact_number'        => 'nullable|string|max:20',
+            'processing_note'       => 'nullable|string|max:255',
+            'delivery_note'         => 'nullable|string|max:255',
             'is_active'             => 'boolean',
             'variants'              => 'nullable|array',
             'variants.*.quantity'   => 'nullable|string|max:50',
@@ -215,21 +232,32 @@ class ProductController extends Controller
 
         $this->ensureSubcategoryBelongsToCategory($data['category_id'], $data['subcategory_id'] ?? null);
 
+        $isEnquiryOnly = (bool) Category::whereKey($data['category_id'])->value('is_enquiry_only');
+
         $data['slug'] = $this->generateUniqueSlug($data['name']);
         $data['is_active'] = $request->boolean('is_active', true);
-        $data['variants'] = $this->normalizeVariants($request->input('variants', []));
 
-        if (empty($data['variants'])) {
-            throw ValidationException::withMessages([
-                'variants' => 'Add at least one product variant with selling price.',
-            ]);
+        if ($isEnquiryOnly) {
+            $data['variants'] = [];
+            $data['unit'] = 'Unit';
+            $data['price'] = 0;
+            $data['mrp'] = 0;
+        } else {
+            $data['variants'] = $this->normalizeVariants($request->input('variants', []));
+
+            if (empty($data['variants'])) {
+                throw ValidationException::withMessages([
+                    'variants' => 'Add at least one product variant with selling price.',
+                ]);
+            }
+
+            $data['unit'] = (string) ($data['variants'][0]['unit'] ?? 'Unit');
+            $data['price'] = ! empty($data['variants'])
+                ? ProductDayPricing::sellingPrice($data['variants'][0], 'today')
+                : 0;
+            $data['mrp'] = ! empty($data['variants']) ? (float) ($data['variants'][0]['mrp'] ?? 0) : 0;
         }
 
-        $data['unit'] = (string) ($data['variants'][0]['unit'] ?? 'Unit');
-        $data['price'] = ! empty($data['variants'])
-            ? ProductDayPricing::sellingPrice($data['variants'][0], 'today')
-            : 0;
-        $data['mrp'] = ! empty($data['variants']) ? (float) ($data['variants'][0]['mrp'] ?? 0) : 0;
         $data['stock'] = $data['is_active'] ? 1 : 0;
 
         $imagePaths = [];
@@ -276,7 +304,10 @@ class ProductController extends Controller
             'subcategory_id'        => ['nullable', 'integer', Rule::exists('categories', 'id')],
             'description'           => 'nullable|string',
             'weight'                => 'nullable|string|max:100',
-            'price'                 => 'required|numeric|min:0|max:99999999.99',
+            'contact_number'        => 'nullable|string|max:20',
+            'processing_note'       => 'nullable|string|max:255',
+            'delivery_note'         => 'nullable|string|max:255',
+            'price'                 => 'nullable|numeric|min:0|max:99999999.99',
             'mrp'                   => 'nullable|numeric|min:0|max:99999999.99',
             'is_active'             => 'boolean',
             'variants'              => 'nullable|array',
@@ -299,14 +330,30 @@ class ProductController extends Controller
 
         $this->ensureSubcategoryBelongsToCategory($data['category_id'], $data['subcategory_id'] ?? null);
 
+        $isEnquiryOnly = (bool) Category::whereKey($data['category_id'])->value('is_enquiry_only');
+
         $data['slug'] = $this->generateUniqueSlug($data['name'], $product->id);
         $data['is_active'] = $request->boolean('is_active', true);
-        $data['variants'] = $this->normalizeVariants($request->input('variants', []));
 
-        if (! empty($data['variants'])) {
-            $data['unit'] = (string) ($data['variants'][0]['unit'] ?? ($product->unit ?: 'Unit'));
-            $data['price'] = ProductDayPricing::sellingPrice($data['variants'][0], 'today', (float) ($data['price'] ?? 0));
-            $data['mrp'] = (float) ($data['variants'][0]['mrp'] ?? $data['mrp'] ?? 0);
+        if ($isEnquiryOnly) {
+            $data['variants'] = [];
+            $data['unit'] = $product->unit ?: 'Unit';
+            $data['price'] = 0;
+            $data['mrp'] = 0;
+        } else {
+            if (! $request->filled('price')) {
+                throw ValidationException::withMessages([
+                    'price' => 'The price field is required.',
+                ]);
+            }
+
+            $data['variants'] = $this->normalizeVariants($request->input('variants', []));
+
+            if (! empty($data['variants'])) {
+                $data['unit'] = (string) ($data['variants'][0]['unit'] ?? ($product->unit ?: 'Unit'));
+                $data['price'] = ProductDayPricing::sellingPrice($data['variants'][0], 'today', (float) ($data['price'] ?? 0));
+                $data['mrp'] = (float) ($data['variants'][0]['mrp'] ?? $data['mrp'] ?? 0);
+            }
         }
 
         $data['stock'] = $data['is_active'] ? 1 : 0;

@@ -14,7 +14,7 @@
             <div class="flex items-start justify-between gap-4">
                 <div>
                     <p class="text-sm font-medium text-slate-500">Today's Sales</p>
-                    <p class="mt-2 text-3xl font-bold tracking-tight text-mayview-blue">
+                    <p class="mt-2 text-3xl font-bold tracking-tight text-porville-gold">
                         &#8377;{{ number_format($stats['today_sales'], 2) }}
                     </p>
                     <p class="mt-3 text-xs font-medium {{ $salesChangePositive ? 'text-emerald-600' : 'text-rose-600' }}">
@@ -22,7 +22,7 @@
                         {{ $salesChangePositive ? '+' : '' }}{{ number_format($stats['sales_change'], 1) }}% vs yesterday
                     </p>
                 </div>
-                <div class="icon-box rounded-2xl bg-blue-100 px-4 py-3 text-mayview-blue">
+                <div class="icon-box rounded-2xl bg-amber-100 px-4 py-3 text-porville-gold">
                     <i class="fa-solid fa-indian-rupee-sign text-xl"></i>
                 </div>
             </div>
@@ -32,10 +32,10 @@
             <div class="flex items-start justify-between gap-4">
                 <div>
                     <p class="text-sm font-medium text-slate-500">Pending Orders</p>
-                    <p class="mt-2 text-3xl font-bold tracking-tight text-admin-orange">{{ $stats['pending_orders'] }}</p>
+                    <p class="mt-2 text-3xl font-bold tracking-tight text-porville-gold">{{ $stats['pending_orders'] }}</p>
                     <p class="mt-3 text-xs text-slate-500">Orders waiting for the next update</p>
                 </div>
-                <div class="icon-box rounded-2xl bg-orange-100 px-4 py-3 text-admin-orange">
+                <div class="icon-box rounded-2xl bg-orange-100 px-4 py-3 text-porville-gold">
                     <i class="fa-solid fa-rotate-left text-xl"></i>
                 </div>
             </div>
@@ -75,7 +75,7 @@
 
                 <label for="salesRangeSelect" class="relative inline-flex items-center">
                     <select id="salesRangeSelect"
-                            class="appearance-none rounded-xl border border-blue-300 bg-white py-2 pl-4 pr-10 text-sm font-medium text-slate-700 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                            class="appearance-none rounded-xl border border-amber-300 bg-white py-2 pl-4 pr-10 text-sm font-medium text-slate-700 shadow-sm outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-100">
                         <option value="30d">Last 30 days</option>
                         <option value="90d">Last 90 days</option>
                         <option value="1y">This year</option>
@@ -101,7 +101,7 @@
         <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
                 <h2 class="text-lg font-semibold text-slate-900">Recent Orders</h2>
-                <a href="{{ route('dashboard.orders') }}" class="text-sm font-medium text-mayview-blue transition hover:text-blue-700">View All</a>
+                <a href="{{ route('dashboard.orders') }}" class="text-sm font-medium text-porville-gold transition hover:text-amber-700">View All</a>
             </div>
 
             <div class="divide-y divide-slate-100">
@@ -135,14 +135,14 @@
 
             <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-2">
                 <a href="{{ route('dashboard.products') }}"
-                   class="group flex min-h-[92px] flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-5 text-center transition hover:border-blue-300 hover:bg-blue-50">
-                    <i class="fa-solid fa-plus text-2xl text-mayview-blue transition group-hover:scale-110"></i>
+                   class="group flex min-h-[92px] flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-5 text-center transition hover:border-amber-300 hover:bg-amber-50">
+                    <i class="fa-solid fa-plus text-2xl text-porville-gold transition group-hover:scale-110"></i>
                     <span class="mt-3 text-sm font-medium text-slate-700">Add Product</span>
                 </a>
 
                 <a href="{{ route('dashboard.orders') }}"
                    class="group flex min-h-[92px] flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-5 text-center transition hover:border-orange-300 hover:bg-orange-50">
-                    <i class="fa-solid fa-truck-fast text-2xl text-admin-orange transition group-hover:scale-110"></i>
+                    <i class="fa-solid fa-truck-fast text-2xl text-porville-gold transition group-hover:scale-110"></i>
                     <span class="mt-3 text-sm font-medium text-slate-700">Dispatch Orders</span>
                 </a>
 

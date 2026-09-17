@@ -32,7 +32,7 @@
             <span class="{{ $checks['gd'] ? 'text-green-600' : 'text-amber-600' }}">{{ $checks['gd'] ? 'Enabled' : 'Disabled (uploads use original format)' }}</span>
         </div>
         <div class="p-4 flex justify-between">
-            <span>Logo file (public/images/Farmsea.webp)</span>
+            <span>Logo file (public/images/Porville.webp)</span>
             <span class="{{ $checks['logo_file'] ? 'text-green-600' : 'text-red-600' }}">{{ $checks['logo_file'] ? 'Found' : 'Missing' }}</span>
         </div>
         <div class="p-4">

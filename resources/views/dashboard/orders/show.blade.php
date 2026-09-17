@@ -53,7 +53,7 @@
 @endphp
 <div class="p-4 md:p-6">
     <div class="mb-4 flex items-center justify-between print:hidden">
-        <a href="{{ route('dashboard.orders') }}" class="flex items-center gap-1 text-sm text-blue-600 hover:underline">
+        <a href="{{ route('dashboard.orders') }}" class="flex items-center gap-1 text-sm text-amber-600 hover:underline">
             <i class="fa-solid fa-arrow-left text-xs"></i> Back
         </a>
         <div class="flex items-center gap-2">
@@ -64,8 +64,8 @@
     </div>
 
     <div class="mb-4 rounded-xl border bg-white p-5">
-        <h2 class="mb-4 flex items-center gap-2 text-lg font-bold text-blue-600">
-            <i class="fa-solid fa-circle-check text-blue-500"></i> Order Details
+        <h2 class="mb-4 flex items-center gap-2 text-lg font-bold text-amber-600">
+            <i class="fa-solid fa-circle-check text-amber-500"></i> Order Details
         </h2>
 
         <div class="overflow-hidden rounded-lg border border-gray-200">
@@ -150,8 +150,8 @@
                         </p>
                     @endif
 
-                    <div class="mt-4 rounded-lg border border-dashed border-blue-200 bg-blue-50 px-3 py-3">
-                        <p class="text-xs font-bold uppercase tracking-wide text-blue-700">Assigned Delivery Boy</p>
+                    <div class="mt-4 rounded-lg border border-dashed border-amber-200 bg-amber-50 px-3 py-3">
+                        <p class="text-xs font-bold uppercase tracking-wide text-amber-700">Assigned Delivery Boy</p>
                         @if($order->deliveryBoy)
                             <p class="mt-2 text-sm font-bold text-gray-800">{{ $order->deliveryBoy->partner_name }}</p>
                             <p class="mt-1 text-xs text-gray-600">{{ $order->deliveryBoy->phone_number }}</p>
@@ -260,7 +260,7 @@
                         @csrf
                         @method('PATCH')
                         <label class="text-sm font-semibold text-gray-700">Update Status:</label>
-                        <select name="status" id="detailOrderStatus" onchange="toggleDetailDeliveryBoy()" class="rounded border border-gray-300 px-3 py-2 text-sm font-semibold outline-none focus:border-blue-400 bg-white">
+                        <select name="status" id="detailOrderStatus" onchange="toggleDetailDeliveryBoy()" class="rounded border border-gray-300 px-3 py-2 text-sm font-semibold outline-none focus:border-amber-400 bg-white">
                             <option value="" disabled selected>Change Status...</option>
                             @foreach($detailAllowedOptions as $val => $label)
                                 <option value="{{ $val }}">
@@ -268,7 +268,7 @@
                                 </option>
                             @endforeach
                         </select>
-                        <select name="delivery_boy_id" id="detailDeliveryBoy" class="rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-400 hidden">
+                        <select name="delivery_boy_id" id="detailDeliveryBoy" class="rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-amber-400 hidden">
                             <option value="">Choose delivery boy</option>
                             @foreach($deliveryBoys as $deliveryBoy)
                                 <option value="{{ $deliveryBoy->id }}" {{ $order->delivery_boy_id === $deliveryBoy->id ? 'selected' : '' }}>
@@ -276,7 +276,7 @@
                                 </option>
                             @endforeach
                         </select>
-                        <button type="submit" class="rounded bg-blue-600 px-5 py-2 text-sm font-bold text-white hover:bg-blue-700">
+                        <button type="submit" class="rounded bg-amber-600 px-5 py-2 text-sm font-bold text-white hover:bg-amber-700">
                             Update
                         </button>
                     </form>

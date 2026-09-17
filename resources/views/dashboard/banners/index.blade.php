@@ -8,17 +8,17 @@
         <form method="GET" class="relative w-full flex-1">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search banners..."
-                   class="w-full rounded-lg border py-2.5 pl-9 pr-4 text-sm outline-none focus:border-blue-400">
+                   class="w-full rounded-lg border py-2.5 pl-9 pr-4 text-sm outline-none focus:border-amber-400">
         </form>
         <button onclick="openModal('addModal')"
-                class="flex w-full items-center justify-center gap-2 rounded-xl bg-purple-600 px-5 py-2.5 text-sm font-medium text-white md:w-auto">
+                class="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-600 px-5 py-2.5 text-sm font-medium text-white md:w-auto">
             <i class="fa-solid fa-plus"></i> Add Banner
         </button>
     </div>
 
     <div class="overflow-x-auto rounded-xl border bg-white">
         <table class="w-full min-w-[900px] text-left">
-            <thead class="bg-gradient-to-r from-purple-700 to-indigo-600 text-white">
+            <thead class="bg-gradient-to-r from-amber-700 to-amber-600 text-white">
                 <tr>
                     <th class="px-4 py-3 text-xs uppercase">Sr.No.</th>
                     <th class="px-4 py-3 text-xs uppercase">Banner</th>
@@ -39,8 +39,8 @@
                                 </div>
                                 @if($banner->mobile_image_url)
                                     <div>
-                                        <p class="mb-1 text-[9px] font-bold uppercase text-purple-500">Mobile</p>
-                                        <img src="{{ $banner->mobile_image_url }}" alt="{{ $banner->title_1 }} mobile banner" class="h-20 w-14 rounded-lg border border-purple-200 object-cover">
+                                        <p class="mb-1 text-[9px] font-bold uppercase text-amber-500">Mobile</p>
+                                        <img src="{{ $banner->mobile_image_url }}" alt="{{ $banner->title_1 }} mobile banner" class="h-20 w-14 rounded-lg border border-amber-200 object-cover">
                                     </div>
                                 @endif
                             </div>
@@ -55,7 +55,7 @@
                         <td class="px-4 py-3">
                             <div class="flex justify-center gap-2">
                                 <button type="button"
-                                        class="rounded-lg p-2 text-xs text-indigo-600 hover:bg-indigo-100"
+                                        class="rounded-lg p-2 text-xs text-amber-600 hover:bg-amber-100"
                                         data-id="{{ $banner->id }}"
                                         data-badge="{{ e($banner->badge) }}"
                                         data-title-1="{{ e($banner->title_1) }}"
@@ -100,7 +100,7 @@
             @csrf
             @include('dashboard.banners.partials.form', ['mode' => 'add'])
             <div class="flex gap-3 pt-1">
-                <button type="submit" class="flex-1 rounded-xl bg-purple-600 py-3 text-sm font-medium text-white hover:bg-purple-700">Save Banner</button>
+                <button type="submit" class="flex-1 rounded-xl bg-amber-600 py-3 text-sm font-medium text-white hover:bg-amber-700">Save Banner</button>
                 <button type="button" onclick="closeModal('addModal')" class="flex-1 rounded-xl bg-gray-100 py-3 text-sm font-medium text-gray-600 hover:bg-gray-200">Cancel</button>
             </div>
         </form>
@@ -117,7 +117,7 @@
             @csrf @method('PUT')
             @include('dashboard.banners.partials.form', ['mode' => 'edit'])
             <div class="flex gap-3 pt-1">
-                <button type="submit" class="flex-1 rounded-xl bg-purple-600 py-3 text-sm font-medium text-white hover:bg-purple-700">Update Banner</button>
+                <button type="submit" class="flex-1 rounded-xl bg-amber-600 py-3 text-sm font-medium text-white hover:bg-amber-700">Update Banner</button>
                 <button type="button" onclick="closeModal('editModal')" class="flex-1 rounded-xl bg-gray-100 py-3 text-sm font-medium text-gray-600 hover:bg-gray-200">Cancel</button>
             </div>
         </form>

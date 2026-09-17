@@ -1,48 +1,55 @@
 @extends('frontend.layouts.app')
-@section('title', 'All Categories')
+@section('title', 'All Categories — Porville')
 @section('content')
 
 @php($focus = request('focus'))
 
-<div class="mx-auto max-w-6xl px-4 py-10">
-    <div class="mb-6 flex flex-col gap-2">
-        <h1 class="nunito text-2xl font-extrabold text-gray-800">All Categories</h1>
+<section class="bg-black py-12 md:py-16">
+    <div class="mx-auto max-w-6xl px-4 text-center">
+        <p class="text-[11px] font-extrabold uppercase tracking-[0.3em] text-amber-400">Browse</p>
+        <h1 class="font-classic mt-3 text-4xl font-bold text-white md:text-5xl">All Categories</h1>
         @if($focus)
-            <p class="text-sm text-gray-500">
-                Highlighted category: <span class="font-bold text-blue-600">{{ str_replace('-', ' ', $focus) }}</span>
+            <p class="mt-3 text-sm text-stone-300">
+                Highlighted category: <span class="font-bold text-amber-400">{{ str_replace('-', ' ', $focus) }}</span>
             </p>
         @endif
     </div>
+</section>
 
-    <div class="grid grid-cols-2 gap-5 md:grid-cols-4">
-        @foreach($categories as $cat)
-            @php($isFocused = $focus === $cat->slug)
-            <a
-                id="category-{{ $cat->slug }}"
-                href="{{ route('frontend.products', ['category' => $cat->slug]) }}"
-                class="block overflow-hidden rounded-2xl border bg-white transition duration-300 hover:-translate-y-1 hover:border-green-400 hover:shadow-lg {{ $isFocused ? 'ring-2 ring-blue-500 border-blue-300 shadow-lg' : 'border-gray-200' }}"
-            >
-                <div class="aspect-square overflow-hidden bg-gray-50">
-                    @if($cat->image)
-                        <img src="{{ asset('storage/'.$cat->image) }}" alt="{{ $cat->name }}" class="h-full w-full object-cover transition-transform duration-500 hover:scale-105">
-                    @else
-                        <div class="flex h-full w-full items-center justify-center text-5xl text-gray-300">C</div>
-                    @endif
-                </div>
-                <div class="border-t p-4">
-                    <p class="font-bold text-gray-800">{{ $cat->name }}</p>
-                    <p class="mt-1 text-xs text-gray-400">{{ $cat->products_count }} products</p>
-                    @if($cat->children->count())
-                        <div class="mt-2 flex flex-wrap gap-1">
-                            @foreach($cat->children->take(3) as $sub)
-                                <span class="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-600">{{ $sub->name }}</span>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
-            </a>
-        @endforeach
+<section class="bg-[#faf7f0] py-12 md:py-16">
+    <div class="mx-auto max-w-6xl px-4">
+        <div class="grid grid-cols-2 gap-5 md:grid-cols-4">
+            @foreach($categories as $cat)
+                @php($isFocused = $focus === $cat->slug)
+                <a
+                    id="category-{{ $cat->slug }}"
+                    href="{{ route('frontend.products', ['category' => $cat->slug]) }}"
+                    class="group block overflow-hidden rounded-2xl border bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-amber-400 hover:shadow-lg {{ $isFocused ? 'ring-2 ring-amber-500 border-amber-300 shadow-lg' : 'border-gray-100' }}"
+                >
+                    <div class="aspect-square overflow-hidden bg-gray-50">
+                        @if($cat->image)
+                            <img src="{{ asset('storage/'.$cat->image) }}" alt="{{ $cat->name }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        @else
+                            <div class="flex h-full w-full items-center justify-center text-5xl text-amber-200">
+                                <i class="fa-solid fa-drumstick-bite"></i>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="border-t border-gray-100 p-4">
+                        <p class="font-classic text-base font-bold text-slate-900">{{ $cat->name }}</p>
+                        <p class="mt-1 text-xs font-semibold text-amber-700">{{ $cat->products_count }} {{ Str::plural('product', $cat->products_count) }}</p>
+                        @if($cat->children->count())
+                            <div class="mt-2 flex flex-wrap gap-1">
+                                @foreach($cat->children->take(3) as $sub)
+                                    <span class="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700">{{ $sub->name }}</span>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </a>
+            @endforeach
+        </div>
     </div>
-</div>
+</section>
 
 @endsection

@@ -15,7 +15,7 @@
             <div>
                 <p class="text-xs font-bold uppercase tracking-[0.18em] text-green-600">{{ $message->department }}</p>
                 <h2 class="mt-2 text-2xl font-extrabold text-slate-900">{{ $message->name }}</h2>
-                <a href="mailto:{{ $message->email }}" class="mt-1 inline-flex text-sm font-semibold text-blue-600">{{ $message->email }}</a>
+                <a href="mailto:{{ $message->email }}" class="mt-1 inline-flex text-sm font-semibold text-amber-600">{{ $message->email }}</a>
                 <p class="mt-2 text-sm text-slate-400">{{ $message->created_at->format('d M Y, h:i A') }}</p>
             </div>
             <span class="w-fit rounded-full px-3 py-1 text-xs font-bold {{ $message->read_at ? 'bg-slate-100 text-slate-500' : 'bg-green-100 text-green-700' }}">
@@ -28,7 +28,7 @@
         </div>
 
         <div class="flex flex-wrap gap-3 border-t pt-5">
-            <a href="mailto:{{ $message->email }}" class="rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-700">
+            <a href="mailto:{{ $message->email }}" class="rounded-xl bg-amber-600 px-5 py-3 text-sm font-bold text-white hover:bg-amber-700">
                 Reply by Email
             </a>
             <form method="POST" action="{{ route('dashboard.contact-messages.destroy', $message) }}" onsubmit="return confirm('Delete this message?')">

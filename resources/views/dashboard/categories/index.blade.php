@@ -10,10 +10,10 @@
         <form method="GET" class="flex-1 relative w-full">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search categories..."
-                   class="w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm outline-none focus:border-blue-400">
+                   class="w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm outline-none focus:border-amber-400">
         </form>
         <button onclick="openModal('addModal')"
-                class="bg-purple-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 w-full md:w-auto md:self-start justify-center">
+                class="bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 w-full md:w-auto md:self-start justify-center">
             <i class="fa-solid fa-plus"></i> Add New Category
         </button>
     </div>
@@ -61,7 +61,7 @@
                     <td class="px-4 py-3 align-middle text-center">
                         <div class="flex items-center justify-center gap-2">
                             <button onclick="openEditModal({{ $cat->id }}, '{{ addslashes($cat->name) }}', '{{ addslashes($cat->description ?? '') }}', {{ $cat->is_active ? 1 : 0 }})"
-                                    class="flex h-8 w-8 items-center justify-center rounded-lg text-xs text-indigo-600 transition hover:bg-indigo-100">
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg text-xs text-amber-600 transition hover:bg-amber-100">
                                 <i class="fa-regular fa-pen-to-square"></i>
                             </button>
                             <form method="POST" action="{{ route('dashboard.categories.destroy', $cat) }}"
@@ -101,7 +101,7 @@
             <div>
                 <label class="block text-sm font-medium mb-1.5">Category Name <span class="text-red-500">*</span></label>
                 <input type="text" name="name" required placeholder="e.g. Fresh Fish"
-                       class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-purple-500">
+                       class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500">
             </div>
             <div>
                 <label class="block text-sm font-medium mb-1.5 text-gray-600">Description</label>
@@ -110,13 +110,13 @@
             </div>
             <div>
                 <label class="block text-sm font-medium mb-1.5">Status</label>
-                <select name="is_active" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-purple-500">
+                <select name="is_active" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500">
                     <option value="1">Active</option>
                     <option value="0">Inactive</option>
                 </select>
             </div>
             <div class="flex gap-3 pt-1">
-                <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-medium text-sm">Save Category</button>
+                <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-xl font-medium text-sm">Save Category</button>
                 <button type="button" onclick="closeModal('addModal')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 py-3 rounded-xl font-medium text-sm">Cancel</button>
             </div>
         </form>
@@ -140,7 +140,7 @@
             <div>
                 <label class="block text-sm font-medium mb-1.5">Category Name <span class="text-red-500">*</span></label>
                 <input type="text" name="name" id="editName" required
-                       class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-purple-500">
+                       class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500">
             </div>
             <div>
                 <label class="block text-sm font-medium mb-1.5 text-gray-600">Description</label>
@@ -149,13 +149,13 @@
             </div>
             <div>
                 <label class="block text-sm font-medium mb-1.5">Status</label>
-                <select name="is_active" id="editStatus" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-purple-500">
+                <select name="is_active" id="editStatus" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500">
                     <option value="1">Active</option>
                     <option value="0">Inactive</option>
                 </select>
             </div>
             <div class="flex gap-3 pt-1">
-                <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-medium text-sm">Update Category</button>
+                <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-xl font-medium text-sm">Update Category</button>
                 <button type="button" onclick="closeModal('editModal')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 py-3 rounded-xl font-medium text-sm">Cancel</button>
             </div>
         </form>

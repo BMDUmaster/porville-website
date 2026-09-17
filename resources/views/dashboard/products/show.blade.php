@@ -6,7 +6,7 @@
 <div class="p-4 sm:p-6">
     <div class="mb-6 flex items-center justify-between gap-4">
         <div>
-            <a href="{{ route('dashboard.products') }}" class="text-sm font-bold text-blue-600 hover:underline">
+            <a href="{{ route('dashboard.products') }}" class="text-sm font-bold text-amber-600 hover:underline">
                 <i class="fa-solid fa-arrow-left mr-1"></i> Back to Products
             </a>
             <h2 class="mt-3 text-2xl font-black text-slate-900">{{ $product->name }}</h2>

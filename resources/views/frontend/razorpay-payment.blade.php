@@ -1,17 +1,17 @@
 @extends('frontend.layouts.app')
 
-@section('title', 'Complete Payment — FarmSea')
+@section('title', 'Complete Payment — Porville')
 
 @section('content')
-<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-    <div class="max-w-md w-full bg-white rounded-2xl shadow-sm p-8 text-center">
+<div class="min-h-screen flex items-center justify-center bg-[#faf7f0] py-12 px-4">
+    <div class="max-w-md w-full bg-white rounded-2xl border border-[#e6d3a3] shadow-[0_18px_45px_rgba(184,134,44,0.1)] p-8 text-center">
 
-        <img src="{{ asset('images/logo.png') }}" alt="FarmSea" class="h-10 mx-auto mb-6">
+        <img src="{{ $brandLogoUrl }}" alt="Porville" class="h-16 w-16 mx-auto mb-4 rounded-full object-cover ring-1 ring-amber-500/40">
 
-        <h1 class="text-xl font-semibold text-gray-800 mb-1">Complete your payment</h1>
-        <p class="text-gray-500 text-sm mb-6">
+        <h1 class="font-classic text-xl font-bold text-slate-900 mb-1">Complete your payment</h1>
+        <p class="text-slate-500 text-sm mb-6">
             Order #{{ $order->order_number }} &mdash;
-            <span class="font-medium text-gray-700">&#8377;{{ number_format($order->total, 2) }}</span>
+            <span class="font-bold text-slate-900">&#8377;{{ number_format($order->total, 2) }}</span>
         </p>
 
         {{-- Post-dismiss UI (hidden until JS triggers it on modal close) --}}
@@ -20,12 +20,12 @@
         </div>
 
         <button id="pay-btn"
-            class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-xl transition">
+            class="w-full border-2 border-amber-500 bg-black hover:bg-neutral-900 text-white font-bold uppercase tracking-wider text-sm py-3.5 rounded-xl transition">
             Pay &#8377;{{ number_format($order->total, 2) }}
         </button>
 
         <a href="{{ route('frontend.razorpay.cancel', $order->id) }}"
-           class="mt-4 block text-sm text-gray-400 hover:text-red-500 transition">
+           class="mt-4 block text-sm text-slate-400 hover:text-red-500 transition">
             Cancel order
         </a>
 
@@ -47,7 +47,7 @@
         key:         '{{ $keyId }}',
         amount:      {{ $razorpayPayment->amount }},
         currency:    'INR',
-        name:        'FarmSea',
+        name:        'Porville',
         description: 'Order #{{ $order->order_number }}',
         order_id:    '{{ $razorpayPayment->razorpay_order_id }}',
         prefill: {
@@ -58,7 +58,7 @@
         @if($paymentMethod === 'upi')
         {{-- UPI: remove method restrictions, let Razorpay show all UPI options --}}
         @endif
-        theme: { color: '#22c55e' },
+        theme: { color: '#b8862c' },
         handler: function (response) {
             document.getElementById('rzp_order_id').value   = response.razorpay_order_id;
             document.getElementById('rzp_payment_id').value = response.razorpay_payment_id;

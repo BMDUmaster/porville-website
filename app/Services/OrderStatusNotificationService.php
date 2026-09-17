@@ -64,12 +64,12 @@ class OrderStatusNotificationService
 
         switch ($status) {
             case 'confirmed':
-                $subject = "Order {$orderNumber} Confirmed! - FarmSea";
+                $subject = "Order {$orderNumber} Confirmed! - Porville";
                 $message = "Your order {$orderNumber} of {$totalFormatted} has been confirmed. We are getting your fresh items ready.";
                 break;
 
             case 'processing':
-                $subject = "Order {$orderNumber} is Processing - FarmSea";
+                $subject = "Order {$orderNumber} is Processing - Porville";
                 $message = "Great news! Your fresh cuts for order {$orderNumber} are being hygienically prepared & cold-chain packed.";
                 break;
 
@@ -78,23 +78,23 @@ class OrderStatusNotificationService
                 $deliveryPhone = $order->deliveryBoy?->phone ?? '';
                 $partnerInfo = $deliveryPhone ? "{$deliveryPartner} ({$deliveryPhone})" : $deliveryPartner;
 
-                $subject = "Order {$orderNumber} Out for Delivery! 🚚 - FarmSea";
+                $subject = "Order {$orderNumber} Out for Delivery! 🚚 - Porville";
                 $message = "Your order {$orderNumber} is out for delivery with {$partnerInfo}. Please be ready to receive your fresh package!";
                 break;
 
             case 'delivered':
-                $subject = "Order {$orderNumber} Delivered Successfully! 🎉 - FarmSea";
-                $message = "Your order {$orderNumber} of {$totalFormatted} has been delivered. Thank you for choosing FarmSea! Enjoy your fresh meal.";
+                $subject = "Order {$orderNumber} Delivered Successfully! 🎉 - Porville";
+                $message = "Your order {$orderNumber} of {$totalFormatted} has been delivered. Thank you for choosing Porville! Enjoy your fresh meal.";
                 break;
 
             case 'cancelled':
-                $subject = "Order {$orderNumber} Cancelled - FarmSea";
-                $message = "Your order {$orderNumber} has been cancelled. If you have any questions, please contact FarmSea support.";
+                $subject = "Order {$orderNumber} Cancelled - Porville";
+                $message = "Your order {$orderNumber} has been cancelled. If you have any questions, please contact Porville support.";
                 break;
 
             case 'pending':
             default:
-                $subject = "Order {$orderNumber} Placed Successfully - FarmSea";
+                $subject = "Order {$orderNumber} Placed Successfully - Porville";
                 $message = "Thank you for your order {$orderNumber} of {$totalFormatted}! We have received your order and will process it shortly.";
                 break;
         }
@@ -127,11 +127,11 @@ class OrderStatusNotificationService
                 "This private review link is valid for 30 days.",
             ] : []),
             "",
-            "If you have any questions about your order, please contact FarmSea support.",
+            "If you have any questions about your order, please contact Porville support.",
             "",
             "Warm Regards,",
-            "FarmSea Team",
-            "https://farmsea.in"
+            "Porville Team",
+            config('app.url')
         ]);
 
         return [$subject, $message, $emailBody];

@@ -15,12 +15,12 @@ class MediaUrl
 
     public static function brandLogo(): string
     {
-        foreach (['images/Farmsea.webp', 'images/FarmSea.webp', 'images/farmsea.webp', 'images/logo.webp', 'images/logo.png'] as $candidate) {
+        foreach (['images/porville-logo.webp', 'images/porville-logo.png', 'images/porville-logo.jpg', 'images/logo.webp', 'images/logo.png'] as $candidate) {
             if (file_exists(public_path($candidate))) {
                 return asset($candidate);
             }
         }
 
-        return asset('images/Farmsea.webp');
+        return asset('images/porville-logo.jpg');
     }
 }

@@ -10,7 +10,7 @@
                     Fresh From Our<br><span class="text-green-500">Trusted Farms</span>
                 </h1>
                 <p class="mt-5 max-w-[520px] text-[15px] leading-7 text-slate-600">
-                    FarmSea works closely with trusted farms and local producers to bring you fresh vegetables, fruits,
+                    Porville works closely with trusted farms and local producers to bring you fresh vegetables, fruits,
                     meat, and seafood with dependable quality, hygiene, and freshness every day.
                 </p>
                 <a href="{{ route('frontend.products') }}" class="mt-7 inline-flex rounded-xl bg-green-600 px-6 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-green-700 hover:shadow-lg">
@@ -68,7 +68,7 @@
                 </div>
                 <p class="mt-5 max-w-[520px] text-[14px] leading-7 text-slate-600">
                     We visit, verify, and work with farms that care about cleanliness, consistency, and responsible
-                    food production. That helps us maintain the quality you expect from FarmSea.
+                    food production. That helps us maintain the quality you expect from Porville.
                 </p>
             </div>
 
@@ -136,7 +136,7 @@
 
             <details class="group rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition open:shadow-md">
                 <summary class="flex cursor-pointer list-none items-center justify-between text-[15px] font-bold text-slate-900">
-                    <span>What makes FarmSea sourcing different?</span>
+                    <span>What makes Porville sourcing different?</span>
                     <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition group-open:rotate-180"></i>
                 </summary>
                 <p class="pt-4 text-[14px] leading-7 text-slate-600">

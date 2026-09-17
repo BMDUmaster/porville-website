@@ -7,7 +7,7 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Artisan::command('farmsea:setup', function () {
+Artisan::command('porville:setup', function () {
     $this->info('Running migrations...');
     $this->call('migrate', ['--force' => true]);
 
@@ -24,4 +24,4 @@ Artisan::command('farmsea:setup', function () {
     $this->line('PHP GD: ' . (extension_loaded('gd') ? 'YES' : 'NO'));
 
     $this->info('Done. Set APP_URL in .env to your live domain.');
-})->purpose('Prepare FarmSea for production (migrate, storage link, clear cache)');
+})->purpose('Prepare Porville for production (migrate, storage link, clear cache)');

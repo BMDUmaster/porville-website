@@ -7,7 +7,7 @@
 
     <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3 md:flex-1">
-            @foreach([['Total Partners',$stats['total'],'blue-500'],['Active',$stats['active'],'green-500'],['Inactive',$stats['inactive'],'red-500']] as [$label,$val,$color])
+            @foreach([['Total Partners',$stats['total'],'amber-500'],['Active',$stats['active'],'green-500'],['Inactive',$stats['inactive'],'red-500']] as [$label,$val,$color])
                 <div class="bg-white p-5 rounded-2xl shadow flex items-center gap-4">
                     <div class="w-12 h-12 bg-{{ $color }} text-white flex items-center justify-center rounded-xl text-xl">
                         <i class="fa-solid fa-motorcycle"></i>
@@ -21,7 +21,7 @@
         </div>
 
         <button type="button" onclick="openDeliveryBoyModal()"
-                class="bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-bold shadow hover:bg-blue-700">
+                class="bg-amber-600 text-white px-5 py-3 rounded-xl text-sm font-bold shadow hover:bg-amber-700">
             + Add Delivery Boy
         </button>
     </div>
@@ -34,7 +34,7 @@
             <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
             <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
         </select>
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm">Filter</button>
+        <button type="submit" class="bg-amber-600 text-white px-4 py-2 rounded-full text-sm">Filter</button>
         <a href="{{ route('dashboard.delivery-boys') }}" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm">Reset</a>
     </form>
 
@@ -49,7 +49,7 @@
                 <col style="width: 20%">
                 <col style="width: 14%">
             </colgroup>
-            <thead class="bg-blue-600 text-white">
+            <thead class="bg-amber-600 text-white">
                 <tr>
                     <th scope="col" class="px-4 py-3 text-left font-bold">Sr no</th>
                     <th scope="col" class="px-4 py-3 text-left font-bold">Partner Name</th>
@@ -152,7 +152,7 @@
                 <button type="button" onclick="closeDeliveryBoyModal()" class="rounded-xl bg-gray-200 px-5 py-2.5 text-sm font-semibold text-gray-700">
                     Cancel
                 </button>
-                <button type="submit" class="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">
+                <button type="submit" class="rounded-xl bg-amber-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-amber-700">
                     Save Delivery Boy
                 </button>
             </div>

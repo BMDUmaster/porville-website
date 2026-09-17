@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\CouponApiController;
 
 /*
 
- FarmSea Public API Routes
+ Porville Public API Routes
  Base URL: http://127.0.0.1:8000/api
 
 */

@@ -23,11 +23,12 @@ class Order extends Model
         'user_id', 'delivery_boy_id', 'order_number', 'status', 'subtotal', 'discount',
         'shipping_cost', 'delivery_charge', 'platform_fee',
         'vendor_total', 'admin_commission', 'tax', 'total',
-        'shipping_address', 'payment_method', 'payment_status', 'delivery_slot', 'delivery_day',
+        'shipping_address', 'payment_method', 'payment_status', 'delivery_slot', 'delivery_day', 'delivery_date',
     ];
 
     protected $casts = [
         'shipping_address' => 'array',
+        'delivery_date' => 'date',
     ];
 
     public function user()

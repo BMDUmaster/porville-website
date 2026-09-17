@@ -12,7 +12,7 @@
             $totalWeight = $categories->sum(fn($c) => $c->products->sum(fn($p) => $p->order_items_count));
         @endphp
         <div class="bg-white border rounded-xl p-4"><p class="text-xs text-gray-500">Total Items</p><p class="text-xl font-bold">{{ $totalItems }}</p></div>
-        <div class="bg-white border rounded-xl p-4"><p class="text-xs text-gray-500">Total Weight</p><p class="text-xl font-bold text-purple-600">{{ $totalWeight }} kg</p></div>
+        <div class="bg-white border rounded-xl p-4"><p class="text-xs text-gray-500">Total Weight</p><p class="text-xl font-bold text-amber-600">{{ $totalWeight }} kg</p></div>
     </div>
 
     {{-- Table --}}
@@ -47,7 +47,7 @@
                         <p class="font-semibold text-sm">{{ $cat->name }}</p>
                     </td>
                     <td class="px-4 py-3 text-xs text-gray-500">{{ $cat->id }}</td>
-                    <td class="px-4 py-3 text-blue-600 font-bold text-sm">{{ $cat->products_count }}</td>
+                    <td class="px-4 py-3 text-amber-600 font-bold text-sm">{{ $cat->products_count }}</td>
                     <td class="px-4 py-3 font-semibold text-sm {{ $demand[1] }}">{{ $demand[0] }}</td>
                 </tr>
                 @empty

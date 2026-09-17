@@ -1,5 +1,5 @@
 @extends('frontend.layouts.app')
-@section('title', 'FarmSea - Fresh Meat & Seafood')
+@section('title', 'Porville — Fresh Cut Pure Standards')
 @section('styles')
 <style>
     .home-hero-slide {
@@ -89,7 +89,7 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(90deg, rgba(10, 31, 12, 0.82) 0%, rgba(10, 31, 12, 0.48) 34%, rgba(10, 31, 12, 0.08) 72%, rgba(10, 31, 12, 0.02) 100%);
+        background: linear-gradient(90deg, rgba(10, 10, 10, 0.85) 0%, rgba(10, 10, 10, 0.5) 34%, rgba(10, 10, 10, 0.1) 72%, rgba(10, 10, 10, 0.02) 100%);
     }
 
     .favorite-hero-banner:hover img {
@@ -115,8 +115,8 @@
 
     .type-showcase-card:hover {
         transform: translateY(-6px);
-        border-color: #c7ddc2;
-        box-shadow: 0 24px 48px rgba(34, 74, 29, 0.12);
+        border-color: #e6d3a3;
+        box-shadow: 0 24px 48px rgba(184, 134, 44, 0.14);
     }
 
     .type-showcase-image {
@@ -172,12 +172,12 @@
 @php
     $defaultHeroSlides = [
         [
-            'image' => 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1800&q=80',
-            'badge' => 'Farm Fresh Daily',
+            'image' => 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=1800&q=80',
+            'badge' => "Delhi's Finest Butchers",
             'category' => 'Chicken',
             'title_1' => 'Premium',
-            'title_2' => 'Chicken Delivered Fresh',
-            'description' => 'Sourced directly from our farms. Cleaned, cut and delivered to your doorstep within hours of slaughter.',
+            'title_2' => 'Chicken, Cut Fresh',
+            'description' => 'Custom-cut to order, vacuum-sealed and delivered chilled within 2 hours. Never pre-packaged.',
             'button' => 'Shop Now',
             'link' => route('frontend.products', ['category' => 'Chicken']),
         ],
@@ -192,14 +192,14 @@
             'link' => route('frontend.products', ['category' => 'Mutton']),
         ],
         [
-            'image' => 'https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=1800&q=80',
-            'badge' => 'Catch of the Day',
-            'category' => 'Seafood',
-            'title_1' => 'Ocean Fresh',
-            'title_2' => 'Seafood Daily',
-            'description' => 'Discover fish, prawns and seafood cleaned, chilled and packed to lock in sea-fresh taste.',
+            'image' => 'https://images.unsplash.com/photo-1518492104633-130d0cc84637?auto=format&fit=crop&w=1800&q=80',
+            'badge' => 'Farm Fresh, Daily',
+            'category' => 'Eggs',
+            'title_1' => 'Pure Standards',
+            'title_2' => 'Farm Fresh Eggs',
+            'description' => 'Pasture-raised, farm-fresh eggs sourced daily. Frozen and non-frozen options available.',
             'button' => 'Shop Now',
-            'link' => route('frontend.products', ['category' => 'Fish']),
+            'link' => route('frontend.products', ['category' => 'Eggs']),
         ],
     ];
 
@@ -238,18 +238,18 @@
 
                 <div class="home-hero-content hidden absolute inset-0 z-10 h-full items-center px-7 md:px-14 lg:px-20">
                     <div class="max-w-[430px] p-5 md:p-7">
-                        <span class="mb-4 inline-flex w-fit rounded-md bg-blue-600 px-4 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.16em] text-white shadow-lg">
+                        <span class="mb-4 inline-flex w-fit rounded-md bg-amber-600 px-4 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.16em] text-white shadow-lg">
                             {{ $slide['badge'] }}
                         </span>
                         <h1 class="max-w-[390px] text-[24px] font-extrabold leading-[1.08] text-white md:text-[36px]">
                             {{ $slide['title_1'] }}
-                            <span class="block text-[18px] text-green-400 md:text-[22px]">{{ $slide['title_2'] }}</span>
+                            <span class="block text-[18px] text-amber-400 md:text-[22px]">{{ $slide['title_2'] }}</span>
                         </h1>
                         <p class="mt-4 max-w-[330px] text-[13px] leading-6 text-white/85 md:text-[15px]">
                             {{ $slide['description'] }}
                         </p>
                         <div class="mt-6">
-                            <a href="{{ $slide['link'] }}" class="inline-flex rounded-xl bg-green-600 px-6 py-3 text-sm font-extrabold uppercase tracking-[0.12em] text-white transition hover:-translate-y-0.5 hover:bg-green-700 hover:shadow-xl">
+                            <a href="{{ $slide['link'] }}" class="inline-flex rounded-xl bg-amber-600 px-6 py-3 text-sm font-extrabold uppercase tracking-[0.12em] text-white transition hover:-translate-y-0.5 hover:bg-amber-700 hover:shadow-xl">
                                 {{ $slide['button'] }}
                             </a>
                         </div>
@@ -320,13 +320,13 @@
         <div class="mb-6 flex items-end justify-between gap-4">
             <div>
                 <h2 class="home-category-heading text-3xl font-extrabold text-slate-900 md:text-4xl">
-                    Shop by <span class="text-blue-600"> Category  </span>
+                    Shop by <span class="text-amber-600"> Category  </span>
                 </h2>
-                <p class="mt-2 text-sm text-slate-500"> Farm-to-table freshness across every cut and kind. </p>
+                <p class="mt-2 text-sm text-slate-500"> Fresh cut, pure standards, across every cut and kind. </p>
             </div>
             <a
                 href="{{ route('frontend.categories') }}"
-                class="inline-flex shrink-0 items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-blue-700 transition hover:border-blue-600 hover:bg-blue-600 hover:text-white sm:px-5"
+                class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5"
             >
                 See All
                 <i class="fa-solid fa-arrow-right text-[10px]"></i>
@@ -348,7 +348,7 @@
 
                 <a
                     href="{{ route('frontend.products', $linkParams) }}"
-                    class="group min-w-[228px] max-w-[228px] overflow-hidden rounded-[18px] border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,43,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_18px_36px_rgba(37,99,235,0.14)]"
+                    class="group min-w-[228px] max-w-[228px] overflow-hidden rounded-[18px] border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,43,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-amber-200 hover:shadow-[0_18px_36px_rgba(217,164,65,0.18)]"
                 >
                     <div class="relative h-[225px] overflow-hidden bg-slate-100">
                         @if($item['image'])
@@ -366,10 +366,10 @@
                     </div>
 
                     <div class="border-t border-slate-100 px-4 py-3 text-center">
-                        <h3 class="text-[15px] font-semibold text-slate-900 transition-colors group-hover:text-blue-700">
+                        <h3 class="text-[15px] font-semibold text-slate-900 transition-colors group-hover:text-amber-700">
                             {{ $item['title'] }}
                         </h3>
-                        <p class="mt-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-green-600">
+                        <p class="mt-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-amber-600">
                             {{ $label }}
                         </p>
                     </div>
@@ -392,52 +392,19 @@
     <div class="mx-auto max-w-7xl px-4">
         <div class="mb-6 flex items-end justify-between">
             <div>
-                <h2 class="text-2xl font-extrabold text-gray-800">New <span class="text-blue-600">Arrivals</span></h2>
+                <h2 class="text-2xl font-extrabold text-gray-800">New <span class="text-amber-600">Arrivals</span></h2>
                 <p class="mt-1 text-xs text-gray-500">The freshest additions to our selection.</p>
             </div>
-            <a href="{{ route('frontend.products') }}" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-blue-700 transition hover:border-blue-600 hover:bg-blue-600 hover:text-white sm:px-5">
+            <a href="{{ route('frontend.products') }}" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
                 See All
                 <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </a>
         </div>
         <div id="home-new-arrivals-scroller" class="scrollbar-hide flex gap-3 overflow-x-auto scroll-smooth pb-3 md:gap-5">
             @forelse($newArrivals as $product)
-            <div class="flex min-w-[260px] max-w-[260px] flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition hover:border-green-300 hover:shadow-lg">
-                    <a href="{{ route('frontend.product.show', $product->slug) }}" class="relative block aspect-square overflow-hidden bg-gray-50">
-                        @if(in_array($product->id, $newArrivalProductIds ?? [], true))
-                            <span class="absolute left-2 top-2 z-10 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-white shadow-sm">
-                                     New Arrival  
-                            </span>  
-                        @endif
-                        @if($product->images && count($product->images))
-                            <img src="{{ asset('storage/'.$product->images[0]) }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition-transform duration-500 hover:scale-105">
-                        @else
-                            <div class="flex h-full w-full items-center justify-center text-5xl">M</div>
-                        @endif
-                    </a>
-                <div class="flex flex-1 flex-col p-3">
-                        <a href="{{ route('frontend.product.show', $product->slug) }}" class="line-clamp-2 text-sm font-bold leading-snug text-gray-800 transition hover:text-green-700">
-                            {{ $product->name }}
-                        </a>
-                        <div class="mt-auto flex items-center justify-between pt-3">
-                            <div>
-                                <p class="text-lg font-extrabold text-gray-800">Rs{{ number_format($product->display_price, 0) }}<span class="ml-1 text-xs font-semibold text-gray-400">{{ $product->display_pack_label }}</span></p>
-                                @if($product->display_mrp && $product->display_mrp > $product->display_price)
-                                    <p class="text-xs text-gray-400 line-through">Rs{{ number_format($product->display_mrp, 0) }}</p>
-                                @endif
-                            </div>
-                            @if(!$product->is_out_of_stock)
-                                <button onclick="addToCart({{ $product->id }})" class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-sm text-white transition hover:bg-blue-700">
-                                    <i class="fa-solid fa-cart-shopping"></i>
-                                </button>
-                            @else
-                                <span class="inline-flex h-9 items-center justify-center rounded-lg border border-red-200 bg-red-50 px-2.5 text-[10px] font-extrabold uppercase tracking-[0.12em] text-red-600">
-                                    Out of Stock
-                                </span>
-                            @endif
-                        </div>
-                    </div>
-                </div>
+            <div class="min-w-[240px] max-w-[240px]">
+                @include('frontend.partials.product-card', ['product' => $product])
+            </div>
             @empty
                 <p class="w-full py-8 text-center text-gray-400">No products yet.</p>
             @endforelse
@@ -445,13 +412,39 @@
     </div>
 </section>
 
+@if($liveStockCategory && $liveStockProducts->isNotEmpty())
+{{-- Farm Fresh Live Stock --}}
+<section class="bg-black py-8 md:py-12">
+    <div class="mx-auto max-w-7xl px-4">
+        <div class="mb-6 flex items-end justify-between gap-4">
+            <div>
+                <p class="text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-400">Enquiry Only &middot; Call to Order</p>
+                <h2 class="font-classic mt-1 text-2xl font-bold text-white md:text-3xl">Farm Fresh Live Stock</h2>
+                <p class="mt-1 max-w-lg text-xs text-stone-300">Healthy live farm birds and livestock raised under premium guidelines.</p>
+            </div>
+            <a href="{{ route('frontend.products', ['category' => $liveStockCategory->slug]) }}" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-500 bg-black px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-400 transition hover:bg-amber-500 hover:text-black sm:px-5">
+                See All
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+        </div>
+        <div class="scrollbar-hide flex gap-3 overflow-x-auto scroll-smooth pb-3 md:gap-5">
+            @foreach($liveStockProducts as $product)
+            <div class="min-w-[240px] max-w-[240px]">
+                @include('frontend.partials.product-card', ['product' => $product])
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
 {{-- Shop By Type --}}
 <section class="bg-white pb-6 pt-2 md:py-7">
     <div class="mx-auto max-w-7xl px-4">
         <div class="mb-6 flex items-center justify-between gap-4">
             <div class="text-left">
                 <h2 class="text-3xl font-extrabold text-slate-900 md:text-4xl">
-                    Shop By <span class="text-blue-600">Type</span>
+                    Shop By <span class="text-amber-600">Type</span>
                 </h2>
             </div>
             <div class="hidden items-center gap-3 md:flex">
@@ -459,7 +452,7 @@
                     type="button"
                     aria-label="Scroll types left"
                     onclick="document.getElementById('home-type-scroller').scrollBy({ left: -360, behavior: 'smooth' })"
-                    class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+                    class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-amber-200 hover:bg-amber-50 hover:text-amber-600"
                 >
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
@@ -467,7 +460,7 @@
                     type="button"
                     aria-label="Scroll types right"
                     onclick="document.getElementById('home-type-scroller').scrollBy({ left: 360, behavior: 'smooth' })"
-                    class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+                    class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-amber-200 hover:bg-amber-50 hover:text-amber-600"
                 >
                     <i class="fa-solid fa-arrow-right"></i>
                 </button>
@@ -513,14 +506,14 @@
             @forelse($categories->take(10) as $cat)
                 @php
                     $slugKey = strtolower($cat->slug ?? $cat->name);
-                    $meta = collect($typeMeta)->first(fn($value, $key) => str_contains($slugKey, $key)) ?? ['icon' => 'fa-layer-group', 'accent' => 'text-green-600', 'tint' => 'bg-green-50', 'subtitle' => 'Collections'];
+                    $meta = collect($typeMeta)->first(fn($value, $key) => str_contains($slugKey, $key)) ?? ['icon' => 'fa-layer-group', 'accent' => 'text-amber-600', 'tint' => 'bg-amber-50', 'subtitle' => 'Collections'];
                     $previewImages = collect([$cat->image])->merge($cat->children->pluck('image'))->filter()->take(3)->values();
                     $countLabel = max($cat->children_count, $cat->products_count, 1);
                     $countText = $cat->children_count > 0 ? $meta['subtitle'] : 'Products';
                     $cardLink = route('frontend.categories', ['focus' => $cat->slug]) . '#category-' . $cat->slug;
                 @endphp
 
-                <article class="group min-w-[260px] max-w-[260px] rounded-[22px] border border-slate-200 bg-white p-4 shadow-[0_10px_30px_rgba(15,23,43,0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_20px_40px_rgba(37,99,235,0.12)]">
+                <article class="group min-w-[260px] max-w-[260px] rounded-[22px] border border-slate-200 bg-white p-4 shadow-[0_10px_30px_rgba(15,23,43,0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-amber-200 hover:shadow-[0_20px_40px_rgba(37,99,235,0.12)]">
                     <a href="{{ $cardLink }}" class="block">
                         <div class="flex flex-col items-center text-center">
                             <div class="flex h-12 w-12 items-center justify-center rounded-2xl {{ $meta['tint'] }} text-xl {{ $meta['accent'] }} transition-transform duration-300 group-hover:scale-110">
@@ -568,7 +561,7 @@
 
                     <a
                         href="{{ $cardLink }}"
-                        class="mt-4 flex h-11 items-center justify-center rounded-xl bg-blue-600 text-[12px] font-extrabold uppercase tracking-[0.18em] text-white transition-all duration-300 hover:bg-blue-700 group-hover:shadow-lg"
+                        class="mt-4 flex h-11 items-center justify-center rounded-xl bg-amber-600 text-[12px] font-extrabold uppercase tracking-[0.18em] text-white transition-all duration-300 hover:bg-amber-700 group-hover:shadow-lg"
                     >
                         View All
                     </a>
@@ -582,7 +575,7 @@
         </div>
 
         <div class="mt-5 flex justify-center md:hidden">
-            <a href="{{ route('frontend.categories') }}" class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-xs font-extrabold uppercase tracking-[0.18em] text-white transition hover:bg-blue-700">
+            <a href="{{ route('frontend.categories') }}" class="inline-flex items-center gap-2 rounded-full bg-amber-600 px-5 py-3 text-xs font-extrabold uppercase tracking-[0.18em] text-white transition hover:bg-amber-700">
                 Browse Types
                 <i class="fa-solid fa-arrow-right"></i>
             </a>
@@ -590,10 +583,10 @@
 
         @if($typeShowcaseLead)
             <div class="mt-8 grid gap-4 lg:grid-cols-[0.82fr_1.18fr] lg:gap-5">
-                <article class="type-showcase-card self-start overflow-hidden rounded-[22px] border border-[#d8ead5] bg-[#f7fbf5]">
-                    <div class="flex flex-col">
-                        <div class="p-4 pb-3 md:min-h-[175px] md:p-5 md:pb-4">
-                            <span class="inline-flex rounded-full bg-green-700 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
+                <article class="type-showcase-card overflow-hidden rounded-[22px] border border-[#e6d3a3] bg-[#faf7f0]">
+                    <div class="flex h-full flex-col">
+                        <div class="p-4 pb-3 md:p-5 md:pb-4">
+                            <span class="inline-flex rounded-full bg-amber-700 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
                                 Chef's Selection
                             </span>
                             <h3 class="mt-3 max-w-[320px] text-[23px] font-extrabold leading-[1.1] text-slate-900 md:text-[30px]">
@@ -610,7 +603,7 @@
                                     @endif
                                 </div>
                                 @if(!$typeShowcaseLead->is_out_of_stock)
-                                    <button onclick="addToCart({{ $typeShowcaseLead->id }})" class="inline-flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-green-800">
+                                    <button onclick="addToCart({{ $typeShowcaseLead->id }})" class="inline-flex items-center gap-2 rounded-lg bg-amber-700 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-amber-800">
                                         <i class="fa-solid fa-cart-plus text-[11px]"></i>
                                         Add
                                     </button>
@@ -622,9 +615,9 @@
                             </div>
                         </div>
 
-                        <a href="{{ route('frontend.product.show', $typeShowcaseLead->slug) }}" class="relative block overflow-hidden">
+                        <a href="{{ route('frontend.product.show', $typeShowcaseLead->slug) }}" class="relative block flex-1 overflow-hidden">
                             @if(in_array($typeShowcaseLead->id, $newArrivalProductIds ?? [], true))
-                                <span class="absolute left-2 top-2 z-10 inline-flex rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
+                                <span class="absolute left-2 top-2 z-10 inline-flex rounded-full bg-amber-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
                                     New Arrival
                                 </span>
                             @endif
@@ -632,10 +625,10 @@
                                 <img
                                     src="{{ asset('storage/' . $typeShowcaseLead->images[0]) }}"
                                     alt="{{ $typeShowcaseLead->name }}"
-                                    class="type-showcase-image h-[240px] w-full object-cover object-center md:h-[285px]"
+                                    class="type-showcase-image absolute inset-0 h-full min-h-[240px] w-full object-cover object-center"
                                 >
                             @else
-                                <div class="flex h-[240px] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-5xl text-slate-400 md:h-[285px]">
+                                <div class="absolute inset-0 flex min-h-[240px] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-5xl text-slate-400">
                                     <i class="fa-solid fa-drumstick-bite"></i>
                                 </div>
                             @endif
@@ -645,55 +638,17 @@
 
                 <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:self-start">
                     @foreach($typeShowcaseGrid as $product)
-                        <article class="type-showcase-card group overflow-hidden rounded-[19px] border border-slate-200 bg-white p-3 shadow-[0_10px_30px_rgba(15,23,43,0.05)]">
-                            <a href="{{ route('frontend.product.show', $product->slug) }}" class="relative block overflow-hidden rounded-[13px]">
-                                @if(in_array($product->id, $newArrivalProductIds ?? [], true))
-                                    <span class="absolute left-2 top-2 z-10 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
-                                        New Arrival
-                                    </span>
-                                @endif
-                                @if($product->images && count($product->images))
-                                    <img
-                                        src="{{ asset('storage/' . $product->images[0]) }}"
-                                        alt="{{ $product->name }}"
-                                        class="type-showcase-image aspect-[1.12] w-full object-cover"
-                                    >
-                                @else
-                                    <div class="flex aspect-[1.12] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-4xl text-slate-400">
-                                        <i class="fa-solid fa-fish-fins"></i>
-                                    </div>
-                                @endif
-                            </a>
-
-                            <div class="pt-2.5">
-                                <a href="{{ route('frontend.product.show', $product->slug) }}" class="block text-[12px] font-extrabold leading-[1.3] text-slate-900 transition hover:text-green-700">
-                                    {{ $product->name }}
-                                </a>
-                                <div class="mt-2.5 flex items-end justify-between gap-2">
-                                    <p class="text-[14px] font-black text-slate-950">Rs{{ number_format($product->display_price, 0) }}<span class="ml-1 text-[9px] font-semibold text-slate-400">{{ $product->display_pack_label }}</span></p>
-                                    @if(!$product->is_out_of_stock)
-                                        <button onclick="addToCart({{ $product->id }})" class="inline-flex min-h-[34px] flex-shrink-0 items-center justify-center gap-1.5 rounded-lg border border-[#dbe8d7] bg-[#f8fbf6] px-2.5 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.1em] text-green-700 transition duration-300 hover:border-green-300 hover:bg-green-50 group-hover:-translate-y-0.5 group-hover:shadow-sm">
-                                            <i class="fa-solid fa-cart-plus text-[14px] leading-none" aria-hidden="true"></i>
-                                            <span>Add</span>
-                                        </button>
-                                    @else
-                                        <span class="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-red-600">
-                                            Out of Stock
-                                        </span>
-                                    @endif
-                                </div>
-                            </div>
-                        </article>
+                        @include('frontend.partials.product-card', ['product' => $product])
                     @endforeach
 
                     @for($slot = $typeShowcaseGrid->count(); $slot < 6; $slot++)
-                        <article class="type-showcase-card flex min-h-[245px] flex-col items-center justify-center rounded-[19px] border border-dashed border-green-200 bg-[linear-gradient(145deg,#f7fbf5,#eff8ec)] p-5 text-center shadow-[0_10px_30px_rgba(15,23,43,0.035)]">
-                            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-lg text-green-600 shadow-sm">
+                        <article class="type-showcase-card flex min-h-[245px] flex-col items-center justify-center rounded-[19px] border border-dashed border-amber-200 bg-[linear-gradient(145deg,#faf7f0,#faf5e8)] p-5 text-center shadow-[0_10px_30px_rgba(15,23,43,0.035)]">
+                            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-lg text-amber-600 shadow-sm">
                                 <i class="fa-solid fa-basket-shopping"></i>
                             </span>
                             <p class="mt-4 text-[12px] font-extrabold uppercase tracking-[0.12em] text-slate-800">More Fresh Picks</p>
                             <p class="mt-1 text-[10px] leading-5 text-slate-500">New products coming soon</p>
-                            <a href="{{ route('frontend.products') }}" class="mt-4 inline-flex rounded-lg border border-green-200 bg-white px-3 py-2 text-[9px] font-extrabold uppercase tracking-[0.12em] text-green-700 transition hover:border-green-300 hover:bg-green-50">
+                            <a href="{{ route('frontend.products') }}" class="mt-4 inline-flex rounded-lg border border-amber-200 bg-white px-3 py-2 text-[9px] font-extrabold uppercase tracking-[0.12em] text-amber-700 transition hover:border-amber-300 hover:bg-amber-50">
                                 View All
                             </a>
                         </article>
@@ -710,10 +665,10 @@
                             : null);
                 @endphp
 
-                <article class="type-showcase-card overflow-hidden rounded-[26px] border border-[#d8ead5] bg-[#f7fbf5]">
+                <article class="type-showcase-card overflow-hidden rounded-[26px] border border-[#e6d3a3] bg-[#faf7f0]">
                     <div class="flex h-full flex-col">
                         <div class="p-5 md:p-6">
-                            <span class="inline-flex rounded-full bg-green-700 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
+                            <span class="inline-flex rounded-full bg-amber-700 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
                                 Fresh Picks
                             </span>
                             <h3 class="mt-4 max-w-[340px] text-[28px] font-extrabold leading-[1.08] text-slate-900 md:text-[38px]">
@@ -727,7 +682,7 @@
                                     <p class="text-[12px] font-bold uppercase tracking-[0.16em] text-slate-400">Available Now</p>
                                     <p class="mt-1 text-[20px] font-black text-slate-950">{{ max($typeShowcaseLeadCategory->children_count, $typeShowcaseLeadCategory->products_count, 1) }}+ Items</p>
                                 </div>
-                                <a href="{{ route('frontend.products', ['category' => $typeShowcaseLeadCategory->slug]) }}" class="inline-flex items-center gap-2 rounded-xl bg-green-700 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-green-800">
+                                <a href="{{ route('frontend.products', ['category' => $typeShowcaseLeadCategory->slug]) }}" class="inline-flex items-center gap-2 rounded-xl bg-amber-700 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-amber-800">
                                     <i class="fa-solid fa-arrow-right text-[11px]"></i>
                                     Browse
                                 </a>
@@ -777,12 +732,12 @@
 
                             <div class="pt-3">
                                 <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Fresh Range</p>
-                                <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="mt-1 block text-[14px] font-extrabold leading-[1.3] text-slate-900 transition hover:text-green-700">
+                                <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="mt-1 block text-[14px] font-extrabold leading-[1.3] text-slate-900 transition hover:text-amber-700">
                                     {{ $category->name }}
                                 </a>
                                 <div class="mt-3 flex items-end justify-between gap-3">
                                     <p class="text-[15px] font-black text-slate-950">{{ max($category->children_count, $category->products_count, 1) }}+ Items</p>
-                                    <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="rounded-lg border border-[#dbe8d7] bg-[#f8fbf6] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-green-700 transition hover:border-green-300 hover:bg-green-50">
+                                    <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="rounded-lg border border-[#e6d3a3] bg-[#faf7f0] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-300 hover:bg-amber-50">
                                         View
                                     </a>
                                 </div>
@@ -796,28 +751,28 @@
 </section>
 
 {{-- Best Sellers --}}
-<section class="bg-[#f7faf7] py-7 md:py-14">
+<section class="bg-gray-50 py-7 md:py-14">
     <div class="mx-auto max-w-7xl px-4">
-        <div class="favorite-hero-banner mb-8 rounded-[30px] border border-[#d7e7d5] shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
+        <div class="favorite-hero-banner mb-8 rounded-[30px] border border-amber-100 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <img
                 src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1800&q=80"
-                alt="Fresh meat and seafood platter"
+                alt="Fresh cut meat platter"
                 class="h-[280px] w-full object-cover md:h-[360px]"
             >
             <div class="favorite-hero-copy absolute inset-0 z-10 flex max-w-[400px] flex-col justify-center px-5 py-8 md:px-10">
-                <span class="mb-5 inline-flex w-fit rounded-md bg-blue-600 px-4 py-1.5 text-xs font-extrabold uppercase tracking-[0.18em] text-white shadow-lg">
+                <span class="mb-5 inline-flex w-fit rounded-md bg-amber-600 px-4 py-1.5 text-xs font-extrabold uppercase tracking-[0.18em] text-white shadow-lg">
                     Premium Quality
                 </span>
                 <h2 class="text-[28px] font-extrabold leading-[1.04] text-white md:text-[48px]">
                     The Freshest
-                    <span class="block text-green-400">Meat & Seafood</span>
+                    <span class="block text-amber-400">Cuts, Pure Standards</span>
                     Delivered Daily
                 </h2>
                 <p class="mt-4 max-w-[340px] text-[13px] leading-6 text-white/85 md:text-[15px]">
                     From our farm gates to your kitchen. Hand-cleaned, hygienically packed proteins every single day.
                 </p>
                 <div class="mt-6 flex flex-wrap gap-3">
-                    <a href="{{ route('frontend.products') }}" class="rounded-xl bg-green-600 px-5 py-2.5 text-xs font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-green-700">
+                    <a href="{{ route('frontend.products') }}" class="rounded-xl bg-amber-600 px-5 py-2.5 text-xs font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-amber-700">
                         Shop The Range
                     </a>
                     <a href="{{ route('frontend.categories') }}" class="rounded-xl border border-white/30 bg-white/10 px-5 py-2.5 text-xs font-extrabold uppercase tracking-[0.14em] text-white backdrop-blur transition hover:bg-white/20">
@@ -839,7 +794,7 @@
                     type="button"
                     aria-label="Scroll favorites left"
                     onclick="document.getElementById('home-favorites-scroller').scrollBy({ left: -360, behavior: 'smooth' })"
-                    class="flex h-12 w-12 items-center justify-center rounded-full border border-[#d8e8d7] bg-white text-slate-600 shadow-sm transition hover:border-green-200 hover:text-green-700"
+                    class="flex h-12 w-12 items-center justify-center rounded-full border border-amber-100 bg-white text-slate-600 shadow-sm transition hover:border-amber-200 hover:text-amber-700"
                 >
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
@@ -847,7 +802,7 @@
                     type="button"
                     aria-label="Scroll favorites right"
                     onclick="document.getElementById('home-favorites-scroller').scrollBy({ left: 360, behavior: 'smooth' })"
-                    class="flex h-12 w-12 items-center justify-center rounded-full border border-[#d8e8d7] bg-white text-slate-600 shadow-sm transition hover:border-green-200 hover:text-green-700"
+                    class="flex h-12 w-12 items-center justify-center rounded-full border border-amber-100 bg-white text-slate-600 shadow-sm transition hover:border-amber-200 hover:text-amber-700"
                 >
                     <i class="fa-solid fa-arrow-right"></i>
                 </button>
@@ -860,96 +815,9 @@
 
         <div id="home-favorites-scroller" class="scrollbar-hide flex gap-4 overflow-x-auto scroll-smooth pb-3">
             @forelse($bestSellers as $index => $product)
-                @php
-                    $favoriteImage = $product->images && count($product->images) ? asset('storage/' . $product->images[0]) : null;
-                    $favoriteLabel = $favoriteLabels[$index % count($favoriteLabels)];
-                    $favoriteVariantIndex = collect($product->variants ?? [])->search(
-                        fn ($variant) => filled($variant['selling_price'] ?? null) || filled($variant['today_price'] ?? null)
-                    );
-                    $favoriteVariantIndex = $favoriteVariantIndex === false ? null : $favoriteVariantIndex;
-                    $favoriteVariant = $favoriteVariantIndex !== null ? ($product->variants[$favoriteVariantIndex] ?? null) : null;
-                    $favoriteTomorrowPrice = $favoriteVariant && filled($favoriteVariant['tomorrow_price'] ?? null)
-                        && (float) $favoriteVariant['tomorrow_price'] > 0
-                            ? (float) $favoriteVariant['tomorrow_price']
-                            : null;
-                    $favoriteTodayPriceSet = $favoriteVariant && filled($favoriteVariant['today_price'] ?? null)
-                        && (float) $favoriteVariant['today_price'] > 0;
-                    // Today is only hidden when Tomorrow's price was explicitly set without a matching Today price.
-                    $favoriteTodayAvailable = $favoriteTodayPriceSet || $favoriteTomorrowPrice === null;
-                @endphp
-
-                <article class="favorite-card group min-w-[255px] max-w-[255px] rounded-[28px] p-3">
-                    <div class="rounded-[22px] border border-[#e5efe4] bg-white p-3">
-                        <a href="{{ route('frontend.product.show', $product->slug) }}" class="block">
-                            <div class="relative overflow-hidden rounded-[20px] bg-slate-100">
-                                @if($favoriteImage)
-                                    <img
-                                        src="{{ $favoriteImage }}"
-                                        alt="{{ $product->name }}"
-                                        class="aspect-[0.95] w-full object-cover transition duration-500 group-hover:scale-105"
-                                    >
-                                @else
-                                    <div class="flex aspect-[0.95] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-5xl text-slate-400">
-                                        <i class="fa-solid fa-drumstick-bite"></i>
-                                    </div>
-                                @endif
-
-                                <span class="absolute left-2 top-2 rounded-lg bg-white px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.16em] text-blue-700 shadow-sm">
-                                    {{ $favoriteLabel }}
-                                </span>
-                            </div>
-                        </a>
-
-                        <div class="mt-2 flex flex-col sm:mt-3">
-                            <a href="{{ route('frontend.product.show', $product->slug) }}" class="text-slate-900 transition hover:text-green-700">
-                                <span class="block text-[18px] font-extrabold leading-[1.15]">{{ $product->name }}</span>
-                            </a>
-                            <p class="mt-2 text-[13px] text-slate-500">
-                                {{ optional($product->category)->name ?: 'FarmSea Fresh' }}
-                                @if(!empty($product->ordered_quantity))
-                                    <span class="text-slate-300">|</span> {{ (int) $product->ordered_quantity }} orders
-                                @endif
-                            </p>
-                        </div>
-
-                        <div class="mt-3 border-t border-dashed border-slate-100 pt-3">
-                            @if($favoriteTodayAvailable)
-                                <div class="flex items-end justify-between gap-3">
-                                    <div>
-                                        <p class="text-[9px] font-black uppercase tracking-wider text-emerald-600">Today</p>
-                                        <p class="text-[18px] font-black text-slate-950">Rs{{ number_format($product->display_price, 0) }}<span class="ml-1 text-[11px] font-semibold text-slate-400">{{ $product->display_pack_label }}</span></p>
-                                    @if($product->display_mrp && $product->display_mrp > $product->display_price)
-                                        <p class="text-xs text-slate-400 line-through">Rs{{ number_format($product->display_mrp, 0) }}</p>
-                                    @endif
-                                    </div>
-                                    @if(!$product->is_out_of_stock)
-                                        <button onclick="addToCart({{ $product->id }}, {{ $favoriteVariantIndex === null ? 'null' : $favoriteVariantIndex }}, 'today')" aria-label="Add {{ $product->name }} for today" title="Add for today" class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-green-700 text-white transition hover:bg-green-800">
-                                            <i class="fa-solid fa-cart-shopping text-[18px]" aria-hidden="true"></i>
-                                        </button>
-                                    @else
-                                        <span class="inline-flex items-center rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-red-600">Out of Stock</span>
-                                    @endif
-                                </div>
-                            @endif
-
-                            @if(!$product->is_out_of_stock && $favoriteTomorrowPrice !== null)
-                                <div class="{{ $favoriteTodayAvailable ? 'mt-2 border-t border-dashed border-slate-100 pt-2' : '' }} flex items-end justify-between gap-3">
-                                    <div>
-                                        <p class="text-[9px] font-black uppercase tracking-wider text-amber-700">Tomorrow</p>
-                                        <p class="text-[18px] font-black text-slate-950">Rs{{ number_format($favoriteTomorrowPrice, 0) }}<span class="ml-1 text-[11px] font-semibold text-slate-400">{{ $product->display_pack_label }}</span></p>
-                                    </div>
-                                    <button onclick="addToCart({{ $product->id }}, {{ $favoriteVariantIndex }}, 'tomorrow')" aria-label="Add {{ $product->name }} for tomorrow" title="Add for tomorrow" class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white transition hover:bg-amber-600">
-                                        <i class="fa-solid fa-cart-shopping text-[18px]" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                            @endif
-
-                            @if($product->is_out_of_stock && !$favoriteTodayAvailable)
-                                <span class="inline-flex items-center rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-red-600">Out of Stock</span>
-                            @endif
-                        </div>
-                    </div>
-                </article>
+                <div class="min-w-[240px] max-w-[240px]">
+                    @include('frontend.partials.product-card', ['product' => $product])
+                </div>
             @empty
                 <div class="flex min-h-[250px] w-full items-center justify-center rounded-[28px] border border-dashed border-slate-200 bg-white px-6 py-12 text-center text-slate-400">
                     <div>
@@ -968,7 +836,7 @@
     <div class="mx-auto max-w-7xl px-4">
         <div class="mb-6 flex items-end justify-between gap-4">
             <div>
-                <p class="mb-2 text-[11px] font-extrabold uppercase tracking-[0.3em] text-green-600">Verified Reviews</p>
+                <p class="mb-2 text-[11px] font-extrabold uppercase tracking-[0.3em] text-amber-600">Verified Reviews</p>
                 <h2 class="text-3xl font-extrabold text-slate-900 md:text-4xl">What Customers Say</h2>
             </div>
             <span class="text-xs font-bold text-slate-400">Swipe to explore</span>
@@ -986,160 +854,18 @@
                                 <i class="fa-solid fa-star {{ $star > $review->rating ? 'text-slate-200' : '' }}"></i>
                             @endfor
                         </div>
-                        <span class="rounded-full bg-green-50 px-2.5 py-1 text-[9px] font-black uppercase text-green-700">Verified</span>
+                        <span class="rounded-full bg-amber-50 px-2.5 py-1 text-[9px] font-black uppercase text-amber-700">Verified</span>
                     </div>
                     <p class="mt-5 line-clamp-4 text-sm leading-7 text-slate-600">“{{ $review->comment ?: 'Great freshness, packaging and delivery experience.' }}”</p>
                     <div class="mt-auto flex items-center gap-3 pt-5">
-                        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-xs font-black text-white">{{ $reviewInitials ?: 'VC' }}</span>
+                        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-amber-600 text-xs font-black text-white">{{ $reviewInitials ?: 'VC' }}</span>
                         <div class="min-w-0">
                             <p class="truncate text-sm font-black text-slate-900">{{ $reviewName }}</p>
-                            <p class="truncate text-[11px] font-semibold text-slate-400">{{ $review->product?->name ?? 'FarmSea Order' }}</p>
+                            <p class="truncate text-[11px] font-semibold text-slate-400">{{ $review->product?->name ?? 'Porville Order' }}</p>
                         </div>
                     </div>
                 </article>
             @endforeach
-        </div>
-    </div>
-</section>
-@endif
-
-{{-- Previous static stories retained only as a disabled fallback --}}
-@if(false)
-{{-- Trusted Stories --}}
-<section class="bg-white py-8 md:py-16">
-    <div class="mx-auto max-w-7xl px-4">
-        <div class="mb-8 flex flex-col gap-6 md:mb-10 md:flex-row md:items-start md:justify-between">
-            <div>
-                <p class="mb-2 text-[11px] font-extrabold uppercase tracking-[0.35em] text-green-600">Real Stories</p>
-                <h2 class="text-3xl font-extrabold leading-tight text-slate-900 md:text-[54px] md:leading-[1.02]">
-                    Trusted by <span class="text-slate-300">Thousands</span>
-                </h2>
-            </div>
-            <div class="text-left md:text-right">
-                <p class="text-2xl font-extrabold text-slate-900 md:text-[28px]">Excellent 4.9 / 5</p>
-                <p class="mt-2 text-[11px] font-bold uppercase tracking-[0.28em] text-[#8f9b83]">Based on 8,400+ Reviews</p>
-                <div class="mt-4 flex gap-1.5 text-[22px] text-[#f59e0b] md:justify-end">
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid gap-5 md:gap-6 lg:grid-cols-[1.05fr_1fr_1fr] lg:grid-rows-2">
-            <div class="group relative min-h-[320px] overflow-hidden rounded-[28px] bg-slate-100 shadow-[0_14px_36px_rgba(15,23,43,0.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_48px_rgba(15,23,43,0.14)] lg:row-span-2 lg:min-h-[585px]">
-                <img
-                    src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=900&q=80"
-                    alt="Happy customers cooking together"
-                    class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                >
-                <div class="absolute inset-0 bg-gradient-to-t from-[#102113]/92 via-[#102113]/20 to-white/10"></div>
-
-                <div class="absolute left-4 top-4 rounded-2xl bg-white/95 px-3 py-3 shadow-lg backdrop-blur transition duration-300 group-hover:-translate-y-0.5">
-                    <div class="flex items-center gap-3">
-                        <img
-                            src="https://images.unsplash.com/photo-1587593810167-a84920ea0781?auto=format&fit=crop&w=120&q=80"
-                            alt="Whole Chicken"
-                            class="h-10 w-10 rounded-xl object-cover"
-                        >
-                        <div>
-                            <p class="text-[13px] font-bold text-slate-800">Ordered</p>
-                            <p class="text-[11px] text-slate-500">Whole Chicken</p>
-                        </div>
-                    </div>
-                </div>
-
-                <button type="button" aria-label="Play customer story" class="absolute left-1/2 top-1/2 flex h-[62px] w-[62px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white text-[26px] text-green-700 shadow-xl transition duration-300 hover:scale-110">
-                    <i class="fa-solid fa-play ml-1"></i>
-                </button>
-
-                <div class="absolute inset-x-0 bottom-0 p-5 md:p-7">
-                    <p class="max-w-[305px] text-[26px] font-extrabold italic leading-[1.1] text-white">
-                        "The freshest chicken I've ever received - arrived cleaned and cold, ready to cook!"
-                    </p>
-                    <p class="mt-5 text-[13px] font-extrabold uppercase tracking-[0.24em] text-[#a8d18f]">
-                        - Priya M., Verified Buyer
-                    </p>
-                </div>
-            </div>
-
-            <div class="group flex flex-col justify-between rounded-[24px] border border-[#dbe6d8] bg-[#fdfefd] p-5 transition duration-300 hover:-translate-y-1 hover:border-[#c6dbc0] hover:shadow-[0_18px_40px_rgba(92,129,79,0.12)] md:p-6 lg:min-h-[220px]">
-                <div>
-                    <div class="mb-5 flex gap-1 text-[#f59e0b]">
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                    </div>
-                    <p class="text-[17px] leading-[1.85] text-slate-700">
-                        "The mutton arrived so fresh - still cold from the ice packs. Noticeably better quality than the local market. Will definitely reorder."
-                    </p>
-                </div>
-                <div class="mt-8 flex items-center gap-4">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-[#2a6fc3] text-sm font-bold text-white transition duration-300 group-hover:scale-110">AK</div>
-                    <div>
-                        <p class="text-[15px] font-extrabold text-slate-900">Arjun K.</p>
-                        <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7e8a73]">Home Chef</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="group flex flex-col justify-between rounded-[24px] border border-[#dbe6d8] bg-[#fdfefd] p-5 transition duration-300 hover:-translate-y-1 hover:border-[#c6dbc0] hover:shadow-[0_18px_40px_rgba(92,129,79,0.12)] md:p-6 lg:min-h-[220px]">
-                <div>
-                    <div class="mb-5 flex gap-1 text-[#f59e0b]">
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                    </div>
-                    <p class="text-[17px] leading-[1.85] text-slate-700">
-                        "Ordered at 8 AM and received by noon. The prawns were huge and absolutely delicious grilled. Fastest delivery for fresh meat!"
-                    </p>
-                </div>
-                <div class="mt-8 flex items-center gap-4">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-[#2f9138] text-sm font-bold text-white transition duration-300 group-hover:scale-110">RD</div>
-                    <div>
-                        <p class="text-[15px] font-extrabold text-slate-900">Rekha D.</p>
-                        <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7e8a73]">Regular Customer</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="group flex flex-col justify-between rounded-[24px] border border-[#dbe6d8] bg-[#fdfefd] p-5 transition duration-300 hover:-translate-y-1 hover:border-[#c6dbc0] hover:shadow-[0_18px_40px_rgba(92,129,79,0.12)] md:p-6 lg:min-h-[220px]">
-                <div>
-                    <div class="mb-5 flex gap-1 text-[#f59e0b]">
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                    </div>
-                    <p class="text-[17px] leading-[1.85] text-slate-700">
-                        "Each portion is labelled with weight and date. My family orders every week - consistent quality, zero complaints every single time."
-                    </p>
-                </div>
-                <div class="mt-8 flex items-center gap-4">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-[#2a6fc3] text-sm font-bold text-white transition duration-300 group-hover:scale-110">SM</div>
-                    <div>
-                        <p class="text-[15px] font-extrabold text-slate-900">Suresh M.</p>
-                        <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7e8a73]">Subscribed Member</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="group flex min-h-[220px] flex-col items-center justify-center rounded-[24px] bg-[#2f73c8] p-6 text-center text-white shadow-[0_14px_36px_rgba(47,115,200,0.24)] transition duration-300 hover:-translate-y-1 hover:bg-[#2768b8] hover:shadow-[0_22px_48px_rgba(47,115,200,0.34)] md:p-8">
-                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-white/15 text-2xl transition duration-300 group-hover:scale-110 group-hover:bg-white/20">
-                    <i class="fa-solid fa-pen-nib"></i>
-                </div>
-                <h3 class="mt-6 text-3xl font-extrabold md:text-[34px]">Share Your Story</h3>
-                <p class="mt-4 max-w-[270px] text-[16px] leading-7 text-white/85">
-                    Get Rs50 off your next order for every verified review.
-                </p>
-            </div>
         </div>
     </div>
 </section>

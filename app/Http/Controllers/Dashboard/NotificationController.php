@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class NotificationController extends Controller
 {
@@ -49,28 +52,38 @@ class NotificationController extends Controller
             'user_ids.*' => ['integer', 'exists:users,id'],
         ]);
 
-        $validUserIds = User::query()
+        $recipients = User::query()
             ->whereIn('id', $data['user_ids'])
             ->where('role', 'customer')
             ->where('status', 'active')
-            ->pluck('id');
+            ->get(['id', 'name', 'email']);
 
-        if ($validUserIds->isEmpty()) {
+        if ($recipients->isEmpty()) {
             return back()->withInput()->withErrors([
                 'user_ids' => 'Please select at least one active customer.',
             ]);
         }
 
-        $validUserIds->each(function ($userId) use ($data) {
+        $recipients->each(function (User $recipient) use ($data) {
             Notification::create([
                 'subject' => $data['subject'],
                 'message' => $data['message'],
                 'sent_by' => auth()->id(),
-                'recipient_id' => $userId,
+                'recipient_id' => $recipient->id,
             ]);
+
+            if ($recipient->email) {
+                try {
+                    Mail::raw($data['message'], function ($mail) use ($recipient, $data) {
+                        $mail->to($recipient->email)->subject($data['subject']);
+                    });
+                } catch (Throwable $e) {
+                    Log::error('Admin notification email failed for user ' . $recipient->id . ': ' . $e->getMessage());
+                }
+            }
         });
 
-        return back()->with('success', 'Notification sent to selected customer(s).');
+        return back()->with('success', 'Notification sent to selected customer(s) — in-app and email.');
     }
 
     public function update(Request $request, Notification $notification)

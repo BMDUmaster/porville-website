@@ -16,7 +16,7 @@ class OrderPricing
         $pricingDay = ProductDayPricing::normalizeDay($pricingDay);
         $subtotal = round(max($subtotal, 0), 2);
         $deliveryCharge = $subtotal > 0 ? self::deliveryCharge($user) : 0.0;
-        $serviceChargePercent = ServiceChargeManager::percentage($pricingDay);
+        $serviceChargePercent = ServiceChargeManager::effectivePercentage($subtotal, $pricingDay);
         $serviceCharge = ServiceChargeManager::calculate($subtotal, $pricingDay);
         $total = round($subtotal + $deliveryCharge + $serviceCharge, 2);
 

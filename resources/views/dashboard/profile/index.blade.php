@@ -50,7 +50,7 @@
                         <h2 class="text-2xl font-black tracking-tight text-slate-900">Update Profile</h2>
                         <p class="mt-1 text-sm text-slate-400">Manage your admin details and photo from here.</p>
                     </div>
-                    <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-blue-600">Profile</span>
+                    <span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-amber-600">Profile</span>
                 </div>
 
                 <form method="POST" action="{{ route('dashboard.profile.update') }}" enctype="multipart/form-data" class="grid gap-5 md:grid-cols-2">
@@ -60,13 +60,13 @@
                     <div class="md:col-span-2">
                         <label class="mb-2 block text-sm font-bold text-slate-700">Full Name</label>
                         <input type="text" name="name" value="{{ $user->name }}" required
-                               class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white">
+                               class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500 focus:bg-white">
                     </div>
 
                     <div>
                         <label class="mb-2 block text-sm font-bold text-slate-700">Phone</label>
                         <input type="text" name="phone" value="{{ $user->phone ?? '' }}"
-                               class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white">
+                               class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500 focus:bg-white">
                     </div>
 
                     <div>
@@ -78,12 +78,12 @@
                     <div class="md:col-span-2">
                         <label class="mb-2 block text-sm font-bold text-slate-700">Profile Photo</label>
                         <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-5">
-                            <input type="file" name="photo" accept="image/*" class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-xl file:border-0 file:bg-blue-600 file:px-4 file:py-2.5 file:text-sm file:font-bold file:text-white hover:file:bg-blue-700">
+                            <input type="file" name="photo" accept="image/*" class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-xl file:border-0 file:bg-amber-600 file:px-4 file:py-2.5 file:text-sm file:font-bold file:text-white hover:file:bg-amber-700">
                         </div>
                     </div>
 
                     <div class="md:col-span-2 pt-1">
-                        <button type="submit" class="inline-flex w-full items-center justify-center rounded-2xl bg-blue-600 px-8 py-3 text-sm font-bold text-white transition hover:bg-blue-700 sm:w-auto">
+                        <button type="submit" class="inline-flex w-full items-center justify-center rounded-2xl bg-amber-600 px-8 py-3 text-sm font-bold text-white transition hover:bg-amber-700 sm:w-auto">
                             Update Profile
                         </button>
                     </div>
@@ -106,7 +106,7 @@
                     <div>
                         <label class="mb-2 block text-sm font-bold text-slate-700">Current Password</label>
                         <input type="password" name="current_password" required
-                               class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white">
+                               class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500 focus:bg-white">
                         @error('current_password')
                             <p class="mt-2 text-xs font-semibold text-red-500">{{ $message }}</p>
                         @enderror
@@ -115,13 +115,13 @@
                     <div>
                         <label class="mb-2 block text-sm font-bold text-slate-700">New Password</label>
                         <input type="password" name="password" required minlength="8"
-                               class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white">
+                               class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500 focus:bg-white">
                     </div>
 
                     <div>
                         <label class="mb-2 block text-sm font-bold text-slate-700">Confirm New Password</label>
                         <input type="password" name="password_confirmation" required
-                               class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white">
+                               class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500 focus:bg-white">
                     </div>
 
                     <div class="pt-1">

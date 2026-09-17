@@ -101,9 +101,7 @@
     })->values();
 
     $defaultVariant = $variantPayload->first();
-    $defaultPricingDay = ($defaultVariant && ! ($defaultVariant['today_available'] ?? true) && ($defaultVariant['tomorrow_available'] ?? false))
-        ? 'tomorrow'
-        : 'today';
+    $defaultPricingDay = 'today';
     $defaultVariantIndex = $variantPayload->search(function ($variant) use ($defaultPricingDay) {
         return $variant[$defaultPricingDay . '_available'] ?? true;
     });
@@ -118,18 +116,26 @@
     $productDescriptionText = trim(preg_replace('/\s+/', ' ', strip_tags((string) ($product->description ?? ''))));
     $hasLongProductDescription = \Illuminate\Support\Str::length($productDescriptionText) > 105;
     $initialDetailTab = $hasProductDescription ? 'description' : 'offers';
-    $productOrigin = $product->subcategory->name ?? $product->category->name ?? 'FarmSea Farms';
+    $productOrigin = $product->subcategory->name ?? $product->category->name ?? 'Porville Farms';
     $productCategory = $product->category->name ?? 'Fresh Cuts';
     $productTagline = 'Pasture-Raised • Grain-Fed • Air-Chilled';
     $isProductAvailable = ! $product->is_out_of_stock;
+    $isEnquiryOnly = $product->is_enquiry_only;
 
-    $productSpecs = [
-        'Origin' => $productOrigin,
-        'Processed' => 'Freshly cleaned and chilled',
-        'Pack Weight' => $selectedPackLabel,
-        'Storage' => '0-4 C. Consume within 24 hrs of opening',
-        'Category' => $productCategory,
-    ];
+    $productSpecs = $isEnquiryOnly
+        ? array_filter([
+            'Origin' => $productOrigin,
+            'Processing' => $product->processing_note ?: null,
+            'Delivery Note' => $product->delivery_note ?: null,
+            'Category' => $productCategory,
+        ])
+        : [
+            'Origin' => $productOrigin,
+            'Processed' => 'Freshly cleaned and chilled',
+            'Pack Weight' => $selectedPackLabel,
+            'Storage' => '0-4 C. Consume within 24 hrs of opening',
+            'Category' => $productCategory,
+        ];
 
     $featureBullets = [
         'Sourced from Karnataka Farms using ethical, sustainable practices',
@@ -182,7 +188,7 @@
         [
             'name' => 'Arjun Kumar',
             'initials' => 'AK',
-            'color' => 'bg-[#3b82f6]',
+            'color' => 'bg-[#262626]',
             'date' => '2 Mar 2026',
             'title' => 'Absolutely fresh, zero smell!',
             'text' => "Arrived well-packed with double ice gel. The {$prodNameLower} was super clean and smelled like nothing — that is how you know it is fresh. Made a dish and the whole family loved it. Will order weekly.",
@@ -191,7 +197,7 @@
         [
             'name' => 'Priya Mehta',
             'initials' => 'PM',
-            'color' => 'bg-[#2f8c43]',
+            'color' => 'bg-[#b8862c]',
             'date' => '28 Feb 2026',
             'title' => 'Consistent quality every time',
             'text' => "Same-day delivery was on point — arrived in under 2 hours. The {$prodNameLower} pieces are uniform in size which makes cooking easier. Been ordering for 2 months now, quality never drops.",
@@ -211,8 +217,8 @@
             'initials' => 'FS',
             'color' => 'bg-[#dc2626]',
             'date' => '18 Feb 2026',
-            'title' => 'FarmSea is now my go-to',
-            'text' => "I used to drive to the local market but FarmSea's {$prodNameLower} has completely replaced that. Freshly cleaned, and delivered right to my door. The hygiene and quality are top notch.",
+            'title' => 'Porville is now my go-to',
+            'text' => "I used to drive to the local market but Porville's {$prodNameLower} has completely replaced that. Freshly cleaned, and delivered right to my door. The hygiene and quality are top notch.",
             'helpful' => 18,
         ],
     ];
@@ -233,7 +239,7 @@
         return [
             'name' => $name,
             'initials' => collect(explode(' ', $name))->take(2)->map(fn($part) => strtoupper(substr($part, 0, 1)))->join('') ?: 'VC',
-            'color' => 'bg-[#2f8c43]',
+            'color' => 'bg-[#b8862c]',
             'date' => optional($review->reviewed_at ?? $review->created_at)->format('d M Y'),
             'title' => 'Verified purchase',
             'text' => $review->comment ?: 'Great product and delivery experience.',
@@ -251,23 +257,23 @@
     $offerCards = [
         [
             'icon' => 'fa-tag',
-            'icon_bg' => 'bg-[#e9f7ec]',
-            'icon_color' => 'text-[#2f8c43]',
+            'icon_bg' => 'bg-[#faf5e8]',
+            'icon_color' => 'text-[#b8862c]',
             'title' => '20% Off on First Order',
-            'text' => 'New customers get flat 20% off on their first FarmSea order. No minimum order value.',
+            'text' => 'New customers get flat 20% off on their first Porville order. No minimum order value.',
             'code' => 'FARMNEW20',
-            'code_bg' => 'bg-[#edf8ef]',
-            'code_text' => 'text-[#2f8c43]',
+            'code_bg' => 'bg-[#faf5e8]',
+            'code_text' => 'text-[#b8862c]',
         ],
         [
             'icon' => 'fa-truck-fast',
-            'icon_bg' => 'bg-[#ebf4ff]',
-            'icon_color' => 'text-[#2d72d3]',
+            'icon_bg' => 'bg-[#f2f2f2]',
+            'icon_color' => 'text-[#262626]',
             'title' => 'Free Delivery on ₹499+',
             'text' => 'Get free same-day delivery on all orders above ₹499. Valid on all products.',
             'code' => null,
-            'code_bg' => 'bg-[#ebf4ff]',
-            'code_text' => 'text-[#2d72d3]',
+            'code_bg' => 'bg-[#f2f2f2]',
+            'code_text' => 'text-[#262626]',
         ],
         [
             'icon' => 'fa-credit-card',
@@ -276,8 +282,8 @@
             'title' => '5% Cashback with HDFC',
             'text' => 'Get 5% cashback (up to ₹150) on HDFC credit/debit cards. Valid on all orders.',
             'code' => 'HDFCC5',
-            'code_bg' => 'bg-[#edf8ef]',
-            'code_text' => 'text-[#2f8c43]',
+            'code_bg' => 'bg-[#faf5e8]',
+            'code_text' => 'text-[#b8862c]',
         ],
         [
             'icon' => 'fa-rotate',
@@ -286,8 +292,8 @@
             'title' => 'Refer & Earn ₹100',
             'text' => 'Refer a friend — they get ₹100 off their first order, and so do you!',
             'code' => 'REFER100',
-            'code_bg' => 'bg-[#edf8ef]',
-            'code_text' => 'text-[#2f8c43]',
+            'code_bg' => 'bg-[#faf5e8]',
+            'code_text' => 'text-[#b8862c]',
         ],
     ];
 
@@ -313,18 +319,18 @@
 <div class="mx-auto w-full max-w-7xl px-3 py-5 sm:px-4 md:px-6 md:py-8">
     <div class="mb-5 hidden flex-wrap items-center justify-between gap-3 text-[11px] font-semibold text-slate-400 md:flex">
         <nav class="flex items-center gap-2">
-            <a href="{{ route('frontend.home') }}" class="transition hover:text-green-700">Home</a>
+            <a href="{{ route('frontend.home') }}" class="transition hover:text-amber-700">Home</a>
             <i class="fa-solid fa-angle-right text-[9px]"></i>
-            <a href="{{ route('frontend.products') }}" class="transition hover:text-green-700">Products</a>
+            <a href="{{ route('frontend.products') }}" class="transition hover:text-amber-700">Products</a>
             <i class="fa-solid fa-angle-right text-[9px]"></i>
             @if($product->category)
-                <a href="{{ route('frontend.products', ['category' => $product->category->slug]) }}" class="transition hover:text-green-700">{{ $product->category->name }}</a>
+                <a href="{{ route('frontend.products', ['category' => $product->category->slug]) }}" class="transition hover:text-amber-700">{{ $product->category->name }}</a>
                 <i class="fa-solid fa-angle-right text-[9px]"></i>
             @endif
             <span class="text-slate-600">{{ $product->name }}</span>
         </nav>
 
-        <a href="{{ route('frontend.products') }}" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-[11px] font-bold text-slate-600 shadow-sm transition hover:border-green-200 hover:text-green-700">
+        <a href="{{ route('frontend.products') }}" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-[11px] font-bold text-slate-600 shadow-sm transition hover:border-amber-200 hover:text-amber-700">
             <i class="fa-solid fa-arrow-left text-[10px]"></i>
             Back
         </a>
@@ -332,8 +338,8 @@
 
     <div class="grid min-w-0 gap-5 md:gap-8 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)] lg:items-start">
         <div class="min-w-0">
-            <div class="overflow-hidden rounded-[28px] border border-[#dce5d9] bg-white shadow-[0_22px_60px_rgba(15,23,42,0.08)]">
-                <div class="relative aspect-[1/0.94] overflow-hidden bg-[#f4f5ef]">
+            <div class="overflow-hidden rounded-[28px] border border-[#e6d3a3] bg-white shadow-[0_22px_60px_rgba(15,23,42,0.08)]">
+                <div class="relative aspect-[1/0.94] overflow-hidden bg-[#faf7f0]">
                     @php
                         $isInWishlist = in_array($product->id, session('wishlist', []), true);
                     @endphp
@@ -345,7 +351,7 @@
                     </button>
 
                     @if(in_array($product->id, $newArrivalProductIds ?? [], true))
-                        <span class="absolute right-4 top-4 z-20 inline-flex items-center rounded-full bg-blue-600 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white shadow-lg">
+                        <span class="absolute right-4 top-4 z-20 inline-flex items-center rounded-full bg-neutral-900 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white shadow-lg">
                             New Arrival
                         </span>
                     @endif
@@ -409,7 +415,7 @@
                                 type="button"
                                 onclick="showGalleryImage({{ $index }})"
                                 id="detailDot{{ $index }}"
-                                class="detail-dot {{ $index === 0 ? 'is-active w-7 bg-[#2f8c43]' : 'w-2.5 bg-[#cfd7d1]' }} h-2.5 rounded-full transition-all duration-200"
+                                class="detail-dot {{ $index === 0 ? 'is-active w-7 bg-[#b8862c]' : 'w-2.5 bg-[#e6ded0]' }} h-2.5 rounded-full transition-all duration-200"
                                 aria-label="Go to image {{ $index + 1 }}"
                             ></button>
                         @endforeach
@@ -445,7 +451,7 @@
             <div class="flex min-w-0 items-start justify-between gap-3 sm:gap-4">
                 <div class="min-w-0 flex-1">
                     <div class="mb-2 flex flex-wrap items-center gap-2">
-                        <span class="inline-flex rounded-md bg-[#e9f4ea] px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-[#2f8c43]">
+                        <span class="inline-flex rounded-md bg-[#faf5e8] px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-[#b8862c]">
                             Best Seller
                         </span>
                     </div>
@@ -465,7 +471,7 @@
                         </div>
                         <span class="text-xs font-black text-slate-700">{{ $reviewSummary['rating'] }}</span>
                         <span class="text-slate-300">|</span>
-                        <span class="text-xs font-semibold text-[#2f8c43] hover:underline">{{ $reviewSummary['total'] }} Reviews</span>
+                        <span class="text-xs font-semibold text-[#b8862c] hover:underline">{{ $reviewSummary['total'] }} Reviews</span>
                     </button>
                     @if($hasProductDescription)
                         <div class="relative mt-3 max-w-[650px] overflow-hidden text-[14px] leading-7 text-slate-500 md:text-[15px]">
@@ -473,7 +479,7 @@
                             @if($hasLongProductDescription)
                                 <button type="button"
                                         onclick="activateDetailTab('description'); document.getElementById('detail-tabs-section').scrollIntoView({ behavior: 'smooth', block: 'start' });"
-                                        class="absolute bottom-0 right-0 bg-[#f5f6fa] pl-2 text-[13px] font-black text-green-700 hover:underline md:text-[14px]">
+                                        class="absolute bottom-0 right-0 bg-[#f5f6fa] pl-2 text-[13px] font-black text-amber-700 hover:underline md:text-[14px]">
                                     ... See more
                                 </button>
                             @endif
@@ -483,16 +489,16 @@
 
                 <div class="flex flex-shrink-0 items-center gap-1.5 sm:gap-2">
                     <div class="relative">
-                        <button type="button" onclick="toggleProductShare(event)" aria-label="Share this product" aria-expanded="false" id="productShareButton" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-green-200 hover:text-green-700">
+                        <button type="button" onclick="toggleProductShare(event)" aria-label="Share this product" aria-expanded="false" id="productShareButton" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-amber-200 hover:text-amber-700">
                             <i class="fa-solid fa-share-nodes text-sm"></i>
                         </button>
                         <div id="productShareMenu" class="hidden absolute right-0 top-11 z-50 w-52 overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl">
                             <p class="px-3 pb-2 pt-1 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Share product</p>
-                            <a href="https://wa.me/?text={{ urlencode($product->name . ' - ' . url()->current()) }}" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 hover:bg-green-50 hover:text-green-700">
-                                <i class="fa-brands fa-whatsapp w-5 text-lg text-green-500"></i> WhatsApp
+                            <a href="https://wa.me/?text={{ urlencode($product->name . ' - ' . url()->current()) }}" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-700">
+                                <i class="fa-brands fa-whatsapp w-5 text-lg text-amber-600"></i> WhatsApp
                             </a>
-                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-700">
-                                <i class="fa-brands fa-facebook w-5 text-lg text-blue-600"></i> Facebook
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-700">
+                                <i class="fa-brands fa-facebook w-5 text-lg text-amber-600"></i> Facebook
                             </a>
                             <button type="button" onclick="shareProductToInstagram(this)" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-slate-700 hover:bg-pink-50 hover:text-pink-700">
                                 <i class="fa-brands fa-instagram w-5 text-lg text-pink-600"></i> <span>Instagram</span>
@@ -508,16 +514,39 @@
                 </div>
             </div>
 
-            <div class="min-w-0 rounded-[24px] border border-[#bce8c3] bg-[#f2fbf3] p-4 shadow-[0_18px_45px_rgba(47,140,67,0.08)] sm:p-5">
-                <div class="mb-4 flex flex-wrap items-center gap-2">
-                    <span class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Choose Day</span>
-                    <button type="button" data-pricing-day="today" class="pricing-day-button {{ $defaultPricingDay === 'today' ? 'is-active' : '' }} {{ ($defaultVariant['today_available'] ?? true) ? '' : 'hidden' }} rounded-full border border-green-500 bg-white px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-green-700 shadow-sm transition hover:border-green-400">
-                        Today
-                    </button>
-                    <button type="button" data-pricing-day="tomorrow" class="pricing-day-button {{ $defaultPricingDay === 'tomorrow' ? 'is-active' : '' }} {{ ($defaultVariant['tomorrow_available'] ?? false) ? '' : 'hidden' }} rounded-full border border-transparent bg-white/70 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-slate-500 transition hover:border-green-200 hover:text-green-700">
-                        Tomorrow
-                    </button>
+            @if(!$isEnquiryOnly)
+                <div>
+                    <div class="mb-3 text-[12px] font-black uppercase tracking-[0.18em] text-slate-500">Pack Size</div>
+                    <div class="flex flex-wrap gap-3">
+                        @foreach($variantPayload as $index => $variant)
+                            @php($isDefaultVariant = $index === $defaultVariantIndex)
+                            <button
+                                type="button"
+                                id="variant-btn-{{ $index }}"
+                                onclick="selectVariant({{ $index }})"
+                                data-today-available="{{ ($variant['today_available'] ?? true) ? '1' : '0' }}"
+                                data-tomorrow-available="{{ ($variant['tomorrow_available'] ?? false) ? '1' : '0' }}"
+                                class="variant-card {{ $isDefaultVariant ? 'is-active border-[#b8862c] bg-[#faf5e8] shadow-[0_14px_28px_rgba(184,134,44,0.16)]' : 'border-slate-200 bg-white' }} {{ ($variant[$defaultPricingDay . '_available'] ?? true) ? '' : 'hidden' }} group relative min-w-[92px] overflow-hidden rounded-[16px] border-2 px-4 py-3 text-left shadow-sm transition duration-200 hover:-translate-y-1 hover:border-amber-400 hover:bg-amber-50 hover:shadow-[0_14px_28px_rgba(184,134,44,0.16)] active:translate-y-0 active:scale-[0.98]"
+                            >
+                                <span class="variant-check absolute right-2 top-2 {{ $isDefaultVariant ? 'flex' : 'hidden' }} h-4 w-4 items-center justify-center rounded-full bg-[#b8862c] text-white">
+                                    <i class="fa-solid fa-check text-[8px]"></i>
+                                </span>
+                                <div class="text-[12px] font-black text-slate-800">{{ $variant['label'] ?: 'Standard Pack' }}</div>
+                                <div class="mt-1 text-[13px] font-black text-[#b8862c]" data-variant-day-price="{{ $index }}">₹{{ number_format($variant[$defaultPricingDay . '_price'], 0) }}</div>
+                            </button>
+                        @endforeach
+                    </div>
                 </div>
+            @endif
+
+            @if($isEnquiryOnly)
+                <div class="min-w-0 rounded-[24px] border border-[#e6d3a3] bg-[#faf5e8] p-4 shadow-[0_18px_45px_rgba(184,134,44,0.08)] sm:p-5">
+                    <span class="inline-flex rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.15em] text-[#b8862c]">Custom cut &middot; enquire</span>
+                    <div class="mt-2 text-[32px] font-black leading-none text-slate-900 sm:text-[36px]">On call</div>
+                    <p class="mt-2 text-[12px] font-semibold leading-6 text-slate-500">Pricing depends on live weight and cut — call us and we'll confirm the best price for you.</p>
+                </div>
+            @else
+            <div class="min-w-0 rounded-[24px] border border-[#e6d3a3] bg-[#faf5e8] p-4 shadow-[0_18px_45px_rgba(184,134,44,0.08)] sm:p-5">
                 <div class="flex min-w-0 flex-wrap items-end gap-2 sm:gap-3">
                     <span class="max-w-full break-words text-[36px] font-black leading-none text-slate-900 sm:text-[40px] md:text-[46px]">
                         ₹<span id="detailCurrentPrice">{{ number_format($defaultDisplayedPrice, 0) }}</span>
@@ -532,16 +561,17 @@
                         </span>
                     </span>
                 </div>
-                <div id="detailSaveRow" class="{{ $selectedSaveAmount > 0 ? '' : 'hidden' }} mt-3 inline-flex items-center gap-1 rounded-xl border border-[#8bd39a] bg-[#dff6e3] px-3 py-1.5 text-[11px] font-black text-[#2f8c43]">
+                <div id="detailSaveRow" class="{{ $selectedSaveAmount > 0 ? '' : 'hidden' }} mt-3 inline-flex items-center gap-1 rounded-xl border border-[#e0b84d] bg-[#faf5e8] px-3 py-1.5 text-[11px] font-black text-[#b8862c]">
                     <span>You save ₹</span>
                     <span id="detailSaveAmount">{{ number_format($selectedSaveAmount, 0) }}</span>
                     <span>on this order</span>
                 </div>
             </div>
+            @endif
 
             @if(count($offerCards))
                 @php($featuredOffer = $offerCards[0])
-                <button type="button" onclick="activateDetailTab('offers'); document.getElementById('detail-tabs-section').scrollIntoView({ behavior: 'smooth', block: 'start' });" class="group flex w-full items-center justify-between gap-4 rounded-[20px] border border-emerald-200 bg-gradient-to-r from-emerald-50 to-green-100/60 px-4 py-3 text-left shadow-sm transition hover:border-emerald-300 hover:shadow-md">
+                <button type="button" onclick="activateDetailTab('offers'); document.getElementById('detail-tabs-section').scrollIntoView({ behavior: 'smooth', block: 'start' });" class="group flex w-full items-center justify-between gap-4 rounded-[20px] border border-emerald-200 bg-gradient-to-r from-emerald-50 to-amber-100/60 px-4 py-3 text-left shadow-sm transition hover:border-emerald-300 hover:shadow-md">
                     <span class="flex min-w-0 items-center gap-3">
                         <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm"><i class="fa-solid fa-percent"></i></span>
                         <span class="min-w-0">
@@ -554,7 +584,7 @@
             @endif
 
             <div class="flex flex-wrap gap-2">
-                <span class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-[11px] font-black {{ $isProductAvailable ? 'border border-green-200 bg-green-50 text-green-700' : 'border border-red-200 bg-red-50 text-red-600' }}">
+                <span class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-[11px] font-black {{ $isProductAvailable ? 'border border-amber-200 bg-amber-50 text-amber-700' : 'border border-red-200 bg-red-50 text-red-600' }}">
                     <i class="fa-solid {{ $isProductAvailable ? 'fa-circle-check' : 'fa-ban' }} text-[10px]"></i>
                     {{ $isProductAvailable ? 'In Stock' : 'Out of Stock' }}
                 </span>
@@ -564,25 +594,7 @@
                 </span>
             </div>
 
-            <div>
-                <div class="mb-3 text-[12px] font-black uppercase tracking-[0.18em] text-slate-500">Pack Size</div>
-                <div class="flex flex-wrap gap-3">
-                    @foreach($variantPayload as $index => $variant)
-                        <button
-                            type="button"
-                            id="variant-btn-{{ $index }}"
-                            onclick="selectVariant({{ $index }})"
-                            data-today-available="{{ ($variant['today_available'] ?? true) ? '1' : '0' }}"
-                            data-tomorrow-available="{{ ($variant['tomorrow_available'] ?? false) ? '1' : '0' }}"
-                            class="variant-card {{ $index === $defaultVariantIndex ? 'is-active' : '' }} {{ ($variant[$defaultPricingDay . '_available'] ?? true) ? '' : 'hidden' }} min-w-[84px] rounded-[16px] border border-slate-200 bg-white px-3 py-3 text-left shadow-sm transition duration-200 hover:-translate-y-1 hover:border-green-400 hover:bg-green-50 hover:shadow-[0_14px_28px_rgba(47,140,67,0.16)] active:translate-y-0 active:scale-[0.98]"
-                        >
-                            <div class="text-[11px] font-black text-slate-800">{{ $variant['label'] ?: 'Standard Pack' }}</div>
-                            <div class="mt-1 text-[10px] font-semibold text-slate-400" data-variant-day-price="{{ $index }}">₹{{ number_format($variant[$defaultPricingDay . '_price'], 0) }}</div>
-                        </button>
-                    @endforeach
-                </div>
-            </div>
-
+            @if(!$isEnquiryOnly)
             <div class="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1.55fr)] gap-3 sm:flex sm:flex-wrap sm:items-stretch">
                 @if($isProductAvailable)
                     <div class="grid min-w-0 grid-cols-3 items-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm sm:flex">
@@ -594,15 +606,9 @@
 
                 @if($isProductAvailable)
                     <button type="button" onclick="addToCartWithQty({{ $product->id }})"
-                            class="inline-flex min-w-0 items-center justify-center gap-2 rounded-2xl bg-[#1f9d47] px-3 py-3 text-[12px] font-black uppercase tracking-[0.1em] text-white shadow-[0_14px_30px_rgba(31,157,71,0.22)] transition hover:-translate-y-0.5 hover:bg-[#18823a] sm:flex-1 sm:px-5 sm:text-[13px] sm:tracking-[0.14em]">
-                        <i class="fa-solid fa-cart-shopping text-[12px]"></i>
+                            class="col-span-2 inline-flex min-w-0 items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 bg-black px-5 py-3 text-[13px] font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_rgba(0,0,0,0.24)] transition hover:-translate-y-0.5 hover:bg-neutral-900 sm:flex-1">
+                        <i class="fa-solid fa-cart-shopping text-[12px] text-amber-400"></i>
                         Add To Cart
-                    </button>
-
-                    <button type="button" onclick="buyNowWithQty({{ $product->id }})"
-                            class="col-span-2 inline-flex min-w-0 items-center justify-center gap-2 rounded-2xl bg-[#1f5ea8] px-5 py-3 text-[13px] font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_rgba(31,94,168,0.24)] transition hover:-translate-y-0.5 hover:bg-[#174c89] sm:flex-1">
-                        <i class="fa-solid fa-bolt text-[12px]"></i>
-                        Buy Now
                     </button>
                 @else
                     <div class="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-5 py-3 text-[13px] font-black uppercase tracking-[0.14em] text-red-600">
@@ -612,29 +618,55 @@
                 @endif
 
             </div>
+            @else
+                @if($isProductAvailable && $product->contact_number)
+                    <a href="tel:{{ preg_replace('/\D/', '', $product->contact_number) }}"
+                       class="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 bg-black px-5 py-4 text-[14px] font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_rgba(0,0,0,0.24)] transition hover:-translate-y-0.5 hover:bg-neutral-900">
+                        <i class="fa-solid fa-phone text-[13px] text-amber-400"></i>
+                        Call to Order &middot; {{ $product->contact_number }}
+                    </a>
+                @elseif($isProductAvailable)
+                    <a href="{{ route('frontend.contact') }}"
+                       class="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 bg-black px-5 py-4 text-[14px] font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_rgba(0,0,0,0.24)] transition hover:-translate-y-0.5 hover:bg-neutral-900">
+                        <i class="fa-solid fa-headset text-[13px] text-amber-400"></i>
+                        Contact Us to Order
+                    </a>
+                @else
+                    <div class="flex w-full items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-[13px] font-black uppercase tracking-[0.14em] text-red-600">
+                        <i class="fa-solid fa-ban text-[12px]"></i>
+                        Currently Unavailable
+                    </div>
+                @endif
+            @endif
 
             @include('frontend.partials.similar-products', ['wrapperClass' => 'mt-3 md:hidden'])
 
-            <div class="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
-                @foreach($productSpecs as $label => $value)
-                    <div class="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-3 border-b border-slate-100 px-4 py-3 last:border-b-0 sm:grid-cols-[140px_minmax(0,1fr)] sm:gap-4">
-                        <div class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">{{ $label }}</div>
-                        <div class="text-[13px] font-semibold text-slate-700">{{ $value }}</div>
-                    </div>
-                @endforeach
-            </div>
+            <details class="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
+                <summary class="flex cursor-pointer list-none items-center justify-between px-4 py-3.5 text-[12px] font-black uppercase tracking-[0.16em] text-slate-700">
+                    Product Details
+                    <i class="fa-solid fa-chevron-down text-xs text-amber-500 transition group-open:rotate-180"></i>
+                </summary>
+                <div class="border-t border-slate-100">
+                    @foreach($productSpecs as $label => $value)
+                        <div class="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-3 border-b border-slate-100 px-4 py-3 last:border-b-0 sm:grid-cols-[140px_minmax(0,1fr)] sm:gap-4">
+                            <div class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">{{ $label }}</div>
+                            <div class="text-[13px] font-semibold text-slate-700">{{ $value }}</div>
+                        </div>
+                    @endforeach
+                </div>
+            </details>
         </div>
     </div>
 
     <div id="detail-tabs-section" class="mt-10 overflow-x-auto">
-        <div class="inline-flex min-w-full gap-1.5 rounded-[18px] border border-slate-200/90 bg-[#f7f9f7] p-2 shadow-[0_10px_25px_rgba(15,23,42,0.05)]">
+        <div class="inline-flex min-w-full gap-1.5 rounded-[18px] border border-slate-200/90 bg-[#faf7f0] p-2 shadow-[0_10px_25px_rgba(15,23,42,0.05)]">
             @if($hasProductDescription)
-                <button type="button" data-detail-tab="description" class="detail-tab-button {{ $initialDetailTab === 'description' ? 'is-active bg-white border-slate-200 shadow-sm text-[#2f8c43]' : 'border-transparent text-slate-500' }} inline-flex items-center gap-2 rounded-[12px] border px-4 py-2.5 text-[12px] font-black transition hover:bg-white hover:text-slate-800">
+                <button type="button" data-detail-tab="description" class="detail-tab-button {{ $initialDetailTab === 'description' ? 'is-active bg-white border-slate-200 shadow-sm text-[#b8862c]' : 'border-transparent text-slate-500' }} inline-flex items-center gap-2 rounded-[12px] border px-4 py-2.5 text-[12px] font-black transition hover:bg-white hover:text-slate-800">
                     <i class="fa-solid fa-bars-staggered text-[11px]"></i>
                     Description
                 </button>
             @endif
-            <button type="button" data-detail-tab="offers" class="detail-tab-button {{ $initialDetailTab === 'offers' ? 'is-active bg-white border-slate-200 shadow-sm text-[#2f8c43]' : 'border-transparent text-slate-500' }} inline-flex items-center gap-2 rounded-[12px] border px-4 py-2.5 text-[12px] font-black transition hover:bg-white hover:text-slate-800">
+            <button type="button" data-detail-tab="offers" class="detail-tab-button {{ $initialDetailTab === 'offers' ? 'is-active bg-white border-slate-200 shadow-sm text-[#b8862c]' : 'border-transparent text-slate-500' }} inline-flex items-center gap-2 rounded-[12px] border px-4 py-2.5 text-[12px] font-black transition hover:bg-white hover:text-slate-800">
                 <i class="fa-solid fa-tag text-[11px]"></i>
                 Offers
             </button>
@@ -645,7 +677,7 @@
         </div>
     </div>
 
-    <div class="mt-6 overflow-hidden rounded-[28px] border border-slate-200 bg-[#fbfcfa] shadow-[0_22px_55px_rgba(15,23,42,0.06)]">
+    <div class="mt-6 overflow-hidden rounded-[28px] border border-slate-200 bg-[#fdfaf3] shadow-[0_22px_55px_rgba(15,23,42,0.06)]">
         @if($hasProductDescription)
             <div id="detail-tab-description" data-detail-panel="description" class="detail-tab-panel {{ $initialDetailTab !== 'description' ? 'hidden' : '' }}">
                 <section id="about-product" class="px-5 py-6 md:px-7">
@@ -658,10 +690,10 @@
         @endif
 
         <section data-detail-panel="offers" class="detail-tab-panel {{ $initialDetailTab !== 'offers' ? 'hidden' : '' }} px-3 py-5 sm:px-5 sm:py-6 md:px-7">
-            <div class="overflow-hidden rounded-[22px] border border-[#d7e6d7] bg-[radial-gradient(circle_at_top_left,_rgba(229,245,232,0.9),_rgba(255,255,255,1)_55%)] sm:rounded-[26px]">
-                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#e3ece3] px-4 py-4 sm:gap-3 sm:px-5 sm:py-5 md:px-6">
+            <div class="overflow-hidden rounded-[22px] border border-[#e6d3a3] bg-[radial-gradient(circle_at_top_left,_rgba(229,245,232,0.9),_rgba(255,255,255,1)_55%)] sm:rounded-[26px]">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#efe4c9] px-4 py-4 sm:gap-3 sm:px-5 sm:py-5 md:px-6">
                     <div class="min-w-0 flex-1">
-                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-[#2f8c43] sm:text-[11px]">Admin Offers</p>
+                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-[#b8862c] sm:text-[11px]">Admin Offers</p>
                         <h3 class="mt-0.5 text-[16px] font-black text-slate-900 sm:mt-1 sm:text-[20px]">Fresh deals on this product page</h3>
                     </div>
                     <div class="inline-flex flex-shrink-0 items-center rounded-full bg-white/90 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-slate-500 shadow-sm sm:px-4 sm:py-2 sm:text-[11px]">
@@ -698,7 +730,7 @@
 
                                         <div class="mt-3 flex flex-wrap items-center gap-1.5 sm:mt-4 sm:gap-2">
                                             @if($offer['code'])
-                                                <div class="inline-flex items-center rounded-lg border border-dashed border-[#2f8c43] {{ $offer['code_bg'] }} px-2.5 py-1.5 text-[10px] font-black uppercase tracking-[0.15em] {{ $offer['code_text'] }} sm:rounded-xl sm:px-3 sm:py-2 sm:text-[11px]">
+                                                <div class="inline-flex items-center rounded-lg border border-dashed border-[#b8862c] {{ $offer['code_bg'] }} px-2.5 py-1.5 text-[10px] font-black uppercase tracking-[0.15em] {{ $offer['code_text'] }} sm:rounded-xl sm:px-3 sm:py-2 sm:text-[11px]">
                                                     <i class="fa-solid fa-ticket mr-1.5 text-[9px] sm:mr-2 sm:text-[10px]"></i>
                                                     {{ $offer['code'] }}
                                                 </div>
@@ -717,8 +749,8 @@
                     </div>
                 @else
                     <div class="px-4 py-8 sm:px-5 sm:py-10 md:px-6">
-                        <div class="rounded-[20px] border border-dashed border-[#cfe1d0] bg-white/80 px-5 py-8 text-center sm:rounded-[24px] sm:px-6 sm:py-10">
-                            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#edf8ef] text-[#2f8c43] sm:h-14 sm:w-14 sm:rounded-2xl">
+                        <div class="rounded-[20px] border border-dashed border-[#e6d3a3] bg-white/80 px-5 py-8 text-center sm:rounded-[24px] sm:px-6 sm:py-10">
+                            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#faf5e8] text-[#b8862c] sm:h-14 sm:w-14 sm:rounded-2xl">
                                 <i class="fa-solid fa-tags text-base sm:text-lg"></i>
                             </div>
                             <h4 class="mt-3 text-[16px] font-black text-slate-900 sm:mt-4 sm:text-[18px]">No live offers right now</h4>
@@ -753,7 +785,7 @@
                                 <span class="w-3">{{ $dist['stars'] }}</span>
                                 <i class="fa-solid fa-star text-[9px] text-[#f59e0b]"></i>
                                 <div class="h-2 flex-1 rounded-full bg-slate-100 overflow-hidden">
-                                    <div class="h-full bg-green-500" style="width: {{ $dist['percent'] }}%"></div>
+                                    <div class="h-full bg-amber-500" style="width: {{ $dist['percent'] }}%"></div>
                                 </div>
                                 <span class="w-8 text-right">{{ $dist['percent'] }}%</span>
                             </div>
@@ -799,12 +831,12 @@
             <div class="grid gap-4 lg:grid-cols-2">
                 <div class="overflow-hidden rounded-[20px] border border-slate-200 bg-white shadow-[0_14px_30px_rgba(15,23,42,0.05)]">
                     <div class="flex items-center gap-2 border-b border-slate-100 px-4 py-4">
-                        <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#edf8ef] text-[#2f8c43]">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#faf5e8] text-[#b8862c]">
                             <i class="fa-solid fa-truck-fast text-[12px]"></i>
                         </span>
                         <h4 class="text-[14px] font-black text-slate-900">Delivery</h4>
                     </div>
-                    <div class="bg-[#fdfefd]">
+                    <div class="bg-[#fdfaf3]">
                         @foreach($deliveryInfoRows as $row)
                             <div class="border-b border-slate-100 px-4 py-3 text-[13px] font-semibold leading-6 text-slate-600 last:border-b-0">
                                 {!! preg_replace('/(10 AM|same-day delivery|3–6 hours|7 days a week|above ₹499|0–4°C delivery)/', '<strong class="font-black text-slate-900">$1</strong>', e($row)) !!}
@@ -820,7 +852,7 @@
                         </span>
                         <h4 class="text-[14px] font-black text-slate-900">Returns &amp; Guarantee</h4>
                     </div>
-                    <div class="bg-[#fdfefd]">
+                    <div class="bg-[#fdfaf3]">
                         @foreach($returnsInfoRows as $row)
                             <div class="border-b border-slate-100 px-4 py-3 text-[13px] font-semibold leading-6 text-slate-600 last:border-b-0">
                                 {!! preg_replace('/(within 2 hours|free replacement or full refund|24–48 hours)/', '<strong class="font-black text-slate-900">$1</strong>', e($row)) !!}
@@ -894,17 +926,17 @@ function showGalleryImage(index) {
 
     document.querySelectorAll('.detail-thumb').forEach((thumb, thumbIndex) => {
         thumb.classList.toggle('is-active', thumbIndex === galleryIndex);
-        thumb.classList.toggle('border-[#2f8c43]', thumbIndex === galleryIndex);
-        thumb.classList.toggle('shadow-[0_10px_25px_rgba(47,140,67,0.15)]', thumbIndex === galleryIndex);
+        thumb.classList.toggle('border-[#b8862c]', thumbIndex === galleryIndex);
+        thumb.classList.toggle('shadow-[0_10px_25px_rgba(184,134,44,0.15)]', thumbIndex === galleryIndex);
     });
 
     document.querySelectorAll('.detail-dot').forEach((dot, dotIndex) => {
         const isActive = dotIndex === galleryIndex;
         dot.classList.toggle('is-active', isActive);
         dot.classList.toggle('w-7', isActive);
-        dot.classList.toggle('bg-[#2f8c43]', isActive);
+        dot.classList.toggle('bg-[#b8862c]', isActive);
         dot.classList.toggle('w-2.5', !isActive);
-        dot.classList.toggle('bg-[#cfd7d1]', !isActive);
+        dot.classList.toggle('bg-[#e6ded0]', !isActive);
     });
 }
 
@@ -960,7 +992,7 @@ function activateDetailTab(tabName) {
         button.classList.toggle('bg-white', isActive);
         button.classList.toggle('border-slate-200', isActive);
         button.classList.toggle('shadow-sm', isActive);
-        button.classList.toggle('text-[#2f8c43]', isActive);
+        button.classList.toggle('text-[#b8862c]', isActive);
         button.classList.toggle('text-slate-500', !isActive);
         button.classList.toggle('border-transparent', !isActive);
     });
@@ -970,124 +1002,43 @@ function activateDetailTab(tabName) {
     });
 }
 
-function getVariantDayPrice(variant, pricingDay) {
+function getVariantPrice(variant) {
     if (!variant) return 0;
 
-    const dayPrice = pricingDay === 'tomorrow' ? variant.tomorrow_price : variant.today_price;
+    const price = variant.today_price;
 
-    if (dayPrice !== null && dayPrice !== undefined && dayPrice !== '') {
-        return Number(dayPrice);
+    if (price !== null && price !== undefined && price !== '') {
+        return Number(price);
     }
 
     return Number(variant.selling_price) || 0;
 }
 
-function isTomorrowAvailable(variant) {
-    if (!variant) return false;
-
-    return variant.tomorrow_available === true;
-}
-
-function isTodayAvailable(variant) {
-    if (!variant) return true;
-
-    return variant.today_available !== false;
-}
-
-function syncPricingDayButtons() {
-    const variant = detailVariants[selectedVariant];
-    const todayButton = document.querySelector('[data-pricing-day="today"]');
-    const tomorrowButton = document.querySelector('[data-pricing-day="tomorrow"]');
-    const todayAvailable = isTodayAvailable(variant);
-    const tomorrowAvailable = isTomorrowAvailable(variant);
-
-    if (todayButton) {
-        todayButton.classList.toggle('hidden', !todayAvailable);
-    }
-
-    if (tomorrowButton) {
-        tomorrowButton.classList.toggle('hidden', !tomorrowAvailable);
-    }
-
-    if (!tomorrowAvailable && selectedPricingDay === 'tomorrow') {
-        selectedPricingDay = 'today';
-    }
-
-    if (!todayAvailable && selectedPricingDay === 'today') {
-        selectedPricingDay = tomorrowAvailable ? 'tomorrow' : 'today';
-    }
-
-    document.querySelectorAll('[data-pricing-day]').forEach((button) => {
-        const isActive = button.dataset.pricingDay === selectedPricingDay;
-        button.classList.toggle('is-active', isActive);
-        button.classList.toggle('border-green-500', isActive);
-        button.classList.toggle('bg-white', isActive);
-        button.classList.toggle('text-green-700', isActive);
-        button.classList.toggle('shadow-sm', isActive);
-        button.classList.toggle('border-transparent', !isActive);
-        button.classList.toggle('bg-white/70', !isActive);
-        button.classList.toggle('text-slate-500', !isActive);
-    });
-}
-
-function getVariantDayOffer(variant, pricingDay) {
+function getVariantOffer(variant) {
     if (!variant) return 0;
 
-    return Number(pricingDay === 'tomorrow' ? variant.tomorrow_offer : variant.today_offer) || 0;
-}
-
-function refreshVariantDayPrices() {
-    detailVariants.forEach((variant, index) => {
-        const priceNode = document.querySelector(`[data-variant-day-price="${index}"]`);
-
-        if (priceNode) {
-            priceNode.textContent = '₹' + Math.round(getVariantDayPrice(variant, selectedPricingDay));
-        }
-    });
-}
-
-function isVariantAvailableForDay(variant, pricingDay) {
-    return pricingDay === 'tomorrow' ? isTomorrowAvailable(variant) : isTodayAvailable(variant);
-}
-
-function syncVariantCardVisibility() {
-    let firstVisibleIndex = null;
-
-    document.querySelectorAll('.variant-card').forEach((card, index) => {
-        const available = isVariantAvailableForDay(detailVariants[index], selectedPricingDay);
-        card.classList.toggle('hidden', !available);
-
-        if (available && firstVisibleIndex === null) {
-            firstVisibleIndex = index;
-        }
-    });
-
-    if (firstVisibleIndex !== null && !isVariantAvailableForDay(detailVariants[selectedVariant], selectedPricingDay)) {
-        selectedVariant = firstVisibleIndex;
-    }
-}
-
-function selectPricingDay(pricingDay) {
-    selectedPricingDay = pricingDay === 'tomorrow' ? 'tomorrow' : 'today';
-    syncPricingDayButtons();
-    syncVariantCardVisibility();
-
-    refreshVariantDayPrices();
-    selectVariant(selectedVariant);
+    return Number(variant.today_offer) || 0;
 }
 
 function selectVariant(index) {
     selectedVariant = index;
     const variant = detailVariants[index];
     if (!variant) return;
-    syncPricingDayButtons();
 
     document.querySelectorAll('.variant-card').forEach((card, cardIndex) => {
         const isActive = cardIndex === index;
         card.classList.toggle('is-active', isActive);
-        card.classList.toggle('border-green-500', isActive);
-        card.classList.toggle('bg-[#f2fbf3]', isActive);
-        card.classList.toggle('shadow-[0_14px_28px_rgba(47,140,67,0.12)]', isActive);
+        card.classList.toggle('border-[#b8862c]', isActive);
+        card.classList.toggle('border-slate-200', !isActive);
+        card.classList.toggle('bg-[#faf5e8]', isActive);
+        card.classList.toggle('bg-white', !isActive);
+        card.classList.toggle('shadow-[0_14px_28px_rgba(184,134,44,0.16)]', isActive);
+
+        const check = card.querySelector('.variant-check');
+        if (check) {
+            check.classList.toggle('flex', isActive);
+            check.classList.toggle('hidden', !isActive);
+        }
     });
 
     const currentPrice = document.getElementById('detailCurrentPrice');
@@ -1098,8 +1049,8 @@ function selectVariant(index) {
     const saveRow = document.getElementById('detailSaveRow');
     const saveAmount = document.getElementById('detailSaveAmount');
 
-    const activePrice = getVariantDayPrice(variant, selectedPricingDay);
-    const activeOffer = getVariantDayOffer(variant, selectedPricingDay);
+    const activePrice = getVariantPrice(variant);
+    const activeOffer = getVariantOffer(variant);
 
     if (currentPrice) currentPrice.textContent = Math.round(activePrice || 0);
     if (currentPriceUnit) currentPriceUnit.textContent = variant.price_unit_label || '{{ $product->display_pack_label }}';
@@ -1128,11 +1079,7 @@ function sendCartRequest(productId, redirectToCheckout = false) {
     .then(response => response.json())
     .then(data => {
         if (!data.success) {
-            if (data.slot_unavailable && typeof openNoSlotModal === 'function') {
-                openNoSlotModal(data.title, data.message);
-            } else {
-                alert(data.message || 'This product is currently unavailable.');
-            }
+            alert(data.message || 'This product is currently unavailable.');
             return;
         }
 
@@ -1168,10 +1115,6 @@ function addToCartWithQty(productId) {
     sendCartRequest(productId, false);
 }
 
-function buyNowWithQty(productId) {
-    sendCartRequest(productId, true);
-}
-
 function toggleProductShare(event) {
     event.stopPropagation();
     const menu = document.getElementById('productShareMenu');
@@ -1182,7 +1125,7 @@ function toggleProductShare(event) {
 }
 
 async function shareProductNative() {
-    const shareData = { title: @json($product->name), text: @json('Check out ' . $product->name . ' on FarmSea'), url: window.location.href };
+    const shareData = { title: @json($product->name), text: @json('Check out ' . $product->name . ' on Porville'), url: window.location.href };
     if (navigator.share) {
         await navigator.share(shareData).catch(() => {});
     } else {
@@ -1219,12 +1162,8 @@ document.querySelectorAll('[data-detail-tab]').forEach((button) => {
     button.addEventListener('click', () => activateDetailTab(button.dataset.detailTab));
 });
 
-document.querySelectorAll('[data-pricing-day]').forEach((button) => {
-    button.addEventListener('click', () => selectPricingDay(button.dataset.pricingDay));
-});
-
 updateQtyDisplay();
-selectPricingDay('{{ $defaultPricingDay }}');
+selectVariant(selectedVariant);
 activateDetailTab('{{ $initialDetailTab }}');
 applyProductImageZoom();
 </script>

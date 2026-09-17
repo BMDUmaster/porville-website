@@ -53,7 +53,7 @@
             <input type="date" name="date_to" value="{{ request('date_to') }}"
                    class="rounded-full border bg-gray-50 px-4 py-2.5 text-sm outline-none">
         </div>
-        <button type="submit" class="rounded-full bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white">Filter</button>
+        <button type="submit" class="rounded-full bg-amber-600 px-4 py-2.5 text-sm font-semibold text-white">Filter</button>
         <a href="{{ route('dashboard.orders.history') }}" class="rounded-full bg-gray-100 px-4 py-2.5 text-center text-sm font-semibold text-gray-600">Reset</a>
     </form>
 
@@ -63,7 +63,7 @@
                 <div class="flex items-start justify-between gap-3">
                     <div class="min-w-0">
                         <p class="text-xs font-bold text-gray-400">#{{ $orders->firstItem() + $i }}</p>
-                        <p class="mt-1 break-all text-sm font-bold text-indigo-600">#ORD-{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</p>
+                        <p class="mt-1 break-all text-sm font-bold text-amber-600">#ORD-{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</p>
                     </div>
                     <span class="rounded-full px-3 py-1 text-xs font-bold {{ $order->status_badge_class }}">
                         {{ $order->status_label }}
@@ -78,8 +78,8 @@
                     </div>
                     <div>
                         <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Amount</p>
-                        <p class="mt-1 text-sm font-bold text-indigo-600">Rs{{ number_format($order->total, 2) }}</p>
-                        <p class="text-xs font-bold uppercase text-blue-600">{{ $order->payment_method ?? 'COD' }}</p>
+                        <p class="mt-1 text-sm font-bold text-amber-600">Rs{{ number_format($order->total, 2) }}</p>
+                        <p class="text-xs font-bold uppercase text-amber-600">{{ $order->payment_method ?? 'COD' }}</p>
                     </div>
                     <div>
                         <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">Customer</p>
@@ -98,7 +98,7 @@
                 </div>
 
                 <a href="{{ route('dashboard.orders.show', $order) }}"
-                   class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-50 px-4 py-2.5 text-sm font-medium text-indigo-600 hover:bg-indigo-100">
+                   class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-600 hover:bg-amber-100">
                     <i class="fas fa-eye"></i> View
                 </a>
             </article>
@@ -109,7 +109,7 @@
 
     <div class="hidden overflow-x-auto rounded-2xl border bg-white shadow-sm md:block">
         <table class="w-full min-w-[1040px] text-left text-sm">
-            <thead class="bg-indigo-600 text-xs uppercase tracking-wider text-white">
+            <thead class="bg-amber-600 text-xs uppercase tracking-wider text-white">
                 <tr>
                     <th class="px-4 py-4">Sr.No.</th>
                     <th class="px-4 py-4">Date & Time</th>
@@ -133,10 +133,10 @@
                             <div class="font-bold text-gray-800">{{ $order->user->name ?? 'Guest' }}</div>
                             <div class="text-xs text-gray-500">ID: {{ $order->user_id }}</div>
                         </td>
-                        <td class="px-4 py-4 font-bold text-indigo-600">#ORD-{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</td>
+                        <td class="px-4 py-4 font-bold text-amber-600">#ORD-{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</td>
                         <td class="px-4 py-4">
-                            <div class="font-bold text-indigo-600">Rs{{ number_format($order->total, 2) }}</div>
-                            <span class="rounded bg-blue-50 px-2 py-0.5 text-xs font-bold uppercase text-blue-600">{{ $order->payment_method ?? 'COD' }}</span>
+                            <div class="font-bold text-amber-600">Rs{{ number_format($order->total, 2) }}</div>
+                            <span class="rounded bg-amber-50 px-2 py-0.5 text-xs font-bold uppercase text-amber-600">{{ $order->payment_method ?? 'COD' }}</span>
                         </td>
                         <td class="px-4 py-4 text-sm text-gray-600">
                             @if($order->deliveryBoy)
@@ -153,7 +153,7 @@
                         </td>
                         <td class="px-4 py-4">
                             <a href="{{ route('dashboard.orders.show', $order) }}"
-                               class="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50">
+                               class="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-amber-600 hover:bg-amber-50">
                                 <i class="fas fa-eye"></i> View
                             </a>
                         </td>

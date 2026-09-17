@@ -4054,3 +4054,7 @@ Stack trace:
 #53 C:/BMDU Work/FarmSea-dashboard/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('...')
 #54 {main}
 "} 
+[2026-09-17 00:53:09] local.ERROR: Cannot redeclare App\Models\Order::$casts {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare App\\Models\\Order::$casts at C:/BMDU Work/porville-fresh-cut/app/Models/Order.php:34)
+[stacktrace]
+#0 {main}
+"} 

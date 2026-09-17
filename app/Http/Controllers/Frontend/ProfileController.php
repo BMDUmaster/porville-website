@@ -16,19 +16,6 @@ class ProfileController extends Controller
         $user = Auth::guard('web_frontend')->user();
 
         $ordersQuery = $user->orders();
-        $orders = $user->orders()->with('items.product')->latest()->take(4)->get();
-        $userNotifications = Notification::query()
-            ->forUser($user->id)
-            ->latest()
-            ->take(8)
-            ->get();
-        $unreadNotifications = Notification::query()
-            ->where('recipient_id', $user->id)
-            ->whereNull('read_at')
-            ->count();
-        $totalNotifications = Notification::query()
-            ->forUser($user->id)
-            ->count();
         $latestAddressOrder = $user->orders()
             ->whereNotNull('shipping_address')
             ->latest()
@@ -59,7 +46,27 @@ class ProfileController extends Controller
             'profile_completion' => $profileCompletion,
         ];
 
-        return view('frontend.profile', compact('user', 'orders', 'stats', 'latestAddress', 'userNotifications', 'unreadNotifications', 'totalNotifications'));
+        return view('frontend.profile', compact('user', 'stats', 'latestAddress'));
+    }
+
+    /** GET /account/notifications */
+    public function notifications()
+    {
+        $user = Auth::guard('web_frontend')->user();
+
+        $userNotifications = Notification::query()
+            ->forUser($user->id)
+            ->latest()
+            ->paginate(15);
+        $unreadNotifications = Notification::query()
+            ->where('recipient_id', $user->id)
+            ->whereNull('read_at')
+            ->count();
+        $totalNotifications = Notification::query()
+            ->forUser($user->id)
+            ->count();
+
+        return view('frontend.notifications', compact('user', 'userNotifications', 'unreadNotifications', 'totalNotifications'));
     }
 
     /** PUT /account/profile */

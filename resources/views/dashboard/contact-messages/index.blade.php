@@ -19,15 +19,15 @@
         <form method="GET" class="relative w-full flex-1">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search contact messages..."
-                   class="w-full rounded-lg border py-2.5 pl-9 pr-4 text-sm outline-none focus:border-blue-400">
+                   class="w-full rounded-lg border py-2.5 pl-9 pr-4 text-sm outline-none focus:border-amber-400">
             <input type="hidden" name="status" value="{{ request('status') }}">
         </form>
         <a href="{{ route('dashboard.contact-messages') }}"
-           class="rounded-xl px-4 py-2.5 text-center text-sm font-bold {{ request('status') ? 'bg-slate-100 text-slate-600' : 'bg-blue-600 text-white' }}">
+           class="rounded-xl px-4 py-2.5 text-center text-sm font-bold {{ request('status') ? 'bg-slate-100 text-slate-600' : 'bg-amber-600 text-white' }}">
             All
         </a>
         <a href="{{ route('dashboard.contact-messages', ['status' => 'unread']) }}"
-           class="rounded-xl px-4 py-2.5 text-center text-sm font-bold {{ request('status') === 'unread' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600' }}">
+           class="rounded-xl px-4 py-2.5 text-center text-sm font-bold {{ request('status') === 'unread' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-600' }}">
             Unread
         </a>
         <div class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-50 px-4 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-green-700">
@@ -38,7 +38,7 @@
 
     <div class="overflow-x-auto rounded-xl border bg-white">
         <table class="w-full min-w-[850px] text-left">
-            <thead class="bg-gradient-to-r from-green-700 to-blue-600 text-white">
+            <thead class="bg-gradient-to-r from-green-700 to-amber-600 text-white">
                 <tr>
                     <th class="px-4 py-3 text-xs uppercase">Sr.No.</th>
                     <th class="px-4 py-3 text-xs uppercase">Sender</th>

@@ -11,8 +11,8 @@
             <label class="text-sm font-bold text-gray-600">Search:</label>
             <input type="text" name="search" value="{{ request('search') }}"
                    placeholder="Customer, email, subject or message"
-                   class="border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button type="submit" class="bg-blue-600 text-white px-4 py-1.5 rounded text-sm">Go</button>
+                   class="border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <button type="submit" class="bg-amber-600 text-white px-4 py-1.5 rounded text-sm">Go</button>
             @if(request()->filled('search'))
                 <a href="{{ route('dashboard.notifications') }}" class="px-3 py-1.5 text-sm font-semibold text-slate-500 hover:text-slate-800">Clear</a>
             @endif
@@ -42,7 +42,7 @@
                             <p class="font-bold text-slate-800">{{ $notif->recipient->name }}</p>
                             <p class="text-xs text-slate-400">{{ $notif->recipient->email }}</p>
                         @else
-                            <span class="rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-bold text-blue-700">All Customers</span>
+                            <span class="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700">All Customers</span>
                         @endif
                     </td>
                     <td class="px-4 py-4 text-sm font-semibold text-gray-800">{{ $notif->subject }}</td>
@@ -50,7 +50,7 @@
                     <td class="px-4 py-4 text-center">
                         <div class="flex flex-wrap justify-center gap-2">
                             <button onclick="openViewModal('{{ addslashes($notif->subject) }}', '{{ addslashes($notif->message) }}')"
-                                    class="px-3 py-1 text-xs font-bold text-blue-600 hover:bg-blue-50 rounded-lg">View</button>
+                                    class="px-3 py-1 text-xs font-bold text-amber-600 hover:bg-amber-50 rounded-lg">View</button>
                             <button onclick="openEditModal({{ $notif->id }}, '{{ addslashes($notif->subject) }}', '{{ addslashes($notif->message) }}')"
                                     class="px-3 py-1 text-xs font-bold text-amber-600 hover:bg-amber-50 rounded-lg">Edit</button>
                             <form method="POST" action="{{ route('dashboard.notifications.destroy', $notif) }}"
@@ -71,7 +71,7 @@
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>{{ $notifications->withQueryString()->links() }}</div>
         <button onclick="openAddModal()"
-                class="w-full rounded-lg bg-blue-600 px-6 py-2 font-bold text-white transition shadow-md hover:bg-blue-700 sm:w-auto">
+                class="w-full rounded-lg bg-amber-600 px-6 py-2 font-bold text-white transition shadow-md hover:bg-amber-700 sm:w-auto">
             Send New Notification
         </button>
     </div>
@@ -91,19 +91,19 @@
                 <div id="userSelectSection" class="space-y-4">
                     <label class="block text-[15px] font-bold text-slate-700">Select Customers</label>
                     <input type="text" id="userSearchInput" placeholder="Search customer by name or ID..."
-                           class="w-full rounded-[10px] border border-slate-300 px-5 py-3 text-base text-slate-700 outline-none transition focus:border-blue-500">
+                           class="w-full rounded-[10px] border border-slate-300 px-5 py-3 text-base text-slate-700 outline-none transition focus:border-amber-500">
                     <label class="flex items-center gap-3 text-[15px] font-medium text-slate-600">
                         <input type="checkbox" id="selectAllUsers"
-                               class="h-6 w-6 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                               class="h-6 w-6 rounded border-slate-300 text-amber-600 focus:ring-amber-500">
                         <span>Select All Customers</span>
                     </label>
                     <div id="userListBox" class="max-h-56 overflow-y-auto rounded-[12px] border border-slate-200 bg-slate-50/70 p-3">
                         <div class="grid gap-2">
                             @forelse($users as $user)
-                                <label class="user-option flex items-center gap-3 rounded-xl border border-transparent bg-white px-3 py-2.5 text-sm text-slate-700 transition hover:border-blue-200 hover:bg-blue-50/60"
+                                <label class="user-option flex items-center gap-3 rounded-xl border border-transparent bg-white px-3 py-2.5 text-sm text-slate-700 transition hover:border-amber-200 hover:bg-amber-50/60"
                                        data-search="{{ strtolower($user->name . ' ' . $user->email . ' ' . $user->id) }}">
                                     <input type="checkbox" name="user_ids[]" value="{{ $user->id }}"
-                                           class="user-checkbox h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                           class="user-checkbox h-4 w-4 rounded border-slate-300 text-amber-600 focus:ring-amber-500">
                                     <span class="min-w-0">
                                         <span class="block truncate font-semibold text-slate-800">{{ $user->name }}</span>
                                         <span class="block truncate text-xs text-slate-400">#{{ $user->id }} · {{ $user->email }}</span>
@@ -121,20 +121,20 @@
                 <div>
                     <label class="mb-2 block text-[15px] font-bold text-slate-700">Title</label>
                     <input type="text" name="subject" id="notifTitle" placeholder="Enter Notification Title"
-                           class="w-full rounded-[10px] border border-slate-300 px-5 py-3 text-base text-slate-700 outline-none transition focus:border-blue-500">
+                           class="w-full rounded-[10px] border border-slate-300 px-5 py-3 text-base text-slate-700 outline-none transition focus:border-amber-500">
                 </div>
 
                 <div>
                     <label class="mb-2 block text-[15px] font-bold text-slate-700">Message</label>
                     <textarea name="message" id="notifMessage" rows="6" placeholder="Enter your message"
-                              class="w-full rounded-[10px] border border-slate-300 px-5 py-4 text-base text-slate-700 outline-none transition focus:border-blue-500"></textarea>
+                              class="w-full rounded-[10px] border border-slate-300 px-5 py-4 text-base text-slate-700 outline-none transition focus:border-amber-500"></textarea>
                 </div>
             </div>
             <div class="flex flex-col gap-3 border-t border-slate-200 bg-slate-50/70 px-5 py-5 sm:flex-row sm:justify-end sm:gap-4 sm:px-8">
                 <button type="button" onclick="closeModal()"
                         class="w-full rounded-[10px] bg-slate-200 px-6 py-3 text-[15px] font-bold text-slate-700 transition hover:bg-slate-300 sm:min-w-44 sm:w-auto">Cancel</button>
                 <button type="submit" id="submitNotifButton"
-                        class="w-full rounded-[10px] bg-blue-600 px-6 py-3 text-[15px] font-bold text-white transition hover:bg-blue-700 sm:min-w-44 sm:w-auto">Send Now</button>
+                        class="w-full rounded-[10px] bg-amber-600 px-6 py-3 text-[15px] font-bold text-white transition hover:bg-amber-700 sm:min-w-44 sm:w-auto">Send Now</button>
             </div>
         </form>
     </div>

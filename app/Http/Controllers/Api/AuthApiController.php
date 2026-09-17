@@ -42,7 +42,7 @@ class AuthApiController extends Controller
             'status'   => 'active',
         ]);
 
-        $token = $user->createToken('farmsea-app')->plainTextToken;
+        $token = $user->createToken('porville-app')->plainTextToken;
 
         return response()->json([
             'success' => true,
@@ -86,7 +86,7 @@ class AuthApiController extends Controller
 
         // Revoke old tokens and issue a fresh one
         $user->tokens()->delete();
-        $token = $user->createToken('farmsea-app')->plainTextToken;
+        $token = $user->createToken('porville-app')->plainTextToken;
 
         return response()->json([
             'success' => true,

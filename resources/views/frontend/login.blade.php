@@ -3,33 +3,33 @@
 
 @section('content')
 <section class="relative overflow-hidden bg-[linear-gradient(135deg,#eef6ff_0%,#f7fbf5_52%,#ffffff_100%)] px-4 py-10 md:px-6 md:py-14">
-    <div class="pointer-events-none absolute -left-24 top-16 h-72 w-72 rounded-full bg-blue-200/25 blur-3xl"></div>
-    <div class="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-green-200/30 blur-3xl"></div>
+    <div class="pointer-events-none absolute -left-24 top-16 h-72 w-72 rounded-full bg-amber-500/15 blur-3xl"></div>
+    <div class="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-amber-500/30 blur-3xl"></div>
 
     <div class="relative mx-auto grid w-full max-w-5xl overflow-hidden rounded-[30px] border border-white/80 bg-white shadow-[0_28px_90px_rgba(15,23,42,0.13)] lg:min-h-[580px] lg:grid-cols-[1.05fr_0.95fr]">
         <!-- Left Banner Image (Desktop) -->
         <div class="relative hidden min-h-[580px] overflow-hidden lg:block">
             <img
-                src="{{ asset('storage/products/HiVF3oTdVV5ivcPECY0aMpXFljIdua0hBYBlCAUW.webp') }}"
-                alt="Fresh FarmSea food prepared for serving"
+                src="{{ asset('storage/products/0rN3oy7Ty5QFSSdx43wSNpvA0AIiKLCLguzBaqwY.webp') }}"
+                alt="Fresh Porville food prepared for serving"
                 class="absolute inset-0 h-full w-full object-cover"
             >
             <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.08),rgba(15,23,42,0.86))]"></div>
 
             <div class="absolute inset-x-0 bottom-0 p-8 text-white md:p-10">
                 <span class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.18em] backdrop-blur">
-                    <i class="fa-solid fa-leaf text-green-300"></i> Freshness you can trust
+                    <i class="fa-solid fa-leaf text-amber-300"></i> Freshness you can trust
                 </span>
                 <h2 class="mt-5 max-w-md text-3xl font-extrabold leading-tight md:text-[40px]">
-                    Fresh from FarmSea,
-                    <span class="block text-green-300">delivered to your door.</span>
+                    Fresh from Porville,
+                    <span class="block text-amber-300">delivered to your door.</span>
                 </h2>
                 <p class="mt-4 max-w-md text-[13px] leading-6 text-white/75">
-                    Sign in or create an account to order fresh sea products, track deliveries, and enjoy fast checkout.
+                    Sign in or create an account to order fresh-cut meat, track deliveries, and enjoy fast checkout.
                 </p>
                 <div class="mt-6 flex flex-wrap gap-3 text-[10px] font-bold uppercase tracking-[0.12em] text-white/90">
-                    <span class="rounded-full border border-white/15 bg-black/15 px-3 py-2"><i class="fa-solid fa-shield-halved mr-2 text-green-300"></i>Secure account</span>
-                    <span class="rounded-full border border-white/15 bg-black/15 px-3 py-2"><i class="fa-solid fa-truck-fast mr-2 text-green-300"></i>Fast delivery</span>
+                    <span class="rounded-full border border-white/15 bg-black/15 px-3 py-2"><i class="fa-solid fa-shield-halved mr-2 text-amber-300"></i>Secure account</span>
+                    <span class="rounded-full border border-white/15 bg-black/15 px-3 py-2"><i class="fa-solid fa-truck-fast mr-2 text-amber-300"></i>Fast delivery</span>
                 </div>
             </div>
         </div>
@@ -37,13 +37,17 @@
         <!-- Right Dynamic Auth Container -->
         <div class="flex items-center px-6 py-9 sm:px-10 md:py-12 lg:px-12">
             <div class="mx-auto w-full max-w-[400px]">
-                <a href="{{ route('frontend.home') }}" class="mb-6 inline-flex items-center">
-                    <img src="{{ $brandLogoUrl }}" alt="FarmSea" class="h-14 w-auto object-contain">
+                <a href="{{ route('frontend.home') }}" class="mb-6 flex flex-col items-center gap-2 text-center">
+                    <img src="{{ $brandLogoUrl }}" alt="Porville" class="h-16 w-16 rounded-full object-cover ring-1 ring-amber-500/40">
+                    <span class="flex flex-col items-center leading-none">
+                        <span class="font-classic text-xl font-bold tracking-wide text-slate-900">PORVILLE</span>
+                        <span class="mt-1.5 text-[9px] font-semibold uppercase tracking-[0.22em] text-slate-400">Fresh Cut Pure Standards</span>
+                    </span>
                 </a>
 
                 <!-- Step Indicator -->
                 <div class="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.14em]">
-                    <span id="stepBadge1" class="rounded-full bg-blue-50 px-3 py-1.5 text-blue-700">1. Email</span>
+                    <span id="stepBadge1" class="rounded-full bg-amber-50 px-3 py-1.5 text-amber-700">1. Email</span>
                     <span id="stepBadge2" class="rounded-full bg-slate-100 px-3 py-1.5 text-slate-400">2. Continue</span>
                 </div>
 
@@ -71,7 +75,7 @@
                 <!-- Active Email Badge (shown in step 2) -->
                 <div id="activeEmailBadge" class="hidden mt-4 flex items-center justify-between rounded-xl bg-slate-100 px-3.5 py-2.5 text-[12px] font-semibold text-slate-700 border border-slate-200">
                     <span class="truncate"><i class="fa-regular fa-envelope mr-2 text-slate-400"></i><span id="activeEmailText"></span></span>
-                    <button type="button" id="btnChangeEmail" class="ml-2 text-[11px] font-extrabold text-blue-600 hover:text-blue-800 hover:underline">Change</button>
+                    <button type="button" id="btnChangeEmail" class="ml-2 text-[11px] font-extrabold text-amber-700 hover:text-amber-800 hover:underline">Change</button>
                 </div>
 
                 <!-- ================= STEP 1: EMAIL ENTRY ================= -->
@@ -83,11 +87,11 @@
                                 <i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
                                 <input id="inputEmail" type="email" name="email" value="{{ old('email', request('email')) }}" required autocomplete="email"
                                        placeholder="you@example.com"
-                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-[13px] text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50">
+                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-[13px] text-slate-900 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100">
                             </div>
                         </div>
 
-                        <button type="submit" id="btnCheckEmail" class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-[12px] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_25px_rgba(37,99,235,0.22)] transition hover:-translate-y-0.5 hover:bg-blue-700 active:translate-y-0">
+                        <button type="submit" id="btnCheckEmail" class="flex w-full items-center justify-center gap-2 rounded-xl bg-black py-3.5 text-[12px] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_25px_rgba(0,0,0,0.22)] transition hover:-translate-y-0.5 hover:bg-neutral-900 active:translate-y-0">
                             <span>Continue</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
                         </button>
                     </form>
@@ -102,7 +106,7 @@
                                 <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
                                 <input id="inputLoginPassword" type="password" name="password" autocomplete="current-password"
                                        placeholder="Enter your password"
-                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-11 text-[13px] text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50">
+                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-11 text-[13px] text-slate-900 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100">
                                 <button type="button" onclick="togglePasswordVisibility('inputLoginPassword', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                                     <i class="fa-regular fa-eye text-sm"></i>
                                 </button>
@@ -111,15 +115,15 @@
 
                         <div class="flex items-center justify-between gap-4">
                             <label class="flex cursor-pointer items-center gap-2.5 text-[12px] font-medium text-slate-600">
-                                <input type="checkbox" name="remember" checked class="h-4 w-4 rounded border-slate-300 accent-blue-600">
+                                <input type="checkbox" name="remember" checked class="h-4 w-4 rounded border-slate-300 accent-amber-600">
                                 Remember Me
                             </label>
-                            <button type="button" id="btnForgotPassword" onclick="handleStartForgotPassword();" class="text-[12px] font-extrabold text-blue-700 transition hover:text-blue-900 hover:underline">
+                            <button type="button" id="btnForgotPassword" onclick="handleStartForgotPassword();" class="text-[12px] font-extrabold text-amber-700 transition hover:text-amber-900 hover:underline">
                                 Forgot password?
                             </button>
                         </div>
 
-                        <button type="submit" id="btnLoginSubmit" class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-[12px] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_25px_rgba(37,99,235,0.22)] transition hover:-translate-y-0.5 hover:bg-blue-700 active:translate-y-0">
+                        <button type="submit" id="btnLoginSubmit" class="flex w-full items-center justify-center gap-2 rounded-xl bg-black py-3.5 text-[12px] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_25px_rgba(0,0,0,0.22)] transition hover:-translate-y-0.5 hover:bg-neutral-900 active:translate-y-0">
                             <span>Sign In</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
                         </button>
                     </form>
@@ -131,12 +135,12 @@
                         <div>
                             <div class="flex items-center justify-between mb-1.5">
                                 <label for="inputRegisterOtp" class="text-[12px] font-extrabold text-slate-700">4-Digit Email OTP</label>
-                                <button type="button" id="btnResendRegisterOtp" onclick="handleResendRegisterOtp()" class="text-[11px] font-bold text-blue-600 hover:underline disabled:opacity-50">Resend OTP</button>
+                                <button type="button" id="btnResendRegisterOtp" onclick="handleResendRegisterOtp()" class="text-[11px] font-bold text-amber-700 hover:underline disabled:opacity-50">Resend OTP</button>
                             </div>
                             <div class="relative">
                                 <i class="fa-solid fa-key absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
                                 <input id="inputRegisterOtp" type="text" name="email_otp" maxlength="4" placeholder="Enter 4-digit OTP"
-                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-[13px] font-mono tracking-widest text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50">
+                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-[13px] font-mono tracking-widest text-slate-900 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100">
                             </div>
                         </div>
 
@@ -145,7 +149,7 @@
                             <div class="relative">
                                 <i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
                                 <input id="inputRegisterName" type="text" name="name" placeholder="Rahul Sharma"
-                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-[13px] text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50">
+                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-[13px] text-slate-900 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100">
                             </div>
                         </div>
 
@@ -154,14 +158,14 @@
                             <div class="relative">
                                 <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
                                 <input id="inputRegisterPassword" type="password" name="password" minlength="6" placeholder="Create password"
-                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-11 text-[13px] text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50">
+                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-11 text-[13px] text-slate-900 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100">
                                 <button type="button" onclick="togglePasswordVisibility('inputRegisterPassword', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                                     <i class="fa-regular fa-eye text-sm"></i>
                                 </button>
                             </div>
                         </div>
 
-                        <button type="submit" id="btnRegisterSubmit" class="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-[12px] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_25px_rgba(37,99,235,0.22)] transition hover:-translate-y-0.5 hover:bg-blue-700 active:translate-y-0">
+                        <button type="submit" id="btnRegisterSubmit" class="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-black py-3.5 text-[12px] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_25px_rgba(0,0,0,0.22)] transition hover:-translate-y-0.5 hover:bg-neutral-900 active:translate-y-0">
                             <span>Create Account & Sign In</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
                         </button>
                     </form>
@@ -173,12 +177,12 @@
                         <div>
                             <div class="flex items-center justify-between mb-1.5">
                                 <label for="inputForgotOtp" class="text-[12px] font-extrabold text-slate-700">4-Digit Reset OTP</label>
-                                <button type="button" id="btnResendForgotOtp" onclick="handleResendForgotOtp()" class="text-[11px] font-bold text-blue-600 hover:underline disabled:opacity-50">Resend OTP</button>
+                                <button type="button" id="btnResendForgotOtp" onclick="handleResendForgotOtp()" class="text-[11px] font-bold text-amber-700 hover:underline disabled:opacity-50">Resend OTP</button>
                             </div>
                             <div class="relative">
                                 <i class="fa-solid fa-key absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
                                 <input id="inputForgotOtp" type="text" name="email_otp" maxlength="4" placeholder="Enter 4-digit OTP"
-                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-[13px] font-mono tracking-widest text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50">
+                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-[13px] font-mono tracking-widest text-slate-900 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100">
                             </div>
                         </div>
 
@@ -187,7 +191,7 @@
                             <div class="relative">
                                 <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
                                 <input id="inputForgotNewPassword" type="password" name="password" minlength="6" placeholder="Enter new password"
-                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-11 text-[13px] text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50">
+                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-11 text-[13px] text-slate-900 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100">
                                 <button type="button" onclick="togglePasswordVisibility('inputForgotNewPassword', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                                     <i class="fa-regular fa-eye text-sm"></i>
                                 </button>
@@ -199,14 +203,14 @@
                             <div class="relative">
                                 <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
                                 <input id="inputForgotConfirmPassword" type="password" name="password_confirmation" minlength="6" placeholder="Confirm new password"
-                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-11 text-[13px] text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50">
+                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-11 text-[13px] text-slate-900 outline-none transition focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-100">
                                 <button type="button" onclick="togglePasswordVisibility('inputForgotConfirmPassword', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                                     <i class="fa-regular fa-eye text-sm"></i>
                                 </button>
                             </div>
                         </div>
 
-                        <button type="submit" id="btnResetPasswordSubmit" class="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-[12px] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_25px_rgba(37,99,235,0.22)] transition hover:-translate-y-0.5 hover:bg-blue-700 active:translate-y-0">
+                        <button type="submit" id="btnResetPasswordSubmit" class="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-black py-3.5 text-[12px] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_25px_rgba(0,0,0,0.22)] transition hover:-translate-y-0.5 hover:bg-neutral-900 active:translate-y-0">
                             <span>Reset & Update Password</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
                         </button>
                     </form>
@@ -282,13 +286,13 @@ function showStep(stepName) {
     if (stepName === 'email') {
         authTitle.textContent = 'Enter your email';
         authDescription.textContent = "We'll check whether you need to sign in or create an account.";
-        stepBadge1.className = 'rounded-full bg-blue-50 px-3 py-1.5 text-blue-700';
+        stepBadge1.className = 'rounded-full bg-amber-50 px-3 py-1.5 text-amber-700';
         stepBadge2.className = 'rounded-full bg-slate-100 px-3 py-1.5 text-slate-400';
         stepEmailContainer.classList.remove('hidden');
         inputEmail.focus();
     } else {
         stepBadge1.className = 'rounded-full bg-slate-100 px-3 py-1.5 text-slate-400';
-        stepBadge2.className = 'rounded-full bg-blue-50 px-3 py-1.5 text-blue-700';
+        stepBadge2.className = 'rounded-full bg-amber-50 px-3 py-1.5 text-amber-700';
         activeEmailText.textContent = activeEmail;
         activeEmailBadge.classList.remove('hidden');
 

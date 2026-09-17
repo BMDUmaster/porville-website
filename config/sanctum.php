@@ -62,7 +62,7 @@ return [
     |
     */
 
-    'token_prefix' => env('SANCTUM_TOKEN_PREFIX', 'farmsea_'),
+    'token_prefix' => env('SANCTUM_TOKEN_PREFIX', 'porville_'),
 
     /*
     |--------------------------------------------------------------------------
