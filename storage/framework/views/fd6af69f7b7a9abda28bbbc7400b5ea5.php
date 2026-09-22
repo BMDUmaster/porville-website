@@ -108,24 +108,6 @@
         transition: transform .35s ease;
     }
 
-    .type-showcase-card {
-        transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
-    }
-
-    .type-showcase-card:hover {
-        transform: translateY(-6px);
-        border-color: #e6d3a3;
-        box-shadow: 0 24px 48px rgba(184, 134, 44, 0.14);
-    }
-
-    .type-showcase-image {
-        transition: transform .6s ease;
-    }
-
-    .type-showcase-card:hover .type-showcase-image {
-        transform: scale(1.05);
-    }
-
     @keyframes favoriteGlowSpin {
         from {
             transform: rotate(0deg);
@@ -148,13 +130,9 @@
         .home-hero-content a { padding: 9px 14px; border-radius: 9px; font-size: 10px; }
         #home-category-scroller > a { min-width: 156px; max-width: 156px; }
         #home-category-scroller > a > div:first-child { height: 150px; }
-        #home-new-arrivals-scroller > div { min-width: 184px; max-width: 184px; }
-        #home-type-scroller > article { min-width: 210px; max-width: 210px; padding: 12px; }
         #home-favorites-scroller > article { min-width: 205px; max-width: 205px; padding: 8px; }
         #home-favorites-scroller > article > div { padding: 10px; }
         #home-favorites-scroller img { height: 145px; aspect-ratio: auto; }
-        .type-showcase-card { border-radius: 18px; }
-        .type-showcase-card .type-showcase-image { max-height: 260px; }
         .favorite-hero-banner { border-radius: 20px; }
         .favorite-hero-banner img { height: 250px; }
         .favorite-hero-copy { padding: 20px 16px; }
@@ -296,7 +274,6 @@
 <section class="bg-white pb-2 pt-5 md:py-6">
     <div class="mx-auto max-w-7xl px-4">
         <?php
-            $categoryLabels = ['Best Seller', 'Lean Protein', 'Juicy Cuts', 'Ready to Cook', 'Fresh Choice', 'Chef Pick', 'Daily Fresh', 'Top Rated'];
             $showcaseCategories = $categories->flatMap(function ($category) {
                 if ($category->children->isNotEmpty()) {
                     return $category->children->map(function ($child) use ($category) {
@@ -306,6 +283,7 @@
                             'category_slug' => $category->slug,
                             'subcategory_slug' => $child->slug,
                             'image' => $child->image ?: $category->image,
+                            'tag' => $child->tag ?: $category->tag,
                         ];
                     });
                 }
@@ -316,6 +294,7 @@
                     'category_slug' => $category->slug,
                     'subcategory_slug' => null,
                     'image' => $category->image,
+                    'tag' => $category->tag,
                 ]]);
             })->take(12)->values();
         ?>
@@ -342,7 +321,6 @@
         >
             <?php $__empty_1 = true; $__currentLoopData = $showcaseCategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <?php
-                    $label = $categoryLabels[$index % count($categoryLabels)];
                     $linkParams = ['category' => $item['category_slug']];
                     if ($item['subcategory_slug']) {
                         $linkParams['subcategory'] = $item['subcategory_slug'];
@@ -369,14 +347,16 @@
                     </div>
 
                     <div class="border-t border-slate-100 px-4 py-3 text-center">
-                        <h3 class="text-[15px] font-semibold text-slate-900 transition-colors group-hover:text-amber-700">
+                        <?php if($item['tag']): ?>
+                            <p class="text-[10px] font-extrabold uppercase tracking-[0.18em] text-amber-600">
+                                <?php echo e($item['tag']); ?>
+
+                            </p>
+                        <?php endif; ?>
+                        <h3 class="mt-1 text-[15px] font-semibold text-slate-900 transition-colors group-hover:text-amber-700">
                             <?php echo e($item['title']); ?>
 
                         </h3>
-                        <p class="mt-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-amber-600">
-                            <?php echo e($label); ?>
-
-                        </p>
                     </div>
                 </a>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
@@ -393,373 +373,39 @@
 </section>
 
 
-<section class="bg-gray-50 pb-2 pt-2 md:py-6">
-    <div class="mx-auto max-w-7xl px-4">
-        <div class="mb-6 flex items-end justify-between">
-            <div>
-                <h2 class="text-2xl font-extrabold text-gray-800">New <span class="text-amber-600">Arrivals</span></h2>
-                <p class="mt-1 text-xs text-gray-500">The freshest additions to our selection.</p>
-            </div>
-            <a href="<?php echo e(route('frontend.products')); ?>" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
-                See All
-                <i class="fa-solid fa-arrow-right text-[10px]"></i>
-            </a>
-        </div>
-        <div id="home-new-arrivals-scroller" class="scrollbar-hide flex gap-3 overflow-x-auto scroll-smooth pb-3 md:gap-5">
-            <?php $__empty_1 = true; $__currentLoopData = $newArrivals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-            <div class="min-w-[240px] max-w-[240px]">
-                <?php echo $__env->make('frontend.partials.product-card', ['product' => $product], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-            </div>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                <p class="w-full py-8 text-center text-gray-400">No products yet.</p>
-            <?php endif; ?>
-        </div>
-    </div>
-</section>
+<?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+    <?php if($category->is_enquiry_only) continue; ?>
+    <?php $categoryProductList = $categoryProducts->get($category->id, collect()); ?>
+    <?php if($categoryProductList->isEmpty()) continue; ?>
 
-<?php if($liveStockCategory && $liveStockProducts->isNotEmpty()): ?>
+    <section class="<?php echo e($loop->even ? 'bg-gray-50' : 'bg-white'); ?> pb-2 pt-2 md:py-6">
+        <div class="mx-auto max-w-7xl px-4">
+            <div class="mb-6 flex items-end justify-between gap-4">
+                <div>
+                    <?php if($category->tag): ?>
+                        <p class="text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-600"><?php echo e($category->tag); ?></p>
+                    <?php endif; ?>
+                    <h2 class="mt-1 text-2xl font-extrabold text-slate-900 md:text-3xl"><?php echo e($category->name); ?></h2>
+                    <p class="mt-1 max-w-lg text-xs text-gray-500 md:text-sm">
+                        <?php echo e($category->description ?: 'Fresh, quality-checked ' . strtolower($category->name) . ', cut and packed daily.'); ?>
 
-<section class="bg-black py-8 md:py-12">
-    <div class="mx-auto max-w-7xl px-4">
-        <div class="mb-6 flex items-end justify-between gap-4">
-            <div>
-                <p class="text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-400">Enquiry Only &middot; Call to Order</p>
-                <h2 class="font-classic mt-1 text-2xl font-bold text-white md:text-3xl">Farm Fresh Live Stock</h2>
-                <p class="mt-1 max-w-lg text-xs text-stone-300">Healthy live farm birds and livestock raised under premium guidelines.</p>
-            </div>
-            <a href="<?php echo e(route('frontend.products', ['category' => $liveStockCategory->slug])); ?>" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-500 bg-black px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-400 transition hover:bg-amber-500 hover:text-black sm:px-5">
-                See All
-                <i class="fa-solid fa-arrow-right text-[10px]"></i>
-            </a>
-        </div>
-        <div class="scrollbar-hide flex gap-3 overflow-x-auto scroll-smooth pb-3 md:gap-5">
-            <?php $__currentLoopData = $liveStockProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <div class="min-w-[240px] max-w-[240px]">
-                <?php echo $__env->make('frontend.partials.product-card', ['product' => $product], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-            </div>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-        </div>
-    </div>
-</section>
-<?php endif; ?>
-
-
-<section class="bg-white pb-6 pt-2 md:py-7">
-    <div class="mx-auto max-w-7xl px-4">
-        <div class="mb-6 flex items-center justify-between gap-4">
-            <div class="text-left">
-                <h2 class="text-3xl font-extrabold text-slate-900 md:text-4xl">
-                    Shop By <span class="text-amber-600">Type</span>
-                </h2>
-            </div>
-            <div class="hidden items-center gap-3 md:flex">
-                <button
-                    type="button"
-                    aria-label="Scroll types left"
-                    onclick="document.getElementById('home-type-scroller').scrollBy({ left: -360, behavior: 'smooth' })"
-                    class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-amber-200 hover:bg-amber-50 hover:text-amber-600"
-                >
-                    <i class="fa-solid fa-arrow-left"></i>
-                </button>
-                <button
-                    type="button"
-                    aria-label="Scroll types right"
-                    onclick="document.getElementById('home-type-scroller').scrollBy({ left: 360, behavior: 'smooth' })"
-                    class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-amber-200 hover:bg-amber-50 hover:text-amber-600"
-                >
-                    <i class="fa-solid fa-arrow-right"></i>
-                </button>
-            </div>
-        </div>
-
-        <?php
-            $typeMeta = [
-                'chicken' => ['icon' => 'fa-drumstick-bite', 'accent' => 'text-rose-500', 'tint' => 'bg-rose-50', 'subtitle' => 'Varieties'],
-                'mutton' => ['icon' => 'fa-bacon', 'accent' => 'text-red-500', 'tint' => 'bg-red-50', 'subtitle' => 'Cuts'],
-                'lamb' => ['icon' => 'fa-bacon', 'accent' => 'text-red-500', 'tint' => 'bg-red-50', 'subtitle' => 'Cuts'],
-                'fish' => ['icon' => 'fa-fish-fins', 'accent' => 'text-sky-500', 'tint' => 'bg-sky-50', 'subtitle' => 'Types'],
-                'seafood' => ['icon' => 'fa-fish-fins', 'accent' => 'text-sky-500', 'tint' => 'bg-sky-50', 'subtitle' => 'Types'],
-                'egg' => ['icon' => 'fa-egg', 'accent' => 'text-amber-600', 'tint' => 'bg-amber-50', 'subtitle' => 'Farm Grade'],
-                'dairy' => ['icon' => 'fa-egg', 'accent' => 'text-amber-600', 'tint' => 'bg-amber-50', 'subtitle' => 'Farm Grade'],
-            ];
-
-            $typeShowcaseLead = $featuredProducts->first() ?? $newArrivals->first();
-            $typeShowcaseGrid = $featuredProducts
-                ->slice(1)
-                ->merge(
-                    $newArrivals->reject(
-                        fn($product) => $typeShowcaseLead && $product->id === $typeShowcaseLead->id
-                    )
-                )
-                ->merge(
-                    $bestSellers->reject(
-                        fn($product) => $typeShowcaseLead && $product->id === $typeShowcaseLead->id
-                    )
-                )
-                ->unique('id')
-                ->take(6)
-                ->values();
-            $typeShowcaseCategories = $categories->take(5)->values();
-            $typeShowcaseLeadCategory = $typeShowcaseCategories->first();
-            $typeShowcaseGridCategories = $typeShowcaseCategories->slice(1, 4);
-        ?>
-
-        <div
-            id="home-type-scroller"
-            class="scrollbar-hide flex gap-4 overflow-x-auto scroll-smooth pb-3"
-        >
-            <?php $__empty_1 = true; $__currentLoopData = $categories->take(10); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                <?php
-                    $slugKey = strtolower($cat->slug ?? $cat->name);
-                    $meta = collect($typeMeta)->first(fn($value, $key) => str_contains($slugKey, $key)) ?? ['icon' => 'fa-layer-group', 'accent' => 'text-amber-600', 'tint' => 'bg-amber-50', 'subtitle' => 'Collections'];
-                    $previewImages = collect([$cat->image])->merge($cat->children->pluck('image'))->filter()->take(3)->values();
-                    $countLabel = max($cat->children_count, $cat->products_count, 1);
-                    $countText = $cat->children_count > 0 ? $meta['subtitle'] : 'Products';
-                    $cardLink = route('frontend.categories', ['focus' => $cat->slug]) . '#category-' . $cat->slug;
-                ?>
-
-                <article class="group min-w-[260px] max-w-[260px] rounded-[22px] border border-slate-200 bg-white p-4 shadow-[0_10px_30px_rgba(15,23,43,0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-amber-200 hover:shadow-[0_20px_40px_rgba(37,99,235,0.12)]">
-                    <a href="<?php echo e($cardLink); ?>" class="block">
-                        <div class="flex flex-col items-center text-center">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-2xl <?php echo e($meta['tint']); ?> text-xl <?php echo e($meta['accent']); ?> transition-transform duration-300 group-hover:scale-110">
-                                <i class="fa-solid <?php echo e($meta['icon']); ?>"></i>
-                            </div>
-
-                            <h3 class="mt-4 text-[15px] font-extrabold uppercase tracking-[0.08em] text-slate-900">
-                                <?php echo e($cat->name); ?>
-
-                            </h3>
-                            <p class="mt-1 text-[12px] text-slate-500">
-                                <?php echo e($countLabel); ?>+ <?php echo e($countText); ?>
-
-                            </p>
-                        </div>
-
-                        <div class="mt-5 grid grid-cols-3 gap-2.5">
-                            <?php for($index = 0; $index < 3; $index++): ?>
-                                <?php
-                                    $image = $previewImages->get($index);
-                                ?>
-                                <div class="relative aspect-[1.08] overflow-hidden rounded-xl bg-slate-100">
-                                    <?php if($image): ?>
-                                        <img
-                                            src="<?php echo e(asset('storage/' . $image)); ?>"
-                                            alt="<?php echo e($cat->name); ?>"
-                                            class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                        >
-                                    <?php else: ?>
-                                        <div class="flex h-full w-full items-center justify-center <?php echo e($meta['tint']); ?> text-lg <?php echo e($meta['accent']); ?>">
-                                            <i class="fa-solid <?php echo e($meta['icon']); ?>"></i>
-                                        </div>
-                                    <?php endif; ?>
-
-                                    <?php if($index === 2): ?>
-                                        <div class="absolute inset-0 bg-gradient-to-br from-slate-900/10 via-transparent to-slate-900/60"></div>
-                                        <div class="absolute inset-0 flex items-center justify-center text-center">
-                                            <span class="rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-extrabold text-slate-900 shadow-sm">
-                                                +<?php echo e($countLabel); ?>
-
-                                            </span>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-                            <?php endfor; ?>
-                        </div>
-                    </a>
-
-                    <a
-                        href="<?php echo e($cardLink); ?>"
-                        class="mt-4 flex h-11 items-center justify-center rounded-xl bg-amber-600 text-[12px] font-extrabold uppercase tracking-[0.18em] text-white transition-all duration-300 hover:bg-amber-700 group-hover:shadow-lg"
-                    >
-                        View All
-                    </a>
-                </article>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                <div class="flex min-h-[220px] w-full items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-6 py-12 text-center text-slate-400">
-                    <i class="fa-solid fa-layer-group mb-3 block text-4xl opacity-40"></i>
-                    <p class="text-sm font-medium">No categories available right now.</p>
+                    </p>
                 </div>
-            <?php endif; ?>
-        </div>
-
-        <div class="mt-5 flex justify-center md:hidden">
-            <a href="<?php echo e(route('frontend.categories')); ?>" class="inline-flex items-center gap-2 rounded-full bg-amber-600 px-5 py-3 text-xs font-extrabold uppercase tracking-[0.18em] text-white transition hover:bg-amber-700">
-                Browse Types
-                <i class="fa-solid fa-arrow-right"></i>
-            </a>
-        </div>
-
-        <?php if($typeShowcaseLead): ?>
-            <div class="mt-8 grid gap-4 lg:grid-cols-[0.82fr_1.18fr] lg:gap-5">
-                <article class="type-showcase-card overflow-hidden rounded-[22px] border border-[#e6d3a3] bg-[#faf7f0]">
-                    <div class="flex h-full flex-col">
-                        <div class="p-4 pb-3 md:p-5 md:pb-4">
-                            <span class="inline-flex rounded-full bg-amber-700 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
-                                Chef's Selection
-                            </span>
-                            <h3 class="mt-3 max-w-[320px] text-[23px] font-extrabold leading-[1.1] text-slate-900 md:text-[30px]">
-                                <?php echo e($typeShowcaseLead->name); ?>
-
-                            </h3>
-                            <p class="mt-2 max-w-[340px] text-[12px] leading-5 text-slate-500">
-                                <?php echo e(\Illuminate\Support\Str::limit($typeShowcaseLead->description ?: 'Raised and packed fresh for everyday home cooking.', 110)); ?>
-
-                            </p>
-                            <div class="mt-4 flex items-end justify-between gap-4">
-                                <div>
-                                    <p class="text-[18px] font-black text-slate-950">Rs<?php echo e(number_format($typeShowcaseLead->display_price, 0)); ?><span class="ml-1 text-[11px] font-semibold text-slate-400"><?php echo e($typeShowcaseLead->display_pack_label); ?></span></p>
-                                    <?php if($typeShowcaseLead->display_mrp && $typeShowcaseLead->display_mrp > $typeShowcaseLead->display_price): ?>
-                                        <p class="text-xs text-slate-400 line-through">Rs<?php echo e(number_format($typeShowcaseLead->display_mrp, 0)); ?></p>
-                                    <?php endif; ?>
-                                </div>
-                                <?php if(!$typeShowcaseLead->is_out_of_stock): ?>
-                                    <button onclick="addToCart(<?php echo e($typeShowcaseLead->id); ?>)" class="inline-flex items-center gap-2 rounded-lg bg-amber-700 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-amber-800">
-                                        <i class="fa-solid fa-cart-plus text-[11px]"></i>
-                                        Add
-                                    </button>
-                                <?php else: ?>
-                                    <span class="inline-flex items-center rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-red-600">
-                                        Out of Stock
-                                    </span>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-
-                        <a href="<?php echo e(route('frontend.product.show', $typeShowcaseLead->slug)); ?>" class="relative block flex-1 overflow-hidden">
-                            <?php if(in_array($typeShowcaseLead->id, $newArrivalProductIds ?? [], true)): ?>
-                                <span class="absolute left-2 top-2 z-10 inline-flex rounded-full bg-amber-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
-                                    New Arrival
-                                </span>
-                            <?php endif; ?>
-                            <?php if($typeShowcaseLead->images && count($typeShowcaseLead->images)): ?>
-                                <img
-                                    src="<?php echo e(asset('storage/' . $typeShowcaseLead->images[0])); ?>"
-                                    alt="<?php echo e($typeShowcaseLead->name); ?>"
-                                    class="type-showcase-image absolute inset-0 h-full min-h-[240px] w-full object-cover object-center"
-                                >
-                            <?php else: ?>
-                                <div class="absolute inset-0 flex min-h-[240px] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-5xl text-slate-400">
-                                    <i class="fa-solid fa-drumstick-bite"></i>
-                                </div>
-                            <?php endif; ?>
-                        </a>
-                    </div>
-                </article>
-
-                <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:self-start">
-                    <?php $__currentLoopData = $typeShowcaseGrid; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <?php echo $__env->make('frontend.partials.product-card', ['product' => $product], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-
-                    <?php for($slot = $typeShowcaseGrid->count(); $slot < 6; $slot++): ?>
-                        <article class="type-showcase-card flex min-h-[245px] flex-col items-center justify-center rounded-[19px] border border-dashed border-amber-200 bg-[linear-gradient(145deg,#faf7f0,#faf5e8)] p-5 text-center shadow-[0_10px_30px_rgba(15,23,43,0.035)]">
-                            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-lg text-amber-600 shadow-sm">
-                                <i class="fa-solid fa-basket-shopping"></i>
-                            </span>
-                            <p class="mt-4 text-[12px] font-extrabold uppercase tracking-[0.12em] text-slate-800">More Fresh Picks</p>
-                            <p class="mt-1 text-[10px] leading-5 text-slate-500">New products coming soon</p>
-                            <a href="<?php echo e(route('frontend.products')); ?>" class="mt-4 inline-flex rounded-lg border border-amber-200 bg-white px-3 py-2 text-[9px] font-extrabold uppercase tracking-[0.12em] text-amber-700 transition hover:border-amber-300 hover:bg-amber-50">
-                                View All
-                            </a>
-                        </article>
-                    <?php endfor; ?>
-                </div>
+                <a href="<?php echo e(route('frontend.products', ['category' => $category->slug])); ?>" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
+                    See All
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </a>
             </div>
-        <?php elseif($typeShowcaseLeadCategory): ?>
-            <div class="mt-8 grid gap-4 lg:grid-cols-[1.08fr_1fr] lg:gap-5">
-                <?php
-                    $leadCategoryImage = $typeShowcaseLeadCategory->image
-                        ? asset('storage/' . $typeShowcaseLeadCategory->image)
-                        : ($typeShowcaseLeadCategory->children->pluck('image')->filter()->first()
-                            ? asset('storage/' . $typeShowcaseLeadCategory->children->pluck('image')->filter()->first())
-                            : null);
-                ?>
-
-                <article class="type-showcase-card overflow-hidden rounded-[26px] border border-[#e6d3a3] bg-[#faf7f0]">
-                    <div class="flex h-full flex-col">
-                        <div class="p-5 md:p-6">
-                            <span class="inline-flex rounded-full bg-amber-700 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
-                                Fresh Picks
-                            </span>
-                            <h3 class="mt-4 max-w-[340px] text-[28px] font-extrabold leading-[1.08] text-slate-900 md:text-[38px]">
-                                <?php echo e($typeShowcaseLeadCategory->name); ?> Fresh Collection
-                            </h3>
-                            <p class="mt-3 max-w-[360px] text-[13px] leading-6 text-slate-500">
-                                Browse top cuts, ready-to-cook options and daily essentials from our <?php echo e(strtolower($typeShowcaseLeadCategory->name)); ?> range.
-                            </p>
-                            <div class="mt-5 flex items-end justify-between gap-4">
-                                <div>
-                                    <p class="text-[12px] font-bold uppercase tracking-[0.16em] text-slate-400">Available Now</p>
-                                    <p class="mt-1 text-[20px] font-black text-slate-950"><?php echo e(max($typeShowcaseLeadCategory->children_count, $typeShowcaseLeadCategory->products_count, 1)); ?>+ Items</p>
-                                </div>
-                                <a href="<?php echo e(route('frontend.products', ['category' => $typeShowcaseLeadCategory->slug])); ?>" class="inline-flex items-center gap-2 rounded-xl bg-amber-700 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-amber-800">
-                                    <i class="fa-solid fa-arrow-right text-[11px]"></i>
-                                    Browse
-                                </a>
-                            </div>
-                        </div>
-
-                        <a href="<?php echo e(route('frontend.products', ['category' => $typeShowcaseLeadCategory->slug])); ?>" class="mt-auto block overflow-hidden">
-                            <?php if($leadCategoryImage): ?>
-                                <img
-                                    src="<?php echo e($leadCategoryImage); ?>"
-                                    alt="<?php echo e($typeShowcaseLeadCategory->name); ?>"
-                                    class="type-showcase-image h-[250px] w-full object-cover md:h-[280px]"
-                                >
-                            <?php else: ?>
-                                <div class="flex h-[250px] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-6xl text-slate-400 md:h-[280px]">
-                                    <i class="fa-solid fa-drumstick-bite"></i>
-                                </div>
-                            <?php endif; ?>
-                        </a>
-                    </div>
-                </article>
-
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <?php $__currentLoopData = $typeShowcaseGridCategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <?php
-                            $categoryImage = $category->image
-                                ? asset('storage/' . $category->image)
-                                : ($category->children->pluck('image')->filter()->first()
-                                    ? asset('storage/' . $category->children->pluck('image')->filter()->first())
-                                    : null);
-                        ?>
-
-                        <article class="type-showcase-card overflow-hidden rounded-[22px] border border-slate-200 bg-white p-3">
-                            <a href="<?php echo e(route('frontend.products', ['category' => $category->slug])); ?>" class="block overflow-hidden rounded-[16px]">
-                                <?php if($categoryImage): ?>
-                                    <img
-                                        src="<?php echo e($categoryImage); ?>"
-                                        alt="<?php echo e($category->name); ?>"
-                                        class="type-showcase-image aspect-[1.05] w-full object-cover"
-                                    >
-                                <?php else: ?>
-                                    <div class="flex aspect-[1.05] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-5xl text-slate-400">
-                                        <i class="fa-solid fa-layer-group"></i>
-                                    </div>
-                                <?php endif; ?>
-                            </a>
-
-                            <div class="pt-3">
-                                <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Fresh Range</p>
-                                <a href="<?php echo e(route('frontend.products', ['category' => $category->slug])); ?>" class="mt-1 block text-[14px] font-extrabold leading-[1.3] text-slate-900 transition hover:text-amber-700">
-                                    <?php echo e($category->name); ?>
-
-                                </a>
-                                <div class="mt-3 flex items-end justify-between gap-3">
-                                    <p class="text-[15px] font-black text-slate-950"><?php echo e(max($category->children_count, $category->products_count, 1)); ?>+ Items</p>
-                                    <a href="<?php echo e(route('frontend.products', ['category' => $category->slug])); ?>" class="rounded-lg border border-[#e6d3a3] bg-[#faf7f0] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-300 hover:bg-amber-50">
-                                        View
-                                    </a>
-                                </div>
-                            </div>
-                        </article>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            <div class="scrollbar-hide flex gap-3 overflow-x-auto scroll-smooth pb-3 md:gap-5">
+                <?php $__currentLoopData = $categoryProductList; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div class="min-w-[240px] max-w-[240px]">
+                    <?php echo $__env->make('frontend.partials.product-card', ['product' => $product], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                 </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
-        <?php endif; ?>
-    </div>
-</section>
+        </div>
+    </section>
+<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
 
 <section class="bg-gray-50 py-7 md:py-14">
@@ -876,6 +522,32 @@
                         </div>
                     </div>
                 </article>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php if($liveStockCategory && $liveStockProducts->isNotEmpty()): ?>
+
+<section class="bg-gray-50 py-8 md:py-12">
+    <div class="mx-auto max-w-7xl px-4">
+        <div class="mb-6 flex items-end justify-between gap-4">
+            <div>
+                <p class="text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-600">Enquiry Only &middot; Call to Order</p>
+                <h2 class="font-classic mt-1 text-2xl font-bold text-slate-900 md:text-3xl">Farm Fresh Live Stock</h2>
+                <p class="mt-1 max-w-lg text-xs text-slate-500">Healthy live farm birds and livestock raised under premium guidelines.</p>
+            </div>
+            <a href="<?php echo e(route('frontend.products', ['category' => $liveStockCategory->slug])); ?>" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
+                See All
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+        </div>
+        <div class="scrollbar-hide flex gap-3 overflow-x-auto scroll-smooth pb-3 md:gap-5">
+            <?php $__currentLoopData = $liveStockProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <div class="min-w-[240px] max-w-[240px]">
+                <?php echo $__env->make('frontend.partials.product-card', ['product' => $product], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+            </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>

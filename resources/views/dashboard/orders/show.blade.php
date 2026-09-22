@@ -126,6 +126,39 @@
                 </div>
             </div>
 
+            @if($order->razorpayPayments->isNotEmpty())
+                <div class="border-b bg-[#faf7f0] px-5 py-4">
+                    <p class="mb-3 flex items-center gap-1 text-xs font-black uppercase tracking-[0.14em] text-[#b8862c]">
+                        <i class="fa-solid fa-credit-card"></i> Razorpay Payment
+                    </p>
+                    @foreach($order->razorpayPayments->sortByDesc('created_at') as $payment)
+                        @php
+                            $rzpBadgeClass = match($payment->status) {
+                                'paid'      => 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                                'failed'    => 'bg-red-100 text-red-700 border-red-200',
+                                'cancelled' => 'bg-gray-100 text-gray-600 border-gray-200',
+                                default     => 'bg-amber-100 text-amber-700 border-amber-200',
+                            };
+                        @endphp
+                        <div class="mb-2 rounded-lg border border-amber-100 bg-white p-3 text-xs last:mb-0">
+                            <div class="mb-1.5 flex items-center justify-between">
+                                <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 font-bold {{ $rzpBadgeClass }}">
+                                    {{ ucfirst($payment->status) }}
+                                </span>
+                                <span class="text-gray-400">{{ $payment->created_at->format('d M Y, h:i A') }}</span>
+                            </div>
+                            <div class="grid grid-cols-1 gap-1 text-gray-600 sm:grid-cols-2">
+                                <p><span class="font-semibold text-gray-800">Amount:</span> &#8377;{{ number_format($payment->amount / 100, 2) }}</p>
+                                <p><span class="font-semibold text-gray-800">Razorpay Order ID:</span> {{ $payment->razorpay_order_id }}</p>
+                                @if($payment->razorpay_payment_id)
+                                    <p class="sm:col-span-2"><span class="font-semibold text-gray-800">Razorpay Payment ID:</span> {{ $payment->razorpay_payment_id }}</p>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
             <div class="border-b">
                 <div class="px-5 py-4">
                     <p class="mb-2 flex items-center gap-1 text-xs font-bold text-teal-600">

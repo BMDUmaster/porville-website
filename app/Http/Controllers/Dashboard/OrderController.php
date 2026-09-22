@@ -37,7 +37,7 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        $order->load('user', 'items.product', 'deliveryBoy');
+        $order->load('user', 'items.product', 'deliveryBoy', 'razorpayPayments');
         $deliveryBoys = $this->availableDeliveryBoys($order);
 
         return view('dashboard.orders.show', compact('order', 'deliveryBoys'));

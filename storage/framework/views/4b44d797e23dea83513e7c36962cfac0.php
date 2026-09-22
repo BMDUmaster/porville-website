@@ -59,7 +59,7 @@
                     </td>
                     <td class="px-4 py-3 align-middle text-center">
                         <div class="flex items-center justify-center gap-2">
-                            <button onclick="openEditModal(<?php echo e($cat->id); ?>, '<?php echo e(addslashes($cat->name)); ?>', '<?php echo e(addslashes($cat->description ?? '')); ?>', <?php echo e($cat->is_active ? 1 : 0); ?>)"
+                            <button onclick="openEditModal(<?php echo e($cat->id); ?>, '<?php echo e(addslashes($cat->name)); ?>', '<?php echo e(addslashes($cat->description ?? '')); ?>', '<?php echo e(addslashes($cat->tag ?? '')); ?>', <?php echo e($cat->is_active ? 1 : 0); ?>)"
                                     class="flex h-8 w-8 items-center justify-center rounded-lg text-xs text-amber-600 transition hover:bg-amber-100">
                                 <i class="fa-regular fa-pen-to-square"></i>
                             </button>
@@ -108,6 +108,11 @@
                           class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none resize-none"></textarea>
             </div>
             <div>
+                <label class="block text-sm font-medium mb-1.5">Tag <span class="text-gray-400 font-normal">(shown above the category name on the home page, e.g. "Best Seller")</span></label>
+                <input type="text" name="tag" maxlength="40" placeholder="e.g. Best Seller"
+                       class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500">
+            </div>
+            <div>
                 <label class="block text-sm font-medium mb-1.5">Status</label>
                 <select name="is_active" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500">
                     <option value="1">Active</option>
@@ -147,6 +152,11 @@
                           class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none resize-none"></textarea>
             </div>
             <div>
+                <label class="block text-sm font-medium mb-1.5">Tag <span class="text-gray-400 font-normal">(shown above the category name on the home page, e.g. "Best Seller")</span></label>
+                <input type="text" name="tag" id="editTag" maxlength="40" placeholder="e.g. Best Seller"
+                       class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500">
+            </div>
+            <div>
                 <label class="block text-sm font-medium mb-1.5">Status</label>
                 <select name="is_active" id="editStatus" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500">
                     <option value="1">Active</option>
@@ -174,9 +184,10 @@ function closeModal(id) {
     document.getElementById(id).classList.add('hidden');
     document.getElementById(id).classList.remove('flex');
 }
-function openEditModal(id, name, desc, isActive) {
+function openEditModal(id, name, desc, tag, isActive) {
     document.getElementById('editName').value = name;
     document.getElementById('editDesc').value = desc;
+    document.getElementById('editTag').value = tag;
     document.getElementById('editStatus').value = isActive;
     document.getElementById('editForm').action = categoryUpdateUrlTemplate.replace('__ID__', encodeURIComponent(id));
     openModal('editModal');
