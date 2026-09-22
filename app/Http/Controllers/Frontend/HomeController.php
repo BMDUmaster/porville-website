@@ -13,13 +13,6 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $newArrivalProductIds = Product::active()->notEnquiryOnly()
-            ->latest('created_at')
-            ->latest('id')
-            ->take(5)
-            ->pluck('id')
-            ->all();
-
         $categories = Category::parents()
             ->where('is_active', true)
             ->with(['children' => fn($query) => $query
@@ -31,30 +24,13 @@ class HomeController extends Controller
             ->withCount(['products' => fn($q) => $q->active()])
             ->get();
 
-        $latestProducts = Product::active()->notEnquiryOnly()->with('category')
+        $categoryProducts = Product::active()->notEnquiryOnly()->with('category')
+            ->whereIn('category_id', $categories->pluck('id'))
             ->orderByDesc('created_at')
-            ->orderByDesc('id');
-
-        $newArrivals = (clone $latestProducts)
-            ->take(8)
-            ->get();
-
-        if ($newArrivals->isEmpty()) {
-            $newArrivals = Product::active()->notEnquiryOnly()->with('category')
-                ->orderByDesc('created_at')
-                ->orderByDesc('id')
-                ->take(8)
-                ->get();
-        }
-
-        $featuredProducts = Product::active()->notEnquiryOnly()->with('category')
-            ->inRandomOrder()
-            ->take(4)
-            ->get();
-
-        if ($featuredProducts->isEmpty()) {
-            $featuredProducts = $newArrivals->take(4)->values();
-        }
+            ->orderByDesc('id')
+            ->get()
+            ->groupBy('category_id')
+            ->map(fn($products) => $products->take(10));
 
         $bestSellers = Product::active()->notEnquiryOnly()->with('category')
             ->withSum([
@@ -96,6 +72,6 @@ class HomeController extends Controller
                 ->get()
             : collect();
 
-        return view('frontend.home', compact('categories', 'newArrivals', 'featuredProducts', 'bestSellers', 'newArrivalProductIds', 'homeBanners', 'homeReviews', 'liveStockCategory', 'liveStockProducts'));
+        return view('frontend.home', compact('categories', 'categoryProducts', 'bestSellers', 'homeBanners', 'homeReviews', 'liveStockCategory', 'liveStockProducts'));
     }
 }

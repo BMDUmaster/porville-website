@@ -109,24 +109,6 @@
         transition: transform .35s ease;
     }
 
-    .type-showcase-card {
-        transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
-    }
-
-    .type-showcase-card:hover {
-        transform: translateY(-6px);
-        border-color: #e6d3a3;
-        box-shadow: 0 24px 48px rgba(184, 134, 44, 0.14);
-    }
-
-    .type-showcase-image {
-        transition: transform .6s ease;
-    }
-
-    .type-showcase-card:hover .type-showcase-image {
-        transform: scale(1.05);
-    }
-
     @keyframes favoriteGlowSpin {
         from {
             transform: rotate(0deg);
@@ -149,13 +131,9 @@
         .home-hero-content a { padding: 9px 14px; border-radius: 9px; font-size: 10px; }
         #home-category-scroller > a { min-width: 156px; max-width: 156px; }
         #home-category-scroller > a > div:first-child { height: 150px; }
-        #home-new-arrivals-scroller > div { min-width: 184px; max-width: 184px; }
-        #home-type-scroller > article { min-width: 210px; max-width: 210px; padding: 12px; }
         #home-favorites-scroller > article { min-width: 205px; max-width: 205px; padding: 8px; }
         #home-favorites-scroller > article > div { padding: 10px; }
         #home-favorites-scroller img { height: 145px; aspect-ratio: auto; }
-        .type-showcase-card { border-radius: 18px; }
-        .type-showcase-card .type-showcase-image { max-height: 260px; }
         .favorite-hero-banner { border-radius: 20px; }
         .favorite-hero-banner img { height: 250px; }
         .favorite-hero-copy { padding: 20px 16px; }
@@ -293,7 +271,6 @@
 <section class="bg-white pb-2 pt-5 md:py-6">
     <div class="mx-auto max-w-7xl px-4">
         @php
-            $categoryLabels = ['Best Seller', 'Lean Protein', 'Juicy Cuts', 'Ready to Cook', 'Fresh Choice', 'Chef Pick', 'Daily Fresh', 'Top Rated'];
             $showcaseCategories = $categories->flatMap(function ($category) {
                 if ($category->children->isNotEmpty()) {
                     return $category->children->map(function ($child) use ($category) {
@@ -303,6 +280,7 @@
                             'category_slug' => $category->slug,
                             'subcategory_slug' => $child->slug,
                             'image' => $child->image ?: $category->image,
+                            'tag' => $child->tag ?: $category->tag,
                         ];
                     });
                 }
@@ -313,6 +291,7 @@
                     'category_slug' => $category->slug,
                     'subcategory_slug' => null,
                     'image' => $category->image,
+                    'tag' => $category->tag,
                 ]]);
             })->take(12)->values();
         @endphp
@@ -339,7 +318,6 @@
         >
             @forelse($showcaseCategories as $index => $item)
                 @php
-                    $label = $categoryLabels[$index % count($categoryLabels)];
                     $linkParams = ['category' => $item['category_slug']];
                     if ($item['subcategory_slug']) {
                         $linkParams['subcategory'] = $item['subcategory_slug'];
@@ -366,12 +344,14 @@
                     </div>
 
                     <div class="border-t border-slate-100 px-4 py-3 text-center">
-                        <h3 class="text-[15px] font-semibold text-slate-900 transition-colors group-hover:text-amber-700">
+                        @if($item['tag'])
+                            <p class="text-[10px] font-extrabold uppercase tracking-[0.18em] text-amber-600">
+                                {{ $item['tag'] }}
+                            </p>
+                        @endif
+                        <h3 class="mt-1 text-[15px] font-semibold text-slate-900 transition-colors group-hover:text-amber-700">
                             {{ $item['title'] }}
                         </h3>
-                        <p class="mt-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-amber-600">
-                            {{ $label }}
-                        </p>
                     </div>
                 </a>
             @empty
@@ -387,368 +367,39 @@
     </div>
 </section>
 
-{{-- New Arrivals --}}
-<section class="bg-gray-50 pb-2 pt-2 md:py-6">
-    <div class="mx-auto max-w-7xl px-4">
-        <div class="mb-6 flex items-end justify-between">
-            <div>
-                <h2 class="text-2xl font-extrabold text-gray-800">New <span class="text-amber-600">Arrivals</span></h2>
-                <p class="mt-1 text-xs text-gray-500">The freshest additions to our selection.</p>
-            </div>
-            <a href="{{ route('frontend.products') }}" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
-                See All
-                <i class="fa-solid fa-arrow-right text-[10px]"></i>
-            </a>
-        </div>
-        <div id="home-new-arrivals-scroller" class="scrollbar-hide flex gap-3 overflow-x-auto scroll-smooth pb-3 md:gap-5">
-            @forelse($newArrivals as $product)
-            <div class="min-w-[240px] max-w-[240px]">
-                @include('frontend.partials.product-card', ['product' => $product])
-            </div>
-            @empty
-                <p class="w-full py-8 text-center text-gray-400">No products yet.</p>
-            @endforelse
-        </div>
-    </div>
-</section>
+{{-- Dynamic Category Sections --}}
+@foreach($categories as $category)
+    @continue($category->is_enquiry_only)
+    @php $categoryProductList = $categoryProducts->get($category->id, collect()); @endphp
+    @continue($categoryProductList->isEmpty())
 
-@if($liveStockCategory && $liveStockProducts->isNotEmpty())
-{{-- Farm Fresh Live Stock --}}
-<section class="bg-black py-8 md:py-12">
-    <div class="mx-auto max-w-7xl px-4">
-        <div class="mb-6 flex items-end justify-between gap-4">
-            <div>
-                <p class="text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-400">Enquiry Only &middot; Call to Order</p>
-                <h2 class="font-classic mt-1 text-2xl font-bold text-white md:text-3xl">Farm Fresh Live Stock</h2>
-                <p class="mt-1 max-w-lg text-xs text-stone-300">Healthy live farm birds and livestock raised under premium guidelines.</p>
-            </div>
-            <a href="{{ route('frontend.products', ['category' => $liveStockCategory->slug]) }}" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-500 bg-black px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-400 transition hover:bg-amber-500 hover:text-black sm:px-5">
-                See All
-                <i class="fa-solid fa-arrow-right text-[10px]"></i>
-            </a>
-        </div>
-        <div class="scrollbar-hide flex gap-3 overflow-x-auto scroll-smooth pb-3 md:gap-5">
-            @foreach($liveStockProducts as $product)
-            <div class="min-w-[240px] max-w-[240px]">
-                @include('frontend.partials.product-card', ['product' => $product])
-            </div>
-            @endforeach
-        </div>
-    </div>
-</section>
-@endif
-
-{{-- Shop By Type --}}
-<section class="bg-white pb-6 pt-2 md:py-7">
-    <div class="mx-auto max-w-7xl px-4">
-        <div class="mb-6 flex items-center justify-between gap-4">
-            <div class="text-left">
-                <h2 class="text-3xl font-extrabold text-slate-900 md:text-4xl">
-                    Shop By <span class="text-amber-600">Type</span>
-                </h2>
-            </div>
-            <div class="hidden items-center gap-3 md:flex">
-                <button
-                    type="button"
-                    aria-label="Scroll types left"
-                    onclick="document.getElementById('home-type-scroller').scrollBy({ left: -360, behavior: 'smooth' })"
-                    class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-amber-200 hover:bg-amber-50 hover:text-amber-600"
-                >
-                    <i class="fa-solid fa-arrow-left"></i>
-                </button>
-                <button
-                    type="button"
-                    aria-label="Scroll types right"
-                    onclick="document.getElementById('home-type-scroller').scrollBy({ left: 360, behavior: 'smooth' })"
-                    class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-amber-200 hover:bg-amber-50 hover:text-amber-600"
-                >
-                    <i class="fa-solid fa-arrow-right"></i>
-                </button>
-            </div>
-        </div>
-
-        @php
-            $typeMeta = [
-                'chicken' => ['icon' => 'fa-drumstick-bite', 'accent' => 'text-rose-500', 'tint' => 'bg-rose-50', 'subtitle' => 'Varieties'],
-                'mutton' => ['icon' => 'fa-bacon', 'accent' => 'text-red-500', 'tint' => 'bg-red-50', 'subtitle' => 'Cuts'],
-                'lamb' => ['icon' => 'fa-bacon', 'accent' => 'text-red-500', 'tint' => 'bg-red-50', 'subtitle' => 'Cuts'],
-                'fish' => ['icon' => 'fa-fish-fins', 'accent' => 'text-sky-500', 'tint' => 'bg-sky-50', 'subtitle' => 'Types'],
-                'seafood' => ['icon' => 'fa-fish-fins', 'accent' => 'text-sky-500', 'tint' => 'bg-sky-50', 'subtitle' => 'Types'],
-                'egg' => ['icon' => 'fa-egg', 'accent' => 'text-amber-600', 'tint' => 'bg-amber-50', 'subtitle' => 'Farm Grade'],
-                'dairy' => ['icon' => 'fa-egg', 'accent' => 'text-amber-600', 'tint' => 'bg-amber-50', 'subtitle' => 'Farm Grade'],
-            ];
-
-            $typeShowcaseLead = $featuredProducts->first() ?? $newArrivals->first();
-            $typeShowcaseGrid = $featuredProducts
-                ->slice(1)
-                ->merge(
-                    $newArrivals->reject(
-                        fn($product) => $typeShowcaseLead && $product->id === $typeShowcaseLead->id
-                    )
-                )
-                ->merge(
-                    $bestSellers->reject(
-                        fn($product) => $typeShowcaseLead && $product->id === $typeShowcaseLead->id
-                    )
-                )
-                ->unique('id')
-                ->take(6)
-                ->values();
-            $typeShowcaseCategories = $categories->take(5)->values();
-            $typeShowcaseLeadCategory = $typeShowcaseCategories->first();
-            $typeShowcaseGridCategories = $typeShowcaseCategories->slice(1, 4);
-        @endphp
-
-        <div
-            id="home-type-scroller"
-            class="scrollbar-hide flex gap-4 overflow-x-auto scroll-smooth pb-3"
-        >
-            @forelse($categories->take(10) as $cat)
-                @php
-                    $slugKey = strtolower($cat->slug ?? $cat->name);
-                    $meta = collect($typeMeta)->first(fn($value, $key) => str_contains($slugKey, $key)) ?? ['icon' => 'fa-layer-group', 'accent' => 'text-amber-600', 'tint' => 'bg-amber-50', 'subtitle' => 'Collections'];
-                    $previewImages = collect([$cat->image])->merge($cat->children->pluck('image'))->filter()->take(3)->values();
-                    $countLabel = max($cat->children_count, $cat->products_count, 1);
-                    $countText = $cat->children_count > 0 ? $meta['subtitle'] : 'Products';
-                    $cardLink = route('frontend.categories', ['focus' => $cat->slug]) . '#category-' . $cat->slug;
-                @endphp
-
-                <article class="group min-w-[260px] max-w-[260px] rounded-[22px] border border-slate-200 bg-white p-4 shadow-[0_10px_30px_rgba(15,23,43,0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-amber-200 hover:shadow-[0_20px_40px_rgba(37,99,235,0.12)]">
-                    <a href="{{ $cardLink }}" class="block">
-                        <div class="flex flex-col items-center text-center">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-2xl {{ $meta['tint'] }} text-xl {{ $meta['accent'] }} transition-transform duration-300 group-hover:scale-110">
-                                <i class="fa-solid {{ $meta['icon'] }}"></i>
-                            </div>
-
-                            <h3 class="mt-4 text-[15px] font-extrabold uppercase tracking-[0.08em] text-slate-900">
-                                {{ $cat->name }}
-                            </h3>
-                            <p class="mt-1 text-[12px] text-slate-500">
-                                {{ $countLabel }}+ {{ $countText }}
-                            </p>
-                        </div>
-
-                        <div class="mt-5 grid grid-cols-3 gap-2.5">
-                            @for($index = 0; $index < 3; $index++)
-                                @php
-                                    $image = $previewImages->get($index);
-                                @endphp
-                                <div class="relative aspect-[1.08] overflow-hidden rounded-xl bg-slate-100">
-                                    @if($image)
-                                        <img
-                                            src="{{ asset('storage/' . $image) }}"
-                                            alt="{{ $cat->name }}"
-                                            class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                        >
-                                    @else
-                                        <div class="flex h-full w-full items-center justify-center {{ $meta['tint'] }} text-lg {{ $meta['accent'] }}">
-                                            <i class="fa-solid {{ $meta['icon'] }}"></i>
-                                        </div>
-                                    @endif
-
-                                    @if($index === 2)
-                                        <div class="absolute inset-0 bg-gradient-to-br from-slate-900/10 via-transparent to-slate-900/60"></div>
-                                        <div class="absolute inset-0 flex items-center justify-center text-center">
-                                            <span class="rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-extrabold text-slate-900 shadow-sm">
-                                                +{{ $countLabel }}
-                                            </span>
-                                        </div>
-                                    @endif
-                                </div>
-                            @endfor
-                        </div>
-                    </a>
-
-                    <a
-                        href="{{ $cardLink }}"
-                        class="mt-4 flex h-11 items-center justify-center rounded-xl bg-amber-600 text-[12px] font-extrabold uppercase tracking-[0.18em] text-white transition-all duration-300 hover:bg-amber-700 group-hover:shadow-lg"
-                    >
-                        View All
-                    </a>
-                </article>
-            @empty
-                <div class="flex min-h-[220px] w-full items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-6 py-12 text-center text-slate-400">
-                    <i class="fa-solid fa-layer-group mb-3 block text-4xl opacity-40"></i>
-                    <p class="text-sm font-medium">No categories available right now.</p>
+    <section class="{{ $loop->even ? 'bg-gray-50' : 'bg-white' }} pb-2 pt-2 md:py-6">
+        <div class="mx-auto max-w-7xl px-4">
+            <div class="mb-6 flex items-end justify-between gap-4">
+                <div>
+                    @if($category->tag)
+                        <p class="text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-600">{{ $category->tag }}</p>
+                    @endif
+                    <h2 class="mt-1 text-2xl font-extrabold text-slate-900 md:text-3xl">{{ $category->name }}</h2>
+                    <p class="mt-1 max-w-lg text-xs text-gray-500 md:text-sm">
+                        {{ $category->description ?: 'Fresh, quality-checked ' . strtolower($category->name) . ', cut and packed daily.' }}
+                    </p>
                 </div>
-            @endforelse
-        </div>
-
-        <div class="mt-5 flex justify-center md:hidden">
-            <a href="{{ route('frontend.categories') }}" class="inline-flex items-center gap-2 rounded-full bg-amber-600 px-5 py-3 text-xs font-extrabold uppercase tracking-[0.18em] text-white transition hover:bg-amber-700">
-                Browse Types
-                <i class="fa-solid fa-arrow-right"></i>
-            </a>
-        </div>
-
-        @if($typeShowcaseLead)
-            <div class="mt-8 grid gap-4 lg:grid-cols-[0.82fr_1.18fr] lg:gap-5">
-                <article class="type-showcase-card overflow-hidden rounded-[22px] border border-[#e6d3a3] bg-[#faf7f0]">
-                    <div class="flex h-full flex-col">
-                        <div class="p-4 pb-3 md:p-5 md:pb-4">
-                            <span class="inline-flex rounded-full bg-amber-700 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
-                                Chef's Selection
-                            </span>
-                            <h3 class="mt-3 max-w-[320px] text-[23px] font-extrabold leading-[1.1] text-slate-900 md:text-[30px]">
-                                {{ $typeShowcaseLead->name }}
-                            </h3>
-                            <p class="mt-2 max-w-[340px] text-[12px] leading-5 text-slate-500">
-                                {{ \Illuminate\Support\Str::limit($typeShowcaseLead->description ?: 'Raised and packed fresh for everyday home cooking.', 110) }}
-                            </p>
-                            <div class="mt-4 flex items-end justify-between gap-4">
-                                <div>
-                                    <p class="text-[18px] font-black text-slate-950">Rs{{ number_format($typeShowcaseLead->display_price, 0) }}<span class="ml-1 text-[11px] font-semibold text-slate-400">{{ $typeShowcaseLead->display_pack_label }}</span></p>
-                                    @if($typeShowcaseLead->display_mrp && $typeShowcaseLead->display_mrp > $typeShowcaseLead->display_price)
-                                        <p class="text-xs text-slate-400 line-through">Rs{{ number_format($typeShowcaseLead->display_mrp, 0) }}</p>
-                                    @endif
-                                </div>
-                                @if(!$typeShowcaseLead->is_out_of_stock)
-                                    <button onclick="addToCart({{ $typeShowcaseLead->id }})" class="inline-flex items-center gap-2 rounded-lg bg-amber-700 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-amber-800">
-                                        <i class="fa-solid fa-cart-plus text-[11px]"></i>
-                                        Add
-                                    </button>
-                                @else
-                                    <span class="inline-flex items-center rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-red-600">
-                                        Out of Stock
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <a href="{{ route('frontend.product.show', $typeShowcaseLead->slug) }}" class="relative block flex-1 overflow-hidden">
-                            @if(in_array($typeShowcaseLead->id, $newArrivalProductIds ?? [], true))
-                                <span class="absolute left-2 top-2 z-10 inline-flex rounded-full bg-amber-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
-                                    New Arrival
-                                </span>
-                            @endif
-                            @if($typeShowcaseLead->images && count($typeShowcaseLead->images))
-                                <img
-                                    src="{{ asset('storage/' . $typeShowcaseLead->images[0]) }}"
-                                    alt="{{ $typeShowcaseLead->name }}"
-                                    class="type-showcase-image absolute inset-0 h-full min-h-[240px] w-full object-cover object-center"
-                                >
-                            @else
-                                <div class="absolute inset-0 flex min-h-[240px] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-5xl text-slate-400">
-                                    <i class="fa-solid fa-drumstick-bite"></i>
-                                </div>
-                            @endif
-                        </a>
-                    </div>
-                </article>
-
-                <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:self-start">
-                    @foreach($typeShowcaseGrid as $product)
-                        @include('frontend.partials.product-card', ['product' => $product])
-                    @endforeach
-
-                    @for($slot = $typeShowcaseGrid->count(); $slot < 6; $slot++)
-                        <article class="type-showcase-card flex min-h-[245px] flex-col items-center justify-center rounded-[19px] border border-dashed border-amber-200 bg-[linear-gradient(145deg,#faf7f0,#faf5e8)] p-5 text-center shadow-[0_10px_30px_rgba(15,23,43,0.035)]">
-                            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-lg text-amber-600 shadow-sm">
-                                <i class="fa-solid fa-basket-shopping"></i>
-                            </span>
-                            <p class="mt-4 text-[12px] font-extrabold uppercase tracking-[0.12em] text-slate-800">More Fresh Picks</p>
-                            <p class="mt-1 text-[10px] leading-5 text-slate-500">New products coming soon</p>
-                            <a href="{{ route('frontend.products') }}" class="mt-4 inline-flex rounded-lg border border-amber-200 bg-white px-3 py-2 text-[9px] font-extrabold uppercase tracking-[0.12em] text-amber-700 transition hover:border-amber-300 hover:bg-amber-50">
-                                View All
-                            </a>
-                        </article>
-                    @endfor
-                </div>
+                <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
+                    See All
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </a>
             </div>
-        @elseif($typeShowcaseLeadCategory)
-            <div class="mt-8 grid gap-4 lg:grid-cols-[1.08fr_1fr] lg:gap-5">
-                @php
-                    $leadCategoryImage = $typeShowcaseLeadCategory->image
-                        ? asset('storage/' . $typeShowcaseLeadCategory->image)
-                        : ($typeShowcaseLeadCategory->children->pluck('image')->filter()->first()
-                            ? asset('storage/' . $typeShowcaseLeadCategory->children->pluck('image')->filter()->first())
-                            : null);
-                @endphp
-
-                <article class="type-showcase-card overflow-hidden rounded-[26px] border border-[#e6d3a3] bg-[#faf7f0]">
-                    <div class="flex h-full flex-col">
-                        <div class="p-5 md:p-6">
-                            <span class="inline-flex rounded-full bg-amber-700 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
-                                Fresh Picks
-                            </span>
-                            <h3 class="mt-4 max-w-[340px] text-[28px] font-extrabold leading-[1.08] text-slate-900 md:text-[38px]">
-                                {{ $typeShowcaseLeadCategory->name }} Fresh Collection
-                            </h3>
-                            <p class="mt-3 max-w-[360px] text-[13px] leading-6 text-slate-500">
-                                Browse top cuts, ready-to-cook options and daily essentials from our {{ strtolower($typeShowcaseLeadCategory->name) }} range.
-                            </p>
-                            <div class="mt-5 flex items-end justify-between gap-4">
-                                <div>
-                                    <p class="text-[12px] font-bold uppercase tracking-[0.16em] text-slate-400">Available Now</p>
-                                    <p class="mt-1 text-[20px] font-black text-slate-950">{{ max($typeShowcaseLeadCategory->children_count, $typeShowcaseLeadCategory->products_count, 1) }}+ Items</p>
-                                </div>
-                                <a href="{{ route('frontend.products', ['category' => $typeShowcaseLeadCategory->slug]) }}" class="inline-flex items-center gap-2 rounded-xl bg-amber-700 px-5 py-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-amber-800">
-                                    <i class="fa-solid fa-arrow-right text-[11px]"></i>
-                                    Browse
-                                </a>
-                            </div>
-                        </div>
-
-                        <a href="{{ route('frontend.products', ['category' => $typeShowcaseLeadCategory->slug]) }}" class="mt-auto block overflow-hidden">
-                            @if($leadCategoryImage)
-                                <img
-                                    src="{{ $leadCategoryImage }}"
-                                    alt="{{ $typeShowcaseLeadCategory->name }}"
-                                    class="type-showcase-image h-[250px] w-full object-cover md:h-[280px]"
-                                >
-                            @else
-                                <div class="flex h-[250px] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-6xl text-slate-400 md:h-[280px]">
-                                    <i class="fa-solid fa-drumstick-bite"></i>
-                                </div>
-                            @endif
-                        </a>
-                    </div>
-                </article>
-
-                <div class="grid gap-4 sm:grid-cols-2">
-                    @foreach($typeShowcaseGridCategories as $category)
-                        @php
-                            $categoryImage = $category->image
-                                ? asset('storage/' . $category->image)
-                                : ($category->children->pluck('image')->filter()->first()
-                                    ? asset('storage/' . $category->children->pluck('image')->filter()->first())
-                                    : null);
-                        @endphp
-
-                        <article class="type-showcase-card overflow-hidden rounded-[22px] border border-slate-200 bg-white p-3">
-                            <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="block overflow-hidden rounded-[16px]">
-                                @if($categoryImage)
-                                    <img
-                                        src="{{ $categoryImage }}"
-                                        alt="{{ $category->name }}"
-                                        class="type-showcase-image aspect-[1.05] w-full object-cover"
-                                    >
-                                @else
-                                    <div class="flex aspect-[1.05] w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-5xl text-slate-400">
-                                        <i class="fa-solid fa-layer-group"></i>
-                                    </div>
-                                @endif
-                            </a>
-
-                            <div class="pt-3">
-                                <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Fresh Range</p>
-                                <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="mt-1 block text-[14px] font-extrabold leading-[1.3] text-slate-900 transition hover:text-amber-700">
-                                    {{ $category->name }}
-                                </a>
-                                <div class="mt-3 flex items-end justify-between gap-3">
-                                    <p class="text-[15px] font-black text-slate-950">{{ max($category->children_count, $category->products_count, 1) }}+ Items</p>
-                                    <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="rounded-lg border border-[#e6d3a3] bg-[#faf7f0] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-300 hover:bg-amber-50">
-                                        View
-                                    </a>
-                                </div>
-                            </div>
-                        </article>
-                    @endforeach
+            <div class="scrollbar-hide flex gap-3 overflow-x-auto scroll-smooth pb-3 md:gap-5">
+                @foreach($categoryProductList as $product)
+                <div class="min-w-[240px] max-w-[240px]">
+                    @include('frontend.partials.product-card', ['product' => $product])
                 </div>
+                @endforeach
             </div>
-        @endif
-    </div>
-</section>
+        </div>
+    </section>
+@endforeach
 
 {{-- Best Sellers --}}
 <section class="bg-gray-50 py-7 md:py-14">
@@ -865,6 +516,32 @@
                         </div>
                     </div>
                 </article>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+@if($liveStockCategory && $liveStockProducts->isNotEmpty())
+{{-- Farm Fresh Live Stock (kept last on the page) --}}
+<section class="bg-gray-50 py-8 md:py-12">
+    <div class="mx-auto max-w-7xl px-4">
+        <div class="mb-6 flex items-end justify-between gap-4">
+            <div>
+                <p class="text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-600">Enquiry Only &middot; Call to Order</p>
+                <h2 class="font-classic mt-1 text-2xl font-bold text-slate-900 md:text-3xl">Farm Fresh Live Stock</h2>
+                <p class="mt-1 max-w-lg text-xs text-slate-500">Healthy live farm birds and livestock raised under premium guidelines.</p>
+            </div>
+            <a href="{{ route('frontend.products', ['category' => $liveStockCategory->slug]) }}" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
+                See All
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+        </div>
+        <div class="scrollbar-hide flex gap-3 overflow-x-auto scroll-smooth pb-3 md:gap-5">
+            @foreach($liveStockProducts as $product)
+            <div class="min-w-[240px] max-w-[240px]">
+                @include('frontend.partials.product-card', ['product' => $product])
+            </div>
             @endforeach
         </div>
     </div>
