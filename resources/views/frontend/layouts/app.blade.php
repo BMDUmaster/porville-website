@@ -329,7 +329,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
             <span class="hidden sm:inline">Coupons &amp; Offers</span>
         </a>
     </div>
-    <div class="w-full px-3 py-2 sm:px-3 md:px-4 lg:py-2.5 flex items-center justify-between gap-2 lg:gap-4">
+    <div class="mx-auto flex w-full max-w-7xl items-center justify-between gap-2 px-3 py-2 sm:px-3 md:px-4 lg:gap-4 lg:py-2.5">
         <button onclick="toggleSidebar()" aria-label="Open menu" class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-stone-200 text-lg lg:hidden">
             <i class="fa-solid fa-bars"></i>
         </button>
@@ -443,7 +443,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
             </button>
         </div>
     </div>
-    <div class="px-3 pb-2.5 md:hidden">
+    <div class="mx-auto max-w-7xl px-3 pb-2.5 md:hidden">
         <form action="{{ route('frontend.products') }}" method="GET" class="relative">
             <input type="text" name="search" placeholder="Search fresh items"
                    class="w-full rounded-xl border border-neutral-700 bg-neutral-900 text-white placeholder:text-neutral-400 px-3.5 py-2 pr-10 text-xs focus:border-amber-500 focus:outline-none transition">
@@ -454,7 +454,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
     </div>
     <!-- Nav strip -->
     <div class="border-t border-neutral-800 hidden md:block overflow-visible bg-black">
-        <div class="flex h-10 w-full items-center gap-1 overflow-visible px-3 text-sm scrollbar-hide sm:px-3 md:px-4">
+        <div class="mx-auto flex h-10 w-full max-w-7xl items-center gap-1 overflow-visible px-3 text-sm scrollbar-hide sm:px-3 md:px-4">
             <a href="{{ route('frontend.products') }}" class="px-3 py-1.5 bg-neutral-900 text-stone-200 font-semibold whitespace-nowrap rounded-md flex-shrink-0">All Products</a>
             @foreach($frontendNavCategories ?? collect() as $category)
                 @if($category->children->isNotEmpty())

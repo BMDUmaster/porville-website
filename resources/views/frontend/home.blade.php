@@ -10,11 +10,13 @@
     }
 
     .home-hero-slide.active {
-        position: relative;
-        inset: auto;
         opacity: 1;
         transform: scale(1);
         pointer-events: auto;
+    }
+
+    .home-hero-card {
+        height: 350px;
     }
 
     .home-hero-card:hover .home-hero-slide.active img {
@@ -208,7 +210,7 @@
                     <img
                         src="{{ $slide['image'] }}"
                         alt="{{ $slide['title_1'] }} {{ $slide['title_2'] }}"
-                        class="block h-auto w-full"
+                        class="block h-full w-full object-cover"
                     >
                 </picture>
                 <div class="hidden absolute inset-0 bg-black/45"></div>
