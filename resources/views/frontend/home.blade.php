@@ -298,16 +298,14 @@
             })->take(12)->values();
         @endphp
 
-        <div class="mb-6 flex items-end justify-between gap-4">
-            <div>
-                <h2 class="home-category-heading text-3xl font-extrabold text-slate-900 md:text-4xl">
-                    Shop by <span class="text-amber-600"> Category  </span>
-                </h2>
-                <p class="mt-2 text-sm text-slate-500"> Fresh cut, pure standards, across every cut and kind. </p>
-            </div>
+        <div class="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-4">
+            <h2 class="home-category-heading col-span-2 col-start-1 text-center text-3xl font-extrabold text-slate-900 md:col-span-1 md:text-left md:text-4xl">
+                Shop by <span class="text-amber-600"> Category  </span>
+            </h2>
+            <p class="col-start-1 mt-2 text-sm text-slate-500"> Fresh cut, pure standards, across every cut and kind. </p>
             <a
                 href="{{ route('frontend.categories') }}"
-                class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5"
+                class="col-start-2 inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5"
             >
                 See All
                 <i class="fa-solid fa-arrow-right text-[10px]"></i>
@@ -377,17 +375,16 @@
 
     <section class="{{ $loop->even ? 'bg-gray-50' : 'bg-white' }} pb-2 pt-2 md:py-6">
         <div class="mx-auto max-w-7xl px-4">
-            <div class="mb-6 flex flex-col items-center gap-3 text-center md:flex-row md:items-end md:justify-between md:gap-4 md:text-left">
-                <div>
-                    @if($category->tag)
-                        <p class="text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-600">{{ $category->tag }}</p>
-                    @endif
-                    <h2 class="mt-1 text-2xl font-extrabold text-slate-900 md:text-3xl">{{ $category->name }}</h2>
-                    <p class="mx-auto mt-1 max-w-lg text-xs text-gray-500 md:mx-0 md:text-sm">
-                        {{ $category->description ?: 'Fresh, quality-checked ' . strtolower($category->name) . ', cut and packed daily.' }}
-                    </p>
-                </div>
-                <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
+            {{-- Grid so the category name can span full width (centered on mobile) while See All stays beside the description --}}
+            <div class="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-4">
+                @if($category->tag)
+                    <p class="col-span-2 col-start-1 text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-600 md:col-span-1">{{ $category->tag }}</p>
+                @endif
+                <h2 class="col-span-2 col-start-1 mt-1 text-center text-2xl font-extrabold text-slate-900 md:col-span-1 md:text-left md:text-3xl">{{ $category->name }}</h2>
+                <p class="col-start-1 mt-1 max-w-lg text-xs text-gray-500 md:text-sm">
+                    {{ $category->description ?: 'Fresh, quality-checked ' . strtolower($category->name) . ', cut and packed daily.' }}
+                </p>
+                <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="col-start-2 inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
                     See All
                     <i class="fa-solid fa-arrow-right text-[10px]"></i>
                 </a>
@@ -528,13 +525,11 @@
 {{-- Farm Fresh Live Stock (kept last on the page) --}}
 <section class="bg-gray-50 py-8 md:py-12">
     <div class="mx-auto max-w-7xl px-4">
-        <div class="mb-6 flex flex-col items-center gap-3 text-center md:flex-row md:items-end md:justify-between md:gap-4 md:text-left">
-            <div>
-                <p class="text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-600">Enquiry Only &middot; Call to Order</p>
-                <h2 class="font-classic mt-1 text-2xl font-bold text-slate-900 md:text-3xl">Farm Fresh Live Stock</h2>
-                <p class="mx-auto mt-1 max-w-lg text-xs text-slate-500 md:mx-0">Healthy live farm birds and livestock raised under premium guidelines.</p>
-            </div>
-            <a href="{{ route('frontend.products', ['category' => $liveStockCategory->slug]) }}" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
+        <div class="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-4">
+            <p class="col-span-2 col-start-1 text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-600 md:col-span-1">Enquiry Only &middot; Call to Order</p>
+            <h2 class="font-classic col-span-2 col-start-1 mt-1 text-center text-2xl font-bold text-slate-900 md:col-span-1 md:text-left md:text-3xl">Farm Fresh Live Stock</h2>
+            <p class="col-start-1 mt-1 max-w-lg text-xs text-slate-500">Healthy live farm birds and livestock raised under premium guidelines.</p>
+            <a href="{{ route('frontend.products', ['category' => $liveStockCategory->slug]) }}" class="col-start-2 inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
                 See All
                 <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </a>
