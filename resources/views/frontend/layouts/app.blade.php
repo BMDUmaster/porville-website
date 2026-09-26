@@ -561,8 +561,8 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                 <a href="tel:9217577006" class="mb-2 inline-flex min-h-9 items-center gap-2 rounded-lg pr-3 text-[15px] font-semibold text-white transition hover:text-amber-400">
                     <i class="fa-solid fa-phone text-amber-400 text-xs"></i> +91 92175 77006
                 </a>
-                <a href="mailto:porville1986@gmail.com" class="mb-4 flex items-center gap-2 text-[14px] text-[#c9b896] transition hover:text-white">
-                    <i class="fa-regular fa-envelope text-xs"></i> porville1986@gmail.com
+                <a href="mailto:porville1986@gmail.com" class="mb-4 flex min-w-0 items-center gap-2 text-[14px] text-[#c9b896] transition hover:text-white">
+                    <i class="fa-regular fa-envelope shrink-0 text-xs"></i> <span class="min-w-0 break-all">porville1986@gmail.com</span>
                 </a>
                 <div class="flex items-center gap-3.5 text-[15px] text-[#c9b896]">
                     <a href="https://wa.me/919217577006" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>

@@ -56,7 +56,7 @@
             </div>
 
             <div class="mt-auto pt-1.5">
-                <p class="font-classic text-[14px] font-bold text-slate-900">On call</p>
+                <p class="text-[14px] font-semibold text-slate-900">On call</p>
 
                 @if(!$product->is_out_of_stock && $product->contact_number)
                     <a href="tel:{{ preg_replace('/\D/', '', $product->contact_number) }}"
@@ -90,7 +90,7 @@
 
             <div class="mt-auto pt-1.5">
                 <div class="flex flex-wrap items-baseline gap-1.5">
-                    <p id="{{ $cardUid }}-price" class="font-classic text-[14px] font-bold text-slate-900">
+                    <p id="{{ $cardUid }}-price" class="text-[14px] font-semibold text-slate-900">
                         From Rs{{ number_format($cardFromPrice, 0) }}
                     </p>
                     <p id="{{ $cardUid }}-mrp" class="text-[10px] font-semibold text-slate-400 line-through {{ ($cardMrp && $cardMrp > $cardFromPrice) ? '' : 'hidden' }}">Rs{{ number_format($cardMrp, 0) }}</p>

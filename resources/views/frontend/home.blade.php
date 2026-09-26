@@ -377,13 +377,13 @@
 
     <section class="{{ $loop->even ? 'bg-gray-50' : 'bg-white' }} pb-2 pt-2 md:py-6">
         <div class="mx-auto max-w-7xl px-4">
-            <div class="mb-6 flex items-end justify-between gap-4">
+            <div class="mb-6 flex flex-col items-center gap-3 text-center md:flex-row md:items-end md:justify-between md:gap-4 md:text-left">
                 <div>
                     @if($category->tag)
                         <p class="text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-600">{{ $category->tag }}</p>
                     @endif
                     <h2 class="mt-1 text-2xl font-extrabold text-slate-900 md:text-3xl">{{ $category->name }}</h2>
-                    <p class="mt-1 max-w-lg text-xs text-gray-500 md:text-sm">
+                    <p class="mx-auto mt-1 max-w-lg text-xs text-gray-500 md:mx-0 md:text-sm">
                         {{ $category->description ?: 'Fresh, quality-checked ' . strtolower($category->name) . ', cut and packed daily.' }}
                     </p>
                 </div>
@@ -528,11 +528,11 @@
 {{-- Farm Fresh Live Stock (kept last on the page) --}}
 <section class="bg-gray-50 py-8 md:py-12">
     <div class="mx-auto max-w-7xl px-4">
-        <div class="mb-6 flex items-end justify-between gap-4">
+        <div class="mb-6 flex flex-col items-center gap-3 text-center md:flex-row md:items-end md:justify-between md:gap-4 md:text-left">
             <div>
                 <p class="text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-600">Enquiry Only &middot; Call to Order</p>
                 <h2 class="font-classic mt-1 text-2xl font-bold text-slate-900 md:text-3xl">Farm Fresh Live Stock</h2>
-                <p class="mt-1 max-w-lg text-xs text-slate-500">Healthy live farm birds and livestock raised under premium guidelines.</p>
+                <p class="mx-auto mt-1 max-w-lg text-xs text-slate-500 md:mx-0">Healthy live farm birds and livestock raised under premium guidelines.</p>
             </div>
             <a href="{{ route('frontend.products', ['category' => $liveStockCategory->slug]) }}" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
                 See All
