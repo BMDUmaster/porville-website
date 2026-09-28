@@ -60,7 +60,7 @@
                     </td>
                     <td class="px-4 py-3 align-middle text-center">
                         <div class="flex items-center justify-center gap-2">
-                            <button onclick="openEditModal({{ $cat->id }}, '{{ addslashes($cat->name) }}', '{{ addslashes($cat->description ?? '') }}', '{{ addslashes($cat->tag ?? '') }}', {{ $cat->is_active ? 1 : 0 }})"
+                            <button onclick="openEditModal({{ $cat->id }}, {!! json_encode($cat->name) !!}, {!! json_encode($cat->description ?? '') !!}, {!! json_encode($cat->tag ?? '') !!}, {{ $cat->is_active ? 1 : 0 }})"
                                     class="flex h-8 w-8 items-center justify-center rounded-lg text-xs text-amber-600 transition hover:bg-amber-100">
                                 <i class="fa-regular fa-pen-to-square"></i>
                             </button>
@@ -86,12 +86,12 @@
 
 {{-- Add Modal --}}
 <div id="addModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl">
-        <div class="px-7 py-5 border-b flex justify-between items-center">
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+        <div class="px-7 py-5 border-b flex justify-between items-center flex-shrink-0">
             <h2 class="text-xl font-semibold">Add Category</h2>
             <button onclick="closeModal('addModal')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
         </div>
-        <form method="POST" action="{{ route('dashboard.categories.store') }}" enctype="multipart/form-data" class="px-7 py-6 space-y-5">
+        <form method="POST" action="{{ route('dashboard.categories.store') }}" enctype="multipart/form-data" class="px-7 py-6 space-y-5 overflow-y-auto flex-1">
             @csrf
             <div>
                 <label class="block text-sm font-medium mb-1.5">Category Image</label>
@@ -130,12 +130,12 @@
 
 {{-- Edit Modal --}}
 <div id="editModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl">
-        <div class="px-7 py-5 border-b flex justify-between items-center">
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+        <div class="px-7 py-5 border-b flex justify-between items-center flex-shrink-0">
             <h2 class="text-xl font-semibold">Edit Category</h2>
             <button onclick="closeModal('editModal')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
         </div>
-        <form id="editForm" method="POST" enctype="multipart/form-data" class="px-7 py-6 space-y-5">
+        <form id="editForm" method="POST" enctype="multipart/form-data" class="px-7 py-6 space-y-5 overflow-y-auto flex-1">
             @csrf @method('PUT')
             <div>
                 <label class="block text-sm font-medium mb-1.5">Update Image</label>

@@ -548,10 +548,9 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
             <div>
                 <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-amber-400">Categories</h4>
                 <ul class="space-y-3.5">
-                    <li><a href="{{ route('frontend.products', ['category' => 'Chicken']) }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Chicken</a></li>
-                    <li><a href="{{ route('frontend.products', ['category' => 'Mutton']) }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Mutton</a></li>
-                    <li><a href="{{ route('frontend.products', ['category' => 'Eggs']) }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Eggs</a></li>
-                    <li><a href="{{ route('frontend.products', ['category' => 'Ready To Eat']) }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Ready To Eat</a></li>
+                    @foreach($frontendNavCategories ?? collect() as $footerCat)
+                        <li><a href="{{ route('frontend.products', ['category' => $footerCat->name]) }}" class="text-[14px] text-[#c9b896] transition hover:text-white">{{ $footerCat->name }}</a></li>
+                    @endforeach
                 </ul>
             </div>
 
