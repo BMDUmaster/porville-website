@@ -245,14 +245,6 @@
                 <span>Coupons & Offers</span>
             </a>
 
-            <a href="{{ route('dashboard.settings.service-charge') }}"
-               class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
-                      hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
-                      {{ request()->routeIs('dashboard.settings.service-charge') ? 'active-link' : 'text-slate-700' }}">
-                <i class="fa-solid fa-percent w-5 text-amber-600"></i>
-                <span>&#8505;&#65039; Service Charge</span>
-            </a>
-
             <a href="{{ route('dashboard.settings.delivery-slots') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white

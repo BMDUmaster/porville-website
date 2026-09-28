@@ -415,11 +415,22 @@ class CartController extends Controller
     private function couponData(float $subtotal, string $day): array
     {
         $userId = auth('web_frontend')->id();
+
+        // Collect product IDs currently in the cart for the given day
+        $dayCart = array_filter(session('cart', []), fn ($item) => \App\Support\ProductDayPricing::normalizeDay($item['pricing_day'] ?? 'today') === $day);
+        $cartProductIds = collect($dayCart)->pluck('product_id')->filter()->unique()->values();
+
         $available = Coupon::valid()
             ->where('min_order_amount', '<=', $subtotal)
             ->orderByDesc('value')
             ->get()
-            ->filter(fn (Coupon $coupon) => $coupon->canBeUsedBy($userId))
+            ->filter(function (Coupon $coupon) use ($userId, $cartProductIds) {
+                // If coupon is tied to a specific product, only show it when that product is in cart
+                if (! is_null($coupon->product_id) && ! $cartProductIds->contains($coupon->product_id)) {
+                    return false;
+                }
+                return $coupon->canBeUsedBy($userId);
+            })
             ->map(fn (Coupon $coupon) => [
                 'code' => $coupon->code,
                 'title' => $coupon->title ?: $coupon->code,
