@@ -60,7 +60,13 @@
                     </td>
                     <td class="px-4 py-3 align-middle text-center">
                         <div class="flex items-center justify-center gap-2">
-                            <button onclick="openEditModal({{ $cat->id }}, {!! json_encode($cat->name) !!}, {!! json_encode($cat->description ?? '') !!}, {!! json_encode($cat->tag ?? '') !!}, {{ $cat->is_active ? 1 : 0 }})"
+                            <button type="button"
+                                    data-cat-id="{{ $cat->id }}"
+                                    data-cat-name="{{ $cat->name }}"
+                                    data-cat-desc="{{ $cat->description ?? '' }}"
+                                    data-cat-tag="{{ $cat->tag ?? '' }}"
+                                    data-cat-active="{{ $cat->is_active ? 1 : 0 }}"
+                                    onclick="openEditModalFromBtn(this)"
                                     class="flex h-8 w-8 items-center justify-center rounded-lg text-xs text-amber-600 transition hover:bg-amber-100">
                                 <i class="fa-regular fa-pen-to-square"></i>
                             </button>
@@ -192,6 +198,15 @@ function openEditModal(id, name, desc, tag, isActive) {
     document.getElementById('editStatus').value = isActive;
     document.getElementById('editForm').action = categoryUpdateUrlTemplate.replace('__ID__', encodeURIComponent(id));
     openModal('editModal');
+}
+function openEditModalFromBtn(btn) {
+    openEditModal(
+        btn.dataset.catId,
+        btn.dataset.catName,
+        btn.dataset.catDesc,
+        btn.dataset.catTag,
+        btn.dataset.catActive
+    );
 }
 </script>
 @endsection

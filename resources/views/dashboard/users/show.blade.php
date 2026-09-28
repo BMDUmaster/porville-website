@@ -58,7 +58,7 @@
                     </div>
                     <div class="rounded-2xl border bg-white p-4 shadow-sm">
                         <p class="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Total Spent</p>
-                        <p class="mt-2 text-3xl font-black text-amber-600">Rs{{ number_format($stats['total_spent'], 2) }}</p>
+                        <p class="mt-2 text-xl font-black text-amber-600 break-all">Rs{{ number_format($stats['total_spent'], 2) }}</p>
                     </div>
                 </div>
             </div>
