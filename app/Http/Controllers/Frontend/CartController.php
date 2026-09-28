@@ -291,11 +291,20 @@ class CartController extends Controller
         ]);
         $day = ProductDayPricing::normalizeDay($data['delivery_day']);
         $cart = array_filter(session('cart', []), fn ($item) => ProductDayPricing::normalizeDay($item['pricing_day'] ?? 'today') === $day);
-        $subtotal = collect($this->buildCartItems($cart))->sum('subtotal');
+        $items = $this->buildCartItems($cart);
+        $subtotal = collect($items)->sum('subtotal');
         $coupon = Coupon::valid()->where('code', strtoupper($data['code']))->first();
 
         if (! $coupon || $subtotal < (float) ($coupon->min_order_amount ?? 0) || ! $coupon->canBeUsedBy(auth('web_frontend')->id())) {
             return response()->json(['success' => false, 'message' => 'Coupon is not eligible or its usage limit has been reached.'], 422);
+        }
+
+        // If coupon is tied to a specific product, verify that product is in the cart
+        if (! is_null($coupon->product_id)) {
+            $cartProductIds = collect($items)->pluck('product_id')->filter()->unique();
+            if (! $cartProductIds->contains($coupon->product_id)) {
+                return response()->json(['success' => false, 'message' => 'This coupon is not applicable to the items in your cart.'], 422);
+            }
         }
 
         session(['applied_coupon_' . $day => $coupon->code]);
@@ -440,13 +449,33 @@ class CartController extends Controller
 
         $code = session('applied_coupon_' . $day);
         $coupon = $code ? Coupon::valid()->where('code', $code)->first() : null;
+
+        // Validate product_id applicability for applied coupon
+        if ($coupon && ! is_null($coupon->product_id) && ! $cartProductIds->contains($coupon->product_id)) {
+            session()->forget('applied_coupon_' . $day);
+            $coupon = null;
+        }
+
         if (! $coupon || $subtotal < (float) ($coupon->min_order_amount ?? 0) || ! $coupon->canBeUsedBy($userId)) {
             session()->forget('applied_coupon_' . $day);
             $coupon = null;
         }
-        $discount = $coupon
-            ? ($coupon->type === 'percent' ? round($subtotal * $coupon->value / 100, 2) : min((float) $coupon->value, $subtotal))
-            : 0.0;
+
+        if ($coupon) {
+            // If product-specific coupon, discount only on that product's subtotal
+            if (! is_null($coupon->product_id)) {
+                $dayItems = $this->buildCartItems($dayCart);
+                $applicableSubtotal = collect($dayItems)->where('product_id', $coupon->product_id)->sum('subtotal');
+                $base = (float) $applicableSubtotal;
+            } else {
+                $base = $subtotal;
+            }
+            $discount = $coupon->type === 'percent'
+                ? round($base * $coupon->value / 100, 2)
+                : min((float) $coupon->value, $base);
+        } else {
+            $discount = 0.0;
+        }
 
         return [
             'discount' => $discount,

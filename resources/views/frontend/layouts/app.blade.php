@@ -548,7 +548,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
             <div>
                 <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-amber-400">Categories</h4>
                 <ul class="space-y-3.5">
-                    @foreach($frontendNavCategories ?? collect() as $footerCat)
+                    @foreach(($frontendNavCategories ?? collect())->take(6) as $footerCat)
                         <li><a href="{{ route('frontend.products', ['category' => $footerCat->name]) }}" class="text-[14px] text-[#c9b896] transition hover:text-white">{{ $footerCat->name }}</a></li>
                     @endforeach
                 </ul>

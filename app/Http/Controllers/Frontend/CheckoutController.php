@@ -203,10 +203,10 @@ class CheckoutController extends Controller
 
         $order = DB::transaction(function () use ($data, $items, $subtotal, $pricing, $user, $checkoutDay) {
             $discount = 0;
-            $coupon = $this->resolveCoupon($data['coupon_code'] ?? null, $subtotal, true);
+            $coupon = $this->resolveCoupon($data['coupon_code'] ?? null, $subtotal, true, $items);
 
             if ($coupon) {
-                $discount = $this->calculateDiscount($coupon, $subtotal);
+                $discount = $this->calculateDiscount($coupon, $subtotal, $items);
             }
 
             $total = round(($pricing['subtotal'] - $discount) + $pricing['delivery_charge'] + $pricing['service_charge'], 2);
@@ -451,7 +451,7 @@ class CheckoutController extends Controller
         return strlen($digits) === 10 ? $digits : '';
     }
 
-    private function resolveCoupon(?string $couponCode, float $subtotal, bool $lock = false): ?Coupon
+    private function resolveCoupon(?string $couponCode, float $subtotal, bool $lock = false, array $items = []): ?Coupon
     {
         $couponCode = strtoupper(trim((string) $couponCode));
 
@@ -479,6 +479,16 @@ class CheckoutController extends Controller
             ]);
         }
 
+        // If coupon is tied to a specific product, verify that product is in the cart
+        if (! is_null($coupon->product_id)) {
+            $cartProductIds = collect($items)->pluck('product_id')->filter()->unique();
+            if (! $cartProductIds->contains($coupon->product_id)) {
+                throw ValidationException::withMessages([
+                    'coupon_code' => 'This coupon is not applicable to the items in your cart.',
+                ]);
+            }
+        }
+
         if ($subtotal < (float) ($coupon->min_order_amount ?? 0)) {
             throw ValidationException::withMessages([
                 'coupon_code' => 'This coupon requires a higher order amount.',
@@ -488,11 +498,22 @@ class CheckoutController extends Controller
         return $coupon;
     }
 
-    private function calculateDiscount(Coupon $coupon, float $subtotal): float
+    private function calculateDiscount(Coupon $coupon, float $subtotal, array $items = []): float
     {
+        // If coupon is tied to a specific product, apply discount only on that product's subtotal
+        if (! is_null($coupon->product_id)) {
+            $applicableSubtotal = collect($items)
+                ->where('product_id', $coupon->product_id)
+                ->sum('subtotal');
+
+            $base = (float) $applicableSubtotal;
+        } else {
+            $base = $subtotal;
+        }
+
         return $coupon->type === 'percent'
-            ? round($subtotal * $coupon->value / 100, 2)
-            : min((float) $coupon->value, $subtotal);
+            ? round($base * $coupon->value / 100, 2)
+            : min((float) $coupon->value, $base);
     }
 
     private function extractPackQuantity(mixed $value): ?float

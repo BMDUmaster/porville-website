@@ -464,6 +464,8 @@ const checkoutPricing = {
     total: Number(@json((float) ($pricing['total'] ?? 0))),
 };
 
+const checkoutCartProductIds = @json(collect($items)->pluck('product_id')->filter()->unique()->values());
+
 const couponInput = document.getElementById('couponCodeInput');
 const applyCouponButton = document.getElementById('applyCouponButton');
 const couponMessage = document.getElementById('couponMessage');
@@ -566,10 +568,16 @@ function applyCoupon() {
         body: JSON.stringify({
             code,
             order_amount: checkoutPricing.subtotal,
+            product_ids: checkoutCartProductIds,
         }),
     })
         .then(async (response) => {
-            const data = await response.json();
+            let data;
+            try {
+                data = await response.json();
+            } catch (_) {
+                throw new Error('Coupon could not be applied. Please try again.');
+            }
 
             if (!response.ok || !data.success) {
                 throw new Error(data.message || 'Coupon could not be applied.');
