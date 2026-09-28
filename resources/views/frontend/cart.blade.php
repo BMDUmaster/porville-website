@@ -86,7 +86,7 @@
                         @foreach($couponData['available'] as $coupon)
                             <div class="flex items-center justify-between gap-2 rounded-xl border border-amber-100 bg-amber-50/50 p-3">
                                 <div><p class="text-sm font-bold text-slate-800">{{ $coupon['title'] }}</p><p class="text-xs text-slate-500">{{ $coupon['type'] === 'percent' ? rtrim(rtrim(number_format($coupon['value'], 2), '0'), '.') . '%' : 'Rs' . number_format($coupon['value'], 2) }} off</p></div>
-                                <button type="button" onclick='applyFullCartCoupon(@json($coupon["code"]))' class="rounded-lg bg-neutral-800 px-3 py-2 text-[10px] font-black text-white">Apply</button>
+                                <button type="button" onclick='{{ $coupon["code"] ? "applyFullCartCoupon(" . json_encode($coupon["code"]) . ")" : "void(0)" }}' {{ $coupon["code"] ? "" : "disabled" }} class="rounded-lg bg-neutral-800 px-3 py-2 text-[10px] font-black text-white {{ $coupon['code'] ? '' : 'opacity-50 cursor-not-allowed' }}">Apply</button>
                             </div>
                         @endforeach
                     </div>

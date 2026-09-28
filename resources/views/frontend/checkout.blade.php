@@ -31,7 +31,36 @@
         $selectedPaymentMethod = array_key_first($paymentOptions);
     }
 
-    $initialCouponCode = old('coupon_code', session('applied_coupon_' . session('checkout_delivery_day', 'today')));
+    // Resolve session coupon for checkout — only proper coupons, not offers
+    $checkoutDay = session('checkout_delivery_day', 'today');
+    $sessionCouponCode = session('applied_coupon_' . $checkoutDay);
+    $checkoutAppliedCoupon = null;
+    $checkoutDiscount = 0.0;
+
+    if ($sessionCouponCode) {
+        $_c = \App\Models\Coupon::valid()->where('code', $sessionCouponCode)->first();
+        $hasEntryType = \Illuminate\Support\Facades\Schema::hasColumn('coupons', 'entry_type');
+        // Skip offers on checkout
+        if ($_c && (!$hasEntryType || $_c->entry_type !== 'offer')) {
+            $subtotalForDiscount = (float) ($pricing['subtotal'] ?? 0);
+            if (!is_null($_c->product_id)) {
+                $applicableBase = (float) collect($items)
+                    ->where('product_id', $_c->product_id)
+                    ->sum('subtotal');
+            } else {
+                $applicableBase = $subtotalForDiscount;
+            }
+            if ($applicableBase > 0) {
+                $checkoutDiscount = $_c->type === 'percent'
+                    ? round($applicableBase * $_c->value / 100, 2)
+                    : min((float) $_c->value, $applicableBase);
+                $checkoutAppliedCoupon = $_c;
+            }
+        }
+    }
+
+    $initialCouponCode = old('coupon_code', $checkoutAppliedCoupon?->code);
+    $checkoutTotalAfterDiscount = max(0, (float)($pricing['total'] ?? 0) - $checkoutDiscount);
 @endphp
 <div class="checkout-page max-w-5xl mx-auto px-4 py-8">
     <h1 class="nunito font-extrabold text-2xl text-gray-800 mb-6">Checkout</h1>
@@ -313,21 +342,21 @@
                         <span>&#8377;{{ number_format($pricing['service_charge'], 2) }}</span>
                     </div>
                     @endif
-                    <div id="checkoutDiscountRow" class="hidden justify-between text-amber-600">
+                    <div id="checkoutDiscountRow" class="{{ $checkoutDiscount > 0 ? 'flex' : 'hidden' }} justify-between text-amber-600">
                         <span>Discount</span>
-                        <span id="checkoutDiscountAmount">-&#8377;0.00</span>
+                        <span id="checkoutDiscountAmount">-&#8377;{{ number_format($checkoutDiscount, 2) }}</span>
                     </div>
                     <hr class="border-gray-100">
                     <div class="flex justify-between text-sm font-bold text-gray-800">
                         <span>Total</span>
-                        <span id="checkoutFinalTotal" class="text-amber-700">&#8377;{{ number_format($pricing['total'], 2) }}</span>
+                        <span id="checkoutFinalTotal" class="text-amber-700">&#8377;{{ number_format($checkoutTotalAfterDiscount, 2) }}</span>
                     </div>
                 </div>
                 <div class="px-4 pb-4">
                     <button type="submit" form="checkoutForm" id="placeOrderButton"
                             class="flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-800 py-3 text-xs font-bold text-white transition hover:bg-black">
                         <i class="fa-solid fa-lock text-xs"></i>
-                        Place Order - <span id="placeOrderTotal">&#8377;{{ number_format($pricing['total'], 2) }}</span>
+                        Place Order - <span id="placeOrderTotal">&#8377;{{ number_format($checkoutTotalAfterDiscount, 2) }}</span>
                     </button>
                 </div>
             </div>
@@ -464,7 +493,12 @@ const checkoutPricing = {
     total: Number(@json((float) ($pricing['total'] ?? 0))),
 };
 
-const checkoutCartProductIds = @json(collect($items)->pluck('product_id')->filter()->unique()->values());
+// Server-side applied coupon (from session) — already shown in order summary
+const checkoutServerDiscount = Number(@json((float) $checkoutDiscount));
+const checkoutServerTotal = Number(@json((float) $checkoutTotalAfterDiscount));
+
+// Full cart items for accurate per-product discount preview
+const checkoutCartItems = @json(collect($items)->map(fn ($i) => ['product_id' => $i['product_id'], 'price' => $i['price'], 'quantity' => $i['quantity']])->values());
 
 const couponInput = document.getElementById('couponCodeInput');
 const applyCouponButton = document.getElementById('applyCouponButton');
@@ -541,10 +575,19 @@ function updateCouponButton() {
 
     if (!hasCode) {
         couponMessage.classList.add('hidden');
-        discountRow.classList.add('hidden');
-        discountRow.classList.remove('flex');
-        finalTotal.textContent = checkoutCurrency(checkoutPricing.total);
-        placeOrderTotal.textContent = checkoutCurrency(checkoutPricing.total);
+        // Restore server-computed discount if available, else zero
+        if (checkoutServerDiscount > 0) {
+            discountAmount.textContent = '-' + checkoutCurrency(checkoutServerDiscount);
+            discountRow.classList.remove('hidden');
+            discountRow.classList.add('flex');
+            finalTotal.textContent = checkoutCurrency(checkoutServerTotal);
+            placeOrderTotal.textContent = checkoutCurrency(checkoutServerTotal);
+        } else {
+            discountRow.classList.add('hidden');
+            discountRow.classList.remove('flex');
+            finalTotal.textContent = checkoutCurrency(checkoutPricing.total);
+            placeOrderTotal.textContent = checkoutCurrency(checkoutPricing.total);
+        }
     }
 }
 
@@ -568,7 +611,7 @@ function applyCoupon() {
         body: JSON.stringify({
             code,
             order_amount: checkoutPricing.subtotal,
-            product_ids: checkoutCartProductIds,
+            cart_items: checkoutCartItems,
         }),
     })
         .then(async (response) => {
@@ -600,8 +643,7 @@ function applyCoupon() {
             finalTotal.textContent = checkoutCurrency(checkoutPricing.total);
             placeOrderTotal.textContent = checkoutCurrency(checkoutPricing.total);
             setCouponMessage(error.message || 'Coupon could not be applied.');
-        })
-        .finally(() => {
+        })        .finally(() => {
             applyCouponButton.disabled = false;
             applyCouponButton.textContent = 'Apply';
         });
@@ -623,9 +665,8 @@ document.querySelectorAll('.coupon-chip').forEach((button) => {
 });
 
 updateCouponButton();
-if (couponInput?.value.trim()) {
-    applyCoupon();
-}
+// Don't auto-apply on page load — server-side discount already rendered in Order Summary
+// applyCoupon() is triggered only by manual input or chip click
 
 const phoneCounter = document.getElementById('phoneCounter');
 

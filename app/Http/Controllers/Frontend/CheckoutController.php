@@ -70,14 +70,24 @@ class CheckoutController extends Controller
         }
 
         $pricing = OrderPricing::summary($subtotal, auth('web_frontend')->user(), $this->pricingDayForCart($cart));
-        $availableCoupons = Coupon::coupons()
-            ->valid()
+        $cartProductIds = collect($items)->pluck('product_id')->filter()->unique();
+
+        // Show all valid coupons applicable to this cart (cart-wide + product-specific for cart items)
+        $availableCoupons = Coupon::valid()
+            ->where(function ($q) use ($cartProductIds) {
+                $q->whereNull('product_id')
+                  ->orWhere(function ($q2) use ($cartProductIds) {
+                      if ($cartProductIds->isNotEmpty()) {
+                          $q2->whereIn('product_id', $cartProductIds);
+                      } else {
+                          $q2->whereRaw('0=1'); // no products → no product-specific coupons
+                      }
+                  });
+            })
             ->orderBy('min_order_amount')
             ->orderByDesc('value')
             ->limit(8)
             ->get();
-
-        $cartProductIds = collect($items)->pluck('product_id')->filter()->unique();
         $checkoutNewArrivals = Product::active()->notEnquiryOnly()
             ->with('category')
             ->when($cartProductIds->isNotEmpty(), fn ($query) => $query->whereNotIn('id', $cartProductIds))

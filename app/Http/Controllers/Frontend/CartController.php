@@ -424,49 +424,72 @@ class CartController extends Controller
     private function couponData(float $subtotal, string $day): array
     {
         $userId = auth('web_frontend')->id();
+        $hasEntryType = \Illuminate\Support\Facades\Schema::hasColumn('coupons', 'entry_type');
 
         // Collect product IDs currently in the cart for the given day
         $dayCart = array_filter(session('cart', []), fn ($item) => \App\Support\ProductDayPricing::normalizeDay($item['pricing_day'] ?? 'today') === $day);
         $cartProductIds = collect($dayCart)->pluck('product_id')->filter()->unique()->values();
 
-        $available = Coupon::valid()
+        // Build cart items once for discount calculations
+        $dayItems = $this->buildCartItems($dayCart);
+
+        $allCoupons = Coupon::valid()
             ->where('min_order_amount', '<=', $subtotal)
             ->orderByDesc('value')
             ->get()
             ->filter(function (Coupon $coupon) use ($userId, $cartProductIds) {
-                // If coupon is tied to a specific product, only show it when that product is in cart
                 if (! is_null($coupon->product_id) && ! $cartProductIds->contains($coupon->product_id)) {
                     return false;
                 }
                 return $coupon->canBeUsedBy($userId);
-            })
-            ->map(fn (Coupon $coupon) => [
-                'code' => $coupon->code,
-                'title' => $coupon->title ?: $coupon->code,
-                'type' => $coupon->type,
-                'value' => (float) $coupon->value,
+            });
+
+        // Product-specific offers: show per product, code = null if entry_type = 'offer'
+        // so they cannot be manually typed — they must be clicked
+        $productOffers = $allCoupons
+            ->filter(fn (Coupon $c) => ! is_null($c->product_id))
+            ->mapWithKeys(fn (Coupon $c) => [
+                $c->product_id => [
+                    'code'  => ($hasEntryType && $c->entry_type === 'offer') ? null : $c->code,
+                    'title' => $c->title ?: $c->code,
+                    'type'  => $c->type,
+                    'value' => (float) $c->value,
+                ],
+            ]);
+
+        // Cart-wide coupons (no product_id)
+        $available = $allCoupons
+            ->filter(fn (Coupon $c) => is_null($c->product_id))
+            ->map(fn (Coupon $c) => [
+                'code'  => $c->code,
+                'title' => $c->title ?: $c->code,
+                'type'  => $c->type,
+                'value' => (float) $c->value,
             ])->values();
 
+        // Merge product offers into the available list (they appear first)
+        $available = $productOffers->values()->concat($available)->values();
+
+        // Resolve applied coupon from session
         $code = session('applied_coupon_' . $day);
         $coupon = $code ? Coupon::valid()->where('code', $code)->first() : null;
 
-        // Validate product_id applicability for applied coupon
+        // Auto-remove if product left cart or coupon no longer valid
         if ($coupon && ! is_null($coupon->product_id) && ! $cartProductIds->contains($coupon->product_id)) {
             session()->forget('applied_coupon_' . $day);
             $coupon = null;
         }
-
-        if (! $coupon || $subtotal < (float) ($coupon->min_order_amount ?? 0) || ! $coupon->canBeUsedBy($userId)) {
+        if ($coupon && (! $coupon->canBeUsedBy($userId) || $subtotal < (float) ($coupon->min_order_amount ?? 0))) {
             session()->forget('applied_coupon_' . $day);
             $coupon = null;
         }
 
+        // Calculate discount on the correct base (product subtotal vs full subtotal)
         if ($coupon) {
-            // If product-specific coupon, discount only on that product's subtotal
             if (! is_null($coupon->product_id)) {
-                $dayItems = $this->buildCartItems($dayCart);
-                $applicableSubtotal = collect($dayItems)->where('product_id', $coupon->product_id)->sum('subtotal');
-                $base = (float) $applicableSubtotal;
+                $base = (float) collect($dayItems)
+                    ->where('product_id', $coupon->product_id)
+                    ->sum('subtotal');
             } else {
                 $base = $subtotal;
             }
@@ -479,7 +502,7 @@ class CartController extends Controller
 
         return [
             'discount' => $discount,
-            'applied' => $coupon ? ['code' => $coupon->code, 'title' => $coupon->title ?: $coupon->code] : null,
+            'applied'  => $coupon ? ['code' => $coupon->code, 'title' => $coupon->title ?: $coupon->code] : null,
             'available' => $available,
         ];
     }
