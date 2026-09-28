@@ -31,7 +31,7 @@
         $selectedPaymentMethod = array_key_first($paymentOptions);
     }
 
-    // Resolve session coupon for checkout — only proper coupons, not offers
+    // Resolve session coupon for checkout — calculate discount for both coupons AND offers
     $checkoutDay = session('checkout_delivery_day', 'today');
     $sessionCouponCode = session('applied_coupon_' . $checkoutDay);
     $checkoutAppliedCoupon = null;
@@ -39,13 +39,7 @@
 
     if ($sessionCouponCode) {
         $_c = \App\Models\Coupon::valid()->where('code', $sessionCouponCode)->first();
-        $hasEntryType = \Illuminate\Support\Facades\Schema::hasColumn('coupons', 'entry_type');
-        // Skip offers on checkout (entry_type = 'offer' OR AUTO-OFFER- prefix)
-        $_isOffer = $_c && (
-            ($hasEntryType && $_c->entry_type === 'offer') ||
-            \Illuminate\Support\Str::startsWith($sessionCouponCode, 'AUTO-OFFER-')
-        );
-        if ($_c && !$_isOffer) {
+        if ($_c) {
             $subtotalForDiscount = (float) ($pricing['subtotal'] ?? 0);
             if (!is_null($_c->product_id)) {
                 $applicableBase = (float) collect($items)
@@ -63,7 +57,13 @@
         }
     }
 
-    $initialCouponCode = old('coupon_code', $checkoutAppliedCoupon?->code);
+    // For the input/chips: only show manual coupon codes (not AUTO-OFFER- offers)
+    $hasEntryType = \Illuminate\Support\Facades\Schema::hasColumn('coupons', 'entry_type');
+    $_isOffer = $checkoutAppliedCoupon && (
+        ($hasEntryType && $checkoutAppliedCoupon->entry_type === 'offer') ||
+        \Illuminate\Support\Str::startsWith($sessionCouponCode ?? '', 'AUTO-OFFER-')
+    );
+    $initialCouponCode = old('coupon_code', $_isOffer ? null : $checkoutAppliedCoupon?->code);
     $checkoutTotalAfterDiscount = max(0, (float)($pricing['total'] ?? 0) - $checkoutDiscount);
 @endphp
 <div class="checkout-page max-w-5xl mx-auto px-4 py-8">

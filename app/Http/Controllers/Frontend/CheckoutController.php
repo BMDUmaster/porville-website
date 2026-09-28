@@ -219,7 +219,12 @@ class CheckoutController extends Controller
 
         $order = DB::transaction(function () use ($data, $items, $subtotal, $pricing, $user, $checkoutDay) {
             $discount = 0;
-            $coupon = $this->resolveCoupon($data['coupon_code'] ?? null, $subtotal, true, $items);
+            // Use form coupon_code; if empty, fall back to session (handles auto-applied offers)
+            $couponCodeToApply = $data['coupon_code'] ?? null;
+            if (empty(trim((string) $couponCodeToApply))) {
+                $couponCodeToApply = session('applied_coupon_' . $checkoutDay);
+            }
+            $coupon = $this->resolveCoupon($couponCodeToApply, $subtotal, true, $items);
 
             if ($coupon) {
                 $discount = $this->calculateDiscount($coupon, $subtotal, $items);
