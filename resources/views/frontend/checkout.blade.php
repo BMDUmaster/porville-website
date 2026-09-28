@@ -40,8 +40,12 @@
     if ($sessionCouponCode) {
         $_c = \App\Models\Coupon::valid()->where('code', $sessionCouponCode)->first();
         $hasEntryType = \Illuminate\Support\Facades\Schema::hasColumn('coupons', 'entry_type');
-        // Skip offers on checkout
-        if ($_c && (!$hasEntryType || $_c->entry_type !== 'offer')) {
+        // Skip offers on checkout (entry_type = 'offer' OR AUTO-OFFER- prefix)
+        $_isOffer = $_c && (
+            ($hasEntryType && $_c->entry_type === 'offer') ||
+            \Illuminate\Support\Str::startsWith($sessionCouponCode, 'AUTO-OFFER-')
+        );
+        if ($_c && !$_isOffer) {
             $subtotalForDiscount = (float) ($pricing['subtotal'] ?? 0);
             if (!is_null($_c->product_id)) {
                 $applicableBase = (float) collect($items)

@@ -72,7 +72,8 @@ class CheckoutController extends Controller
         $pricing = OrderPricing::summary($subtotal, auth('web_frontend')->user(), $this->pricingDayForCart($cart));
         $cartProductIds = collect($items)->pluck('product_id')->filter()->unique();
 
-        // Show all valid coupons applicable to this cart (cart-wide + product-specific for cart items)
+        // Show only proper coupons (entry_type = 'coupon') as chips on checkout
+        // Offers (entry_type = 'offer' / AUTO-OFFER-* codes) are cart-only
         $availableCoupons = Coupon::valid()
             ->where(function ($q) use ($cartProductIds) {
                 $q->whereNull('product_id')
@@ -80,9 +81,14 @@ class CheckoutController extends Controller
                       if ($cartProductIds->isNotEmpty()) {
                           $q2->whereIn('product_id', $cartProductIds);
                       } else {
-                          $q2->whereRaw('0=1'); // no products → no product-specific coupons
+                          $q2->whereRaw('0=1');
                       }
                   });
+            })
+            ->where(function ($q) {
+                // Only manual coupon codes, not auto-generated offer codes
+                $q->where('entry_type', 'coupon')
+                  ->orWhereNull('entry_type');
             })
             ->orderBy('min_order_amount')
             ->orderByDesc('value')

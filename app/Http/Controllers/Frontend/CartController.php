@@ -444,13 +444,13 @@ class CartController extends Controller
                 return $coupon->canBeUsedBy($userId);
             });
 
-        // Product-specific offers: show per product, code = null if entry_type = 'offer'
-        // so they cannot be manually typed — they must be clicked
+        // Product-specific offers — keep actual code (AUTO-OFFER-* etc.) so Apply works
+        // They show as offer cards in cart UI
         $productOffers = $allCoupons
             ->filter(fn (Coupon $c) => ! is_null($c->product_id))
             ->mapWithKeys(fn (Coupon $c) => [
                 $c->product_id => [
-                    'code'  => ($hasEntryType && $c->entry_type === 'offer') ? null : $c->code,
+                    'code'  => $c->code,   // always use real code
                     'title' => $c->title ?: $c->code,
                     'type'  => $c->type,
                     'value' => (float) $c->value,
