@@ -4058,3 +4058,89 @@ Stack trace:
 [stacktrace]
 #0 {main}
 "} 
+[2026-09-29 00:58:52] local.ERROR: Out of memory (allocated 16777216 bytes) (tried to allocate 1310720 bytes) {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Out of memory (allocated 16777216 bytes) (tried to allocate 1310720 bytes) at C:/BMDU Work/porville-fresh-cut/vendor/symfony/event-dispatcher/EventDispatcher.php:36)
+[stacktrace]
+#0 {main}
+"} 
+[2026-09-29 00:58:51] local.ERROR: Out of memory (allocated 16777216 bytes) (tried to allocate 1310720 bytes) {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Out of memory (allocated 16777216 bytes) (tried to allocate 1310720 bytes) at C:/BMDU Work/porville-fresh-cut/vendor/symfony/event-dispatcher/EventDispatcher.php:50)
+[stacktrace]
+#0 {main}
+"} 
+[2026-09-29 10:07:13] local.ERROR: Uncaught InvalidArgumentException: Please provide a valid cache path. in C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\View\Compilers\Compiler.php:67
+Stack trace:
+#0 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\View\ViewServiceProvider.php(97): Illuminate\View\Compilers\Compiler->__construct()
+#1 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\Container\Container.php(952): Illuminate\View\ViewServiceProvider->Illuminate\View\{closure}()
+#2 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\Container\Container.php(832): Illuminate\Container\Container->build()
+#3 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(1078): Illuminate\Container\Container->resolve()
+#4 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\Container\Container.php(763): Illuminate\Foundation\Application->resolve()
+#5 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(1058): Illuminate\Container\Container->make()
+#6 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\Foundation\helpers.php(124): Illuminate\Foundation\Application->make()
+#7 Command line code(1): app()
+#8 {main}
+  thrown {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Uncaught InvalidArgumentException: Please provide a valid cache path. in C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\View\\Compilers\\Compiler.php:67
+Stack trace:
+#0 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\View\\ViewServiceProvider.php(97): Illuminate\\View\\Compilers\\Compiler->__construct()
+#1 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(952): Illuminate\\View\\ViewServiceProvider->Illuminate\\View\\{closure}()
+#2 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(832): Illuminate\\Container\\Container->build()
+#3 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1078): Illuminate\\Container\\Container->resolve()
+#4 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(763): Illuminate\\Foundation\\Application->resolve()
+#5 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1058): Illuminate\\Container\\Container->make()
+#6 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\helpers.php(124): Illuminate\\Foundation\\Application->make()
+#7 Command line code(1): app()
+#8 {main}
+  thrown at C:/BMDU Work/porville-fresh-cut/vendor/laravel/framework/src/Illuminate/View/Compilers/Compiler.php:67)
+[stacktrace]
+#0 {main}
+"} 
+[2026-09-29 11:22:02] local.ERROR: Uncaught InvalidArgumentException: Please provide a valid cache path. in C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\View\Compilers\Compiler.php:67
+Stack trace:
+#0 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\View\ViewServiceProvider.php(97): Illuminate\View\Compilers\Compiler->__construct()
+#1 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\Container\Container.php(952): Illuminate\View\ViewServiceProvider->Illuminate\View\{closure}()
+#2 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\Container\Container.php(832): Illuminate\Container\Container->build()
+#3 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(1078): Illuminate\Container\Container->resolve()
+#4 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\Container\Container.php(763): Illuminate\Foundation\Application->resolve()
+#5 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(1058): Illuminate\Container\Container->make()
+#6 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\Foundation\helpers.php(124): Illuminate\Foundation\Application->make()
+#7 Command line code(1): app()
+#8 {main}
+  thrown {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Uncaught InvalidArgumentException: Please provide a valid cache path. in C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\View\\Compilers\\Compiler.php:67
+Stack trace:
+#0 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\View\\ViewServiceProvider.php(97): Illuminate\\View\\Compilers\\Compiler->__construct()
+#1 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(952): Illuminate\\View\\ViewServiceProvider->Illuminate\\View\\{closure}()
+#2 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(832): Illuminate\\Container\\Container->build()
+#3 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1078): Illuminate\\Container\\Container->resolve()
+#4 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(763): Illuminate\\Foundation\\Application->resolve()
+#5 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1058): Illuminate\\Container\\Container->make()
+#6 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\helpers.php(124): Illuminate\\Foundation\\Application->make()
+#7 Command line code(1): app()
+#8 {main}
+  thrown at C:/BMDU Work/porville-fresh-cut/vendor/laravel/framework/src/Illuminate/View/Compilers/Compiler.php:67)
+[stacktrace]
+#0 {main}
+"} 
+[2026-09-29 11:30:51] local.ERROR: Uncaught InvalidArgumentException: Please provide a valid cache path. in C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\View\Compilers\Compiler.php:67
+Stack trace:
+#0 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\View\ViewServiceProvider.php(97): Illuminate\View\Compilers\Compiler->__construct()
+#1 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\Container\Container.php(952): Illuminate\View\ViewServiceProvider->Illuminate\View\{closure}()
+#2 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\Container\Container.php(832): Illuminate\Container\Container->build()
+#3 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(1078): Illuminate\Container\Container->resolve()
+#4 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\Container\Container.php(763): Illuminate\Foundation\Application->resolve()
+#5 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(1058): Illuminate\Container\Container->make()
+#6 C:\BMDU Work\porville-fresh-cut\vendor\laravel\framework\src\Illuminate\Foundation\helpers.php(124): Illuminate\Foundation\Application->make()
+#7 Command line code(1): app()
+#8 {main}
+  thrown {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Uncaught InvalidArgumentException: Please provide a valid cache path. in C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\View\\Compilers\\Compiler.php:67
+Stack trace:
+#0 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\View\\ViewServiceProvider.php(97): Illuminate\\View\\Compilers\\Compiler->__construct()
+#1 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(952): Illuminate\\View\\ViewServiceProvider->Illuminate\\View\\{closure}()
+#2 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(832): Illuminate\\Container\\Container->build()
+#3 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1078): Illuminate\\Container\\Container->resolve()
+#4 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(763): Illuminate\\Foundation\\Application->resolve()
+#5 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1058): Illuminate\\Container\\Container->make()
+#6 C:\\BMDU Work\\porville-fresh-cut\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\helpers.php(124): Illuminate\\Foundation\\Application->make()
+#7 Command line code(1): app()
+#8 {main}
+  thrown at C:/BMDU Work/porville-fresh-cut/vendor/laravel/framework/src/Illuminate/View/Compilers/Compiler.php:67)
+[stacktrace]
+#0 {main}
+"} 

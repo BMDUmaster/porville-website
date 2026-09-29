@@ -261,6 +261,14 @@
                 <span>FAQs</span>
             </a>
 
+            <a href="{{ route('dashboard.seo') }}"
+               class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
+                      hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
+                      {{ request()->routeIs('dashboard.seo*') ? 'active-link' : 'text-slate-700' }}">
+                <i class="fa-solid fa-magnifying-glass-chart w-5 text-amber-600"></i>
+                <span>SEO Management</span>
+            </a>
+
             <a href="{{ route('dashboard.profile') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white

@@ -33,6 +33,7 @@ use App\Http\Controllers\Dashboard\SystemCheckController;
 use App\Http\Controllers\Dashboard\HomeBannerController;
 use App\Http\Controllers\Dashboard\ContactMessageController;
 use App\Http\Controllers\Dashboard\ReviewController as DashboardReviewController;
+use App\Http\Controllers\Dashboard\SeoPageController;
 use App\Http\Controllers\ServerDiagnosticsController;
 
 // Public server diagnostics (no login) — use this URL on live hosting
@@ -175,7 +176,21 @@ Route::middleware('admin')->group(function () {
     Route::post('/faqs/items', [\App\Http\Controllers\Dashboard\FaqController::class, 'storeFaq'])->name('dashboard.faqs.items.store');
     Route::put('/faqs/items/{faq}', [\App\Http\Controllers\Dashboard\FaqController::class, 'updateFaq'])->name('dashboard.faqs.items.update');
     Route::delete('/faqs/items/{faq}', [\App\Http\Controllers\Dashboard\FaqController::class, 'destroyFaq'])->name('dashboard.faqs.items.destroy');
+
+    // SEO Management
+    Route::get('/seo-management',                    [SeoPageController::class, 'index'])->name('dashboard.seo');
+    Route::get('/seo-management/create',             [SeoPageController::class, 'create'])->name('dashboard.seo.create');
+    Route::post('/seo-management',                   [SeoPageController::class, 'store'])->name('dashboard.seo.store');
+    Route::post('/seo-management/import',            [SeoPageController::class, 'importDefaults'])->name('dashboard.seo.import');
+    Route::get('/seo-management/{seoPage}/edit',     [SeoPageController::class, 'edit'])->name('dashboard.seo.edit');
+    Route::put('/seo-management/{seoPage}',          [SeoPageController::class, 'update'])->name('dashboard.seo.update');
+    Route::patch('/seo-management/{seoPage}/toggle', [SeoPageController::class, 'toggle'])->name('dashboard.seo.toggle');
+    Route::delete('/seo-management/{seoPage}',       [SeoPageController::class, 'destroy'])->name('dashboard.seo.destroy');
 });
+
+// SEO — public crawler files
+Route::get('/sitemap.xml', [\App\Http\Controllers\Frontend\SeoController::class, 'sitemap'])->name('seo.sitemap');
+Route::get('/robots.txt',  [\App\Http\Controllers\Frontend\SeoController::class, 'robots'])->name('seo.robots');
 
 
 // FRONTEND — Home

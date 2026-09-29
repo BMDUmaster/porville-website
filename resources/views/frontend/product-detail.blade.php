@@ -1,5 +1,8 @@
 @extends('frontend.layouts.app')
 @section('title', $product->name)
+@section('meta_description', Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags((string) $product->description))), 160, '…'))
+@section('og_image', collect($product->images ?? [])->filter()->map(fn ($image) => asset('storage/' . $image))->first() ?? '')
+@section('og_type', 'product')
 
 @section('content')
 @php

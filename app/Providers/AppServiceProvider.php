@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\Product;
+use App\Models\SeoPage;
 use App\Support\MediaUrl;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\URL;
@@ -23,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureApplicationUrl();
         View::share('brandLogoUrl', MediaUrl::brandLogo());
         $this->shareFrontendNavigationCategories();
+        $this->shareFrontendSeo();
     }
 
     private function shareFrontendNavigationCategories(): void
@@ -47,6 +49,19 @@ class AppServiceProvider extends ServiceProvider
                 'frontendTickerProduct' => $tickerProduct,
                 'frontendTickerOffer' => $tickerOffer,
             ]);
+        });
+    }
+
+    private function shareFrontendSeo(): void
+    {
+        View::composer('frontend.layouts.app', function ($view) {
+            try {
+                $seoPage = SeoPage::forPath(request()->path());
+            } catch (Throwable) {
+                $seoPage = null; // table not migrated yet
+            }
+
+            $view->with('seoPage', $seoPage);
         });
     }
 
