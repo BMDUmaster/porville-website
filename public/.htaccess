@@ -5,8 +5,8 @@
 
     RewriteEngine On
 
-    # REQUIRED when site runs in a subfolder (e.g. https://bmdublog.com/farmsea/)
-    RewriteBase /farmsea/
+    # Only needed when site runs in a subfolder, e.g. RewriteBase /farmsea/
+    # RewriteBase /farmsea/
 
     # Serve static diagnostic file directly (if uploaded to public/)
     RewriteRule ^server-check\.php$ - [L]
