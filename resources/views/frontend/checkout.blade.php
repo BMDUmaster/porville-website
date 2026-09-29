@@ -180,7 +180,7 @@
                     </div>
                 </div>
 
-                <div class="overflow-hidden rounded-2xl border bg-white">
+                <div class="rounded-2xl border bg-white">
                     <div class="flex items-center justify-between border-b px-6 py-4">
                         <div class="flex items-center gap-2">
                             <div class="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-800 text-xs font-bold text-white">2</div>
@@ -247,17 +247,22 @@
                                 </div>
                             </div>
                             <div class="grid gap-4 sm:grid-cols-2">
-                                <div>
-                                    <label class="mb-1 block text-xs font-semibold text-gray-600">Area / Sector</label>
-                                    <input type="text" name="sector" id="shippingSectorInput" placeholder="e.g. Sangam Vihar"
+                                <div class="relative">
+                                    <label class="mb-1 block text-xs font-semibold text-gray-600">Area / Sector{{ !empty($pinSectors) ? ' *' : '' }}</label>
+                                    <input type="text" name="sector" id="shippingSectorInput" autocomplete="off"
+                                           placeholder="{{ !empty($pinSectors) ? 'Search your area...' : 'e.g. Sangam Vihar' }}"
                                            class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-neutral-600">
+                                    <div id="sectorDropdown" class="area-dropdown hidden absolute left-0 right-0 top-full z-30 mt-1 max-h-64 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-xl"></div>
                                 </div>
-                                <div>
+                                <div class="relative">
                                     <label class="mb-1 block text-xs font-semibold text-gray-600">PIN Code *</label>
-                                    <input type="text" name="pincode" id="shippingPincodeInput" required maxlength="6" inputmode="numeric" placeholder="110080"
+                                    <input type="text" name="pincode" id="shippingPincodeInput" required maxlength="6" inputmode="numeric" autocomplete="off"
+                                           placeholder="{{ !empty($pinSectors) ? 'Type PIN code...' : '110080' }}"
                                            class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 outline-none focus:border-neutral-600">
+                                    <div id="pincodeDropdown" class="area-dropdown hidden absolute left-0 right-0 top-full z-30 mt-1 max-h-64 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-xl"></div>
                                 </div>
                             </div>
+                            <p id="areaError" class="hidden text-xs font-semibold text-red-600"></p>
                         </div>
                     </div>
                 </div>
@@ -712,6 +717,156 @@ const stateInput = document.getElementById('shippingStateInput');
 const pincodeInput = document.getElementById('shippingPincodeInput');
 const sectorInput = document.getElementById('shippingSectorInput');
 
+// Delivery areas managed from the admin panel. When the list is not empty,
+// Area / Sector and PIN Code must be picked from it.
+const pinSectors = @json($pinSectors ?? []);
+const naturalCompare = (a, b) => a.localeCompare(b, undefined, { numeric: true });
+const areaOptions = Object.entries(pinSectors)
+    .flatMap(([pin, sectors]) => sectors.map(sector => ({ sector, pin })))
+    .sort((a, b) => naturalCompare(a.sector, b.sector) || a.pin.localeCompare(b.pin));
+const areasRestricted = areaOptions.length > 0;
+const sectorDropdown = document.getElementById('sectorDropdown');
+const pincodeDropdown = document.getElementById('pincodeDropdown');
+const areaError = document.getElementById('areaError');
+const areaOutsideMessage = 'We do not deliver to this Area / PIN Code yet. Please select your Area / Sector from the list.';
+
+function findArea(sector, pin) {
+    const name = String(sector || '').trim().toLowerCase();
+    const code = String(pin || '').trim();
+    return areaOptions.find(option => option.pin === code && option.sector.toLowerCase() === name) || null;
+}
+
+function isServiceableArea(sector, pin) {
+    return !areasRestricted || findArea(sector, pin) !== null;
+}
+
+function showAreaError(message) {
+    areaError.textContent = message;
+    areaError.classList.toggle('hidden', !message);
+    [sectorInput, pincodeInput].forEach(el => el.classList.toggle('border-red-400', !!message));
+}
+
+function closeAreaDropdowns() {
+    sectorDropdown.classList.add('hidden');
+    pincodeDropdown.classList.add('hidden');
+}
+
+function selectArea(option) {
+    sectorInput.value = option.sector;
+    pincodeInput.value = option.pin;
+    closeAreaDropdowns();
+    showAreaError('');
+}
+
+function renderAreaDropdown(dropdown, options, emptyText) {
+    dropdown.innerHTML = '';
+
+    if (!options.length) {
+        const empty = document.createElement('div');
+        empty.className = 'px-4 py-3 text-sm text-gray-400';
+        empty.textContent = emptyText;
+        dropdown.appendChild(empty);
+    }
+
+    options.forEach(option => {
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'flex w-full items-center justify-between gap-3 border-b border-gray-100 px-4 py-2.5 text-left text-sm last:border-b-0 hover:bg-amber-50';
+        const name = document.createElement('span');
+        name.className = 'font-semibold text-gray-800';
+        name.textContent = option.sector;
+        const pin = document.createElement('span');
+        pin.className = 'text-xs font-semibold text-gray-400';
+        pin.textContent = option.pin;
+        item.append(name, pin);
+        // mousedown fires before the input's blur, so the pick isn't lost when the list closes
+        item.addEventListener('mousedown', event => {
+            event.preventDefault();
+            selectArea(option);
+        });
+        dropdown.appendChild(item);
+    });
+
+    dropdown._options = options;
+    dropdown.classList.remove('hidden');
+}
+
+function openSectorDropdown() {
+    const query = sectorInput.value.trim().toLowerCase();
+    pincodeDropdown.classList.add('hidden');
+    renderAreaDropdown(
+        sectorDropdown,
+        areaOptions.filter(option => !query || option.sector.toLowerCase().includes(query) || option.pin.includes(query)),
+        'We do not deliver to this area yet'
+    );
+}
+
+function openPincodeDropdown() {
+    const query = pincodeInput.value.trim();
+    sectorDropdown.classList.add('hidden');
+    renderAreaDropdown(
+        pincodeDropdown,
+        areaOptions
+            .filter(option => !query || option.pin.startsWith(query))
+            .sort((a, b) => a.pin.localeCompare(b.pin) || naturalCompare(a.sector, b.sector)),
+        'We do not deliver to this PIN Code yet'
+    );
+}
+
+function handleAreaKeydown(event, dropdown) {
+    if (event.key === 'Escape') {
+        closeAreaDropdowns();
+    } else if (event.key === 'Enter' && !dropdown.classList.contains('hidden')) {
+        // Enter picks the first match instead of submitting the whole checkout form
+        event.preventDefault();
+        if (dropdown._options?.length) selectArea(dropdown._options[0]);
+    }
+}
+
+if (areasRestricted) {
+    sectorInput.addEventListener('focus', openSectorDropdown);
+    sectorInput.addEventListener('input', () => { showAreaError(''); openSectorDropdown(); });
+    sectorInput.addEventListener('keydown', event => handleAreaKeydown(event, sectorDropdown));
+    sectorInput.addEventListener('blur', () => {
+        sectorDropdown.classList.add('hidden');
+        // Typed an exact area name that exists under a single PIN: fill the PIN for them
+        if (findArea(sectorInput.value, pincodeInput.value)) return;
+        const matches = areaOptions.filter(option => option.sector.toLowerCase() === sectorInput.value.trim().toLowerCase());
+        if (matches.length === 1) selectArea(matches[0]);
+    });
+
+    pincodeInput.addEventListener('focus', openPincodeDropdown);
+    pincodeInput.addEventListener('input', () => {
+        pincodeInput.value = pincodeInput.value.replace(/\D/g, '').slice(0, 6);
+        showAreaError('');
+        openPincodeDropdown();
+    });
+    pincodeInput.addEventListener('keydown', event => handleAreaKeydown(event, pincodeDropdown));
+    pincodeInput.addEventListener('blur', () => {
+        pincodeDropdown.classList.add('hidden');
+        // A PIN with only one area: fill the area for them
+        if (findArea(sectorInput.value, pincodeInput.value)) return;
+        const matches = areaOptions.filter(option => option.pin === pincodeInput.value.trim());
+        if (matches.length === 1) selectArea(matches[0]);
+    });
+
+    // Saved address cards copy their values into these same inputs, so one check covers both modes.
+    document.getElementById('checkoutForm')?.addEventListener('submit', event => {
+        const match = findArea(sectorInput.value, pincodeInput.value);
+        if (match) {
+            sectorInput.value = match.sector; // send the admin's spelling
+            return;
+        }
+
+        event.preventDefault();
+        if (selectedAddressIndex >= 0) {
+            editAddressCard(null, selectedAddressIndex);
+        }
+        showAreaError(areaOutsideMessage);
+        sectorInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+}
+
 function updateAddressSelectionUI() {
     const isCardSelected = selectedAddressIndex >= 0;
 
@@ -756,7 +911,16 @@ function updateAddressSelectionUI() {
 }
 
 function selectAddressCard(index) {
+    const addr = pastAddresses[index];
+    if (!isServiceableArea(addr.sector, addr.pincode)) {
+        // Saved address is outside the delivery list: open it so the area can be re-picked
+        editAddressCard(null, index);
+        showAreaError(areaOutsideMessage);
+        return;
+    }
+
     selectedAddressIndex = index;
+    showAreaError('');
     updateAddressSelectionUI();
 }
 
@@ -776,8 +940,9 @@ function showNewAddressForm() {
 }
 
 function editAddressCard(event, index) {
-    event.stopPropagation();
+    event?.stopPropagation();
     selectedAddressIndex = -1; // form mode
+    showAreaError('');
 
     const addr = pastAddresses[index];
     streetInput.value = addr.address || '';
@@ -793,14 +958,27 @@ function editAddressCard(event, index) {
 }
 
 function cancelAddressForm() {
-    if (pastAddresses.length > 0) {
-        selectedAddressIndex = 0;
-        updateAddressSelectionUI();
+    const firstServiceable = pastAddresses.findIndex(addr => isServiceableArea(addr.sector, addr.pincode));
+    if (firstServiceable >= 0) {
+        selectAddressCard(firstServiceable);
     }
 }
 
+// Flag saved addresses that fall outside the admin's delivery list
+addressCards.forEach((card, idx) => {
+    const addr = pastAddresses[idx];
+    if (!addr || isServiceableArea(addr.sector, addr.pincode)) return;
+    card.classList.add('opacity-60');
+    const note = document.createElement('p');
+    note.className = 'mt-1 text-[11px] font-semibold text-red-500';
+    note.textContent = 'Outside delivery area - tap to update';
+    card.querySelector('.min-w-0')?.appendChild(note);
+});
+
 // Initial setup
-if (pastAddresses.length > 0 && !hasErrors) {
+const firstServiceableAddress = pastAddresses.findIndex(addr => isServiceableArea(addr.sector, addr.pincode));
+if (firstServiceableAddress >= 0 && !hasErrors) {
+    selectedAddressIndex = firstServiceableAddress;
     updateAddressSelectionUI();
 } else {
     // No past addresses or validation errors — show form with old/default values
@@ -811,6 +989,9 @@ if (pastAddresses.length > 0 && !hasErrors) {
     stateInput.value = @json(old('state', $checkoutDefaults['state'] ?? ''));
     sectorInput.value = @json(old('sector', $checkoutDefaults['sector'] ?? ''));
     pincodeInput.value = @json(old('pincode', $checkoutDefaults['pincode'] ?? ''));
+    @error('sector')
+        showAreaError(@json($message));
+    @enderror
 }
 
 // Contact Information Toggle

@@ -29,6 +29,7 @@ use App\Http\Controllers\Dashboard\CouponController;
 use App\Http\Controllers\Dashboard\ProfileController;
 use App\Http\Controllers\Dashboard\ServiceChargeController;
 use App\Http\Controllers\Dashboard\DeliverySlotController;
+use App\Http\Controllers\Dashboard\DeliveryAreaController;
 use App\Http\Controllers\Dashboard\SystemCheckController;
 use App\Http\Controllers\Dashboard\HomeBannerController;
 use App\Http\Controllers\Dashboard\ContactMessageController;
@@ -168,6 +169,8 @@ Route::middleware('admin')->group(function () {
     Route::post('/settings/delivery-slots/slot', [DeliverySlotController::class, 'storeSlot'])->name('dashboard.settings.delivery-slots.slot.store');
     Route::delete('/settings/delivery-slots/slot/{slot}', [DeliverySlotController::class, 'destroySlot'])->name('dashboard.settings.delivery-slots.slot.destroy');
     Route::delete('/settings/delivery-slots/date/{date}', [DeliverySlotController::class, 'destroyDate'])->name('dashboard.settings.delivery-slots.date.destroy');
+    Route::get('/settings/delivery-areas', [DeliveryAreaController::class, 'index'])->name('dashboard.settings.delivery-areas');
+    Route::put('/settings/delivery-areas', [DeliveryAreaController::class, 'update'])->name('dashboard.settings.delivery-areas.update');
     // FAQs
     Route::get('/faqs', [\App\Http\Controllers\Dashboard\FaqController::class, 'index'])->name('dashboard.faqs');
     Route::post('/faqs/categories', [\App\Http\Controllers\Dashboard\FaqController::class, 'storeCategory'])->name('dashboard.faqs.categories.store');

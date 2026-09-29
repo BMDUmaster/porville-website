@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\RazorpayPayment;
+use App\Support\DeliveryAreaManager;
 use App\Support\DeliverySlotManager;
 use App\Support\OrderPricing;
 use App\Support\ProductDayPricing;
@@ -154,7 +155,8 @@ class CheckoutController extends Controller
                 ->all();
         }
 
-        return view('frontend.checkout', compact('items', 'subtotal', 'checkoutDefaults', 'selectedDeliverySlot', 'selectedDeliveryDate', 'upcomingDates', 'deliverySlotOptions', 'pricing', 'availableCoupons', 'pastAddresses', 'checkoutNewArrivals', 'checkoutSimilarProducts'));
+        return view('frontend.checkout', compact('items', 'subtotal', 'checkoutDefaults', 'selectedDeliverySlot', 'selectedDeliveryDate', 'upcomingDates', 'deliverySlotOptions', 'pricing', 'availableCoupons', 'pastAddresses', 'checkoutNewArrivals', 'checkoutSimilarProducts'))
+            ->with('pinSectors', DeliveryAreaManager::pinSectors());
     }
 
     /** POST /checkout */
@@ -180,13 +182,22 @@ class CheckoutController extends Controller
             'city'             => 'required|string',
             'state'            => 'required|string',
             'pincode'          => ['required', 'regex:/^\d{6}$/'],
-            'sector'           => ['nullable', 'string'],
+            'sector'           => [DeliveryAreaManager::isRestricted() ? 'required' : 'nullable', 'string', 'max:100'],
             'delivery_date'    => ['required', 'string', Rule::in($allowedDates)],
             'payment_method'   => 'required|in:COD,online',
             'coupon_code'      => 'nullable|string',
         ], [
             'phone.regex' => 'Phone number must be exactly 10 digits.',
+            'sector.required' => 'Please select your Area / Sector from the list.',
         ]);
+
+        $sector = DeliveryAreaManager::match($data['pincode'], $data['sector'] ?? null);
+        if ($sector === null) {
+            throw ValidationException::withMessages([
+                'sector' => 'We do not deliver to this Area / PIN Code yet. Please select your Area / Sector from the list.',
+            ]);
+        }
+        $data['sector'] = $sector;
 
         $dayOptions = collect($upcomingDates)->firstWhere('date', $data['delivery_date'])['options'] ?? [];
         $data += $request->validate([
