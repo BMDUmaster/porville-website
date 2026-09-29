@@ -266,7 +266,7 @@
                 ></button>
             @endforeach
         </div>
-    </div>
+    </div> 
 </section>
 
 {{-- Shop By Category --}}
