@@ -15,7 +15,6 @@ use Throwable;
 class AuthController extends Controller
 {
     private const REGISTER_OTP_TTL_MINUTES = 10;
-    private const DEFAULT_OTP = '1111'; // TODO: temporary fixed OTP, restore random_int() in generateOtp()
     private const PASSWORD_OTP_TTL_MINUTES = 10;
 
     /** GET /account/login */
@@ -387,7 +386,7 @@ class AuthController extends Controller
 
     private function generateOtp(): string
     {
-        return self::DEFAULT_OTP;
+        return str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
     }
 
     private function registrationEmailRules(): array
@@ -403,9 +402,6 @@ class AuthController extends Controller
 
     private function sendOtpEmail(string $email, string $otp, string $purpose, int $ttlMinutes): void
     {
-        // TODO: temporary — email sending disabled while DEFAULT_OTP is in use. Remove this return to re-enable SMTP.
-        return;
-
         $this->ensureMailIsConfigured();
 
         $subject = 'Porville OTP for ' . ucwords($purpose);
