@@ -14,6 +14,7 @@ use App\Support\OrderPricing;
 use App\Support\ProductDayPricing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -310,6 +311,7 @@ class CheckoutController extends Controller
                 return redirect()->route('frontend.razorpay.payment', $order->id);
 
             } catch (\Throwable $e) {
+                Log::error('Razorpay order creation failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
                 $order->delete();
                 return back()->withInput()->with('error', 'Payment gateway is unavailable. Please try again.');
             }
