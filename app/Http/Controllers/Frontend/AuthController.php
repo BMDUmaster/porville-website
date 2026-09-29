@@ -345,7 +345,7 @@ class AuthController extends Controller
                     'success' => false,
                     'message' => 'Invalid or expired OTP.',
                 ], 422);
-            }
+             }
             throw ValidationException::withMessages([
                 'email_otp' => 'Invalid or expired OTP.',
             ]);
