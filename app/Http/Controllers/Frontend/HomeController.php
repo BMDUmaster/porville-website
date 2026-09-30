@@ -22,6 +22,7 @@ class HomeController extends Controller
             ])
             ->withCount('children')
             ->withCount(['products' => fn($q) => $q->active()])
+            ->ordered()
             ->get();
 
         $categoryProducts = Product::active()->notEnquiryOnly()->with('category')

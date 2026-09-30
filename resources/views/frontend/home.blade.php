@@ -298,14 +298,16 @@
             })->take(12)->values();
         @endphp
 
-        <div class="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-4">
-            <h2 class="home-category-heading col-span-2 col-start-1 text-center text-3xl font-extrabold text-slate-900 md:col-span-1 md:text-left md:text-4xl">
-                Shop by <span class="text-amber-600"> Category  </span>
-            </h2>
-            <p class="col-start-1 mt-2 text-sm text-slate-500"> Fresh cut, pure standards, across every cut and kind. </p>
+        <div class="mb-4 flex items-center justify-between gap-4 md:mb-6 md:items-end">
+            <div class="min-w-0 text-left">
+                <h2 class="home-category-heading text-2xl font-extrabold text-slate-900 md:text-4xl">
+                    Shop by <span class="text-amber-600"> Category  </span>
+                </h2>
+                <p class="mt-2 hidden text-sm text-slate-500 md:block"> Fresh cut, pure standards, across every cut and kind. </p>
+            </div>
             <a
                 href="{{ route('frontend.categories') }}"
-                class="col-start-2 inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5"
+                class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5"
             >
                 See All
                 <i class="fa-solid fa-arrow-right text-[10px]"></i>
@@ -315,6 +317,7 @@
         <div
             id="home-category-scroller"
             class="scrollbar-hide flex gap-4 overflow-x-auto scroll-smooth pb-3"
+            data-mobile-autoscroll
         >
             @forelse($showcaseCategories as $index => $item)
                 @php
@@ -375,21 +378,23 @@
 
     <section class="{{ $loop->even ? 'bg-gray-50' : 'bg-white' }} pb-2 pt-2 md:py-6">
         <div class="mx-auto max-w-7xl px-4">
-            {{-- Grid so the category name can span full width (centered on mobile) while See All stays beside the description --}}
-            <div class="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-4">
-                @if($category->tag)
-                    <p class="col-span-2 col-start-1 text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-600 md:col-span-1">{{ $category->tag }}</p>
-                @endif
-                <h2 class="col-span-2 col-start-1 mt-1 text-center text-2xl font-extrabold text-slate-900 md:col-span-1 md:text-left md:text-3xl">{{ $category->name }}</h2>
-                <p class="col-start-1 mt-1 max-w-lg text-xs text-gray-500 md:text-sm">
-                    {{ $category->description ?: 'Fresh, quality-checked ' . strtolower($category->name) . ', cut and packed daily.' }}
-                </p>
-                <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="col-start-2 inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
+            {{-- Name on the left, See All on the right; tag and description are desktop-only --}}
+            <div class="mb-4 flex items-center justify-between gap-4 md:mb-6 md:items-end">
+                <div class="min-w-0 text-left">
+                    @if($category->tag)
+                        <p class="hidden text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-600 md:block">{{ $category->tag }}</p>
+                    @endif
+                    <h2 class="text-2xl font-extrabold text-slate-900 md:mt-1 md:text-3xl">{{ $category->name }}</h2>
+                    <p class="mt-1 hidden max-w-lg text-sm text-gray-500 md:block">
+                        {{ $category->description ?: 'Fresh, quality-checked ' . strtolower($category->name) . ', cut and packed daily.' }}
+                    </p>
+                </div>
+                <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
                     See All
                     <i class="fa-solid fa-arrow-right text-[10px]"></i>
                 </a>
             </div>
-            <div class="scrollbar-hide flex gap-3 overflow-x-auto scroll-smooth pb-3 md:gap-5">
+            <div class="scrollbar-hide flex gap-3 overflow-x-auto scroll-smooth pb-3 md:gap-5" data-mobile-autoscroll>
                 @foreach($categoryProductList as $product)
                 <div class="min-w-[240px] max-w-[240px]">
                     @include('frontend.partials.product-card', ['product' => $product])
@@ -525,16 +530,18 @@
 {{-- Farm Fresh Live Stock (kept last on the page) --}}
 <section class="bg-gray-50 py-8 md:py-12">
     <div class="mx-auto max-w-7xl px-4">
-        <div class="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-4">
-            <p class="col-span-2 col-start-1 text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-600 md:col-span-1">Enquiry Only &middot; Call to Order</p>
-            <h2 class="font-classic col-span-2 col-start-1 mt-1 text-center text-2xl font-bold text-slate-900 md:col-span-1 md:text-left md:text-3xl">Farm Fresh Live Stock</h2>
-            <p class="col-start-1 mt-1 max-w-lg text-xs text-slate-500">Healthy live farm birds and livestock raised under premium guidelines.</p>
-            <a href="{{ route('frontend.products', ['category' => $liveStockCategory->slug]) }}" class="col-start-2 inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
+        <div class="mb-4 flex items-center justify-between gap-4 md:mb-6 md:items-end">
+            <div class="min-w-0 text-left">
+                <p class="hidden text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-600 md:block">Enquiry Only &middot; Call to Order</p>
+                <h2 class="font-classic text-2xl font-bold text-slate-900 md:mt-1 md:text-3xl">Farm Fresh Live Stock</h2>
+                <p class="mt-1 hidden max-w-lg text-sm text-slate-500 md:block">Healthy live farm birds and livestock raised under premium guidelines.</p>
+            </div>
+            <a href="{{ route('frontend.products', ['category' => $liveStockCategory->slug]) }}" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
                 See All
                 <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </a>
         </div>
-        <div class="scrollbar-hide flex gap-3 overflow-x-auto scroll-smooth pb-3 md:gap-5">
+        <div class="scrollbar-hide flex gap-3 overflow-x-auto scroll-smooth pb-3 md:gap-5" data-mobile-autoscroll>
             @foreach($liveStockProducts as $product)
             <div class="min-w-[240px] max-w-[240px]">
                 @include('frontend.partials.product-card', ['product' => $product])
@@ -608,6 +615,64 @@
 
         hero.addEventListener('mouseenter', homeHeroStop);
         hero.addEventListener('mouseleave', homeHeroStart);
+    });
+
+    // Mobile only: auto-advance the category / product card rows one card at a time.
+    document.addEventListener('DOMContentLoaded', () => {
+        const mobileQuery = window.matchMedia('(max-width: 767px)');
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const scrollers = document.querySelectorAll('[data-mobile-autoscroll]');
+        if (!scrollers.length || reduceMotion.matches) return;
+
+        const visible = new Set();
+        const pausedUntil = new WeakMap();
+
+        const observer = 'IntersectionObserver' in window
+            ? new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        visible.add(entry.target);
+                    } else {
+                        visible.delete(entry.target);
+                    }
+                });
+            }, { threshold: 0.4 })
+            : null;
+
+        scrollers.forEach((scroller) => {
+            if (observer) {
+                observer.observe(scroller);
+            } else {
+                visible.add(scroller);
+            }
+
+            // Pause while the user is swiping, then resume a few seconds later.
+            const pause = () => pausedUntil.set(scroller, Date.now() + 6000);
+            scroller.addEventListener('touchstart', pause, { passive: true });
+            scroller.addEventListener('pointerdown', pause, { passive: true });
+        });
+
+        window.setInterval(() => {
+            if (!mobileQuery.matches || document.hidden) return;
+
+            visible.forEach((scroller) => {
+                if ((pausedUntil.get(scroller) || 0) > Date.now()) return;
+
+                const maxScroll = scroller.scrollWidth - scroller.clientWidth;
+                if (maxScroll <= 4) return;
+
+                const card = scroller.firstElementChild;
+                const gap = parseFloat(getComputedStyle(scroller).columnGap) || 0;
+                const step = card ? card.getBoundingClientRect().width + gap : scroller.clientWidth * 0.8;
+
+                // At the end of the row, jump back to the first card.
+                const next = scroller.scrollLeft >= maxScroll - 4
+                    ? 0
+                    : Math.min(scroller.scrollLeft + step, maxScroll);
+
+                scroller.scrollTo({ left: next, behavior: 'smooth' });
+            });
+        }, 3000);
     });
 </script>
 @endsection

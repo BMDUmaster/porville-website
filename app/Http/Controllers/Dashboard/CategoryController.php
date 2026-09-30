@@ -9,6 +9,8 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class CategoryController extends Controller
 {
@@ -21,9 +23,10 @@ class CategoryController extends Controller
                 $query->where('name', 'like', '%' . $request->search . '%');
             }
 
-            $categories = $query->latest()->paginate(15);
+            $categories = $query->ordered()->latest()->paginate(15);
+            $nextSortOrder = (int) Category::parents()->max('sort_order') + 1;
 
-            return view('dashboard.categories.index', compact('categories'));
+            return view('dashboard.categories.index', compact('categories', 'nextSortOrder'));
         } catch (\Throwable $e) {
             report($e);
 
@@ -32,7 +35,9 @@ class CategoryController extends Controller
                 'query' => $request->query(),
             ]);
 
-            return view('dashboard.categories.index', compact('categories'))
+            $nextSortOrder = 1;
+
+            return view('dashboard.categories.index', compact('categories', 'nextSortOrder'))
                 ->with('error', 'Could not load categories. ' . $this->friendlyExceptionMessage($e));
         }
     }
@@ -44,9 +49,10 @@ class CategoryController extends Controller
                 'name'        => 'required|string|max:100',
                 'description' => 'nullable|string',
                 'tag'         => 'nullable|string|max:40',
+                'sort_order'  => $this->sortOrderRules(),
                 'image'       => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,avif|max:5120',
                 'is_active'   => 'nullable|boolean',
-            ]);
+            ], $this->sortOrderMessages());
 
             $data['slug'] = $this->generateUniqueSlug($data['name']);
             $data['is_active'] = $request->boolean('is_active', true);
@@ -58,6 +64,8 @@ class CategoryController extends Controller
             Category::create($data);
 
             return back()->with('success', 'Category created successfully.');
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (QueryException $e) {
             report($e);
 
@@ -76,9 +84,10 @@ class CategoryController extends Controller
                 'name'        => 'required|string|max:100',
                 'description' => 'nullable|string',
                 'tag'         => 'nullable|string|max:40',
+                'sort_order'  => $this->sortOrderRules($category->id),
                 'image'       => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,avif|max:5120',
                 'is_active'   => 'nullable|boolean',
-            ]);
+            ], $this->sortOrderMessages());
 
             $data['slug'] = $this->generateUniqueSlug($data['name'], $category->id);
             $data['is_active'] = $request->boolean('is_active');
@@ -90,6 +99,8 @@ class CategoryController extends Controller
             $category->update($data);
 
             return back()->with('success', 'Category updated successfully.');
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (QueryException $e) {
             report($e);
 
@@ -105,6 +116,27 @@ class CategoryController extends Controller
     {
         $category->delete();
         return back()->with('success', 'Category deleted.');
+    }
+
+    private function sortOrderRules(?int $ignoreId = null): array
+    {
+        return [
+            'required',
+            'integer',
+            'min:1',
+            Rule::unique('categories', 'sort_order')
+                ->whereNull('parent_id')
+                ->ignore($ignoreId),
+        ];
+    }
+
+    private function sortOrderMessages(): array
+    {
+        return [
+            'sort_order.required' => 'Please enter a sort order.',
+            'sort_order.unique'   => 'This sort order is already used by another category. Choose a different number.',
+            'sort_order.min'      => 'Sort order must be 1 or more.',
+        ];
     }
 
     private function generateUniqueSlug(string $name, ?int $ignoreId = null): string

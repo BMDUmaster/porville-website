@@ -80,6 +80,7 @@ class ProductController extends Controller
             ->withCount([
                 'products as active_products_count' => fn($productQuery) => $productQuery->active(),
             ])
+            ->ordered()
             ->get();
 
         $sidebarMaxPrice = (int) ceil((Product::max('price') ?? 500) / 50) * 50;

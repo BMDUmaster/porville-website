@@ -67,6 +67,7 @@ class PageController extends Controller
             ->where('is_active', true)
             ->with(['children' => fn($q) => $q->where('is_active', true)])
             ->withCount(['products' => fn($q) => $q->active()])
+            ->ordered()
             ->get();
         return view('frontend.pages.categories', compact('categories'));
     }

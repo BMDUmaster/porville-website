@@ -38,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
                 $categories = Category::parents()
                     ->where('is_active', true)
                     ->with(['children' => fn ($query) => $query->where('is_active', true)->orderBy('name')])
-                    ->orderBy('name')
+                    ->ordered()
                     ->get();
                 $tickerProduct = Product::active()->latest('created_at')->latest('id')->first();
                 $tickerOffer = Coupon::offers()->activeEntries()->latest('id')->first();

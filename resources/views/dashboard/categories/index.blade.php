@@ -26,6 +26,7 @@
                     <th class="px-4 py-3 text-xs uppercase">Sr.No.</th>
                     <th class="px-4 py-3 text-xs uppercase">Image</th>
                     <th class="px-4 py-3 text-xs uppercase">Category</th>
+                    <th class="px-4 py-3 text-xs uppercase">Sort Order</th>
                     <th class="px-4 py-3 text-xs uppercase">Sub-cats</th>
                     <th class="px-4 py-3 text-xs uppercase">Date</th>
                     <th class="px-4 py-3 text-xs uppercase">Status</th>
@@ -49,6 +50,7 @@
                         <p class="font-semibold text-sm text-gray-800">{{ $cat->name }}</p>
                         <p class="text-xs text-gray-400 truncate max-w-[200px]">{{ $cat->description ?? 'No description' }}</p>
                     </td>
+                    <td class="px-4 py-3 align-middle text-sm font-semibold text-gray-700">{{ $cat->sort_order ?? '—' }}</td>
                     <td class="px-4 py-3 align-middle text-sm text-gray-600">{{ $cat->children->count() }}</td>
                     <td class="px-4 py-3 align-middle text-sm text-gray-500">{{ $cat->created_at->format('d M Y') }}</td>
                     <td class="px-4 py-3 align-middle text-sm">
@@ -65,6 +67,7 @@
                                     data-cat-name="{{ $cat->name }}"
                                     data-cat-desc="{{ $cat->description ?? '' }}"
                                     data-cat-tag="{{ $cat->tag ?? '' }}"
+                                    data-cat-sort="{{ $cat->sort_order ?? '' }}"
                                     data-cat-active="{{ $cat->is_active ? 1 : 0 }}"
                                     onclick="openEditModalFromBtn(this)"
                                     class="flex h-8 w-8 items-center justify-center rounded-lg text-xs text-amber-600 transition hover:bg-amber-100">
@@ -81,7 +84,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="7" class="px-4 py-8 text-center text-gray-400">No categories found.</td></tr>
+                <tr><td colspan="8" class="px-4 py-8 text-center text-gray-400">No categories found.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -117,6 +120,11 @@
             <div>
                 <label class="block text-sm font-medium mb-1.5">Tag <span class="text-gray-400 font-normal">(shown above the category name on the home page, e.g. "Best Seller")</span></label>
                 <input type="text" name="tag" maxlength="40" placeholder="e.g. Best Seller"
+                       class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1.5">Sort Order <span class="text-red-500">*</span> <span class="text-gray-400 font-normal">(lower number shows first on the home page; each category needs a different number)</span></label>
+                <input type="number" name="sort_order" min="1" step="1" required value="{{ old('sort_order', $nextSortOrder ?? 1) }}"
                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500">
             </div>
             <div>
@@ -164,6 +172,11 @@
                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500">
             </div>
             <div>
+                <label class="block text-sm font-medium mb-1.5">Sort Order <span class="text-red-500">*</span> <span class="text-gray-400 font-normal">(lower number shows first on the home page; each category needs a different number)</span></label>
+                <input type="number" name="sort_order" id="editSort" min="1" step="1" required value=""
+                       class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500">
+            </div>
+            <div>
                 <label class="block text-sm font-medium mb-1.5">Status</label>
                 <select name="is_active" id="editStatus" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500">
                     <option value="1">Active</option>
@@ -191,10 +204,11 @@ function closeModal(id) {
     document.getElementById(id).classList.add('hidden');
     document.getElementById(id).classList.remove('flex');
 }
-function openEditModal(id, name, desc, tag, isActive) {
+function openEditModal(id, name, desc, tag, sortOrder, isActive) {
     document.getElementById('editName').value = name;
     document.getElementById('editDesc').value = desc;
     document.getElementById('editTag').value = tag;
+    document.getElementById('editSort').value = sortOrder;
     document.getElementById('editStatus').value = isActive;
     document.getElementById('editForm').action = categoryUpdateUrlTemplate.replace('__ID__', encodeURIComponent(id));
     openModal('editModal');
@@ -205,6 +219,7 @@ function openEditModalFromBtn(btn) {
         btn.dataset.catName,
         btn.dataset.catDesc,
         btn.dataset.catTag,
+        btn.dataset.catSort,
         btn.dataset.catActive
     );
 }
