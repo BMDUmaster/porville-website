@@ -10,8 +10,8 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
-        'category_id', 'subcategory_id', 'name', 'slug', 'description',
-        'price', 'mrp', 'weight', 'unit', 'contact_number', 'processing_note', 'delivery_note', 'stock', 'images', 'videos', 'variants', 'is_active',
+        'category_id', 'subcategory_id', 'name', 'search_keywords', 'slug', 'description',
+        'price', 'mrp', 'weight', 'unit', 'contact_number', 'processing_note', 'delivery_note', 'stock', 'images', 'videos', 'video_url', 'variants', 'is_active',
     ];
 
     protected $casts = [
@@ -47,6 +47,56 @@ class Product extends Model
                       $sq->where('categories.is_active', true);
                   });
             });
+    }
+
+    /**
+     * Customer search: matches the product name or any admin-added
+     * alternate name (e.g. "murga" for Chicken).
+     */
+    public function scopeSearch($query, ?string $term)
+    {
+        $term = trim((string) $term);
+
+        if ($term === '') {
+            return $query;
+        }
+
+        $like = '%' . addcslashes($term, '%_\\') . '%';
+
+        return $query->where(function ($q) use ($like) {
+            $q->where('products.name', 'like', $like)
+              ->orWhere('products.search_keywords', 'like', $like);
+        });
+    }
+
+    /**
+     * YouTube video id from a watch / youtu.be / shorts / embed / live link.
+     */
+    public static function youtubeId(?string $url): ?string
+    {
+        $url = trim((string) $url);
+
+        if ($url === '') {
+            return null;
+        }
+
+        $pattern = '~^(?:https?://)?(?:www\.|m\.|music\.)?(?:youtube\.com/(?:watch\?(?:.*&)?v=|shorts/|embed/|live/|v/)|youtu\.be/)([A-Za-z0-9_-]{11})~i';
+
+        return preg_match($pattern, $url, $matches) ? $matches[1] : null;
+    }
+
+    public function getYoutubeEmbedUrlAttribute(): ?string
+    {
+        $id = self::youtubeId($this->video_url);
+
+        return $id ? 'https://www.youtube.com/embed/' . $id . '?rel=0' : null;
+    }
+
+    public function getYoutubeThumbnailUrlAttribute(): ?string
+    {
+        $id = self::youtubeId($this->video_url);
+
+        return $id ? 'https://img.youtube.com/vi/' . $id . '/hqdefault.jpg' : null;
     }
 
     /**

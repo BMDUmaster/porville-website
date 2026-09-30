@@ -99,6 +99,8 @@
                         'images_count' => is_array($product->images) ? count($product->images) : 0,
                         'images' => is_array($product->images) ? array_values($product->images) : [],
                         'videos' => is_array($product->videos) ? array_values($product->videos) : [],
+                        'video_url' => $product->video_url,
+                        'search_keywords' => $product->search_keywords,
                         'variants' => is_array($product->variants) ? array_values($product->variants) : [],
                     ];
                 @endphp
@@ -182,6 +184,8 @@
                                     'images_count' => is_array($product->images) ? count($product->images) : 0,
                                     'images' => is_array($product->images) ? array_values($product->images) : [],
                                     'videos' => is_array($product->videos) ? array_values($product->videos) : [],
+                                    'video_url' => $product->video_url,
+                                    'search_keywords' => $product->search_keywords,
                                     'variants' => is_array($product->variants) ? array_values($product->variants) : [],
                                 ];
                             @endphp
@@ -258,15 +262,9 @@
             {{-- Product Images --}}
             <div>
                 <label class="block text-sm text-gray-700 mb-2">Product Images</label>
-                <div class="flex items-start gap-2">
-                    <div id="addImagePickerRow" class="flex-1"></div>
-                    <button type="button" onclick="addSelectedImage()"
-                            class="px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded whitespace-nowrap">
-                        Add
-                    </button>
-                </div>
+                <div id="addImagePickerRow"></div>
                 <input type="file" id="finalAddImagesInput" name="images[]" multiple class="hidden">
-                <p class="mt-1 text-[11px] text-gray-400">Gallery se ek saath multiple images choose karo, phir Add dabao. Sab images neeche preview mein aa jayengi.</p>
+                <p class="mt-1 text-[11px] text-gray-400">Gallery se ek ya multiple images choose karo — choose karte hi neeche preview mein add ho jayengi. Aur images ke liye dobara Choose Image dabao.</p>
                 <div id="addProductImagePreviews" class="mt-3 flex flex-wrap gap-3"></div>
             </div>
 
@@ -275,6 +273,10 @@
                 <input type="file" name="videos[]" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska"
                        class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-amber-400">
                 <p class="mt-1 text-[11px] text-gray-400">Ek product video upload karo. MP4/WebM/MOV supported, max 50MB.</p>
+                <label class="mt-3 block text-sm text-gray-700 mb-1">YouTube Video Link <span class="text-gray-400">(optional)</span></label>
+                <input type="url" name="video_url" value="{{ old('video_url') }}" placeholder="https://www.youtube.com/watch?v=... ya https://youtu.be/..."
+                       class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-amber-400">
+                <p class="mt-1 text-[11px] text-gray-400">Video upload ki jagah (ya saath mein) YouTube link bhi de sakte ho. Product page par video ke saath dikhega.</p>
             </div>
 
             {{-- Product Name --}}
@@ -282,6 +284,14 @@
                 <label class="block text-sm text-gray-700 mb-1">Product Name</label>
                 <input type="text" name="name" required placeholder="Enter product name"
                        class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-amber-400">
+            </div>
+
+            {{-- Alternate names used by the website search --}}
+            <div>
+                <label class="block text-sm text-gray-700 mb-1">Search Names / Keywords <span class="text-gray-400">(optional)</span></label>
+                <input type="text" name="search_keywords" value="{{ old('search_keywords') }}" maxlength="1000" placeholder="e.g. murga, murgi, chicken, chick"
+                       class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-amber-400">
+                <p class="mt-1 text-[11px] text-gray-400">Comma (,) se alag karke doosre naam likho. Website par customer inme se koi bhi naam search karega to ye product dikhega.</p>
             </div>
 
             <div id="addWeightField">
@@ -438,6 +448,12 @@
                 <input type="text" name="name" id="editProductName" required
                        class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
             </div>
+            <div>
+                <label class="text-xs font-bold text-slate-600 block mb-1">Search Names / Keywords <span class="font-normal text-slate-400">(optional)</span></label>
+                <input type="text" name="search_keywords" id="editSearchKeywords" maxlength="1000" placeholder="e.g. murga, murgi, chicken, chick"
+                       class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
+                <p class="mt-1 text-[11px] text-slate-400">Comma (,) se alag karke doosre naam likho. Website search mein inme se koi bhi naam likhne par ye product dikhega.</p>
+            </div>
             <div id="editWeightField">
                 <label class="text-xs font-bold text-slate-600 block mb-1">Pack Weight</label>
                 <input type="text" name="weight" id="editProductWeight" placeholder="e.g. 1 Kg, 500 Gram, 6-8 pieces"
@@ -451,17 +467,11 @@
             </div>
             <div>
                 <label class="text-xs font-bold text-slate-600 block mb-1">Product Images</label>
-                <div class="flex items-start gap-2">
-                    <div id="editImagePickerRow" class="flex-1"></div>
-                    <button type="button" onclick="addSelectedEditImage()"
-                            class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded whitespace-nowrap">
-                        Add
-                    </button>
-                </div>
+                <div id="editImagePickerRow"></div>
                 <input type="hidden" name="existing_images_present" value="1">
                 <input type="file" id="finalEditImagesInput" name="images[]" multiple class="hidden">
                 <div id="editExistingImagesInputs" class="hidden"></div>
-                <p id="editImageHint" class="mt-1 text-[11px] text-slate-400">Current images neeche dikhengi. Delete icon se hata sakte ho, aur new images add karne ke liye image choose karke Add dabao.</p>
+                <p id="editImageHint" class="mt-1 text-[11px] text-slate-400">Current images neeche dikhengi. Delete icon se hata sakte ho. New images choose karte hi add ho jayengi.</p>
                 <div id="editCurrentImagesSection" class="mt-4 hidden">
                     <p class="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Current Images</p>
                     <div id="editCurrentImagePreviews" class="flex flex-wrap gap-3"></div>
@@ -476,6 +486,10 @@
                 <input type="file" name="videos[]" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska"
                        class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
                 <p id="editVideoHint" class="mt-1 text-[11px] text-slate-400">New video choose karoge to old video update ho jayega.</p>
+                <label class="mt-3 text-xs font-bold text-slate-600 block mb-1">YouTube Video Link <span class="font-normal text-slate-400">(optional)</span></label>
+                <input type="url" name="video_url" id="editVideoUrl" placeholder="https://www.youtube.com/watch?v=... ya https://youtu.be/..."
+                       class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
+                <p class="mt-1 text-[11px] text-slate-400">Link hata doge (khali chhod doge) to YouTube video product page se hat jayega.</p>
             </div>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div id="editPriceField">
@@ -593,6 +607,9 @@ function handleAddImageSelection(input) {
             label.textContent = 'No file chosen';
         }
     }
+
+    // Selecting images adds them straight to the preview list.
+    addSelectedImage();
 }
 
 function addSelectedImage() {
@@ -710,6 +727,8 @@ function openEditModal(source) {
     };
 
     document.getElementById('editProductName').value  = product.name ?? '';
+    document.getElementById('editSearchKeywords').value = product.search_keywords ?? '';
+    document.getElementById('editVideoUrl').value     = product.video_url ?? '';
     document.getElementById('editProductWeight').value = product.weight ?? '';
     document.getElementById('editCatId').value        = product.category_id ?? '';
     document.getElementById('editDescription').value  = product.description ?? '';
@@ -722,7 +741,7 @@ function openEditModal(source) {
     document.getElementById('editVideoHint').textContent = (product.videos ?? []).length
         ? 'Current video saved hai. New video choose karoge to old video update ho jayega.'
         : 'Abhi video saved nahi hai. Ek video choose karke update kar sakte ho.';
-    document.getElementById('editImageHint').textContent = 'Current images neeche dikhengi. Delete icon se hata sakte ho, aur new images add karne ke liye image choose karke Add dabao.';
+    document.getElementById('editImageHint').textContent = 'Current images neeche dikhengi. Delete icon se hata sakte ho. New images choose karte hi add ho jayengi.';
     resetEditProductImages(false);
     renderEditCurrentImages(product.images ?? []);
     renderEditVariants(product.variants ?? []);
@@ -771,6 +790,9 @@ function handleEditImageSelection(input) {
             label.textContent = 'No file chosen';
         }
     }
+
+    // Selecting images adds them straight to the preview list.
+    addSelectedEditImage();
 }
 
 function addSelectedEditImage() {

@@ -228,6 +228,8 @@ class ProductController extends Controller
             'variants.*.vendor_amount' => 'nullable|numeric|min:0|max:99999999.99',
             'images.*'              => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,avif|max:5120',
             'videos.*'              => 'nullable|file|mimes:mp4,mov,avi,webm,mkv|max:51200',
+            'video_url'             => ['nullable', 'string', 'max:500', $this->youtubeUrlRule()],
+            'search_keywords'       => 'nullable|string|max:1000',
         ]);
 
         $this->ensureSubcategoryBelongsToCategory($data['category_id'], $data['subcategory_id'] ?? null);
@@ -235,6 +237,8 @@ class ProductController extends Controller
         $isEnquiryOnly = (bool) Category::whereKey($data['category_id'])->value('is_enquiry_only');
 
         $data['slug'] = $this->generateUniqueSlug($data['name']);
+        $data['search_keywords'] = $this->normalizeSearchKeywords($data['search_keywords'] ?? null);
+        $data['video_url'] = trim((string) ($data['video_url'] ?? '')) ?: null;
         $data['is_active'] = $request->boolean('is_active', true);
 
         if ($isEnquiryOnly) {
@@ -326,6 +330,8 @@ class ProductController extends Controller
             'existing_images.*'     => 'string',
             'images.*'              => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,avif|max:5120',
             'videos.*'              => 'nullable|file|mimes:mp4,mov,avi,webm,mkv|max:51200',
+            'video_url'             => ['nullable', 'string', 'max:500', $this->youtubeUrlRule()],
+            'search_keywords'       => 'nullable|string|max:1000',
         ]);
 
         $this->ensureSubcategoryBelongsToCategory($data['category_id'], $data['subcategory_id'] ?? null);
@@ -333,6 +339,8 @@ class ProductController extends Controller
         $isEnquiryOnly = (bool) Category::whereKey($data['category_id'])->value('is_enquiry_only');
 
         $data['slug'] = $this->generateUniqueSlug($data['name'], $product->id);
+        $data['search_keywords'] = $this->normalizeSearchKeywords($data['search_keywords'] ?? null);
+        $data['video_url'] = trim((string) ($data['video_url'] ?? '')) ?: null;
         $data['is_active'] = $request->boolean('is_active', true);
 
         if ($isEnquiryOnly) {
@@ -391,6 +399,33 @@ class ProductController extends Controller
         $product->delete();
 
         return back()->with('success', 'Product deleted.');
+    }
+
+    private function youtubeUrlRule(): \Closure
+    {
+        return function (string $attribute, $value, \Closure $fail) {
+            if (trim((string) $value) !== '' && ! Product::youtubeId($value)) {
+                $fail('Please enter a valid YouTube video link (youtube.com/watch?v=..., youtu.be/... or /shorts/...).');
+            }
+        };
+    }
+
+    /**
+     * "Murga, chicken ,  CHICKEN" -> "Murga, chicken" (trimmed, de-duplicated).
+     */
+    private function normalizeSearchKeywords(?string $keywords): ?string
+    {
+        $unique = [];
+
+        foreach (preg_split('/[,\r\n]+/', (string) $keywords) as $keyword) {
+            $keyword = trim(preg_replace('/\s+/', ' ', $keyword));
+
+            if ($keyword !== '' && ! isset($unique[mb_strtolower($keyword)])) {
+                $unique[mb_strtolower($keyword)] = $keyword;
+            }
+        }
+
+        return $unique ? implode(', ', $unique) : null;
     }
 
     private function ensureSubcategoryBelongsToCategory(int $categoryId, ?int $subcategoryId): void

@@ -26,7 +26,7 @@ class ProductApiController extends Controller
         }
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->search($request->search);
         }
 
         $perPage  = min((int) $request->get('per_page', 20), 100);

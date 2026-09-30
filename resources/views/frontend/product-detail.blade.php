@@ -17,6 +17,12 @@
     $detailMedia = collect($galleryImages)
         ->map(fn($image) => ['type' => 'image', 'path' => $image, 'url' => asset('storage/' . $image)])
         ->concat(collect($productVideos)->map(fn($video) => ['type' => 'video', 'path' => $video, 'url' => asset('storage/' . $video)]))
+        ->when($product->youtube_embed_url, fn($media) => $media->push([
+            'type' => 'youtube',
+            'path' => $product->video_url,
+            'url' => $product->youtube_embed_url,
+            'thumb' => $product->youtube_thumbnail_url,
+        ]))
         ->values();
 
     $variantCollection = collect($product->variants ?? [])
@@ -374,6 +380,15 @@
                             <source src="{{ $detailMedia->first()['type'] === 'video' ? $detailMedia->first()['url'] : '' }}" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
+                        <iframe
+                            id="detailMainYoutube"
+                            src="{{ $detailMedia->first()['type'] === 'youtube' ? $detailMedia->first()['url'] : '' }}"
+                            title="{{ $product->name }} video"
+                            class="{{ $detailMedia->first()['type'] === 'youtube' ? '' : 'hidden' }} h-full w-full bg-black"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen
+                            loading="lazy"
+                        ></iframe>
                     @else
                         <div class="flex h-full w-full items-center justify-center text-7xl text-slate-300">
                             <i class="fa-solid fa-drumstick-bite"></i>
@@ -431,7 +446,14 @@
                                 id="detailThumb{{ $index }}"
                                 class="detail-thumb {{ $index === 0 ? 'is-active' : '' }} h-14 w-14 overflow-hidden rounded-[16px] border-2 border-transparent bg-white p-1 shadow-[0_10px_30px_rgba(15,23,42,0.08)] transition hover:-translate-y-0.5 sm:h-20 sm:w-20 sm:rounded-[20px] md:h-28 md:w-28 md:rounded-[24px]"
                             >
-                                @if($media['type'] === 'video')
+                                @if($media['type'] === 'youtube')
+                                    <span class="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[12px] bg-slate-900 text-white sm:rounded-[16px] md:rounded-[20px]">
+                                        <img src="{{ $media['thumb'] }}" alt="{{ $product->name }} YouTube video" class="h-full w-full object-cover opacity-80">
+                                        <span class="absolute inset-0 flex items-center justify-center">
+                                            <i class="fa-brands fa-youtube text-lg text-red-600 drop-shadow sm:text-2xl"></i>
+                                        </span>
+                                    </span>
+                                @elseif($media['type'] === 'video')
                                     <span class="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[12px] bg-slate-900 text-white sm:rounded-[16px] md:rounded-[20px]">
                                         <video preload="metadata" muted class="h-full w-full object-cover opacity-70">
                                             <source src="{{ $media['url'] }}">
@@ -905,8 +927,25 @@ function showGalleryImage(index) {
     const mainImage = document.getElementById('detailMainImage');
     const mainVideo = document.getElementById('detailMainVideo');
     const mainVideoSource = mainVideo?.querySelector('source');
+    const mainYoutube = document.getElementById('detailMainYoutube');
 
-    if (media.type === 'video') {
+    // Clearing the src stops YouTube playback when another slide is shown.
+    if (mainYoutube && media.type !== 'youtube') {
+        mainYoutube.classList.add('hidden');
+        mainYoutube.src = '';
+    }
+
+    if (media.type === 'youtube') {
+        if (mainImage) mainImage.classList.add('hidden');
+        if (mainVideo) {
+            mainVideo.pause();
+            mainVideo.classList.add('hidden');
+        }
+        if (mainYoutube) {
+            if (mainYoutube.src !== media.url) mainYoutube.src = media.url;
+            mainYoutube.classList.remove('hidden');
+        }
+    } else if (media.type === 'video') {
         if (mainImage) mainImage.classList.add('hidden');
         if (mainVideo && mainVideoSource) {
             mainVideoSource.src = media.url;

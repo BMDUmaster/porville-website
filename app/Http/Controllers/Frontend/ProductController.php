@@ -26,7 +26,7 @@ class ProductController extends Controller
         $query = Product::active()->with(['category', 'subcategory']);
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->search($request->search);
         }
 
         $activeCategory = null;
