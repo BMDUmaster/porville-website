@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Cache;
 class DeliveryAreaManager
 {
     private const SETTING_KEY = 'delivery_areas';
-    private const CACHE_KEY = 'delivery_areas';
+    private const CACHE_KEY = 'delivery_areas:v2';
 
     /**
      * Admin-managed delivery areas as [pincode => [sector, ...]].

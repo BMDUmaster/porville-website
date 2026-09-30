@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Cache;
 class DeliveryChargeManager
 {
     public const SETTING_KEY = 'delivery_charge';
-    private const CACHE_KEY = 'delivery_charge';
+    private const CACHE_KEY = 'delivery_charge:v2';
 
     public static function amount(): float
     {

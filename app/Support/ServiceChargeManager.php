@@ -10,8 +10,8 @@ class ServiceChargeManager
 {
     public const SETTING_KEY = 'service_charge_percent';
     public const TOMORROW_SETTING_KEY = 'service_charge_percent_tomorrow';
-    private const CACHE_KEY_PREFIX = 'service_charge_percent_';
-    private const TIERS_CACHE_KEY = 'service_charge_tiers';
+    private const CACHE_KEY_PREFIX = 'service_charge_percent:v2:';
+    private const TIERS_CACHE_KEY = 'service_charge_tiers:v2';
 
     public static function percentage(?string $day = 'today'): float
     {
