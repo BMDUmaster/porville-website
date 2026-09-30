@@ -34,13 +34,9 @@ class NotificationController extends Controller
         }
 
         $notifications = $query->paginate(20);
-        $users = User::query()
-            ->where('role', 'customer')
-            ->where('status', 'active')
-            ->orderBy('name')
-            ->get(['id', 'name', 'email']);
+        $customerCount = $this->activeCustomers()->count();
 
-        return view('dashboard.notifications.index', compact('notifications', 'users'));
+        return view('dashboard.notifications.index', compact('notifications', 'customerCount'));
     }
 
     public function store(Request $request)
@@ -48,20 +44,13 @@ class NotificationController extends Controller
         $data = $request->validate([
             'subject' => 'required|string|max:200',
             'message' => 'required|string',
-            'user_ids' => ['required', 'array', 'min:1'],
-            'user_ids.*' => ['integer', 'exists:users,id'],
         ]);
 
-        $recipients = User::query()
-            ->whereIn('id', $data['user_ids'])
-            ->where('role', 'customer')
-            ->where('status', 'active')
-            ->get(['id', 'name', 'email']);
+        // Admin notifications always go to every active customer.
+        $recipients = $this->activeCustomers()->get(['id', 'name', 'email']);
 
         if ($recipients->isEmpty()) {
-            return back()->withInput()->withErrors([
-                'user_ids' => 'Please select at least one active customer.',
-            ]);
+            return back()->withInput()->with('error', 'There are no active customers to notify yet.');
         }
 
         $recipients->each(function (User $recipient) use ($data) {
@@ -83,7 +72,14 @@ class NotificationController extends Controller
             }
         });
 
-        return back()->with('success', 'Notification sent to selected customer(s) — in-app and email.');
+        return back()->with('success', 'Notification sent to all ' . $recipients->count() . ' customer(s) — in-app and email.');
+    }
+
+    private function activeCustomers()
+    {
+        return User::query()
+            ->where('role', 'customer')
+            ->where('status', 'active');
     }
 
     public function update(Request $request, Notification $notification)

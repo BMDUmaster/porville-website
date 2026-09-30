@@ -4,7 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
-return Application::configure(basePath: dirname(__DIR__))
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
@@ -27,3 +27,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
+
+// Local development: an untracked .env.local (see .gitignore) replaces the
+// committed production .env, so local DB settings never reach the server.
+if (is_file(dirname(__DIR__) . '/.env.local')) {
+    $app->loadEnvironmentFrom('.env.local');
+}
+
+return $app;

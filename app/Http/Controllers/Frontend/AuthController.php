@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\AccountNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -66,6 +67,8 @@ class AuthController extends Controller
             }
 
             $request->session()->regenerate();
+
+            AccountNotificationService::notifyLoggedIn($user, $request);
 
             if ($request->expectsJson()) {
                 return response()->json([
@@ -363,6 +366,8 @@ class AuthController extends Controller
 
         Auth::guard('web_frontend')->login($user);
         $request->session()->regenerate();
+
+        AccountNotificationService::notifyRegistered($user);
 
         if ($request->expectsJson()) {
             return response()->json([
