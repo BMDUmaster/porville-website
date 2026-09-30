@@ -118,31 +118,31 @@ body > footer {
             </div>
         </div>
 
-        <div class="px-5 py-4">
-            <div class="overflow-hidden rounded-xl border border-slate-200">
+        <div class="px-3 py-4 sm:px-5">
+            <div class="overflow-x-auto rounded-xl border border-slate-200">
                 <table class="min-w-full divide-y divide-slate-200">
                     <thead class="bg-slate-50">
                         <tr>
-                            <th class="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">#</th>
-                            <th class="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Item</th>
-                            <th class="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Pack</th>
-                            <th class="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Qty</th>
-                            <th class="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Rate</th>
-                            <th class="px-3 py-2.5 text-right text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Amount</th>
+                            <th class="hidden px-2 py-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-slate-500 sm:px-3 sm:tracking-[0.16em] text-left sm:table-cell">#</th>
+                            <th class="px-2 py-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-slate-500 sm:px-3 sm:tracking-[0.16em] text-left">Item</th>
+                            <th class="px-2 py-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-slate-500 sm:px-3 sm:tracking-[0.16em] text-left">Pack</th>
+                            <th class="px-2 py-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-slate-500 sm:px-3 sm:tracking-[0.16em] text-center">Qty</th>
+                            <th class="px-2 py-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-slate-500 sm:px-3 sm:tracking-[0.16em] text-right">Rate</th>
+                            <th class="px-2 py-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-slate-500 sm:px-3 sm:tracking-[0.16em] text-right">Amount</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 bg-white">
                         @forelse($order->items as $index => $item)
                             <tr>
-                                <td class="px-3 py-3 text-xs font-bold text-slate-400">{{ $index + 1 }}</td>
-                                <td class="px-3 py-3">
+                                <td class="hidden px-2 py-3 text-xs font-bold text-slate-400 sm:table-cell sm:px-3">{{ $index + 1 }}</td>
+                                <td class="px-2 py-3 sm:px-3">
                                     <p class="text-xs font-bold text-slate-900">{{ $item->product->name ?? '0' }}</p>
                                     <p class="mt-1 text-[11px] text-slate-500">{{ $item->unit ?: '0' }}</p>
                                 </td>
-                                <td class="px-3 py-3 text-xs text-slate-700">{{ $item->variant_label ?: '0' }}</td>
-                                <td class="px-3 py-3 text-xs text-slate-700">{{ $item->quantity ?: '0' }}</td>
-                                <td class="px-3 py-3 text-xs text-slate-700">&#8377;{{ number_format((float) ($item->unit_price ?? 0), 2) }}</td>
-                                <td class="px-3 py-3 text-right text-xs font-bold text-slate-900">&#8377;{{ number_format((float) ($item->subtotal ?? 0), 2) }}</td>
+                                <td class="px-2 py-3 text-xs text-slate-700 sm:px-3">{{ $item->variant_label ?: '0' }}</td>
+                                <td class="px-2 py-3 text-center text-xs text-slate-700 sm:px-3">{{ $item->quantity ?: '0' }}</td>
+                                <td class="whitespace-nowrap px-2 py-3 text-right text-xs text-slate-700 sm:px-3">&#8377;{{ number_format((float) ($item->unit_price ?? 0), 2) }}</td>
+                                <td class="whitespace-nowrap px-2 py-3 text-right text-xs font-bold text-slate-900 sm:px-3">&#8377;{{ number_format((float) ($item->subtotal ?? 0), 2) }}</td>
                             </tr>
                         @empty
                             <tr>
