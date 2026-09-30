@@ -276,7 +276,7 @@
                 <label class="mt-3 block text-sm text-gray-700 mb-1">YouTube Video Link <span class="text-gray-400">(optional)</span></label>
                 <input type="url" name="video_url" value="{{ old('video_url') }}" placeholder="https://www.youtube.com/watch?v=... ya https://youtu.be/..."
                        class="w-full border border-gray-300 rounded px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-amber-400">
-                <p class="mt-1 text-[11px] text-gray-400">Video upload ki jagah (ya saath mein) YouTube link bhi de sakte ho. Product page par video ke saath dikhega.</p>
+                <p class="mt-1 text-[11px] text-gray-400">Video upload ki jagah (ya saath mein) YouTube link bhi de sakte ho. Apni ya embedding-allowed video ka link do — film/music label ki official videos aksar dusri websites par "This video is unavailable" dikhati hain.</p>
             </div>
 
             {{-- Product Name --}}
@@ -489,7 +489,7 @@
                 <label class="mt-3 text-xs font-bold text-slate-600 block mb-1">YouTube Video Link <span class="font-normal text-slate-400">(optional)</span></label>
                 <input type="url" name="video_url" id="editVideoUrl" placeholder="https://www.youtube.com/watch?v=... ya https://youtu.be/..."
                        class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
-                <p class="mt-1 text-[11px] text-slate-400">Link hata doge (khali chhod doge) to YouTube video product page se hat jayega.</p>
+                <p class="mt-1 text-[11px] text-slate-400">Link hata doge (khali chhod doge) to YouTube video product page se hat jayega. Film/music label ki official videos dusri websites par aksar nahi chalti — apni ya embedding-allowed video ka link do.</p>
             </div>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div id="editPriceField">

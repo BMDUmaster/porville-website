@@ -387,6 +387,7 @@
                             class="{{ $detailMedia->first()['type'] === 'youtube' ? '' : 'hidden' }} h-full w-full bg-black"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowfullscreen
+                            referrerpolicy="strict-origin-when-cross-origin"
                             loading="lazy"
                         ></iframe>
                     @else
