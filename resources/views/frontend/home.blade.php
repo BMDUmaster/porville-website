@@ -298,8 +298,9 @@
             })->take(12)->values();
         @endphp
 
-        <div class="mb-4 flex items-center justify-between gap-4 md:mb-6 md:items-end">
-            <div class="min-w-0 text-left">
+        <div class="mb-4 grid grid-cols-[1fr_auto_1fr] items-center gap-2 md:mb-6 md:flex md:items-end md:justify-between md:gap-4">
+            <span class="md:hidden" aria-hidden="true"></span>
+            <div class="min-w-0 text-center md:text-left">
                 <h2 class="home-category-heading text-2xl font-extrabold text-slate-900 md:text-4xl">
                     Shop by <span class="text-amber-600"> Category  </span>
                 </h2>
@@ -307,7 +308,7 @@
             </div>
             <a
                 href="{{ route('frontend.categories') }}"
-                class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5"
+                class="inline-flex shrink-0 items-center gap-2 justify-self-end rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5"
             >
                 See All
                 <i class="fa-solid fa-arrow-right text-[10px]"></i>
@@ -378,9 +379,10 @@
 
     <section class="{{ $loop->even ? 'bg-gray-50' : 'bg-white' }} pb-2 pt-2 md:py-6">
         <div class="mx-auto max-w-7xl px-4">
-            {{-- Name on the left, See All on the right; tag and description are desktop-only --}}
-            <div class="mb-4 flex items-center justify-between gap-4 md:mb-6 md:items-end">
-                <div class="min-w-0 text-left">
+            {{-- Mobile: name centered with See All on the right. Desktop: name left; tag and description are desktop-only --}}
+            <div class="mb-4 grid grid-cols-[1fr_auto_1fr] items-center gap-2 md:mb-6 md:flex md:items-end md:justify-between md:gap-4">
+                <span class="md:hidden" aria-hidden="true"></span>
+                <div class="min-w-0 text-center md:text-left">
                     @if($category->tag)
                         <p class="hidden text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-600 md:block">{{ $category->tag }}</p>
                     @endif
@@ -389,7 +391,7 @@
                         {{ $category->description ?: 'Fresh, quality-checked ' . strtolower($category->name) . ', cut and packed daily.' }}
                     </p>
                 </div>
-                <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
+                <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="inline-flex shrink-0 items-center gap-2 justify-self-end rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
                     See All
                     <i class="fa-solid fa-arrow-right text-[10px]"></i>
                 </a>
@@ -530,13 +532,14 @@
 {{-- Farm Fresh Live Stock (kept last on the page) --}}
 <section class="bg-gray-50 py-8 md:py-12">
     <div class="mx-auto max-w-7xl px-4">
-        <div class="mb-4 flex items-center justify-between gap-4 md:mb-6 md:items-end">
-            <div class="min-w-0 text-left">
+        <div class="mb-4 grid grid-cols-[1fr_auto_1fr] items-center gap-2 md:mb-6 md:flex md:items-end md:justify-between md:gap-4">
+            <span class="md:hidden" aria-hidden="true"></span>
+            <div class="min-w-0 text-center md:text-left">
                 <p class="hidden text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-600 md:block">Enquiry Only &middot; Call to Order</p>
                 <h2 class="font-classic text-2xl font-bold text-slate-900 md:mt-1 md:text-3xl">Farm Fresh Live Stock</h2>
                 <p class="mt-1 hidden max-w-lg text-sm text-slate-500 md:block">Healthy live farm birds and livestock raised under premium guidelines.</p>
             </div>
-            <a href="{{ route('frontend.products', ['category' => $liveStockCategory->slug]) }}" class="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
+            <a href="{{ route('frontend.products', ['category' => $liveStockCategory->slug]) }}" class="inline-flex shrink-0 items-center gap-2 justify-self-end rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
                 See All
                 <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </a>
@@ -617,15 +620,19 @@
         hero.addEventListener('mouseleave', homeHeroStart);
     });
 
-    // Mobile only: auto-advance the category / product card rows one card at a time.
+    // Mobile only: rows glide slowly and continuously (right to the end, then back).
     document.addEventListener('DOMContentLoaded', () => {
         const mobileQuery = window.matchMedia('(max-width: 767px)');
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-        const scrollers = document.querySelectorAll('[data-mobile-autoscroll]');
+        const scrollers = Array.from(document.querySelectorAll('[data-mobile-autoscroll]'));
         if (!scrollers.length || reduceMotion.matches) return;
 
+        const SPEED = 28;        // pixels per second
+        const EDGE_PAUSE = 1500; // rest at each end before turning around
+        const USER_PAUSE = 5000; // wait after the user touches a row
+
+        const state = new Map();
         const visible = new Set();
-        const pausedUntil = new WeakMap();
 
         const observer = 'IntersectionObserver' in window
             ? new IntersectionObserver((entries) => {
@@ -636,43 +643,86 @@
                         visible.delete(entry.target);
                     }
                 });
-            }, { threshold: 0.4 })
+            }, { threshold: 0.2 })
             : null;
 
         scrollers.forEach((scroller) => {
+            state.set(scroller, { pos: scroller.scrollLeft, dir: 1, pausedUntil: 0 });
+
             if (observer) {
                 observer.observe(scroller);
             } else {
                 visible.add(scroller);
             }
 
-            // Pause while the user is swiping, then resume a few seconds later.
-            const pause = () => pausedUntil.set(scroller, Date.now() + 6000);
-            scroller.addEventListener('touchstart', pause, { passive: true });
-            scroller.addEventListener('pointerdown', pause, { passive: true });
+            const pause = () => {
+                state.get(scroller).pausedUntil = performance.now() + USER_PAUSE;
+            };
+            ['touchstart', 'pointerdown', 'wheel', 'focusin'].forEach((type) => {
+                scroller.addEventListener(type, pause, { passive: true });
+            });
         });
 
-        window.setInterval(() => {
-            if (!mobileQuery.matches || document.hidden) return;
+        let running = false;
+        let lastTime = 0;
 
-            visible.forEach((scroller) => {
-                if ((pausedUntil.get(scroller) || 0) > Date.now()) return;
+        function frame(now) {
+            if (!running) return;
 
-                const maxScroll = scroller.scrollWidth - scroller.clientWidth;
-                if (maxScroll <= 4) return;
+            const dt = Math.min((now - lastTime) / 1000, 0.05);
+            lastTime = now;
 
-                const card = scroller.firstElementChild;
-                const gap = parseFloat(getComputedStyle(scroller).columnGap) || 0;
-                const step = card ? card.getBoundingClientRect().width + gap : scroller.clientWidth * 0.8;
+            if (!document.hidden) {
+                visible.forEach((scroller) => {
+                    const s = state.get(scroller);
+                    if (s.pausedUntil > now) return;
 
-                // At the end of the row, jump back to the first card.
-                const next = scroller.scrollLeft >= maxScroll - 4
-                    ? 0
-                    : Math.min(scroller.scrollLeft + step, maxScroll);
+                    const maxScroll = scroller.scrollWidth - scroller.clientWidth;
+                    if (maxScroll <= 2) return;
 
-                scroller.scrollTo({ left: next, behavior: 'smooth' });
+                    // Continue from wherever the user left the row.
+                    if (Math.abs(scroller.scrollLeft - s.pos) > 2) {
+                        s.pos = scroller.scrollLeft;
+                    }
+
+                    s.pos += s.dir * SPEED * dt;
+
+                    if (s.pos >= maxScroll) {
+                        s.pos = maxScroll;
+                        s.dir = -1;
+                        s.pausedUntil = now + EDGE_PAUSE;
+                    } else if (s.pos <= 0) {
+                        s.pos = 0;
+                        s.dir = 1;
+                        s.pausedUntil = now + EDGE_PAUSE;
+                    }
+
+                    scroller.scrollLeft = s.pos;
+                });
+            }
+
+            requestAnimationFrame(frame);
+        }
+
+        function sync() {
+            const shouldRun = mobileQuery.matches;
+
+            // The rows use scroll-smooth; per-frame updates need instant scrolling.
+            scrollers.forEach((scroller) => {
+                scroller.style.scrollBehavior = shouldRun ? 'auto' : '';
             });
-        }, 3000);
+
+            if (shouldRun && !running) {
+                running = true;
+                lastTime = performance.now();
+                requestAnimationFrame(frame);
+            } else if (!shouldRun) {
+                running = false;
+            }
+        }
+
+        sync();
+        mobileQuery.addEventListener?.('change', sync);
     });
 </script>
 @endsection
