@@ -344,7 +344,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
             </span>
         </a>
         <form action="{{ route('frontend.products') }}" method="GET" class="relative mx-2 hidden max-w-lg flex-grow md:flex lg:mx-4">
-            <input type="text" name="search" placeholder="Search Chicken Mutton Fish Items"
+            <input type="text" name="search" placeholder="Search fresh items" data-typing-placeholder
                    class="w-full border border-neutral-700 bg-neutral-900 text-white placeholder:text-neutral-400 rounded-xl px-5 py-2.5 text-sm focus:outline-none focus:border-amber-500 transition">
             <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-amber-400">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -445,7 +445,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
     </div>
     <div class="mx-auto max-w-7xl px-3 pb-2.5 md:hidden">
         <form action="{{ route('frontend.products') }}" method="GET" class="relative">
-            <input type="text" name="search" placeholder="Search fresh items"
+            <input type="text" name="search" placeholder="Search fresh items" data-typing-placeholder
                    class="w-full rounded-xl border border-neutral-700 bg-neutral-900 text-white placeholder:text-neutral-400 px-3.5 py-2 pr-10 text-xs focus:border-amber-500 focus:outline-none transition">
             <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-amber-400">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -1251,6 +1251,51 @@ document.addEventListener('DOMContentLoaded', () => {
     }).observe(document.body, { childList: true, subtree: true });
 });
 
+// Header search: type admin product names into the placeholder letter by letter,
+// hold the full name, erase it, then move to the next product.
+(function () {
+    const names = @json($frontendSearchNames ?? []);
+    const inputs = Array.from(document.querySelectorAll('[data-typing-placeholder]'));
+    if (!names.length || !inputs.length) return;
+
+    const prefix = 'Search ';
+    const setPlaceholder = (text) => inputs.forEach((input) => { input.placeholder = text; });
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        setPlaceholder(prefix + names[0]);
+        return;
+    }
+
+    const TYPE_MS = 75;   // per letter while typing
+    const ERASE_MS = 35;  // per letter while erasing
+    const HOLD_MS = 1600; // full name stays visible
+    const GAP_MS = 350;   // pause before the next name
+
+    let nameIndex = 0;
+    let charCount = 0;
+    let erasing = false;
+
+    function tick() {
+        const letters = Array.from(names[nameIndex]);
+        let delay = erasing ? ERASE_MS : TYPE_MS;
+
+        charCount += erasing ? -1 : 1;
+        setPlaceholder(prefix + letters.slice(0, charCount).join(''));
+
+        if (!erasing && charCount >= letters.length) {
+            erasing = true;
+            delay = HOLD_MS;
+        } else if (erasing && charCount <= 0) {
+            erasing = false;
+            nameIndex = (nameIndex + 1) % names.length;
+            delay = GAP_MS;
+        }
+
+        window.setTimeout(tick, delay);
+    }
+
+    tick();
+})();
 </script>
 @yield('scripts')
 </body>

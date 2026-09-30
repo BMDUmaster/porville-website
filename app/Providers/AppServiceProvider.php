@@ -42,16 +42,28 @@ class AppServiceProvider extends ServiceProvider
                     ->get();
                 $tickerProduct = Product::active()->latest('created_at')->latest('id')->first();
                 $tickerOffer = Coupon::offers()->activeEntries()->latest('id')->first();
+                // Names typed one by one into the header search placeholder.
+                $searchNames = Product::active()
+                    ->latest('created_at')
+                    ->latest('id')
+                    ->take(15)
+                    ->pluck('name')
+                    ->map(fn ($name) => trim((string) $name))
+                    ->filter()
+                    ->unique()
+                    ->values();
             } catch (Throwable) {
                 $categories = collect();
                 $tickerProduct = null;
                 $tickerOffer = null;
+                $searchNames = collect();
             }
 
             $view->with([
                 'frontendNavCategories' => $categories,
                 'frontendTickerProduct' => $tickerProduct,
                 'frontendTickerOffer' => $tickerOffer,
+                'frontendSearchNames' => $searchNames,
             ]);
         });
     }
