@@ -124,8 +124,9 @@
             </div>
             <div>
                 <label class="block text-sm font-medium mb-1.5">Sort Order <span class="text-red-500">*</span> <span class="text-gray-400 font-normal">(lower number shows first on the home page; each category needs a different number)</span></label>
-                <input type="number" name="sort_order" min="1" step="1" required value="{{ old('sort_order', $nextSortOrder ?? 1) }}"
+                <input type="number" name="sort_order" id="addSort" data-sort-order-input data-ignore-id="" min="1" step="1" required value="{{ old('sort_order', $nextSortOrder ?? 1) }}"
                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500">
+                <p class="sort-order-error mt-1.5 hidden text-sm font-medium text-red-600"></p>
             </div>
             <div>
                 <label class="block text-sm font-medium mb-1.5">Status</label>
@@ -173,8 +174,9 @@
             </div>
             <div>
                 <label class="block text-sm font-medium mb-1.5">Sort Order <span class="text-red-500">*</span> <span class="text-gray-400 font-normal">(lower number shows first on the home page; each category needs a different number)</span></label>
-                <input type="number" name="sort_order" id="editSort" min="1" step="1" required value=""
+                <input type="number" name="sort_order" id="editSort" data-sort-order-input data-ignore-id="" min="1" step="1" required value=""
                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500">
+                <p class="sort-order-error mt-1.5 hidden text-sm font-medium text-red-600"></p>
             </div>
             <div>
                 <label class="block text-sm font-medium mb-1.5">Status</label>
@@ -209,10 +211,57 @@ function openEditModal(id, name, desc, tag, sortOrder, isActive) {
     document.getElementById('editDesc').value = desc;
     document.getElementById('editTag').value = tag;
     document.getElementById('editSort').value = sortOrder;
+    document.getElementById('editSort').dataset.ignoreId = id;
     document.getElementById('editStatus').value = isActive;
     document.getElementById('editForm').action = categoryUpdateUrlTemplate.replace('__ID__', encodeURIComponent(id));
+    checkSortOrder(document.getElementById('editSort'));
     openModal('editModal');
 }
+
+// Live duplicate check for sort order (server validates again on save).
+const usedSortOrders = @json($usedSortOrders);
+
+function checkSortOrder(input) {
+    const error = input.parentElement.querySelector('.sort-order-error');
+    const submit = input.form.querySelector('button[type="submit"]');
+    const raw = input.value.trim();
+    const value = Number(raw);
+    let message = '';
+
+    if (raw === '') {
+        message = 'Please enter a sort order.';
+    } else if (!Number.isInteger(value) || value < 1) {
+        message = 'Sort order must be a whole number, 1 or more.';
+    } else {
+        const taken = usedSortOrders.find((cat) => cat.sort_order === value && String(cat.id) !== String(input.dataset.ignoreId || ''));
+        if (taken) {
+            message = `Sort order ${value} is already used by "${taken.name}". Choose a different number.`;
+        }
+    }
+
+    error.textContent = message;
+    error.classList.toggle('hidden', !message);
+    input.classList.toggle('border-red-500', !!message);
+    input.classList.toggle('border-slate-200', !message);
+    submit.disabled = !!message;
+    submit.classList.toggle('opacity-50', !!message);
+    submit.classList.toggle('cursor-not-allowed', !!message);
+
+    return !message;
+}
+
+document.querySelectorAll('[data-sort-order-input]').forEach((input) => {
+    input.addEventListener('input', () => checkSortOrder(input));
+    input.form.addEventListener('submit', (event) => {
+        if (!checkSortOrder(input)) {
+            event.preventDefault();
+            input.focus();
+        }
+    });
+    if (input.value.trim() !== '') {
+        checkSortOrder(input);
+    }
+});
 function openEditModalFromBtn(btn) {
     openEditModal(
         btn.dataset.catId,

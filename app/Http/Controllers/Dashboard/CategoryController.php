@@ -25,8 +25,13 @@ class CategoryController extends Controller
 
             $categories = $query->ordered()->latest()->paginate(15);
             $nextSortOrder = (int) Category::parents()->max('sort_order') + 1;
+            $usedSortOrders = Category::parents()
+                ->whereNotNull('sort_order')
+                ->get(['id', 'name', 'sort_order'])
+                ->map(fn ($cat) => ['id' => $cat->id, 'name' => $cat->name, 'sort_order' => $cat->sort_order])
+                ->values();
 
-            return view('dashboard.categories.index', compact('categories', 'nextSortOrder'));
+            return view('dashboard.categories.index', compact('categories', 'nextSortOrder', 'usedSortOrders'));
         } catch (\Throwable $e) {
             report($e);
 
@@ -36,8 +41,9 @@ class CategoryController extends Controller
             ]);
 
             $nextSortOrder = 1;
+            $usedSortOrders = collect();
 
-            return view('dashboard.categories.index', compact('categories', 'nextSortOrder'))
+            return view('dashboard.categories.index', compact('categories', 'nextSortOrder', 'usedSortOrders'))
                 ->with('error', 'Could not load categories. ' . $this->friendlyExceptionMessage($e));
         }
     }
