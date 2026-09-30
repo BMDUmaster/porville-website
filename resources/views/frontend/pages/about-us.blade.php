@@ -5,7 +5,7 @@
 
 <section class="bg-black py-16 md:py-24">
     <div class="mx-auto max-w-4xl px-4 text-center">
-        <p class="text-[11px] font-extrabold uppercase tracking-[0.3em] text-amber-400">About Porville</p>
+        <p class="text-[11px] font-extrabold uppercase tracking-[0.3em] text-amber-400">About hello  Porville</p>
         <h1 class="font-classic mt-4 text-4xl font-bold leading-tight text-white md:text-5xl">
             Fresh Cut. Pure Standards.
         </h1>
