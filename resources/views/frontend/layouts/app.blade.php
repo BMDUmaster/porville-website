@@ -353,9 +353,9 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                data-ends-at="{{ $frontendEndingSlot['ends_at']->toIso8601String() }}"
                data-server-now="{{ now()->toIso8601String() }}"
                title="{{ $endingProduct->name }} — order slot {{ $frontendEndingSlot['badge'] }}"
-               class="group relative hidden max-w-[260px] flex-shrink-0 items-center gap-2.5 overflow-hidden rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-orange-500 py-1.5 pl-1.5 pr-3.5 shadow-[0_0_22px_rgba(245,158,11,0.35)] ring-1 ring-amber-200/70 transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(245,158,11,0.55)] xl:flex">
+               class="group relative hidden max-w-[260px] flex-shrink-0 items-center gap-2.5 overflow-hidden rounded-none bg-gradient-to-r from-amber-300 via-amber-400 to-orange-500 py-1.5 pl-1.5 pr-3.5 shadow-[0_0_22px_rgba(245,158,11,0.35)] ring-1 ring-amber-200/70 transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(245,158,11,0.55)] xl:flex">
                 <span class="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent transition-all duration-700 group-hover:left-full"></span>
-                <span class="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl bg-black ring-2 ring-white/80 shadow-md">
+                <span class="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-none bg-black ring-2 ring-white/80 shadow-md">
                     @if(! empty($endingProduct->images[0]))
                         <img src="{{ asset('storage/' . $endingProduct->images[0]) }}" alt="{{ $endingProduct->name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-110">
                     @else
