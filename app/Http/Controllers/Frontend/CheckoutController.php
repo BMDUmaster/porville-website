@@ -13,6 +13,7 @@ use App\Support\DeliveryAreaManager;
 use App\Support\DeliverySlotManager;
 use App\Support\OrderPricing;
 use App\Support\ProductDayPricing;
+use App\Support\ProductSlotManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -374,6 +375,12 @@ class CheckoutController extends Controller
             if (! $product || $product->is_out_of_stock) {
                 throw ValidationException::withMessages([
                     'cart' => 'One or more products in your cart are currently out of stock.',
+                ]);
+            }
+
+            if (! ProductSlotManager::isOrderable($product)) {
+                throw ValidationException::withMessages([
+                    'cart' => ProductSlotManager::unavailableMessage($product) . ' Please remove it from your cart to continue.',
                 ]);
             }
 

@@ -7,6 +7,7 @@ use App\Models\Coupon;
 use App\Models\Product;
 use App\Models\SeoPage;
 use App\Support\MediaUrl;
+use App\Support\ProductSlotManager;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
@@ -26,6 +27,11 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useTailwind();
         $this->configureApplicationUrl();
         $this->runPendingMigrations();
+
+        // Send "Notify Me" alerts for product slots that just opened (max once a minute).
+        if (! $this->app->runningInConsole()) {
+            ProductSlotManager::queueDueAlertCheck();
+        }
         View::share('brandLogoUrl', MediaUrl::brandLogo());
         $this->shareFrontendNavigationCategories();
         $this->shareFrontendSeo();

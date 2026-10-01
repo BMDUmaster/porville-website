@@ -29,6 +29,7 @@ use App\Http\Controllers\Dashboard\CouponController;
 use App\Http\Controllers\Dashboard\ProfileController;
 use App\Http\Controllers\Dashboard\ServiceChargeController;
 use App\Http\Controllers\Dashboard\DeliverySlotController;
+use App\Http\Controllers\Dashboard\ProductSlotController;
 use App\Http\Controllers\Dashboard\DeliveryAreaController;
 use App\Http\Controllers\Dashboard\SystemCheckController;
 use App\Http\Controllers\Dashboard\HomeBannerController;
@@ -169,6 +170,10 @@ Route::middleware('admin')->group(function () {
     Route::post('/settings/delivery-slots/slot', [DeliverySlotController::class, 'storeSlot'])->name('dashboard.settings.delivery-slots.slot.store');
     Route::delete('/settings/delivery-slots/slot/{slot}', [DeliverySlotController::class, 'destroySlot'])->name('dashboard.settings.delivery-slots.slot.destroy');
     Route::delete('/settings/delivery-slots/date/{date}', [DeliverySlotController::class, 'destroyDate'])->name('dashboard.settings.delivery-slots.date.destroy');
+    Route::get('/product-slots', [ProductSlotController::class, 'index'])->name('dashboard.product-slots');
+    Route::post('/product-slots', [ProductSlotController::class, 'store'])->name('dashboard.product-slots.store');
+    Route::put('/product-slots/{slot}', [ProductSlotController::class, 'update'])->name('dashboard.product-slots.update');
+    Route::delete('/product-slots/{slot}', [ProductSlotController::class, 'destroy'])->name('dashboard.product-slots.destroy');
     Route::get('/settings/delivery-areas', [DeliveryAreaController::class, 'index'])->name('dashboard.settings.delivery-areas');
     Route::put('/settings/delivery-areas', [DeliveryAreaController::class, 'update'])->name('dashboard.settings.delivery-areas.update');
     // FAQs
@@ -251,6 +256,7 @@ Route::middleware('auth:web_frontend')->group(function () {
     Route::post('/account/notifications/read', [FrontProfileController::class, 'markNotificationsRead'])->name('frontend.notifications.read');
     Route::post('/account/notifications/{notification}/read', [FrontProfileController::class, 'markNotificationRead'])->name('frontend.notifications.mark-read');
     Route::delete('/account/notifications/{notification}', [FrontProfileController::class, 'deleteNotification'])->name('frontend.notifications.delete');
+    Route::match(['get', 'post'], '/account/slot-alerts/{product}', [\App\Http\Controllers\Frontend\ProductSlotAlertController::class, 'subscribe'])->name('frontend.slot-alerts.subscribe');
 
     Route::get('/account/orders',       [FrontOrderController::class, 'index'])->name('frontend.orders');
     Route::get('/account/orders/{id}',  [FrontOrderController::class, 'show'])->name('frontend.order.show');

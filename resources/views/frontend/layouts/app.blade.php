@@ -800,6 +800,38 @@ function updateProductCardPrice(cardUid) {
         }
     }
 }
+// Product slot closed: ask to be alerted when the next ordering slot opens.
+function notifyProductSlot(productId, button) {
+    if (button) button.disabled = true;
+
+    fetch('{{ url("account/slot-alerts") }}/' + encodeURIComponent(productId), {
+        method: 'POST',
+        headers: {'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json'},
+    })
+        .then((response) => response.json().then((data) => ({ ok: response.ok, data })))
+        .then(({ ok, data }) => {
+            if (!ok || !data.success) throw new Error(data.message || 'Could not save your alert.');
+            showToast(data.message, 'success');
+
+            if (data.available) {
+                window.location.reload();
+                return;
+            }
+
+            // Swap every Notify Me button for this product with the confirmed state.
+            document.querySelectorAll('[onclick^="notifyProductSlot(' + productId + ',"]').forEach((el) => {
+                const done = document.createElement('span');
+                done.className = el.className.replace('border-amber-500 bg-amber-50 text-amber-800 transition hover:bg-amber-100', 'border-emerald-200 bg-emerald-50 text-emerald-700');
+                done.innerHTML = '<i class="fa-solid fa-bell"></i> We&#39;ll notify you';
+                el.replaceWith(done);
+            });
+        })
+        .catch((error) => {
+            if (button) button.disabled = false;
+            showToast(error.message || 'Could not save your alert.', 'error');
+        });
+}
+
 function addProductCardToCart(productId, cardUid) {
     const control = document.getElementById(cardUid);
     const variantIndex = control && control.value !== '' ? parseInt(control.value, 10) : null;

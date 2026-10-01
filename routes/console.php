@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -25,3 +26,11 @@ Artisan::command('porville:setup', function () {
 
     $this->info('Done. Set APP_URL in .env to your live domain.');
 })->purpose('Prepare Porville for production (migrate, storage link, clear cache)');
+
+Artisan::command('product-slots:notify', function () {
+    $sent = \App\Support\ProductSlotManager::sendDueAlerts();
+    $this->info("Product slot alerts sent: {$sent}");
+})->purpose('Notify customers whose product ordering slot has opened');
+
+// Web requests also trigger this check, so a cron job is optional.
+Schedule::command('product-slots:notify')->everyMinute()->withoutOverlapping();

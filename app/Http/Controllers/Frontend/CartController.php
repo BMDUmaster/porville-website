@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Support\DeliverySlotManager;
 use App\Support\OrderPricing;
 use App\Support\ProductDayPricing;
+use App\Support\ProductSlotManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
@@ -111,6 +112,19 @@ class CartController extends Controller
 
         if ($product->is_out_of_stock) {
             $message = 'This product is currently out of stock.';
+
+            if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                ], 422);
+            }
+
+            return back()->with('error', $message);
+        }
+
+        if (! ProductSlotManager::isOrderable($product)) {
+            $message = ProductSlotManager::unavailableMessage($product);
 
             if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
                 return response()->json([
@@ -380,6 +394,7 @@ class CartController extends Controller
             $product = $products->get($item['product_id']);
             $item['key']         = $key;
             $item['is_out_of_stock'] = !$product || $product->is_out_of_stock;
+            $item['slot_closed'] = $product && ! ProductSlotManager::isOrderable($product);
             $item['subtotal']    = $item['price'] * $item['quantity'];
             $item['image_url']   = $item['image'] ? asset('storage/' . $item['image']) : null;
             $item['product_url'] = route('frontend.product.show', $item['slug']);

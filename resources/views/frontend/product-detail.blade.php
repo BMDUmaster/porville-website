@@ -129,6 +129,9 @@
     $productCategory = $product->category->name ?? 'Fresh Cuts';
     $productTagline = 'Pasture-Raised • Grain-Fed • Air-Chilled';
     $isProductAvailable = ! $product->is_out_of_stock;
+    $detailSlot = \App\Support\ProductSlotManager::status($product);
+    $detailSlotClosed = $detailSlot && ! $detailSlot['open'];
+    $detailSlotAlerted = $detailSlotClosed && in_array($product->id, \App\Support\ProductSlotManager::alertedProductIds(), true);
     $isEnquiryOnly = $product->is_enquiry_only;
 
     $productSpecs = $isEnquiryOnly
@@ -609,6 +612,23 @@
                 </button>
             @endif
 
+            @if($detailSlot && !$isEnquiryOnly)
+                <div class="rounded-2xl border px-4 py-3 text-left {{ $detailSlot['open'] ? 'border-emerald-200 bg-emerald-50' : ($detailSlot['state'] === 'timeout' ? 'border-red-200 bg-red-50' : 'border-amber-200 bg-amber-50') }}">
+                    <div class="flex items-center gap-2 text-[13px] font-black {{ $detailSlot['open'] ? 'text-emerald-700' : ($detailSlot['state'] === 'timeout' ? 'text-red-600' : 'text-amber-800') }}">
+                        <i class="fa-regular {{ $detailSlot['state'] === 'timeout' ? 'fa-hourglass-end' : 'fa-clock' }}"></i>
+                        {{ $detailSlot['open'] ? 'Order Slot: ' . $detailSlot['badge'] : $detailSlot['badge'] }}
+                    </div>
+                    <p class="mt-1 text-[12px] font-semibold text-slate-600">{{ $detailSlot['message'] }}</p>
+                    @if(count($detailSlot['ranges']))
+                        <div class="mt-2 flex flex-wrap gap-1.5">
+                            @foreach($detailSlot['ranges'] as $range)
+                                <span class="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-slate-600 shadow-sm">{{ $range }}</span>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            @endif
+
             <div class="flex flex-wrap gap-2">
                 <span class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-[11px] font-black {{ $isProductAvailable ? 'border border-amber-200 bg-amber-50 text-amber-700' : 'border border-red-200 bg-red-50 text-red-600' }}">
                     <i class="fa-solid {{ $isProductAvailable ? 'fa-circle-check' : 'fa-ban' }} text-[10px]"></i>
@@ -622,7 +642,9 @@
 
             @if(!$isEnquiryOnly)
             <div class="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1.55fr)] gap-3 sm:flex sm:flex-wrap sm:items-stretch">
-                @if($isProductAvailable)
+                @if($isProductAvailable && $detailSlotClosed)
+                    @include('frontend.partials.slot-notify-button', ['productId' => $product->id, 'alerted' => $detailSlotAlerted, 'size' => 'detail'])
+                @elseif($isProductAvailable)
                     <div class="grid min-w-0 grid-cols-3 items-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm sm:flex">
                         <button type="button" onclick="changeQty(-1)" class="flex h-12 min-w-0 items-center justify-center text-slate-500 transition hover:bg-slate-50 hover:text-slate-800 sm:w-11">-</button>
                         <span id="qty-display" class="flex h-12 min-w-0 items-center justify-center border-x border-slate-200 px-2 text-[15px] font-black text-slate-800 sm:min-w-[48px] sm:px-3">1</span>
@@ -630,13 +652,13 @@
                     </div>
                 @endif
 
-                @if($isProductAvailable)
+                @if($isProductAvailable && ! $detailSlotClosed)
                     <button type="button" onclick="addToCartWithQty({{ $product->id }})"
                             class="col-span-2 inline-flex min-w-0 items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 bg-black px-5 py-3 text-[13px] font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_rgba(0,0,0,0.24)] transition hover:-translate-y-0.5 hover:bg-neutral-900 sm:flex-1">
                         <i class="fa-solid fa-cart-shopping text-[12px] text-amber-400"></i>
                         Add To Cart
                     </button>
-                @else
+                @elseif(! $isProductAvailable)
                     <div class="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-5 py-3 text-[13px] font-black uppercase tracking-[0.14em] text-red-600">
                         <i class="fa-solid fa-ban text-[12px]"></i>
                         Out Of Stock

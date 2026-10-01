@@ -132,6 +132,10 @@
                                         <span class="inline-flex items-center rounded border border-red-200 bg-red-50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-red-600">
                                             Out of Stock
                                         </span>
+                                    @elseif(!empty($item['slot_closed']))
+                                        <span class="inline-flex items-center gap-1 rounded border border-red-200 bg-red-50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-red-600">
+                                            <i class="fa-solid fa-hourglass-end"></i> Time Out
+                                        </span>
                                     @endif
                                 </div>
                             </div>
@@ -163,8 +167,15 @@
 
         <div class="lg:col-span-4">
             @php($hasOutOfStock = collect($items)->contains('is_out_of_stock', true))
+            @php($hasSlotClosed = collect($items)->contains('slot_closed', true))
             <div class="sticky top-20 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
                 <h2 class="text-lg font-bold text-gray-800">Order Summary</h2>
+
+                @if($hasSlotClosed && ! $hasOutOfStock)
+                    <div class="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-semibold text-red-600">
+                        <i class="fa-solid fa-hourglass-end mr-1"></i> Ordering time is over for some items (marked Time Out). Please remove them to proceed to checkout.
+                    </div>
+                @endif
 
                 @if($hasOutOfStock)
                     <div class="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-semibold text-red-600">
@@ -186,9 +197,9 @@
                     </div>
                 </div>
                 <div class="px-0 pt-4">
-                    @if($hasOutOfStock)
+                    @if($hasOutOfStock || $hasSlotClosed)
                         <button disabled type="button" class="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-gray-400 py-3.5 text-sm font-bold text-white opacity-70">
-                            <i class="fa-solid fa-ban text-xs"></i> Remove Out of Stock Items
+                            <i class="fa-solid fa-ban text-xs"></i> {{ $hasOutOfStock ? 'Remove Out of Stock Items' : 'Remove Time Out Items' }}
                         </button>
                     @else
                         <a href="{{ route('frontend.checkout', ['delivery_day' => $selectedDay]) }}"
