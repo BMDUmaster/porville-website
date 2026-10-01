@@ -1373,13 +1373,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Slot just closed: show Time Out and stop new add-to-cart clicks.
             if (badge) {
                 badge.className = badge.className.replace(/bg-emerald-600|bg-amber-500 text-black/g, 'bg-red-600 text-white');
-                badge.innerHTML = '<i class="fa-regular fa-hourglass-end"></i> Time Out';
+                badge.innerHTML = '<i class="fa-regular fa-clock"></i> Time Out';
             }
             document.querySelectorAll('[data-slot-cart-button="' + timer.dataset.product + '"]').forEach((button) => {
                 button.disabled = true;
                 button.removeAttribute('onclick');
                 button.className = button.className.replace(/bg-black|hover:bg-neutral-900|border-amber-500/g, '') + ' cursor-not-allowed border-red-200 bg-red-50 text-red-600';
-                button.innerHTML = '<i class="fa-regular fa-hourglass-end"></i> Time Out';
+                button.innerHTML = '<i class="fa-regular fa-clock"></i> Time Out';
             });
         } else if (badge) {
             badge.className = badge.className.replace(/bg-amber-500 text-black/g, 'bg-emerald-600 text-white');

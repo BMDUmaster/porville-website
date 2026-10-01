@@ -617,7 +617,7 @@
                 <div class="rounded-2xl border px-4 py-3 text-left {{ $detailSlot['open'] ? 'border-emerald-200 bg-emerald-50' : ($detailSlot['state'] === 'timeout' ? 'border-red-200 bg-red-50' : 'border-amber-200 bg-amber-50') }}">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <div class="flex items-center gap-2 text-[13px] font-black {{ $detailSlot['open'] ? 'text-emerald-700' : ($detailSlot['state'] === 'timeout' ? 'text-red-600' : 'text-amber-800') }}">
-                            <i class="fa-regular {{ $detailSlot['state'] === 'timeout' ? 'fa-hourglass-end' : 'fa-clock' }}"></i>
+                            <i class="fa-regular fa-clock"></i>
                             {{ $detailSlot['open'] ? 'Order Slot: ' . $detailSlot['badge'] : $detailSlot['badge'] }}
                         </div>
                         @if($detailTimer)

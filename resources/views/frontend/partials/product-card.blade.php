@@ -28,7 +28,7 @@
             @if($cardSlot)
                 <span data-slot-badge title="Order slot: {{ implode(', ', $cardSlot['ranges']) }}"
                       class="inline-flex max-w-full items-center gap-1 truncate rounded-full px-2 py-1 text-[9px] font-bold shadow {{ $cardSlot['open'] ? 'bg-emerald-600 text-white' : ($cardSlot['state'] === 'timeout' ? 'bg-red-600 text-white' : 'bg-amber-500 text-black') }}">
-                    <i class="fa-regular {{ $cardSlot['state'] === 'timeout' ? 'fa-hourglass-end' : 'fa-clock' }} text-[9px]"></i>
+                    <i class="fa-regular fa-clock text-[9px]"></i>
                     @if($cardTimer)
                         {{-- Live countdown: time left while open, time to opening otherwise --}}
                         <span class="truncate">

@@ -134,7 +134,7 @@
                                         </span>
                                     @elseif(!empty($item['slot_closed']))
                                         <span class="inline-flex items-center gap-1 rounded border border-red-200 bg-red-50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-red-600">
-                                            <i class="fa-solid fa-hourglass-end"></i> Time Out
+                                            <i class="fa-regular fa-clock"></i> Time Out
                                         </span>
                                     @endif
                                 </div>
@@ -173,7 +173,7 @@
 
                 @if($hasSlotClosed && ! $hasOutOfStock)
                     <div class="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-semibold text-red-600">
-                        <i class="fa-solid fa-hourglass-end mr-1"></i> Ordering time is over for some items (marked Time Out). Please remove them to proceed to checkout.
+                        <i class="fa-regular fa-clock mr-1"></i> Ordering time is over for some items (marked Time Out). Please remove them to proceed to checkout.
                     </div>
                 @endif
 
