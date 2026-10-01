@@ -582,7 +582,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 </div>
 
 <!-- Footer -->
-<footer class="relative overflow-hidden bg-black pt-10 md:pt-12 lg:pt-14 pb-5 md:pb-6 lg:pb-7 text-white" style="font-family:'Poppins',sans-serif;">
+<footer class="relative overflow-hidden bg-black pt-3 md:pt-12 lg:pt-14 pb-5 md:pb-6 lg:pb-7 text-white" style="font-family:'Poppins',sans-serif;">
     <div class="relative z-10 mx-auto max-w-[1220px] px-5 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 pb-6 md:grid-cols-2 md:gap-x-6 md:gap-y-7 lg:grid-cols-[1fr_1fr_1fr_1fr_180px] lg:gap-x-8 lg:gap-y-6 lg:pb-7">
             <div class="border-b border-white/10 md:border-0">
