@@ -584,52 +584,77 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 <!-- Footer -->
 <footer class="relative overflow-hidden bg-black pt-10 md:pt-12 lg:pt-14 pb-5 md:pb-6 lg:pb-7 text-white" style="font-family:'Poppins',sans-serif;">
     <div class="relative z-10 mx-auto max-w-[1220px] px-5 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-2 gap-x-6 gap-y-7 pb-6 lg:grid-cols-[1fr_1fr_1fr_1fr_180px] lg:gap-x-8 lg:gap-y-6 lg:pb-7">
-            <div>
-                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-amber-400">Info</h4>
-                <ul class="space-y-3.5">
-                    <li><a href="{{ route('frontend.about') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">About Us</a></li>
-                    <li><a href="{{ route('frontend.contact') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Contact Us</a></li>
-                    <li><a href="{{ route('frontend.faq') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">FAQ</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-amber-400">Useful Links</h4>
-                <ul class="space-y-3.5">
-                    <li><a href="{{ route('frontend.contact') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Help Center</a></li>
-                    <li><a href="{{ route('frontend.shipping') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Shipping Info</a></li>
-                    <li><a href="{{ route('frontend.returns') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Return Policy</a></li>
-                    <li><a href="{{ route('frontend.privacy') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Privacy Policy</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-amber-400">Categories</h4>
-                <ul class="space-y-3.5">
-                    @foreach(($frontendNavCategories ?? collect())->take(6) as $footerCat)
-                        <li><a href="{{ \App\Support\ShopUrl::to(['category' => $footerCat->slug]) }}" class="text-[14px] text-[#c9b896] transition hover:text-white">{{ $footerCat->name }}</a></li>
-                    @endforeach
-                </ul>
-            </div>
-
-            <div>
-                <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-amber-400">Reach Us</h4>
-                <p class="mb-3 text-[14px] text-[#c9b896]">D-1b/1028, Sangam Vihar-110080</p>
-                <a href="tel:9217577006" class="mb-2 inline-flex min-h-9 items-center gap-2 rounded-lg pr-3 text-[15px] font-semibold text-white transition hover:text-amber-400">
-                    <i class="fa-solid fa-phone text-amber-400 text-xs"></i> +91 92175 77006
-                </a>
-                <a href="mailto:porville1986@gmail.com" class="mb-4 flex min-w-0 items-center gap-2 text-[14px] text-[#c9b896] transition hover:text-white">
-                    <i class="fa-regular fa-envelope shrink-0 text-xs"></i> <span class="min-w-0 break-all">porville1986@gmail.com</span>
-                </a>
-                <div class="flex items-center gap-3.5 text-[15px] text-[#c9b896]">
-                    <a href="https://wa.me/919217577006" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-                    <a href="https://www.instagram.com/porville_1986?stkn=MXFsNHc5dTZxdGRnaA%3D%3D" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://www.facebook.com/share/19EEMe2Rof/" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+        <div class="grid grid-cols-1 pb-6 md:grid-cols-2 md:gap-x-6 md:gap-y-7 lg:grid-cols-[1fr_1fr_1fr_1fr_180px] lg:gap-x-8 lg:gap-y-6 lg:pb-7">
+            <div class="border-b border-white/10 md:border-0">
+                <button type="button" onclick="toggleFooterSection(this)" aria-expanded="false"
+                        class="flex w-full items-center justify-between py-4 text-left md:pointer-events-none md:mb-4 md:py-0">
+                    <h4 class="text-[14px] font-bold text-white md:text-[12px] md:uppercase md:tracking-[0.22em] md:text-amber-400">Info</h4>
+                    <i class="fa-solid fa-plus text-sm text-white transition md:hidden"></i>
+                </button>
+                <div class="hidden pb-5 md:block md:pb-0">
+                    <ul class="space-y-3.5">
+                        <li><a href="{{ route('frontend.about') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">About Us</a></li>
+                        <li><a href="{{ route('frontend.contact') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Contact Us</a></li>
+                        <li><a href="{{ route('frontend.faq') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">FAQ</a></li>
+                    </ul>
                 </div>
             </div>
 
-            <div class="col-span-2 lg:col-span-1">
+            <div class="border-b border-white/10 md:border-0">
+                <button type="button" onclick="toggleFooterSection(this)" aria-expanded="false"
+                        class="flex w-full items-center justify-between py-4 text-left md:pointer-events-none md:mb-4 md:py-0">
+                    <h4 class="text-[14px] font-bold text-white md:text-[12px] md:uppercase md:tracking-[0.22em] md:text-amber-400">Useful Links</h4>
+                    <i class="fa-solid fa-plus text-sm text-white transition md:hidden"></i>
+                </button>
+                <div class="hidden pb-5 md:block md:pb-0">
+                    <ul class="space-y-3.5">
+                        <li><a href="{{ route('frontend.contact') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Help Center</a></li>
+                        <li><a href="{{ route('frontend.shipping') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Shipping Info</a></li>
+                        <li><a href="{{ route('frontend.returns') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Return Policy</a></li>
+                        <li><a href="{{ route('frontend.privacy') }}" class="text-[14px] text-[#c9b896] transition hover:text-white">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-b border-white/10 md:border-0">
+                <button type="button" onclick="toggleFooterSection(this)" aria-expanded="false"
+                        class="flex w-full items-center justify-between py-4 text-left md:pointer-events-none md:mb-4 md:py-0">
+                    <h4 class="text-[14px] font-bold text-white md:text-[12px] md:uppercase md:tracking-[0.22em] md:text-amber-400">Categories</h4>
+                    <i class="fa-solid fa-plus text-sm text-white transition md:hidden"></i>
+                </button>
+                <div class="hidden pb-5 md:block md:pb-0">
+                    <ul class="space-y-3.5">
+                        @foreach(($frontendNavCategories ?? collect())->take(6) as $footerCat)
+                            <li><a href="{{ \App\Support\ShopUrl::to(['category' => $footerCat->slug]) }}" class="text-[14px] text-[#c9b896] transition hover:text-white">{{ $footerCat->name }}</a></li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-b border-white/10 md:border-0">
+                <button type="button" onclick="toggleFooterSection(this)" aria-expanded="false"
+                        class="flex w-full items-center justify-between py-4 text-left md:pointer-events-none md:mb-4 md:py-0">
+                    <h4 class="text-[14px] font-bold text-white md:text-[12px] md:uppercase md:tracking-[0.22em] md:text-amber-400">Reach Us</h4>
+                    <i class="fa-solid fa-plus text-sm text-white transition md:hidden"></i>
+                </button>
+                <div class="hidden pb-5 md:block md:pb-0">
+                    <p class="mb-3 text-[14px] text-[#c9b896]">D-1b/1028, Sangam Vihar-110080</p>
+                    <a href="tel:9217577006" class="mb-2 inline-flex min-h-9 items-center gap-2 rounded-lg pr-3 text-[15px] font-semibold text-white transition hover:text-amber-400">
+                        <i class="fa-solid fa-phone text-amber-400 text-xs"></i> +91 92175 77006
+                    </a>
+                    <a href="mailto:porville1986@gmail.com" class="mb-4 flex min-w-0 items-center gap-2 text-[14px] text-[#c9b896] transition hover:text-white">
+                        <i class="fa-regular fa-envelope shrink-0 text-xs"></i> <span class="min-w-0 break-all">porville1986@gmail.com</span>
+                    </a>
+                    <div class="flex items-center gap-3.5 text-[15px] text-[#c9b896]">
+                        <a href="https://wa.me/919217577006" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                        <a href="https://www.instagram.com/porville_1986?stkn=MXFsNHc5dTZxdGRnaA%3D%3D" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="https://www.facebook.com/share/19EEMe2Rof/" target="_blank" rel="noopener noreferrer" class="transition hover:text-white" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+    
+                </div>
+            </div>
+            </div>
+
+            <div class="mt-6 md:col-span-2 md:mt-0 lg:col-span-1">
                 <div class="flex h-full min-h-[140px] flex-col items-center justify-center rounded-[14px] border border-amber-900/40 bg-[#141210] px-5 py-6 text-center">
                     <i class="fa-solid fa-drumstick-bite mb-3 text-[22px] text-amber-400"></i>
                     <h5 class="text-[13px] font-bold uppercase leading-none text-white">Fresh &amp; Hygienic</h5>
@@ -859,6 +884,19 @@ function updateProductCardPrice(cardUid) {
         }
     }
 }
+// Mobile footer accordion: "+" opens a section, "−" closes it (always open from md up).
+function toggleFooterSection(button) {
+    if (window.matchMedia('(min-width: 768px)').matches) return;
+
+    const panel = button.nextElementSibling;
+    const open = panel.classList.toggle('hidden') === false;
+    const icon = button.querySelector('i');
+
+    button.setAttribute('aria-expanded', open ? 'true' : 'false');
+    icon.classList.toggle('fa-plus', !open);
+    icon.classList.toggle('fa-minus', open);
+}
+
 // Product slot closed: ask to be alerted when the next ordering slot opens.
 function notifyProductSlot(productId, button) {
     if (button) button.disabled = true;
