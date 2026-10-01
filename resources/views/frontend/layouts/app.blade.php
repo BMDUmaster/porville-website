@@ -53,6 +53,10 @@
 }
 /* Prevent horizontal overflow */
 html, body { overflow-x: clip; max-width: 100vw; }
+@keyframes slotMarquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.slot-marquee { animation: slotMarquee 14s linear infinite; }
+.group:hover .slot-marquee { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .slot-marquee { animation: none; } }
 html, body { scrollbar-width: none; -ms-overflow-style: none; }
 html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display: none; }
 @media (min-width: 1024px) {
@@ -347,33 +351,34 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
             @php
                 $endingProduct = $frontendEndingSlot['product'];
             @endphp
-            {{-- Product whose ordering slot closes first, with a live countdown --}}
+            {{-- Product whose ordering slot closes first: photo + scrolling text that runs under the photo --}}
             <a href="{{ route('frontend.product.show', $endingProduct->slug) }}"
                data-slot-countdown
                data-ends-at="{{ $frontendEndingSlot['ends_at']->toIso8601String() }}"
                data-server-now="{{ now()->toIso8601String() }}"
                title="{{ $endingProduct->name }} — order slot {{ $frontendEndingSlot['badge'] }}"
-               class="group relative hidden max-w-[260px] flex-shrink-0 items-center gap-2.5 overflow-hidden rounded-none bg-gradient-to-r from-amber-300 via-amber-400 to-orange-500 py-1.5 pl-1.5 pr-3.5 shadow-[0_0_22px_rgba(245,158,11,0.35)] ring-1 ring-amber-200/70 transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(245,158,11,0.55)] xl:flex">
-                <span class="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent transition-all duration-700 group-hover:left-full"></span>
-                <span class="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-none bg-black ring-2 ring-white/80 shadow-md">
+               class="group relative hidden h-[52px] w-[270px] flex-shrink-0 overflow-hidden bg-gradient-to-r from-amber-300 via-amber-400 to-orange-500 xl:block">
+                <span class="absolute inset-y-0 left-0 z-10 w-[52px] overflow-hidden bg-black">
                     @if(! empty($endingProduct->images[0]))
                         <img src="{{ asset('storage/' . $endingProduct->images[0]) }}" alt="{{ $endingProduct->name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-110">
                     @else
                         <span class="flex h-full w-full items-center justify-center text-amber-400"><i class="fa-solid fa-drumstick-bite"></i></span>
                     @endif
                 </span>
-                <span class="min-w-0 leading-tight">
-                    <span class="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.18em] text-black/70">
-                        <span class="relative flex h-1.5 w-1.5">
-                            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-600 opacity-75"></span>
-                            <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-red-600"></span>
-                        </span>
-                        Slot Ending Soon
-                    </span>
-                    <span class="mt-0.5 block truncate text-[13px] font-extrabold text-black">{{ $endingProduct->name }}</span>
-                    <span class="mt-0.5 flex items-center gap-1.5 text-[10px] font-bold text-black/75">
-                        <span data-countdown-label>Ends in</span>
-                        <span data-countdown class="rounded-md bg-black px-1.5 py-0.5 font-mono text-[11px] font-bold tabular-nums tracking-wider text-amber-300">--:--:--</span>
+                <span class="absolute inset-0 flex items-center overflow-hidden">
+                    <span class="slot-marquee flex w-max items-center whitespace-nowrap">
+                        @for($copy = 0; $copy < 2; $copy++)
+                            <span class="flex items-center gap-2 pl-6 pr-4 text-[15px] font-extrabold text-black" @if($copy) aria-hidden="true" @endif>
+                                <span class="relative flex h-2 w-2">
+                                    <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-600 opacity-75"></span>
+                                    <span class="relative inline-flex h-2 w-2 rounded-full bg-red-600"></span>
+                                </span>
+                                <span class="text-[11px] font-black uppercase tracking-[0.16em] text-black/70">Slot Ending Soon</span>
+                                <span>{{ $endingProduct->name }}</span>
+                                <span data-countdown-label class="text-[13px] font-bold text-black/75">Ends in</span>
+                                <span data-countdown class="bg-black px-2 py-0.5 font-mono text-[14px] font-bold tabular-nums tracking-wider text-amber-300">--:--:--</span>
+                            </span>
+                        @endfor
                     </span>
                 </span>
             </a>
@@ -1415,22 +1420,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const endsAt = Date.parse(widget.dataset.endsAt);
     const clockOffset = Date.parse(widget.dataset.serverNow) - Date.now();
-    const output = widget.querySelector('[data-countdown]');
-    const label = widget.querySelector('[data-countdown-label]');
+    const outputs = widget.querySelectorAll('[data-countdown]');
+    const labels = widget.querySelectorAll('[data-countdown-label]');
     const pad = (n) => String(n).padStart(2, '0');
 
     function render() {
         const left = Math.max(0, Math.floor((endsAt - (Date.now() + clockOffset)) / 1000));
 
         if (left === 0) {
-            label.textContent = 'Slot';
-            output.textContent = 'Time Out';
-            output.classList.replace('text-amber-300', 'text-red-400');
+            labels.forEach((label) => { label.textContent = 'Slot'; });
+            outputs.forEach((output) => {
+                output.textContent = 'Time Out';
+                output.classList.replace('text-amber-300', 'text-red-400');
+            });
             widget.classList.add('opacity-70');
             return false;
         }
 
-        output.textContent = pad(Math.floor(left / 3600)) + ':' + pad(Math.floor((left % 3600) / 60)) + ':' + pad(left % 60);
+        const text = pad(Math.floor(left / 3600)) + ':' + pad(Math.floor((left % 3600) / 60)) + ':' + pad(left % 60);
+        outputs.forEach((output) => { output.textContent = text; });
         return true;
     }
 
@@ -1452,7 +1460,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const setPlaceholder = (text) => inputs.forEach((input) => { input.placeholder = text; });
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        setPlaceholder(prefix + names[0]);
+        setPlaceholder(prefix + '"' + names[0] + '"');
         return;
     }
 
@@ -1470,7 +1478,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let delay = erasing ? ERASE_MS : TYPE_MS;
 
         charCount += erasing ? -1 : 1;
-        setPlaceholder(prefix + letters.slice(0, charCount).join(''));
+        setPlaceholder(prefix + '"' + letters.slice(0, charCount).join('') + '"');
 
         if (!erasing && charCount >= letters.length) {
             erasing = true;
