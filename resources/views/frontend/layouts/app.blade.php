@@ -184,18 +184,18 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                         </button>
                         <ul id="mobile-category-{{ $category->id }}" class="ml-3 hidden border-l border-amber-100 pl-2">
                             <li>
-                                <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="block rounded p-2 text-xs font-semibold text-amber-500 hover:bg-gray-100">
+                                <a href="{{ \App\Support\ShopUrl::to(['category' => $category->slug]) }}" class="block rounded p-2 text-xs font-semibold text-amber-500 hover:bg-gray-100">
                                     View all {{ $category->name }}
                                 </a>
                             </li>
                             @foreach($category->children as $subcategory)
                                 <li>
-                                    <a href="{{ route('frontend.products', ['category' => $category->slug, 'subcategory' => $subcategory->slug]) }}" class="block p-2 text-xs text-gray-500 hover:bg-gray-100 hover:text-amber-500 rounded">{{ $subcategory->name }}</a>
+                                    <a href="{{ \App\Support\ShopUrl::to(['category' => $category->slug, 'subcategory' => $subcategory->slug]) }}" class="block p-2 text-xs text-gray-500 hover:bg-gray-100 hover:text-amber-500 rounded">{{ $subcategory->name }}</a>
                                 </li>
                             @endforeach
                         </ul>
                     @else
-                        <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="block p-2 font-semibold hover:bg-gray-100 rounded">{{ $category->name }}</a>
+                        <a href="{{ \App\Support\ShopUrl::to(['category' => $category->slug]) }}" class="block p-2 font-semibold hover:bg-gray-100 rounded">{{ $category->name }}</a>
                     @endif
                 </li>
             @empty
@@ -322,7 +322,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                 <div class="flex items-center gap-10 pr-10">
                     <span><i class="fa-solid fa-leaf mr-2 text-amber-400"></i>Fresh Cut. Pure Standards. Delivered to Your Door.</span>
                     @if($frontendTickerOffer ?? null)
-                        <a href="{{ route('frontend.products', ['offer' => 'flash_deal']) }}" class="text-amber-300 hover:text-amber-200">
+                        <a href="{{ \App\Support\ShopUrl::to(['offer' => 'flash_deal']) }}" class="text-amber-300 hover:text-amber-200">
                             <i class="fa-solid fa-bolt mr-2"></i>{{ $frontendTickerOffer->title ?: $frontendTickerOffer->description ?: 'Special offer available now' }}
                         </a>
                     @else
@@ -518,19 +518,19 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
             @foreach($frontendNavCategories ?? collect() as $category)
                 @if($category->children->isNotEmpty())
                     <div class="header-nav-group relative mr-2 flex-shrink-0">
-                        <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="inline-flex items-center gap-2 rounded-md bg-neutral-900 px-3 py-1.5 font-medium text-amber-400 transition hover:bg-neutral-800">
+                        <a href="{{ \App\Support\ShopUrl::to(['category' => $category->slug]) }}" class="inline-flex items-center gap-2 rounded-md bg-neutral-900 px-3 py-1.5 font-medium text-amber-400 transition hover:bg-neutral-800">
                             {{ $category->name }}
                             <i class="fa-solid fa-angle-down text-xs"></i>
                         </a>
                         <div class="header-nav-dropdown absolute left-0 top-full z-[10010] mt-3 min-w-[230px] space-y-1 rounded-2xl border border-amber-900/30 bg-white p-2 shadow-[0_20px_40px_rgba(15,23,42,0.14)]">
-                            <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="block rounded-xl px-4 py-3 text-[15px] font-semibold text-amber-700 transition hover:bg-amber-50">All {{ $category->name }}</a>
+                            <a href="{{ \App\Support\ShopUrl::to(['category' => $category->slug]) }}" class="block rounded-xl px-4 py-3 text-[15px] font-semibold text-amber-700 transition hover:bg-amber-50">All {{ $category->name }}</a>
                             @foreach($category->children as $subcategory)
-                                <a href="{{ route('frontend.products', ['category' => $category->slug, 'subcategory' => $subcategory->slug]) }}" class="block rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 transition hover:bg-amber-50 hover:text-amber-700">{{ $subcategory->name }}</a>
+                                <a href="{{ \App\Support\ShopUrl::to(['category' => $category->slug, 'subcategory' => $subcategory->slug]) }}" class="block rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 transition hover:bg-amber-50 hover:text-amber-700">{{ $subcategory->name }}</a>
                             @endforeach
                         </div>
                     </div>
                 @else
-                    <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="px-3 py-1.5 text-stone-200 whitespace-nowrap hover:bg-neutral-900 hover:text-amber-400 rounded-md flex-shrink-0">{{ $category->name }}</a>
+                    <a href="{{ \App\Support\ShopUrl::to(['category' => $category->slug]) }}" class="px-3 py-1.5 text-stone-200 whitespace-nowrap hover:bg-neutral-900 hover:text-amber-400 rounded-md flex-shrink-0">{{ $category->name }}</a>
                 @endif
             @endforeach
             <span class="ml-auto"></span>
@@ -538,7 +538,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                 <i class="fa-solid fa-rotate-left text-[13px]"></i>
                 View Order
             </a>
-            <a href="{{ route('frontend.products', ['sort' => 'latest']) }}" class="px-3 py-1.5 text-stone-200 font-semibold whitespace-nowrap rounded-md transition hover:bg-neutral-900">Latest</a>
+            <a href="{{ \App\Support\ShopUrl::to(['sort' => 'latest']) }}" class="px-3 py-1.5 text-stone-200 font-semibold whitespace-nowrap rounded-md transition hover:bg-neutral-900">Latest</a>
         </div>
     </div>
 </header>
@@ -608,7 +608,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                 <h4 class="mb-4 text-[12px] font-bold uppercase tracking-[0.22em] text-amber-400">Categories</h4>
                 <ul class="space-y-3.5">
                     @foreach(($frontendNavCategories ?? collect())->take(6) as $footerCat)
-                        <li><a href="{{ route('frontend.products', ['category' => $footerCat->name]) }}" class="text-[14px] text-[#c9b896] transition hover:text-white">{{ $footerCat->name }}</a></li>
+                        <li><a href="{{ \App\Support\ShopUrl::to(['category' => $footerCat->slug]) }}" class="text-[14px] text-[#c9b896] transition hover:text-white">{{ $footerCat->name }}</a></li>
                     @endforeach
                 </ul>
             </div>

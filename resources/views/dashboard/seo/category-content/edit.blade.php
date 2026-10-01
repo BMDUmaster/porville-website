@@ -5,8 +5,8 @@
 @section('content')
 @php
     $pageUrl = $category->parent_id
-        ? route('frontend.products', ['category' => $category->parent?->slug, 'subcategory' => $category->slug])
-        : route('frontend.products', ['category' => $category->slug]);
+        ? \App\Support\ShopUrl::to(['category' => $category->parent?->slug, 'subcategory' => $category->slug])
+        : \App\Support\ShopUrl::to(['category' => $category->slug]);
     $tags = [
         ['H2', '<h2>', '</h2>'],
         ['H3', '<h3>', '</h3>'],

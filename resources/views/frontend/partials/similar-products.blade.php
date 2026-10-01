@@ -4,7 +4,7 @@
             <h2 class="text-[24px] font-black text-slate-900">
                 Similar <span class="text-[#b8862c]">Products</span>
             </h2>
-            <a href="{{ route('frontend.products', ['category' => $product->category->slug ?? null]) }}" class="shrink-0 whitespace-nowrap text-[12px] font-black uppercase tracking-[0.18em] text-[#b8862c] transition hover:text-[#8f6a1c]">
+            <a href="{{ \App\Support\ShopUrl::to(['category' => $product->category->slug ?? null]) }}" class="shrink-0 whitespace-nowrap text-[12px] font-black uppercase tracking-[0.18em] text-[#b8862c] transition hover:text-[#8f6a1c]">
                 View All
             </a>
         </div>

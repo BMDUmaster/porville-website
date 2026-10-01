@@ -159,7 +159,7 @@
             'title_2' => 'Chicken, Cut Fresh',
             'description' => 'Custom-cut to order, vacuum-sealed and delivered chilled within 2 hours. Never pre-packaged.',
             'button' => 'Shop Now',
-            'link' => route('frontend.products', ['category' => 'Chicken']),
+            'link' => \App\Support\ShopUrl::to(['category' => 'Chicken']),
         ],
         [
             'image' => 'https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=1800&q=80',
@@ -169,7 +169,7 @@
             'title_2' => 'Mutton Cuts',
             'description' => 'Choose tender curry cuts, premium chops and slow-cook favourites packed for flavor and freshness.',
             'button' => 'Shop Now',
-            'link' => route('frontend.products', ['category' => 'Mutton']),
+            'link' => \App\Support\ShopUrl::to(['category' => 'Mutton']),
         ],
         [
             'image' => 'https://images.unsplash.com/photo-1518492104633-130d0cc84637?auto=format&fit=crop&w=1800&q=80',
@@ -179,7 +179,7 @@
             'title_2' => 'Farm Fresh Eggs',
             'description' => 'Pasture-raised, farm-fresh eggs sourced daily. Frozen and non-frozen options available.',
             'button' => 'Shop Now',
-            'link' => route('frontend.products', ['category' => 'Eggs']),
+            'link' => \App\Support\ShopUrl::to(['category' => 'Eggs']),
         ],
     ];
 
@@ -328,7 +328,7 @@
                 @endphp
 
                 <a
-                    href="{{ route('frontend.products', $linkParams) }}"
+                    href="{{ \App\Support\ShopUrl::to($linkParams) }}"
                     class="group min-w-[228px] max-w-[228px] overflow-hidden rounded-[18px] border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,43,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-amber-200 hover:shadow-[0_18px_36px_rgba(217,164,65,0.18)]"
                 >
                     <div class="relative h-[225px] overflow-hidden bg-slate-100">
@@ -348,7 +348,7 @@
 
                     <div class="border-t border-slate-100 px-4 py-3 text-center">
                         @if($item['tag'])
-                            <p class="text-[10px] font-extrabold uppercase tracking-[0.18em] text-amber-600">
+                            <p class="hidden text-[10px] font-extrabold uppercase tracking-[0.18em] text-amber-600 md:block">
                                 {{ $item['tag'] }}
                             </p>
                         @endif
@@ -389,7 +389,7 @@
                         {{ $category->description ?: 'Fresh, quality-checked ' . strtolower($category->name) . ', cut and packed daily.' }}
                     </p>
                 </div>
-                <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
+                <a href="{{ \App\Support\ShopUrl::to(['category' => $category->slug]) }}" class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
                     See All
                     <i class="fa-solid fa-arrow-right text-[10px]"></i>
                 </a>
@@ -536,7 +536,7 @@
                 <h2 class="font-classic text-2xl font-bold text-slate-900 md:mt-1 md:text-3xl">Farm Fresh Live Stock</h2>
                 <p class="mt-1 hidden max-w-lg text-sm text-slate-500 md:block">Healthy live farm birds and livestock raised under premium guidelines.</p>
             </div>
-            <a href="{{ route('frontend.products', ['category' => $liveStockCategory->slug]) }}" class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
+            <a href="{{ \App\Support\ShopUrl::to(['category' => $liveStockCategory->slug]) }}" class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
                 See All
                 <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </a>

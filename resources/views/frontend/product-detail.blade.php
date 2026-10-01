@@ -337,7 +337,7 @@
             <a href="{{ route('frontend.products') }}" class="transition hover:text-amber-700">Products</a>
             <i class="fa-solid fa-angle-right text-[9px]"></i>
             @if($product->category)
-                <a href="{{ route('frontend.products', ['category' => $product->category->slug]) }}" class="transition hover:text-amber-700">{{ $product->category->name }}</a>
+                <a href="{{ \App\Support\ShopUrl::to(['category' => $product->category->slug]) }}" class="transition hover:text-amber-700">{{ $product->category->name }}</a>
                 <i class="fa-solid fa-angle-right text-[9px]"></i>
             @endif
             <span class="text-slate-600">{{ $product->name }}</span>

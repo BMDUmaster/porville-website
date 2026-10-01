@@ -234,6 +234,8 @@ Route::get('/wishlist/count',  [WishlistController::class, 'count'])->name('fron
 // ── Shop — specific routes BEFORE wildcard
 Route::get('/shop',            [FrontProductController::class, 'index'])->name('frontend.products');
 Route::get('/shop/categories', [PageController::class, 'categories'])->name('frontend.categories');
+// SEO-friendly category listing: /category/chicken and /category/chicken/curry-cut
+Route::get('/category/{category}/{subcategory?}', [FrontProductController::class, 'index'])->name('frontend.category');
 Route::get('/shop/{slug}',     [FrontProductController::class, 'show'])->name('frontend.product.show');
 
 // ── Frontend Auth (guest only)

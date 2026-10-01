@@ -386,7 +386,7 @@
                             <p class="text-[9px] font-black uppercase tracking-[0.18em] text-amber-600">Just In</p>
                             <h3 class="text-sm font-black text-slate-900">New Arrivals</h3>
                         </div>
-                        <a href="{{ route('frontend.products', ['sort' => 'latest']) }}" class="text-[9px] font-black uppercase tracking-wider text-amber-600 hover:underline">View All</a>
+                        <a href="{{ \App\Support\ShopUrl::to(['sort' => 'latest']) }}" class="text-[9px] font-black uppercase tracking-wider text-amber-600 hover:underline">View All</a>
                     </div>
 
                     <div class="space-y-2.5">

@@ -8,6 +8,7 @@ use App\Models\Coupon;
 use App\Models\HomeBanner;
 use App\Models\Product;
 use App\Models\Review;
+use App\Support\ShopUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -16,6 +17,35 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
+        // Category filters live in the path; send old ?category= links (and
+        // filter-form submits) to the clean URL with a permanent redirect.
+        if ($request->hasAny(['category', 'subcategory'])) {
+            $params = $request->query();
+            $switchedCategory = $request->has('category') && $request->query('category') !== $request->route('category');
+
+            if (! $request->has('category')) {
+                $params['category'] = $request->route('category');
+            }
+
+            // A different category drops the sub category from the current path.
+            if (! $request->has('subcategory') && ! $switchedCategory) {
+                $params['subcategory'] = $request->route('subcategory');
+            }
+
+            if (blank($params['category'] ?? null)) {
+                unset($params['category'], $params['subcategory']);
+            }
+
+            return redirect()->to(ShopUrl::to($params), 301);
+        }
+
+        if ($request->route('category')) {
+            $request->merge(array_filter([
+                'category' => $request->route('category'),
+                'subcategory' => $request->route('subcategory'),
+            ]));
+        }
+
         $newArrivalProductIds = Product::active()
             ->latest('created_at')
             ->latest('id')
@@ -38,15 +68,17 @@ class ProductController extends Controller
                       ->orWhere('name', $request->category);
                 })
                 ->first();
-            if ($activeCategory) {
-                $query->where('products.category_id', $activeCategory->id);
-            }
+            // Unknown /category/... paths are real 404s, not an "all products" page.
+            abort_unless($activeCategory, 404);
+            $query->where('products.category_id', $activeCategory->id);
         }
 
         if ($request->filled('subcategory')) {
             $sub = Category::subcategories()
                 ->where('slug', $request->subcategory)
+                ->when($activeCategory, fn ($q) => $q->where('parent_id', $activeCategory->id))
                 ->first();
+            abort_unless($sub, 404);
             if ($sub) {
                 $query->where('products.subcategory_id', $sub->id);
             }

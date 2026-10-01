@@ -107,8 +107,8 @@
     $isFlashDealActive = request()->boolean('flash_deal') || request()->filled('flash_deal') || request('offer') === 'flash_deal';
     $hasActiveProductQuery = ! empty(request()->query());
     $flashDealToggleUrl = $isFlashDealActive
-        ? route('frontend.products', request()->except(['flash_deal', 'offer', 'page']))
-        : route('frontend.products', array_merge(request()->except('page'), ['flash_deal' => '1']));
+        ? \App\Support\ShopUrl::to(request()->except(['flash_deal', 'offer', 'page']))
+        : \App\Support\ShopUrl::to(array_merge(request()->except('page'), ['flash_deal' => '1']));
 @endphp
 
 <div id="mobileFilterModal" class="fixed inset-0 z-[10000] hidden bg-black/50 p-4 backdrop-blur-sm lg:hidden">
@@ -313,7 +313,7 @@
             <div class="flex items-center gap-2">
                 <p class="text-sm text-gray-500 font-semibold">{{ $products->total() }} products found</p>
                 @if($isFlashDealActive)
-                    <a href="{{ route('frontend.products', request()->except(['flash_deal', 'offer', 'page'])) }}" 
+                    <a href="{{ \App\Support\ShopUrl::to(request()->except(['flash_deal', 'offer', 'page'])) }}" 
                        class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900 border border-amber-300 hover:bg-amber-200 transition shadow-sm">
                         <i class="fa-solid fa-bolt text-amber-600"></i>
                         <span>20% Off Offers (FRESH30)</span>
@@ -335,7 +335,7 @@
                 @if($isFlashDealActive)
                     <i class="fa-solid fa-bolt-slash text-5xl mb-4 text-amber-400 block"></i>
                     <p class="font-semibold text-slate-700">No products with 20% Flash Deal offers found at the moment.</p>
-                    <a href="{{ route('frontend.products', request()->except(['flash_deal', 'offer', 'page'])) }}" class="text-amber-600 font-bold text-sm mt-3 inline-block hover:underline">Show All Products</a>
+                    <a href="{{ \App\Support\ShopUrl::to(request()->except(['flash_deal', 'offer', 'page'])) }}" class="text-amber-600 font-bold text-sm mt-3 inline-block hover:underline">Show All Products</a>
                 @else
                     <i class="fa-solid fa-box-open text-5xl mb-4 block"></i>
                     <p class="font-semibold">No products found.</p>

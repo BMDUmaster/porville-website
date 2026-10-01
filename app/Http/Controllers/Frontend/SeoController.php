@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\SeoPage;
+use App\Support\ShopUrl;
 use Illuminate\Http\Response;
 
 class SeoController extends Controller
@@ -52,6 +54,31 @@ class SeoController extends Controller
                     'changefreq' => 'weekly',
                     'priority' => '0.7',
                 ];
+            });
+
+        // Category and sub category listing pages (clean /category/... URLs).
+        Category::parents()->where('is_active', true)
+            ->with(['children' => fn ($query) => $query->where('is_active', true)])
+            ->get()
+            ->each(function (Category $category) use (&$entries, $excluded) {
+                $pages = [[$category, ShopUrl::to(['category' => $category->slug])]];
+
+                foreach ($category->children as $child) {
+                    $pages[] = [$child, ShopUrl::to(['category' => $category->slug, 'subcategory' => $child->slug])];
+                }
+
+                foreach ($pages as [$page, $loc]) {
+                    if (isset($entries[$loc]) || in_array(parse_url($loc, PHP_URL_PATH), $excluded, true)) {
+                        continue;
+                    }
+
+                    $entries[$loc] = [
+                        'loc' => $loc,
+                        'lastmod' => $page->updated_at?->toAtomString(),
+                        'changefreq' => 'daily',
+                        'priority' => '0.8',
+                    ];
+                }
             });
 
         return response()

@@ -23,7 +23,7 @@
                 @php($isFocused = $focus === $cat->slug)
                 <a
                     id="category-{{ $cat->slug }}"
-                    href="{{ route('frontend.products', ['category' => $cat->slug]) }}"
+                    href="{{ \App\Support\ShopUrl::to(['category' => $cat->slug]) }}"
                     class="group block overflow-hidden rounded-2xl border bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-amber-400 hover:shadow-lg {{ $isFocused ? 'ring-2 ring-amber-500 border-amber-300 shadow-lg' : 'border-gray-100' }}"
                 >
                     <div class="aspect-square overflow-hidden bg-gray-50">
