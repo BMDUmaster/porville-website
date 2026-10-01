@@ -234,8 +234,6 @@ Route::get('/wishlist/count',  [WishlistController::class, 'count'])->name('fron
 // ── Shop — specific routes BEFORE wildcard
 Route::get('/shop',            [FrontProductController::class, 'index'])->name('frontend.products');
 Route::get('/shop/categories', [PageController::class, 'categories'])->name('frontend.categories');
-// SEO-friendly category listing: /category/chicken and /category/chicken/curry-cut
-Route::get('/category/{category}/{subcategory?}', [FrontProductController::class, 'index'])->name('frontend.category');
 Route::get('/shop/{slug}',     [FrontProductController::class, 'show'])->name('frontend.product.show');
 
 // ── Frontend Auth (guest only)
@@ -298,3 +296,18 @@ Route::get('/terms-of-service',     [PageController::class, 'terms'])->name('fro
 Route::get('/shipping-policy',      [PageController::class, 'shipping'])->name('frontend.shipping');
 Route::get('/return-refund-policy', [PageController::class, 'returns'])->name('frontend.returns');
 Route::get('/cookie-policy',        [PageController::class, 'cookies'])->name('frontend.cookies');
+
+// ── Category pages at the site root: /chicken and /chicken/curry-cut
+// Keep these LAST so every other page is matched first. Category slugs that
+// would clash with a page are prevented in App\Support\ReservedSlugs.
+$slugPattern = '[a-z0-9]+(?:-[a-z0-9]+)*';
+
+// Earlier /category/... links -> clean URL.
+Route::get('/category/{category}/{subcategory?}', fn (string $category, ?string $subcategory = null) => redirect()->to(
+    \App\Support\ShopUrl::to(array_filter(compact('category', 'subcategory')) + request()->query()),
+    301
+))->where(['category' => $slugPattern, 'subcategory' => $slugPattern]);
+
+Route::get('/{category}/{subcategory?}', [FrontProductController::class, 'index'])
+    ->where(['category' => $slugPattern, 'subcategory' => $slugPattern])
+    ->name('frontend.category');

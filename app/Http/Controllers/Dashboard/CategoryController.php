@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Support\ReservedSlugs;
 use App\Support\WebpImage;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -152,8 +153,10 @@ class CategoryController extends Controller
         $slug = $baseSlug;
         $counter = 2;
 
+        // Category pages are served at /{slug}, so skip slugs used by other pages.
         while (
-            Category::where('slug', $slug)
+            ReservedSlugs::contains($slug)
+            || Category::where('slug', $slug)
                 ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
                 ->exists()
         ) {

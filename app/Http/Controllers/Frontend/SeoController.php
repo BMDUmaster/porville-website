@@ -88,25 +88,22 @@ class SeoController extends Controller
 
     public function robots(): Response
     {
-        // Admin panel routes live at the site root, so each one is listed explicitly.
-        $adminPaths = [
+        // Admin and private pages live at the site root next to category pages
+        // (/chicken), so block each one exactly ("/products" and "/products/…")
+        // instead of as a prefix that would also hide e.g. /products-special.
+        $privatePaths = [
             '/dashboard', '/login', '/banners', '/contact-messages', '/reviews', '/categories',
             '/subcategories', '/products', '/orders', '/users', '/delivery-boys', '/notifications',
-            '/coupons', '/profile', '/settings/', '/faqs', '/seo-management',
+            '/coupons', '/profile', '/settings', '/faqs', '/seo-management', '/product-slots',
+            '/checkout', '/cart', '/wishlist', '/server-check', '/system-check', '/clear-cache',
         ];
 
         $lines = [
             'User-agent: *',
-            ...array_map(fn ($path) => "Disallow: {$path}", $adminPaths),
+            ...collect($privatePaths)->flatMap(fn ($path) => ["Disallow: {$path}$", "Disallow: {$path}/", "Disallow: {$path}?"])->all(),
             'Disallow: /account/',
-            'Disallow: /checkout',
-            'Disallow: /cart',
-            'Disallow: /wishlist',
             'Disallow: /order-success/',
             'Disallow: /review/',
-            'Disallow: /server-check',
-            'Disallow: /system-check',
-            'Disallow: /clear-cache',
             '',
             'Sitemap: ' . url('/sitemap.xml'),
         ];
