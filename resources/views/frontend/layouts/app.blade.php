@@ -1360,6 +1360,53 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 })();
 
+// Product slot countdowns on cards and the product page (server clock based).
+(function () {
+    const clockOffset = Date.parse(@json(now()->toIso8601String())) - Date.now();
+    const pad = (n) => String(n).padStart(2, '0');
+
+    function expire(timer) {
+        const badge = timer.closest('[data-slot-badge]');
+
+        if (timer.dataset.mode === 'open') {
+            // Slot just closed: show Time Out and stop new add-to-cart clicks.
+            if (badge) {
+                badge.className = badge.className.replace(/bg-emerald-600|bg-amber-500 text-black/g, 'bg-red-600 text-white');
+                badge.innerHTML = '<i class="fa-regular fa-hourglass-end"></i> Time Out';
+            }
+            document.querySelectorAll('[data-slot-cart-button="' + timer.dataset.product + '"]').forEach((button) => {
+                button.disabled = true;
+                button.removeAttribute('onclick');
+                button.className = button.className.replace(/bg-black|hover:bg-neutral-900|border-amber-500/g, '') + ' cursor-not-allowed border-red-200 bg-red-50 text-red-600';
+                button.innerHTML = '<i class="fa-regular fa-hourglass-end"></i> Time Out';
+            });
+        } else if (badge) {
+            badge.className = badge.className.replace(/bg-amber-500 text-black/g, 'bg-emerald-600 text-white');
+            badge.innerHTML = '<i class="fa-regular fa-clock"></i> Open now';
+        }
+    }
+
+    function tick() {
+        const now = Date.now() + clockOffset;
+
+        document.querySelectorAll('[data-slot-timer]').forEach((timer) => {
+            const left = Math.max(0, Math.floor((Date.parse(timer.dataset.target) - now) / 1000));
+
+            if (left === 0) {
+                expire(timer);
+                return;
+            }
+
+            timer.textContent = pad(Math.floor(left / 3600)) + ':' + pad(Math.floor((left % 3600) / 60)) + ':' + pad(left % 60);
+        });
+    }
+
+    if (document.querySelector('[data-slot-timer]')) {
+        tick();
+        window.setInterval(tick, 1000);
+    }
+})();
+
 // Header "Slot Ending Soon" countdown (server clock based, so a wrong device clock doesn't matter).
 (function () {
     const widget = document.querySelector('[data-slot-countdown]');

@@ -132,6 +132,7 @@
     $detailSlot = \App\Support\ProductSlotManager::status($product);
     $detailSlotClosed = $detailSlot && ! $detailSlot['open'];
     $detailSlotAlerted = $detailSlotClosed && in_array($product->id, \App\Support\ProductSlotManager::alertedProductIds(), true);
+    $detailTimer = \App\Support\ProductSlotManager::timer($detailSlot);
     $isEnquiryOnly = $product->is_enquiry_only;
 
     $productSpecs = $isEnquiryOnly
@@ -614,9 +615,19 @@
 
             @if($detailSlot && !$isEnquiryOnly)
                 <div class="rounded-2xl border px-4 py-3 text-left {{ $detailSlot['open'] ? 'border-emerald-200 bg-emerald-50' : ($detailSlot['state'] === 'timeout' ? 'border-red-200 bg-red-50' : 'border-amber-200 bg-amber-50') }}">
-                    <div class="flex items-center gap-2 text-[13px] font-black {{ $detailSlot['open'] ? 'text-emerald-700' : ($detailSlot['state'] === 'timeout' ? 'text-red-600' : 'text-amber-800') }}">
-                        <i class="fa-regular {{ $detailSlot['state'] === 'timeout' ? 'fa-hourglass-end' : 'fa-clock' }}"></i>
-                        {{ $detailSlot['open'] ? 'Order Slot: ' . $detailSlot['badge'] : $detailSlot['badge'] }}
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 text-[13px] font-black {{ $detailSlot['open'] ? 'text-emerald-700' : ($detailSlot['state'] === 'timeout' ? 'text-red-600' : 'text-amber-800') }}">
+                            <i class="fa-regular {{ $detailSlot['state'] === 'timeout' ? 'fa-hourglass-end' : 'fa-clock' }}"></i>
+                            {{ $detailSlot['open'] ? 'Order Slot: ' . $detailSlot['badge'] : $detailSlot['badge'] }}
+                        </div>
+                        @if($detailTimer)
+                            <span data-slot-badge class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-black shadow-sm {{ $detailTimer['mode'] === 'open' ? 'bg-emerald-600 text-white' : 'bg-amber-500 text-black' }}">
+                                <i class="fa-regular fa-clock"></i>
+                                {{ $detailTimer['mode'] === 'upcoming' ? 'Opens in' : '' }}
+                                <span data-slot-timer data-product="{{ $product->id }}" data-mode="{{ $detailTimer['mode'] }}" data-target="{{ $detailTimer['target']->toIso8601String() }}" class="font-mono tabular-nums">{{ $detailTimer['text'] }}</span>
+                                {{ $detailTimer['mode'] === 'open' ? 'left' : '' }}
+                            </span>
+                        @endif
                     </div>
                     <p class="mt-1 text-[12px] font-semibold text-slate-600">{{ $detailSlot['message'] }}</p>
                     @if(count($detailSlot['ranges']))
@@ -653,7 +664,7 @@
                 @endif
 
                 @if($isProductAvailable && ! $detailSlotClosed)
-                    <button type="button" onclick="addToCartWithQty({{ $product->id }})"
+                    <button type="button" data-slot-cart-button="{{ $product->id }}" onclick="addToCartWithQty({{ $product->id }})"
                             class="col-span-2 inline-flex min-w-0 items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 bg-black px-5 py-3 text-[13px] font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_rgba(0,0,0,0.24)] transition hover:-translate-y-0.5 hover:bg-neutral-900 sm:flex-1">
                         <i class="fa-solid fa-cart-shopping text-[12px] text-amber-400"></i>
                         Add To Cart

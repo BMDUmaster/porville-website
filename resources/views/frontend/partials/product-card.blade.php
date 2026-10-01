@@ -9,6 +9,7 @@
     $cardSlot = \App\Support\ProductSlotManager::status($product);
     $cardSlotAlerted = $cardSlot && in_array($product->id, \App\Support\ProductSlotManager::alertedProductIds(), true);
     $cardImages = collect($product->images ?? [])->filter()->values();
+    $cardTimer = \App\Support\ProductSlotManager::timer($cardSlot);
 @endphp
 <article class="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:-translate-y-1 hover:border-amber-300 hover:shadow-lg">
     <button
@@ -25,9 +26,19 @@
     <a href="{{ route('frontend.product.show', $product->slug) }}" class="relative block aspect-[4/3] overflow-hidden bg-gray-50" @if($cardImages->count() > 1) data-card-gallery @endif>
         <span class="absolute left-2 top-2 z-10 flex max-w-[calc(100%-3.5rem)] flex-col items-start gap-1">
             @if($cardSlot)
-                <span class="inline-flex max-w-full items-center gap-1 truncate rounded-full px-2 py-1 text-[9px] font-bold shadow {{ $cardSlot['open'] ? 'bg-emerald-600 text-white' : ($cardSlot['state'] === 'timeout' ? 'bg-red-600 text-white' : 'bg-amber-500 text-black') }}">
+                <span data-slot-badge title="Order slot: {{ implode(', ', $cardSlot['ranges']) }}"
+                      class="inline-flex max-w-full items-center gap-1 truncate rounded-full px-2 py-1 text-[9px] font-bold shadow {{ $cardSlot['open'] ? 'bg-emerald-600 text-white' : ($cardSlot['state'] === 'timeout' ? 'bg-red-600 text-white' : 'bg-amber-500 text-black') }}">
                     <i class="fa-regular {{ $cardSlot['state'] === 'timeout' ? 'fa-hourglass-end' : 'fa-clock' }} text-[9px]"></i>
-                    <span class="truncate">{{ $cardSlot['badge'] }}</span>
+                    @if($cardTimer)
+                        {{-- Live countdown: time left while open, time to opening otherwise --}}
+                        <span class="truncate">
+                            {{ $cardTimer['mode'] === 'upcoming' ? 'Opens in' : '' }}
+                            <span data-slot-timer data-product="{{ $product->id }}" data-mode="{{ $cardTimer['mode'] }}" data-target="{{ $cardTimer['target']->toIso8601String() }}" class="font-mono tabular-nums">{{ $cardTimer['text'] }}</span>
+                            {{ $cardTimer['mode'] === 'open' ? 'left' : '' }}
+                        </span>
+                    @else
+                        <span class="truncate">{{ $cardSlot['badge'] }}</span>
+                    @endif
                 </span>
             @endif
             @if($cardIsNewArrival)
@@ -114,7 +125,7 @@
                 @if(!$product->is_out_of_stock && $cardSlot && ! $cardSlot['open'])
                     @include('frontend.partials.slot-notify-button', ['productId' => $product->id, 'alerted' => $cardSlotAlerted, 'size' => 'card'])
                 @elseif(!$product->is_out_of_stock)
-                    <button type="button"
+                    <button type="button" data-slot-cart-button="{{ $product->id }}"
                             onclick="addProductCardToCart({{ $product->id }}, '{{ $cardUid }}')"
                             class="mt-1.5 flex h-8 w-full items-center justify-center gap-1.5 rounded-lg border border-amber-500 bg-black text-[9px] font-bold uppercase tracking-[0.08em] text-white transition hover:bg-neutral-900">
                         <i class="fa-solid fa-cart-shopping text-[10px] text-amber-400"></i> Add to Cart

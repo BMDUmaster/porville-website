@@ -116,6 +116,39 @@ class ProductSlotManager
         ];
     }
 
+    /**
+     * Live countdown for a slot status: time left while open, or time until
+     * it opens (when that is within a day). Null for Time Out.
+     *
+     * @return array{mode: string, target: Carbon, text: string}|null
+     */
+    public static function timer(?array $status, ?Carbon $now = null): ?array
+    {
+        if (! $status) {
+            return null;
+        }
+
+        $now ??= now();
+        $mode = $status['open'] ? 'open' : 'upcoming';
+        $target = $status['open'] ? $status['ends_at'] : $status['next_start'];
+
+        if (! $target || ($mode === 'upcoming' && $status['state'] !== 'upcoming')) {
+            return null;
+        }
+
+        $seconds = max(0, $target->getTimestamp() - $now->getTimestamp());
+
+        if ($mode === 'upcoming' && $seconds > 86400) {
+            return null; // far away: the "Opens 5 Oct, 10:00 AM" label reads better
+        }
+
+        return [
+            'mode' => $mode,
+            'target' => $target,
+            'text' => sprintf('%02d:%02d:%02d', intdiv($seconds, 3600), intdiv($seconds % 3600, 60), $seconds % 60),
+        ];
+    }
+
     public static function isOrderable(Product|int $product, ?Carbon $now = null): bool
     {
         $status = self::status($product, $now);
