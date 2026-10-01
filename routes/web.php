@@ -188,6 +188,11 @@ Route::middleware('admin')->group(function () {
     // SEO Management
     Route::get('/seo-management',                    [SeoPageController::class, 'index'])->name('dashboard.seo');
     Route::get('/seo-management/create',             [SeoPageController::class, 'create'])->name('dashboard.seo.create');
+    // SEO > Category page content (HTML shown above the footer)
+    Route::get('/seo-management/category-content',                    [\App\Http\Controllers\Dashboard\CategorySeoContentController::class, 'index'])->name('dashboard.seo.category-content');
+    Route::get('/seo-management/category-content/{category}/edit',    [\App\Http\Controllers\Dashboard\CategorySeoContentController::class, 'edit'])->name('dashboard.seo.category-content.edit');
+    Route::put('/seo-management/category-content/{category}',         [\App\Http\Controllers\Dashboard\CategorySeoContentController::class, 'update'])->name('dashboard.seo.category-content.update');
+    Route::delete('/seo-management/category-content/{category}',      [\App\Http\Controllers\Dashboard\CategorySeoContentController::class, 'destroy'])->name('dashboard.seo.category-content.destroy');
     Route::post('/seo-management',                   [SeoPageController::class, 'store'])->name('dashboard.seo.store');
     Route::post('/seo-management/import',            [SeoPageController::class, 'importDefaults'])->name('dashboard.seo.import');
     Route::get('/seo-management/{seoPage}/edit',     [SeoPageController::class, 'edit'])->name('dashboard.seo.edit');

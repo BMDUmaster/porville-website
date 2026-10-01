@@ -381,6 +381,8 @@
         </div>
     </div>
 </section>
+
+@include('frontend.partials.category-seo-content')
 @endsection
 
 @section('scripts')

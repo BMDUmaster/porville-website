@@ -357,7 +357,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                data-ends-at="{{ $frontendEndingSlot['ends_at']->toIso8601String() }}"
                data-server-now="{{ now()->toIso8601String() }}"
                title="{{ $endingProduct->name }} — order slot {{ $frontendEndingSlot['badge'] }}"
-               class="group relative hidden h-[52px] w-[270px] flex-shrink-0 overflow-hidden bg-gradient-to-r from-amber-300 via-amber-400 to-orange-500 xl:block">
+               class="group relative hidden h-[52px] w-[270px] flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-r from-amber-300 via-amber-400 to-orange-500 xl:block">
                 <span class="absolute inset-y-0 left-0 z-10 w-[52px] overflow-hidden bg-black">
                     @if(! empty($endingProduct->images[0]))
                         <img src="{{ asset('storage/' . $endingProduct->images[0]) }}" alt="{{ $endingProduct->name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-110">
@@ -376,7 +376,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                                 <span class="text-[11px] font-black uppercase tracking-[0.16em] text-black/70">Slot Ending Soon</span>
                                 <span>{{ $endingProduct->name }}</span>
                                 <span data-countdown-label class="text-[13px] font-bold text-black/75">Ends in</span>
-                                <span data-countdown class="bg-black px-2 py-0.5 font-mono text-[14px] font-bold tabular-nums tracking-wider text-amber-300">--:--:--</span>
+                                <span data-countdown class="rounded-md bg-black px-2 py-0.5 font-mono text-[14px] font-bold tabular-nums tracking-wider text-amber-300">--:--:--</span>
                             </span>
                         @endfor
                     </span>

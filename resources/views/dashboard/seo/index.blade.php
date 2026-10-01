@@ -19,6 +19,9 @@
                     </button>
                 </form>
             @endif
+            <a href="{{ route('dashboard.seo.category-content') }}" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm transition hover:border-amber-400 hover:text-amber-700">
+                <i class="fa-solid fa-layer-group"></i> Category Page Content
+            </a>
             <a href="{{ route('dashboard.seo.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-amber-400 px-5 py-2.5 text-sm font-bold text-slate-900 shadow-sm transition hover:bg-amber-500">
                 <i class="fa-solid fa-plus"></i> Add New Page
             </a>
