@@ -353,8 +353,9 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                data-ends-at="{{ $frontendEndingSlot['ends_at']->toIso8601String() }}"
                data-server-now="{{ now()->toIso8601String() }}"
                title="{{ $endingProduct->name }} — order slot {{ $frontendEndingSlot['badge'] }}"
-               class="group hidden max-w-[250px] flex-shrink-0 items-center gap-2.5 rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent py-1.5 pl-1.5 pr-3.5 transition hover:border-amber-400 hover:from-amber-500/25 xl:flex">
-                <span class="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl bg-neutral-800 ring-1 ring-amber-500/40">
+               class="group relative hidden max-w-[260px] flex-shrink-0 items-center gap-2.5 overflow-hidden rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-orange-500 py-1.5 pl-1.5 pr-3.5 shadow-[0_0_22px_rgba(245,158,11,0.35)] ring-1 ring-amber-200/70 transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(245,158,11,0.55)] xl:flex">
+                <span class="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent transition-all duration-700 group-hover:left-full"></span>
+                <span class="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl bg-black ring-2 ring-white/80 shadow-md">
                     @if(! empty($endingProduct->images[0]))
                         <img src="{{ asset('storage/' . $endingProduct->images[0]) }}" alt="{{ $endingProduct->name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-110">
                     @else
@@ -362,17 +363,17 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                     @endif
                 </span>
                 <span class="min-w-0 leading-tight">
-                    <span class="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.18em] text-amber-400">
+                    <span class="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.18em] text-black/70">
                         <span class="relative flex h-1.5 w-1.5">
-                            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75"></span>
-                            <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-600 opacity-75"></span>
+                            <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-red-600"></span>
                         </span>
                         Slot Ending Soon
                     </span>
-                    <span class="mt-0.5 block truncate text-[12px] font-bold text-white">{{ $endingProduct->name }}</span>
-                    <span class="block text-[11px] font-semibold text-stone-300">
+                    <span class="mt-0.5 block truncate text-[13px] font-extrabold text-black">{{ $endingProduct->name }}</span>
+                    <span class="mt-0.5 flex items-center gap-1.5 text-[10px] font-bold text-black/75">
                         <span data-countdown-label>Ends in</span>
-                        <span data-countdown class="font-mono font-bold tabular-nums text-amber-300">--:--:--</span>
+                        <span data-countdown class="rounded-md bg-black px-1.5 py-0.5 font-mono text-[11px] font-bold tabular-nums tracking-wider text-amber-300">--:--:--</span>
                     </span>
                 </span>
             </a>
