@@ -298,9 +298,8 @@
             })->take(12)->values();
         @endphp
 
-        <div class="mb-4 grid grid-cols-[1fr_auto_1fr] items-center gap-2 md:mb-6 md:flex md:items-end md:justify-between md:gap-4">
-            <span class="md:hidden" aria-hidden="true"></span>
-            <div class="min-w-0 text-center md:text-left">
+        <div class="mb-4 flex items-center justify-between gap-3 md:mb-6 md:items-end md:gap-4">
+            <div class="min-w-0 text-left">
                 <h2 class="home-category-heading text-2xl font-extrabold text-slate-900 md:text-4xl">
                     Shop by <span class="text-amber-600"> Category  </span>
                 </h2>
@@ -308,7 +307,7 @@
             </div>
             <a
                 href="{{ route('frontend.categories') }}"
-                class="inline-flex shrink-0 items-center gap-2 justify-self-end whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5"
+                class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5"
             >
                 See All
                 <i class="fa-solid fa-arrow-right text-[10px]"></i>
@@ -379,10 +378,9 @@
 
     <section class="{{ $loop->even ? 'bg-gray-50' : 'bg-white' }} pb-2 pt-2 md:py-6">
         <div class="mx-auto max-w-7xl px-4">
-            {{-- Mobile: name centered with See All on the right. Desktop: name left; tag and description are desktop-only --}}
-            <div class="mb-4 grid grid-cols-[1fr_auto_1fr] items-center gap-2 md:mb-6 md:flex md:items-end md:justify-between md:gap-4">
-                <span class="md:hidden" aria-hidden="true"></span>
-                <div class="min-w-0 text-center md:text-left">
+            {{-- Name on the left, See All on the right; tag and description are desktop-only --}}
+            <div class="mb-4 flex items-center justify-between gap-3 md:mb-6 md:items-end md:gap-4">
+                <div class="min-w-0 text-left">
                     @if($category->tag)
                         <p class="hidden text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-600 md:block">{{ $category->tag }}</p>
                     @endif
@@ -391,7 +389,7 @@
                         {{ $category->description ?: 'Fresh, quality-checked ' . strtolower($category->name) . ', cut and packed daily.' }}
                     </p>
                 </div>
-                <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="inline-flex shrink-0 items-center gap-2 justify-self-end whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
+                <a href="{{ route('frontend.products', ['category' => $category->slug]) }}" class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
                     See All
                     <i class="fa-solid fa-arrow-right text-[10px]"></i>
                 </a>
@@ -532,14 +530,13 @@
 {{-- Farm Fresh Live Stock (kept last on the page) --}}
 <section class="bg-gray-50 py-8 md:py-12">
     <div class="mx-auto max-w-7xl px-4">
-        <div class="mb-4 grid grid-cols-[1fr_auto_1fr] items-center gap-2 md:mb-6 md:flex md:items-end md:justify-between md:gap-4">
-            <span class="md:hidden" aria-hidden="true"></span>
-            <div class="min-w-0 text-center md:text-left">
+        <div class="mb-4 flex items-center justify-between gap-3 md:mb-6 md:items-end md:gap-4">
+            <div class="min-w-0 text-left">
                 <p class="hidden text-[11px] font-extrabold uppercase tracking-[0.28em] text-amber-600 md:block">Enquiry Only &middot; Call to Order</p>
                 <h2 class="font-classic text-2xl font-bold text-slate-900 md:mt-1 md:text-3xl">Farm Fresh Live Stock</h2>
                 <p class="mt-1 hidden max-w-lg text-sm text-slate-500 md:block">Healthy live farm birds and livestock raised under premium guidelines.</p>
             </div>
-            <a href="{{ route('frontend.products', ['category' => $liveStockCategory->slug]) }}" class="inline-flex shrink-0 items-center gap-2 justify-self-end whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
+            <a href="{{ route('frontend.products', ['category' => $liveStockCategory->slug]) }}" class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
                 See All
                 <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </a>
