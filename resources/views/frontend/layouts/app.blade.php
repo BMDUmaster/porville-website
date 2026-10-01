@@ -204,6 +204,15 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
         </ul>
         <hr class="my-4">
         <a href="{{ route('frontend.track') }}" class="block p-2 font-bold text-amber-600">Track Order</a>
+        <a href="{{ route('frontend.wishlist') }}" class="flex items-center gap-2 p-2 font-bold text-amber-600">
+            <i class="fa-regular fa-heart w-4 text-red-500"></i> Wishlist
+            @if(count(session('wishlist', [])) > 0)
+                <span class="ml-auto rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-black text-white">{{ count(session('wishlist', [])) }}</span>
+            @endif
+        </a>
+        <a href="{{ auth('web_frontend')->check() ? route('frontend.notifications') : route('frontend.login') }}" class="flex items-center gap-2 p-2 font-bold text-amber-600">
+            <i class="fa-regular fa-bell w-4"></i> Notifications
+        </a>
         @auth('web_frontend')
             <a href="{{ route('frontend.profile') }}" class="block p-2 font-bold text-amber-500">My Profile</a>
             <a href="{{ route('frontend.orders') }}" class="block p-2 font-bold text-amber-500">My Orders</a>
@@ -373,7 +382,6 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                                     <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-600 opacity-75"></span>
                                     <span class="relative inline-flex h-2 w-2 rounded-full bg-red-600"></span>
                                 </span>
-                                <span class="text-[11px] font-black uppercase tracking-[0.16em] text-black/70">Slot Ending Soon</span>
                                 <span>{{ $endingProduct->name }}</span>
                                 <span data-countdown-label class="text-[13px] font-bold text-black/75">Ends in</span>
                                 <span data-countdown class="rounded-md bg-black px-2 py-0.5 font-mono text-[14px] font-bold tabular-nums tracking-wider text-amber-300">--:--:--</span>
@@ -409,7 +417,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                         <i class="fa-regular fa-user text-xl group-hover:text-amber-400"></i>
                         @auth('web_frontend')
                             @if($frontendUnreadNotifications > 0)
-                                <span class="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-black leading-none text-white ring-2 ring-black">
+                                <span class="absolute -right-2 -top-2 hidden h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-black leading-none text-white ring-2 ring-black md:flex">
                                     {{ $frontendUnreadNotifications > 99 ? '99+' : $frontendUnreadNotifications }}
                                 </span>
                             @endif
@@ -462,7 +470,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                 $initialWishlist = session('wishlist', []);
                 $initialWishlistCount = count($initialWishlist);
             @endphp
-            <a href="{{ route('frontend.wishlist') }}" class="text-stone-200 relative flex flex-col items-center group transition hover:text-red-400">
+            <a href="{{ route('frontend.wishlist') }}" class="text-stone-200 relative hidden flex-col items-center group transition hover:text-red-400 md:flex">
                 <div class="relative">
                     <i class="fa-regular fa-heart text-xl group-hover:text-red-400 transition"></i>
                     <span id="header-wishlist-badge"
@@ -471,6 +479,17 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                     </span>
                 </div>
                 <span class="text-[10px] font-bold mt-0.5 hidden md:block">Wishlist</span>
+            </a>
+            <!-- Notifications (mobile; desktop has them in the account menu) -->
+            <a href="{{ auth('web_frontend')->check() ? route('frontend.notifications') : route('frontend.login') }}"
+               aria-label="Notifications"
+               class="relative flex items-center text-stone-200 transition hover:text-amber-400 md:hidden">
+                <i class="fa-regular fa-bell text-xl"></i>
+                @if(($frontendUnreadNotifications ?? 0) > 0)
+                    <span class="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-black leading-none text-white ring-2 ring-black">
+                        {{ $frontendUnreadNotifications > 99 ? '99+' : $frontendUnreadNotifications }}
+                    </span>
+                @endif
             </a>
             <!-- Cart -->
             <button onclick="openCart()" class="text-amber-400 relative flex flex-col items-center group">
