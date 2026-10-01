@@ -366,7 +366,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                data-ends-at="{{ $frontendEndingSlot['ends_at']->toIso8601String() }}"
                data-server-now="{{ now()->toIso8601String() }}"
                title="{{ $endingProduct->name }} — order slot {{ $frontendEndingSlot['badge'] }}"
-               class="group relative hidden h-[52px] w-[270px] flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-r from-amber-300 via-amber-400 to-orange-500 xl:block">
+               class="group relative hidden h-[52px] w-[270px] flex-shrink-0 overflow-hidden rounded-xl bg-black xl:block">
                 <span class="absolute inset-y-0 left-0 z-10 w-[52px] overflow-hidden bg-black">
                     @if(! empty($endingProduct->images[0]))
                         <img src="{{ asset('storage/' . $endingProduct->images[0]) }}" alt="{{ $endingProduct->name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-110">
@@ -377,14 +377,14 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                 <span class="absolute inset-0 flex items-center overflow-hidden">
                     <span class="slot-marquee flex w-max items-center whitespace-nowrap">
                         @for($copy = 0; $copy < 2; $copy++)
-                            <span class="flex items-center gap-2 pl-6 pr-4 text-[15px] font-extrabold text-black" @if($copy) aria-hidden="true" @endif>
+                            <span class="flex items-center gap-1.5 pl-5 pr-3 text-[15px] font-extrabold text-white" @if($copy) aria-hidden="true" @endif>
                                 <span class="relative flex h-2 w-2">
                                     <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-600 opacity-75"></span>
                                     <span class="relative inline-flex h-2 w-2 rounded-full bg-red-600"></span>
                                 </span>
                                 <span>{{ $endingProduct->name }}</span>
-                                <span data-countdown-label class="text-[13px] font-bold text-black/75">Ends in</span>
-                                <span data-countdown class="rounded-md bg-black px-2 py-0.5 font-mono text-[14px] font-bold tabular-nums tracking-wider text-amber-300">--:--:--</span>
+                                <span data-countdown-label class="text-[13px] font-semibold text-stone-400">Ends in</span>
+                                <span data-countdown class="rounded-md bg-amber-400 px-1.5 py-0.5 font-mono text-[14px] font-bold tabular-nums text-black">--:--:--</span>
                             </span>
                         @endfor
                     </span>
@@ -1450,7 +1450,8 @@ document.addEventListener('DOMContentLoaded', () => {
             labels.forEach((label) => { label.textContent = 'Slot'; });
             outputs.forEach((output) => {
                 output.textContent = 'Time Out';
-                output.classList.replace('text-amber-300', 'text-red-400');
+                output.classList.remove('bg-amber-400', 'text-black');
+                output.classList.add('bg-red-600', 'text-white');
             });
             widget.classList.add('opacity-70');
             return false;
