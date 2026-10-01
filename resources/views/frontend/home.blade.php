@@ -307,7 +307,7 @@
             </div>
             <a
                 href="{{ route('frontend.categories') }}"
-                class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5"
+                class="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:text-amber-900"
             >
                 See All
                 <i class="fa-solid fa-arrow-right text-[10px]"></i>
@@ -389,7 +389,7 @@
                         {{ $category->description ?: 'Fresh, quality-checked ' . strtolower($category->name) . ', cut and packed daily.' }}
                     </p>
                 </div>
-                <a href="{{ \App\Support\ShopUrl::to(['category' => $category->slug]) }}" class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
+                <a href="{{ \App\Support\ShopUrl::to(['category' => $category->slug]) }}" class="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:text-amber-900">
                     See All
                     <i class="fa-solid fa-arrow-right text-[10px]"></i>
                 </a>
@@ -536,7 +536,7 @@
                 <h2 class="font-classic text-2xl font-bold text-slate-900 md:mt-1 md:text-3xl">Farm Fresh Live Stock</h2>
                 <p class="mt-1 hidden max-w-lg text-sm text-slate-500 md:block">Healthy live farm birds and livestock raised under premium guidelines.</p>
             </div>
-            <a href="{{ \App\Support\ShopUrl::to(['category' => $liveStockCategory->slug]) }}" class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:border-amber-600 hover:bg-amber-600 hover:text-white sm:px-5">
+            <a href="{{ \App\Support\ShopUrl::to(['category' => $liveStockCategory->slug]) }}" class="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap text-[11px] font-extrabold uppercase tracking-[0.14em] text-amber-700 transition hover:text-amber-900">
                 See All
                 <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </a>
