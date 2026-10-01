@@ -343,6 +343,40 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                 <span class="mt-1 hidden text-[8px] font-semibold uppercase tracking-[0.22em] text-stone-300 sm:block md:text-[9px]">Fresh Cut Pure Standards</span>
             </span>
         </a>
+        @if(! empty($frontendEndingSlot))
+            @php
+                $endingProduct = $frontendEndingSlot['product'];
+            @endphp
+            {{-- Product whose ordering slot closes first, with a live countdown --}}
+            <a href="{{ route('frontend.product.show', $endingProduct->slug) }}"
+               data-slot-countdown
+               data-ends-at="{{ $frontendEndingSlot['ends_at']->toIso8601String() }}"
+               data-server-now="{{ now()->toIso8601String() }}"
+               title="{{ $endingProduct->name }} — order slot {{ $frontendEndingSlot['badge'] }}"
+               class="group hidden max-w-[250px] flex-shrink-0 items-center gap-2.5 rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent py-1.5 pl-1.5 pr-3.5 transition hover:border-amber-400 hover:from-amber-500/25 xl:flex">
+                <span class="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl bg-neutral-800 ring-1 ring-amber-500/40">
+                    @if(! empty($endingProduct->images[0]))
+                        <img src="{{ asset('storage/' . $endingProduct->images[0]) }}" alt="{{ $endingProduct->name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-110">
+                    @else
+                        <span class="flex h-full w-full items-center justify-center text-amber-400"><i class="fa-solid fa-drumstick-bite"></i></span>
+                    @endif
+                </span>
+                <span class="min-w-0 leading-tight">
+                    <span class="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.18em] text-amber-400">
+                        <span class="relative flex h-1.5 w-1.5">
+                            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75"></span>
+                            <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                        </span>
+                        Slot Ending Soon
+                    </span>
+                    <span class="mt-0.5 block truncate text-[12px] font-bold text-white">{{ $endingProduct->name }}</span>
+                    <span class="block text-[11px] font-semibold text-stone-300">
+                        <span data-countdown-label>Ends in</span>
+                        <span data-countdown class="font-mono font-bold tabular-nums text-amber-300">--:--:--</span>
+                    </span>
+                </span>
+            </a>
+        @endif
         <form action="{{ route('frontend.products') }}" method="GET" class="relative mx-2 hidden max-w-lg flex-grow md:flex lg:mx-4">
             <input type="text" name="search" placeholder="Search fresh items" data-typing-placeholder
                    class="w-full border border-neutral-700 bg-neutral-900 text-white placeholder:text-neutral-400 rounded-xl px-5 py-2.5 text-sm focus:outline-none focus:border-amber-500 transition">
@@ -1282,6 +1316,82 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }).observe(document.body, { childList: true, subtree: true });
 });
+
+// Product cards with several photos: cycle through them while the mouse is over the image.
+(function () {
+    if (!window.matchMedia('(hover: hover)').matches) return;
+
+    let activeGallery = null;
+    let timer = null;
+
+    function show(gallery, index) {
+        gallery.querySelectorAll('[data-card-image]').forEach((img, i) => {
+            img.classList.toggle('opacity-0', i + 1 !== index);
+        });
+    }
+
+    function start(gallery) {
+        const extras = gallery.querySelectorAll('[data-card-image]');
+        extras.forEach((img) => {
+            if (!img.getAttribute('src')) img.src = img.dataset.src;
+        });
+
+        let index = 1;
+        show(gallery, index);
+        timer = window.setInterval(() => {
+            index = (index + 1) % (extras.length + 1);
+            show(gallery, index);
+        }, 1200);
+    }
+
+    function stop(gallery) {
+        window.clearInterval(timer);
+        show(gallery, 0);
+    }
+
+    // Delegated, so cards added later (filters, load more) work too.
+    document.addEventListener('mouseover', (event) => {
+        const gallery = event.target.closest ? event.target.closest('[data-card-gallery]') : null;
+        if (gallery === activeGallery) return;
+
+        if (activeGallery) stop(activeGallery);
+        activeGallery = gallery;
+        if (gallery) start(gallery);
+    });
+})();
+
+// Header "Slot Ending Soon" countdown (server clock based, so a wrong device clock doesn't matter).
+(function () {
+    const widget = document.querySelector('[data-slot-countdown]');
+    if (!widget) return;
+
+    const endsAt = Date.parse(widget.dataset.endsAt);
+    const clockOffset = Date.parse(widget.dataset.serverNow) - Date.now();
+    const output = widget.querySelector('[data-countdown]');
+    const label = widget.querySelector('[data-countdown-label]');
+    const pad = (n) => String(n).padStart(2, '0');
+
+    function render() {
+        const left = Math.max(0, Math.floor((endsAt - (Date.now() + clockOffset)) / 1000));
+
+        if (left === 0) {
+            label.textContent = 'Slot';
+            output.textContent = 'Time Out';
+            output.classList.replace('text-amber-300', 'text-red-400');
+            widget.classList.add('opacity-70');
+            return false;
+        }
+
+        output.textContent = pad(Math.floor(left / 3600)) + ':' + pad(Math.floor((left % 3600) / 60)) + ':' + pad(left % 60);
+        return true;
+    }
+
+    if (render()) {
+        const timer = window.setInterval(() => {
+            if (!render()) window.clearInterval(timer);
+        }, 1000);
+    }
+})();
 
 // Header search: type admin product names into the placeholder letter by letter,
 // hold the full name, erase it, then move to the next product.

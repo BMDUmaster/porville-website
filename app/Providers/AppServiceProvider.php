@@ -65,11 +65,19 @@ class AppServiceProvider extends ServiceProvider
                 $searchNames = collect();
             }
 
+            try {
+                // Product whose ordering slot closes first (header countdown).
+                $endingSlot = ProductSlotManager::endingSoonest();
+            } catch (Throwable) {
+                $endingSlot = null;
+            }
+
             $view->with([
                 'frontendNavCategories' => $categories,
                 'frontendTickerProduct' => $tickerProduct,
                 'frontendTickerOffer' => $tickerOffer,
                 'frontendSearchNames' => $searchNames,
+                'frontendEndingSlot' => $endingSlot,
             ]);
         });
     }

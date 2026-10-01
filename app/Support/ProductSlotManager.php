@@ -123,6 +123,36 @@ class ProductSlotManager
         return $status === null || $status['open'];
     }
 
+    /**
+     * The orderable product whose open slot closes first — shown in the header.
+     *
+     * @return array{product: Product, ends_at: Carbon, badge: string}|null
+     */
+    public static function endingSoonest(?Carbon $now = null): ?array
+    {
+        $productIds = array_keys(self::slotsByProduct());
+
+        if (! $productIds) {
+            return null;
+        }
+
+        return Product::active()
+            ->notEnquiryOnly()
+            ->whereIn('products.id', $productIds)
+            ->get()
+            ->reject(fn (Product $product) => $product->is_out_of_stock)
+            ->map(function (Product $product) use ($now) {
+                $status = self::status($product, $now);
+
+                return $status && $status['open']
+                    ? ['product' => $product, 'ends_at' => $status['ends_at'], 'badge' => $status['badge']]
+                    : null;
+            })
+            ->filter()
+            ->sortBy(fn ($entry) => $entry['ends_at']->timestamp)
+            ->first();
+    }
+
     public static function unavailableMessage(Product $product): string
     {
         $status = self::status($product);

@@ -8,6 +8,7 @@
     $cardIsNewArrival = in_array($product->id, $newArrivalProductIds ?? [], true);
     $cardSlot = \App\Support\ProductSlotManager::status($product);
     $cardSlotAlerted = $cardSlot && in_array($product->id, \App\Support\ProductSlotManager::alertedProductIds(), true);
+    $cardImages = collect($product->images ?? [])->filter()->values();
 @endphp
 <article class="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:-translate-y-1 hover:border-amber-300 hover:shadow-lg">
     <button
@@ -21,7 +22,7 @@
         <i class="{{ $cardInWishlist ? 'fa-solid fa-heart text-base text-red-500' : 'fa-regular fa-heart text-base text-slate-500 hover:text-red-500' }}"></i>
     </button>
 
-    <a href="{{ route('frontend.product.show', $product->slug) }}" class="relative block aspect-[4/3] overflow-hidden bg-gray-50">
+    <a href="{{ route('frontend.product.show', $product->slug) }}" class="relative block aspect-[4/3] overflow-hidden bg-gray-50" @if($cardImages->count() > 1) data-card-gallery @endif>
         <span class="absolute left-2 top-2 z-10 flex max-w-[calc(100%-3.5rem)] flex-col items-start gap-1">
             @if($cardSlot)
                 <span class="inline-flex max-w-full items-center gap-1 truncate rounded-full px-2 py-1 text-[9px] font-bold shadow {{ $cardSlot['open'] ? 'bg-emerald-600 text-white' : ($cardSlot['state'] === 'timeout' ? 'bg-red-600 text-white' : 'bg-amber-500 text-black') }}">
@@ -40,8 +41,12 @@
                 </span>
             @endif
         </span>
-        @if($product->images && count($product->images))
-            <img src="{{ asset('storage/' . $product->images[0]) }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+        @if($cardImages->isNotEmpty())
+            <img src="{{ asset('storage/' . $cardImages[0]) }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+            {{-- Extra photos fade in while hovering; they load only on first hover. --}}
+            @foreach($cardImages->slice(1)->take(4) as $extraImage)
+                <img data-card-image data-src="{{ asset('storage/' . $extraImage) }}" alt="{{ $product->name }}" class="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500">
+            @endforeach
         @else
             <div class="flex h-full w-full items-center justify-center text-4xl text-slate-300">
                 <i class="fa-solid fa-drumstick-bite"></i>
