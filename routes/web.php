@@ -73,6 +73,12 @@ Route::get('/login',   [AuthController::class, 'showLogin'])->name('dashboard.lo
 Route::post('/login',  [AuthController::class, 'login'])->middleware('throttle:5,1')->name('dashboard.login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('dashboard.logout');
 
+// Admin password reset (emailed code). Also linked from the admin Profile page.
+Route::get('/login/forgot-password',   [\App\Http\Controllers\Dashboard\PasswordResetController::class, 'show'])->name('dashboard.password.forgot');
+Route::post('/login/forgot-password',  [\App\Http\Controllers\Dashboard\PasswordResetController::class, 'sendOtp'])->middleware('throttle:3,1')->name('dashboard.password.send-otp');
+Route::post('/login/reset-password',   [\App\Http\Controllers\Dashboard\PasswordResetController::class, 'reset'])->middleware('throttle:6,1')->name('dashboard.password.reset');
+Route::post('/login/forgot-password/restart', [\App\Http\Controllers\Dashboard\PasswordResetController::class, 'restart'])->name('dashboard.password.restart');
+
 
 // ADMIN DASHBOARD (protected)
 
@@ -155,6 +161,12 @@ Route::middleware('admin')->group(function () {
     Route::post('/coupons',            [CouponController::class, 'store'])->name('dashboard.coupons.store');
     Route::put('/coupons/{coupon}',    [CouponController::class, 'update'])->name('dashboard.coupons.update');
     Route::delete('/coupons/{coupon}', [CouponController::class, 'destroy'])->name('dashboard.coupons.destroy');
+
+    // Admin Management (main admin only — enforced in AdminMiddleware)
+    Route::get('/admins',            [\App\Http\Controllers\Dashboard\AdminUserController::class, 'index'])->name('dashboard.admins');
+    Route::post('/admins',           [\App\Http\Controllers\Dashboard\AdminUserController::class, 'store'])->name('dashboard.admins.store');
+    Route::put('/admins/{staff}',    [\App\Http\Controllers\Dashboard\AdminUserController::class, 'update'])->name('dashboard.admins.update');
+    Route::delete('/admins/{staff}', [\App\Http\Controllers\Dashboard\AdminUserController::class, 'destroy'])->name('dashboard.admins.destroy');
 
     // Profile
     Route::get('/profile',           [ProfileController::class, 'index'])->name('dashboard.profile');

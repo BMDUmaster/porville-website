@@ -155,7 +155,7 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 text-xs font-semibold text-slate-600">{{ $product->category->name ?? '—' }}</td>
-                    <td class="px-6 py-4 text-xs font-semibold text-slate-600">{{ $product->subcategory->name ?? '�' }}</td>
+                    <td class="px-6 py-4 text-xs font-semibold text-slate-600">{{ $product->subcategory->name ?? '—' }}</td>
                     <td class="px-6 py-4 text-xs font-semibold text-slate-700">₹{{ number_format($product->price, 2) }}</td>
                     <td class="px-6 py-4">
                         <span class="text-xs font-bold px-2 py-1 rounded {{ $product->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">

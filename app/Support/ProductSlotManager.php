@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Throwable;
 
 /**
@@ -163,10 +162,20 @@ class ProductSlotManager
      */
     public static function endingSoonest(?Carbon $now = null): ?array
     {
+        return self::openSlotsByEnding($now)->first();
+    }
+
+    /**
+     * Every orderable product with an open slot, soonest closing first.
+     *
+     * @return \Illuminate\Support\Collection<int, array{product: Product, ends_at: Carbon, badge: string}>
+     */
+    public static function openSlotsByEnding(?Carbon $now = null): Collection
+    {
         $productIds = array_keys(self::slotsByProduct());
 
         if (! $productIds) {
-            return null;
+            return collect();
         }
 
         return Product::active()
@@ -183,7 +192,7 @@ class ProductSlotManager
             })
             ->filter()
             ->sortBy(fn ($entry) => $entry['ends_at']->timestamp)
-            ->first();
+            ->values();
     }
 
     public static function unavailableMessage(Product $product): string
@@ -287,24 +296,13 @@ class ProductSlotManager
                     Log::error('Slot alert in-app notification failed: ' . $e->getMessage());
                 }
 
-                if ($alert->user->email) {
-                    try {
-                        Mail::raw(implode("\n", [
-                            "Hello {$alert->user->name},",
-                            '',
-                            $message,
-                            '',
-                            'Order now: ' . $link,
-                            '',
-                            'Warm Regards,',
-                            'Porville Team',
-                        ]), function ($mail) use ($alert, $subject) {
-                            $mail->to($alert->user->email)->subject($subject);
-                        });
-                    } catch (Throwable $e) {
-                        Log::error('Slot alert email failed for ' . $alert->user->email . ': ' . $e->getMessage());
-                    }
-                }
+                PorvilleMail::send($alert->user->email, $subject, 'emails.message', [
+                    'heading'      => "{$product->name} is available now!",
+                    'greetingName' => $alert->user->name,
+                    'lines'        => [$message],
+                    'buttonText'   => 'Order Now',
+                    'buttonUrl'    => $link,
+                ]);
 
                 $sent++;
             }

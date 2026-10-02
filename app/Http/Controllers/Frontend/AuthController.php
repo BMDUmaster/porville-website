@@ -409,20 +409,21 @@ class AuthController extends Controller
     {
         $this->ensureMailIsConfigured();
 
-        $subject = 'Porville OTP for ' . ucwords($purpose);
-        $body = implode("\n", [
-            'Hello,',
-            '',
-            "Your Porville OTP for {$purpose} is: {$otp}",
-            '',
-            "This OTP is valid for {$ttlMinutes} minutes.",
-            'If you did not request this, please ignore this email.',
-            '',
-            'Regards,',
-            'Porville Team',
-        ]);
+        $isReset = $purpose === 'password reset';
+        $subject = $isReset ? 'Porville Password Reset Code' : 'Verify your email - Porville';
 
-        Mail::raw($body, function ($message) use ($email, $subject) {
+        // Throws on failure so the caller can tell the customer the email did not go out.
+        Mail::send('emails.otp', [
+            'title'      => $isReset ? 'Password Reset' : 'Verify Your Email',
+            'intro'      => $isReset
+                ? 'We received a request to reset the password associated with your Porville account.'
+                : 'Use this code to verify your email and finish creating your Porville account.',
+            'otp'        => $otp,
+            'minutes'    => $ttlMinutes,
+            'ignoreText' => $isReset
+                ? 'If you did not request a password reset, you can safely ignore this email. No changes will be made to your account.'
+                : 'If you did not try to create a Porville account, you can safely ignore this email.',
+        ], function ($message) use ($email, $subject) {
             $message->to($email)->subject($subject);
         });
     }

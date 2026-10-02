@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 @section('title', 'Profile')
-@section('page_title', 'Profile Settings')
+@section('page_title', 'Profile Management')
 
 @section('content')
 <div class="p-4 lg:p-8">
@@ -10,18 +10,15 @@
             <div class="flex flex-col gap-6 px-6 py-7 md:px-8 lg:flex-row lg:items-center lg:justify-between">
                 <div class="flex items-center gap-5">
                     <div class="h-20 w-20 overflow-hidden rounded-full border-4 border-white/20 bg-white/15 text-3xl font-black shadow-lg sm:h-24 sm:w-24 sm:text-4xl">
-                        @if($user->photo ?? false)
-                            <img src="{{ asset('storage/'.$user->photo) }}" class="h-full w-full object-cover" alt="{{ $user->name }}">
-                        @else
-                            <div class="flex h-full w-full items-center justify-center">
-                                {{ strtoupper(substr($user->name, 0, 1)) }}
-                            </div>
-                        @endif
+                        <img id="profilePhotoPreview" src="{{ $user->photo_url }}" class="{{ $user->photo_url ? '' : 'hidden' }} h-full w-full object-cover" alt="{{ $user->name }}">
+                        <div id="profilePhotoInitial" class="{{ $user->photo_url ? 'hidden' : 'flex' }} h-full w-full items-center justify-center">
+                            {{ strtoupper(substr($user->name, 0, 1)) }}
+                        </div>
                     </div>
                     <div>
                         <p class="text-xs font-bold uppercase tracking-[0.28em] text-white/70">Admin Profile</p>
                         <h1 class="mt-1 text-2xl font-black tracking-tight sm:text-3xl">{{ $user->name }}</h1>
-                        <p class="mt-1 text-sm font-semibold text-white/85 capitalize">{{ $user->role }}</p>
+                        <p class="mt-1 text-sm font-semibold text-white/85">{{ $user->role === 'sub_admin' ? 'Sub Admin' : 'Main Admin' }}</p>
                         <p class="text-sm text-white/70">{{ $user->email }}</p>
                     </div>
                 </div>
@@ -78,7 +75,8 @@
                     <div class="md:col-span-2">
                         <label class="mb-2 block text-sm font-bold text-slate-700">Profile Photo</label>
                         <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-5">
-                            <input type="file" name="photo" accept="image/*" class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-xl file:border-0 file:bg-amber-600 file:px-4 file:py-2.5 file:text-sm file:font-bold file:text-white hover:file:bg-amber-700">
+                            <input type="file" name="photo" accept="image/*" onchange="previewProfilePhoto(this)" class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-xl file:border-0 file:bg-amber-600 file:px-4 file:py-2.5 file:text-sm file:font-bold file:text-white hover:file:bg-amber-700">
+                            <p class="mt-2 text-xs text-slate-400">JPG, PNG or WEBP up to 5 MB. The preview updates as soon as you choose a photo; click Update Profile to save it.</p>
                         </div>
                     </div>
 
@@ -124,6 +122,10 @@
                                class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500 focus:bg-white">
                     </div>
 
+                    <a href="{{ route('dashboard.password.forgot') }}" class="inline-block text-xs font-bold text-amber-700 hover:underline">
+                        <i class="fa-solid fa-key mr-1"></i> Forgot your current password? Reset it with an email OTP
+                    </a>
+
                     <div class="pt-1">
                         <button type="submit" class="inline-flex w-full items-center justify-center rounded-2xl bg-red-500 px-8 py-3 text-sm font-bold text-white transition hover:bg-red-600 sm:w-auto">
                             Update Password
@@ -134,4 +136,19 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+function previewProfilePhoto(input) {
+    const file = input.files && input.files[0];
+    if (!file) return;
+
+    const preview = document.getElementById('profilePhotoPreview');
+    preview.src = URL.createObjectURL(file);
+    preview.classList.remove('hidden');
+    document.getElementById('profilePhotoInitial').classList.add('hidden');
+    document.getElementById('profilePhotoInitial').classList.remove('flex');
+}
+</script>
 @endsection

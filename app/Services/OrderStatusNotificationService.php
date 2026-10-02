@@ -4,15 +4,17 @@ namespace App\Services;
 
 use App\Models\Notification;
 use App\Models\Order;
+use App\Support\AdminModules;
+use App\Support\PorvilleMail;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Throwable;
 
 class OrderStatusNotificationService
 {
     /**
-     * Notify user (in-app + email) when order status changes or a new order is placed.
+     * Notify the customer (in-app + email) and the admins (email) when an
+     * order is placed or its status changes.
      */
     public static function notifyStatusChange(Order $order, ?string $oldStatus = null): void
     {
@@ -25,17 +27,17 @@ class OrderStatusNotificationService
         }
 
         $orderNumber = $order->order_number ?: ('#' . $order->id);
-        [$subject, $message, $emailBody] = self::buildMessageAndEmail($order, $orderNumber, $newStatus);
+        $content = self::content($order, $orderNumber, $newStatus);
 
-        // 1. Save In-App Notification (database)
+        // 1. In-app notification for the customer
         if ($order->user_id) {
             try {
                 $sentBy = auth('web')->id() ?? auth('web_frontend')->id() ?? null;
 
                 Notification::create([
                     'recipient_id' => $order->user_id,
-                    'subject'      => $subject,
-                    'message'      => $message,
+                    'subject'      => $content['subject'],
+                    'message'      => $content['message'],
                     'sent_by'      => $sentBy,
                 ]);
             } catch (Throwable $e) {
@@ -43,97 +45,111 @@ class OrderStatusNotificationService
             }
         }
 
-        // 2. Send Email Notification to user
+        // 2. Email to the customer
         $recipientEmail = $order->shipping_address['email'] ?? $order->user?->email;
+        $customerName = $order->user?->name ?? $order->shipping_address['name'] ?? 'Customer';
 
-        if ($recipientEmail) {
-            try {
-                Mail::raw($emailBody, function ($mail) use ($recipientEmail, $subject) {
-                    $mail->to($recipientEmail)->subject($subject);
-                });
-            } catch (Throwable $e) {
-                Log::error('Order status email notification failed: ' . $e->getMessage());
-            }
-        }
+        PorvilleMail::sendAfterResponse($recipientEmail, $content['subject'], 'emails.order', [
+            'order'           => $order,
+            'heading'         => $content['heading'],
+            'intro'           => $content['intro'],
+            'icon'            => $content['icon'],
+            'greetingName'    => $customerName,
+            'messageText'     => $content['message'],
+            'deliveryPartner' => $content['partner'],
+            'buttonText'      => 'View My Order',
+            'buttonUrl'       => $order->user_id ? route('frontend.order.show', $order->id) : route('frontend.track'),
+            'reviewUrl'       => $newStatus === 'delivered'
+                ? URL::temporarySignedRoute('frontend.review.create', now()->addDays(30), ['order' => $order->id])
+                : null,
+        ]);
+
+        // 3. Email to the admins who handle orders
+        $isNew = $oldStatus === null && $newStatus === 'pending';
+        $total = '₹' . number_format((float) $order->total, 2);
+
+        PorvilleMail::sendAfterResponse(
+            AdminModules::recipients('orders'),
+            $isNew ? "New order {$orderNumber} ({$total}) - Porville" : "Order {$orderNumber} is now {$order->status_label} - Porville",
+            'emails.order',
+            [
+                'order'           => $order,
+                'heading'         => $isNew ? 'New Order Received' : 'Order Status Updated',
+                'intro'           => $isNew
+                    ? "{$customerName} just placed an order on Porville."
+                    : "Order {$orderNumber} moved" . ($oldStatus ? ' from ' . ucwords(str_replace('_', ' ', $oldStatus)) : '') . " to {$order->status_label}.",
+                'icon'            => $isNew ? '🛒' : $content['icon'],
+                'greetingName'    => 'Team',
+                'messageText'     => $isNew
+                    ? "Order {$orderNumber} of {$total} is waiting to be confirmed."
+                    : "The customer has been notified about this update.",
+                'deliveryPartner' => $content['partner'],
+                'buttonText'      => 'Open in Admin',
+                'buttonUrl'       => route('dashboard.orders.show', $order),
+            ]
+        );
     }
 
-    private static function buildMessageAndEmail(Order $order, string $orderNumber, string $status): array
+    private static function content(Order $order, string $orderNumber, string $status): array
     {
-        $userName = $order->user?->name ?? $order->shipping_address['name'] ?? 'Customer';
-        $totalFormatted = 'Rs' . number_format($order->total, 2);
+        $total = '₹' . number_format((float) $order->total, 2);
+        $partner = null;
 
         switch ($status) {
             case 'confirmed':
                 $subject = "Order {$orderNumber} Confirmed! - Porville";
-                $message = "Your order {$orderNumber} of {$totalFormatted} has been confirmed. We are getting your fresh items ready.";
+                $heading = 'Order Confirmed!';
+                $intro = 'Good news — your order is confirmed and our team is getting it ready.';
+                $icon = '✓';
+                $message = "Your order {$orderNumber} of {$total} has been confirmed. We are getting your fresh items ready.";
                 break;
 
             case 'processing':
                 $subject = "Order {$orderNumber} is Processing - Porville";
+                $heading = 'Your Order Is Being Prepared';
+                $intro = 'Your fresh cuts are being hygienically prepared and cold-chain packed.';
+                $icon = '⏳';
                 $message = "Great news! Your fresh cuts for order {$orderNumber} are being hygienically prepared & cold-chain packed.";
                 break;
 
             case 'out_for_delivery':
-                $deliveryPartner = $order->deliveryBoy?->partner_name ?? 'Our delivery executive';
-                $deliveryPhone = $order->deliveryBoy?->phone ?? '';
-                $partnerInfo = $deliveryPhone ? "{$deliveryPartner} ({$deliveryPhone})" : $deliveryPartner;
+                $partnerName = $order->deliveryBoy?->partner_name ?? 'Our delivery executive';
+                $partnerPhone = $order->deliveryBoy?->phone ?? '';
+                $partner = $partnerPhone ? "{$partnerName} ({$partnerPhone})" : $partnerName;
 
                 $subject = "Order {$orderNumber} Out for Delivery! 🚚 - Porville";
-                $message = "Your order {$orderNumber} is out for delivery with {$partnerInfo}. Please be ready to receive your fresh package!";
+                $heading = 'Out for Delivery!';
+                $intro = 'Your order is on its way. Please be ready to receive your fresh package.';
+                $icon = '🚚';
+                $message = "Your order {$orderNumber} is out for delivery with {$partner}. Please be ready to receive your fresh package!";
                 break;
 
             case 'delivered':
                 $subject = "Order {$orderNumber} Delivered Successfully! 🎉 - Porville";
-                $message = "Your order {$orderNumber} of {$totalFormatted} has been delivered. Thank you for choosing Porville! Enjoy your fresh meal.";
+                $heading = 'Order Delivered!';
+                $intro = 'Your order has been delivered. Enjoy your fresh meal!';
+                $icon = '🎉';
+                $message = "Your order {$orderNumber} of {$total} has been delivered. Thank you for choosing Porville! Enjoy your fresh meal.";
                 break;
 
             case 'cancelled':
                 $subject = "Order {$orderNumber} Cancelled - Porville";
+                $heading = 'Order Cancelled';
+                $intro = 'Your order has been cancelled.';
+                $icon = '✕';
                 $message = "Your order {$orderNumber} has been cancelled. If you have any questions, please contact Porville support.";
                 break;
 
             case 'pending':
             default:
                 $subject = "Order {$orderNumber} Placed Successfully - Porville";
-                $message = "Thank you for your order {$orderNumber} of {$totalFormatted}! We have received your order and will process it shortly.";
+                $heading = 'Order Placed Successfully!';
+                $intro = "Thank you for choosing Porville. We've received your order and will start preparing it shortly.";
+                $icon = '✓';
+                $message = "Your order {$orderNumber} has been successfully placed. We'll keep you updated as your order progresses.";
                 break;
         }
 
-        $addressText = trim(
-            ($order->shipping_address['address'] ?? '') . ', ' .
-            ($order->shipping_address['sector'] ?? '') . ', ' .
-            ($order->shipping_address['city'] ?? '') . ' - ' .
-            ($order->shipping_address['pincode'] ?? '')
-        );
-
-        $emailBody = implode("\n", [
-            "Hello {$userName},",
-            "",
-            $message,
-            "",
-            "--- Order Summary ---",
-            "Order Number: {$orderNumber}",
-            "Current Status: {$order->status_label}",
-            "Total Amount: {$totalFormatted}",
-            "Payment Method: " . strtoupper($order->payment_method ?? 'COD'),
-            "Delivery Slot: " . ($order->delivery_slot ?? 'Standard Slot'),
-            "",
-            "Delivery Address:",
-            $addressText,
-            ...($status === 'delivered' ? [
-                "",
-                "We would love your feedback! Review your order here:",
-                URL::temporarySignedRoute('frontend.review.create', now()->addDays(30), ['order' => $order->id]),
-                "This private review link is valid for 30 days.",
-            ] : []),
-            "",
-            "If you have any questions about your order, please contact Porville support.",
-            "",
-            "Warm Regards,",
-            "Porville Team",
-            config('app.url')
-        ]);
-
-        return [$subject, $message, $emailBody];
+        return compact('subject', 'heading', 'intro', 'icon', 'message', 'partner');
     }
 }

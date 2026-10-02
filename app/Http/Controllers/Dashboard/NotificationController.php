@@ -5,10 +5,8 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\Models\User;
+use App\Support\PorvilleMail;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
-use Throwable;
 
 class NotificationController extends Controller
 {
@@ -61,15 +59,13 @@ class NotificationController extends Controller
                 'recipient_id' => $recipient->id,
             ]);
 
-            if ($recipient->email) {
-                try {
-                    Mail::raw($data['message'], function ($mail) use ($recipient, $data) {
-                        $mail->to($recipient->email)->subject($data['subject']);
-                    });
-                } catch (Throwable $e) {
-                    Log::error('Admin notification email failed for user ' . $recipient->id . ': ' . $e->getMessage());
-                }
-            }
+            PorvilleMail::sendAfterResponse($recipient->email, $data['subject'], 'emails.message', [
+                'heading'      => $data['subject'],
+                'greetingName' => $recipient->name,
+                'lines'        => [$data['message']],
+                'buttonText'   => 'Visit Porville',
+                'buttonUrl'    => route('frontend.home'),
+            ]);
         });
 
         return back()->with('success', 'Notification sent to all ' . $recipients->count() . ' customer(s) — in-app and email.');

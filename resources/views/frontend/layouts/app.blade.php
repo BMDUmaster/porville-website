@@ -53,10 +53,6 @@
 }
 /* Prevent horizontal overflow */
 html, body { overflow-x: clip; max-width: 100vw; }
-@keyframes slotMarquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-.slot-marquee { animation: slotMarquee 14s linear infinite; }
-.group:hover .slot-marquee { animation-play-state: paused; }
-@media (prefers-reduced-motion: reduce) { .slot-marquee { animation: none; } }
 html, body { scrollbar-width: none; -ms-overflow-style: none; }
 html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display: none; }
 @media (min-width: 1024px) {
@@ -269,9 +265,9 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
         <div class="mb-3 rounded-2xl border border-slate-200 bg-slate-50/70">
             <button type="button" onclick="toggleCartDropdown('cart-amount-details', 'cart-amount-chevron')" class="flex w-full items-center justify-between gap-3 px-3 py-3 text-left">
                 <span class="text-xs font-black uppercase tracking-[0.16em] text-slate-600">Amount Details</span>
-                <i id="cart-amount-chevron" class="fa-solid fa-chevron-down text-[10px] text-slate-500 transition"></i>
+                <i id="cart-amount-chevron" class="fa-solid fa-chevron-down rotate-180 text-[10px] text-slate-500 transition"></i>
             </button>
-            <div id="cart-amount-details" class="hidden border-t border-slate-200 px-3 py-3">
+            <div id="cart-amount-details" class="border-t border-slate-200 px-3 py-3">
         <div class="flex justify-between text-sm font-semibold mb-2">
             <span>Subtotal</span>
             <span id="cart-subtotal-drawer">₹0.00</span>
@@ -356,40 +352,47 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
                 <span class="mt-1 hidden text-[8px] font-semibold uppercase tracking-[0.22em] text-stone-300 sm:block md:text-[9px]">Fresh Cut Pure Standards</span>
             </span>
         </a>
-        @if(! empty($frontendEndingSlot))
-            @php
-                $endingProduct = $frontendEndingSlot['product'];
-            @endphp
-            {{-- Product whose ordering slot closes first: photo + scrolling text that runs under the photo --}}
-            <a href="{{ route('frontend.product.show', $endingProduct->slug) }}"
-               data-slot-countdown
-               data-ends-at="{{ $frontendEndingSlot['ends_at']->toIso8601String() }}"
-               data-server-now="{{ now()->toIso8601String() }}"
-               title="{{ $endingProduct->name }} — order slot {{ $frontendEndingSlot['badge'] }}"
-               class="group relative hidden h-[52px] w-[270px] flex-shrink-0 overflow-hidden rounded-xl bg-black xl:block">
-                <span class="absolute inset-y-0 left-0 z-10 w-[52px] overflow-hidden bg-black">
-                    @if(! empty($endingProduct->images[0]))
-                        <img src="{{ asset('storage/' . $endingProduct->images[0]) }}" alt="{{ $endingProduct->name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-110">
-                    @else
-                        <span class="flex h-full w-full items-center justify-center text-amber-400"><i class="fa-solid fa-drumstick-bite"></i></span>
-                    @endif
-                </span>
-                <span class="absolute inset-0 flex items-center overflow-hidden">
-                    <span class="slot-marquee flex w-max items-center whitespace-nowrap">
-                        @for($copy = 0; $copy < 2; $copy++)
-                            <span class="flex items-center gap-1.5 pl-5 pr-3 text-[15px] font-extrabold text-white" @if($copy) aria-hidden="true" @endif>
-                                <span class="relative flex h-2 w-2">
+        @if(($frontendEndingSlots ?? collect())->isNotEmpty())
+            {{-- Open product slots, soonest closing first; < > to browse them --}}
+            <div data-slot-carousel data-server-now="{{ now()->toIso8601String() }}"
+                 class="hidden h-[52px] w-[280px] flex-shrink-0 items-center gap-1 rounded-xl bg-black px-1.5 xl:flex">
+                @if($frontendEndingSlots->count() > 1)
+                    <button type="button" data-slot-prev aria-label="Previous slot"
+                            class="flex h-8 w-7 flex-shrink-0 items-center justify-center rounded-lg text-stone-400 transition hover:bg-white/10 hover:text-amber-300">
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                    </button>
+                @endif
+                <div class="min-w-0 flex-1">
+                    @foreach($frontendEndingSlots as $index => $endingSlot)
+                        <a href="{{ route('frontend.product.show', $endingSlot['product']->slug) }}"
+                           data-slot-slide
+                           data-ends-at="{{ $endingSlot['ends_at']->toIso8601String() }}"
+                           title="{{ $endingSlot['product']->name }} — order slot {{ $endingSlot['badge'] }}"
+                           class="{{ $index === 0 ? 'flex' : 'hidden' }} min-w-0 flex-col justify-center px-1.5 leading-tight">
+                            <span class="flex min-w-0 items-center gap-1.5">
+                                <span class="relative flex h-2 w-2 flex-shrink-0">
                                     <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-600 opacity-75"></span>
                                     <span class="relative inline-flex h-2 w-2 rounded-full bg-red-600"></span>
                                 </span>
-                                <span>{{ $endingProduct->name }}</span>
-                                <span data-countdown-label class="text-[13px] font-semibold text-stone-400">Ends in</span>
-                                <span data-countdown class="rounded-md bg-amber-400 px-1.5 py-0.5 font-mono text-[14px] font-bold tabular-nums text-black">--:--:--</span>
+                                <span class="truncate text-[14px] font-extrabold text-white">{{ $endingSlot['product']->name }}</span>
                             </span>
-                        @endfor
-                    </span>
-                </span>
-            </a>
+                            <span class="mt-1 flex items-center gap-1.5">
+                                <span data-countdown-label class="text-[12px] font-semibold text-stone-400">Ends in</span>
+                                <span data-countdown class="rounded-md bg-amber-400 px-1.5 py-0.5 font-mono text-[12px] font-bold tabular-nums text-black">--:--:--</span>
+                                @if($frontendEndingSlots->count() > 1)
+                                    <span class="ml-auto text-[10px] font-semibold text-stone-500">{{ $index + 1 }}/{{ $frontendEndingSlots->count() }}</span>
+                                @endif
+                            </span>
+                        </a>
+                    @endforeach
+                </div>
+                @if($frontendEndingSlots->count() > 1)
+                    <button type="button" data-slot-next aria-label="Next slot"
+                            class="flex h-8 w-7 flex-shrink-0 items-center justify-center rounded-lg text-stone-400 transition hover:bg-white/10 hover:text-amber-300">
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                @endif
+            </div>
         @endif
         <form action="{{ route('frontend.products') }}" method="GET" class="relative mx-2 hidden max-w-lg flex-grow md:flex lg:mx-4">
             <input type="text" name="search" placeholder="Search fresh items" data-typing-placeholder
@@ -1470,41 +1473,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 })();
 
-// Header "Slot Ending Soon" countdown (server clock based, so a wrong device clock doesn't matter).
+// Header slot carousel: each open slot with its own countdown, browsed with < >.
 (function () {
-    const widget = document.querySelector('[data-slot-countdown]');
-    if (!widget) return;
+    const carousel = document.querySelector('[data-slot-carousel]');
+    if (!carousel) return;
 
-    const endsAt = Date.parse(widget.dataset.endsAt);
-    const clockOffset = Date.parse(widget.dataset.serverNow) - Date.now();
-    const outputs = widget.querySelectorAll('[data-countdown]');
-    const labels = widget.querySelectorAll('[data-countdown-label]');
+    const slides = Array.from(carousel.querySelectorAll('[data-slot-slide]'));
+    const clockOffset = Date.parse(carousel.dataset.serverNow) - Date.now();
     const pad = (n) => String(n).padStart(2, '0');
+    let current = 0;
 
-    function render() {
-        const left = Math.max(0, Math.floor((endsAt - (Date.now() + clockOffset)) / 1000));
+    function show(index) {
+        current = (index + slides.length) % slides.length;
+        slides.forEach((slide, i) => {
+            slide.classList.toggle('hidden', i !== current);
+            slide.classList.toggle('flex', i === current);
+        });
+    }
 
-        if (left === 0) {
-            labels.forEach((label) => { label.textContent = 'Slot'; });
-            outputs.forEach((output) => {
+    carousel.querySelector('[data-slot-prev]')?.addEventListener('click', () => show(current - 1));
+    carousel.querySelector('[data-slot-next]')?.addEventListener('click', () => show(current + 1));
+
+    function tick() {
+        const now = Date.now() + clockOffset;
+
+        slides.forEach((slide) => {
+            const output = slide.querySelector('[data-countdown]');
+            const left = Math.max(0, Math.floor((Date.parse(slide.dataset.endsAt) - now) / 1000));
+
+            if (left === 0) {
+                slide.querySelector('[data-countdown-label]').textContent = 'Slot';
                 output.textContent = 'Time Out';
                 output.classList.remove('bg-amber-400', 'text-black');
                 output.classList.add('bg-red-600', 'text-white');
-            });
-            widget.classList.add('opacity-70');
-            return false;
-        }
+                return;
+            }
 
-        const text = pad(Math.floor(left / 3600)) + ':' + pad(Math.floor((left % 3600) / 60)) + ':' + pad(left % 60);
-        outputs.forEach((output) => { output.textContent = text; });
-        return true;
+            output.textContent = pad(Math.floor(left / 3600)) + ':' + pad(Math.floor((left % 3600) / 60)) + ':' + pad(left % 60);
+        });
     }
 
-    if (render()) {
-        const timer = window.setInterval(() => {
-            if (!render()) window.clearInterval(timer);
-        }, 1000);
-    }
+    tick();
+    window.setInterval(tick, 1000);
 })();
 
 // Header search: type admin product names into the placeholder letter by letter,

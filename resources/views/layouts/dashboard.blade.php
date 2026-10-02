@@ -131,6 +131,7 @@
                 <span>Dashboard</span>
             </a>
 
+            @if(\App\Support\AdminModules::can(auth()->user(), 'products'))
             <!-- Products Dropdown -->
             <div>
                 <button onclick="toggleProductMenu()"
@@ -139,7 +140,7 @@
                                {{ request()->routeIs('dashboard.categories','dashboard.subcategories','dashboard.products') ? 'active-link' : 'text-slate-700' }}">
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-boxes-stacked w-5 text-amber-600"></i>
-                        <span>Products</span>
+                        <span>Product Management</span>
                     </div>
                     <i id="productArrow" class="fa-solid fa-chevron-down text-xs transition-transform duration-300
                        {{ request()->routeIs('dashboard.categories','dashboard.subcategories','dashboard.products') ? 'rotate-180' : '' }}"></i>
@@ -171,15 +172,19 @@
                     </a>
                 </div>
             </div>
+            @endif
 
+            @if(\App\Support\AdminModules::can(auth()->user(), 'orders'))
             <a href="{{ route('dashboard.orders') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
                       {{ request()->routeIs('dashboard.orders') ? 'active-link' : 'text-slate-700' }}">
                 <i class="fa-solid fa-bag-shopping w-5 text-amber-600"></i>
-                <span>Orders</span>
+                <span>Order Management</span>
             </a>
+            @endif
 
+            @if(\App\Support\AdminModules::can(auth()->user(), 'orders'))
             <a href="{{ route('dashboard.orders.history') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
@@ -187,15 +192,19 @@
                 <i class="fa-solid fa-clock-rotate-left w-5 text-amber-600"></i>
                 <span>Order History</span>
             </a>
+            @endif
 
+            @if(\App\Support\AdminModules::can(auth()->user(), 'banners'))
             <a href="{{ route('dashboard.banners') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
                       {{ request()->routeIs('dashboard.banners*') ? 'active-link' : 'text-slate-700' }}">
                 <i class="fa-regular fa-images w-5 text-amber-600"></i>
-                <span>Home Banners</span>
+                <span>Website Banners</span>
             </a>
+            @endif
 
+            @if(\App\Support\AdminModules::can(auth()->user(), 'contact'))
             <a href="{{ route('dashboard.contact-messages') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
@@ -204,15 +213,19 @@
                 <span>Contact Us</span>
                 <span id="contactSidebarUnreadBadge" class="ml-auto hidden min-w-5 rounded-full bg-red-500 px-1.5 py-0.5 text-center text-[10px] font-bold text-white"></span>
             </a>
+            @endif
 
+            @if(\App\Support\AdminModules::can(auth()->user(), 'reviews'))
             <a href="{{ route('dashboard.reviews') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
                       {{ request()->routeIs('dashboard.reviews*') ? 'active-link' : 'text-slate-700' }}">
                 <i class="fa-solid fa-star w-5 text-amber-600"></i>
-                <span>Reviews</span>
+                <span>Review Management</span>
             </a>
+            @endif
 
+            @if(\App\Support\AdminModules::can(auth()->user(), 'customers'))
             <a href="{{ route('dashboard.users') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
@@ -220,7 +233,9 @@
                 <i class="fa-solid fa-user w-5 text-amber-600"></i>
                 <span>Customers</span>
             </a>
+            @endif
 
+            @if(\App\Support\AdminModules::can(auth()->user(), 'delivery_boys'))
             <a href="{{ route('dashboard.delivery-boys') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
@@ -228,23 +243,29 @@
                 <i class="fa-solid fa-motorcycle w-5 text-amber-600"></i>
                 <span>Delivery Boys</span>
             </a>
+            @endif
 
+            @if(\App\Support\AdminModules::can(auth()->user(), 'notifications'))
             <a href="{{ route('dashboard.notifications') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
                       {{ request()->routeIs('dashboard.notifications') ? 'active-link' : 'text-slate-700' }}">
                 <i class="fa-regular fa-bell w-5 text-amber-600"></i>
-                <span>Notifications</span>
+                <span>All Notifications</span>
             </a>
+            @endif
 
+            @if(\App\Support\AdminModules::can(auth()->user(), 'coupons'))
             <a href="{{ route('dashboard.coupons') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
                       {{ request()->routeIs('dashboard.coupons') ? 'active-link' : 'text-slate-700' }}">
                 <i class="fa-solid fa-tags w-5 text-amber-600"></i>
-                <span>Coupons & Offers</span>
+                <span>Offer & Coupon Management</span>
             </a>
+            @endif
 
+            @if(\App\Support\AdminModules::can(auth()->user(), 'delivery_slots'))
             <a href="{{ route('dashboard.settings.delivery-slots') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
@@ -252,7 +273,9 @@
                 <i class="fa-regular fa-clock w-5 text-amber-600"></i>
                 <span>Delivery Slots</span>
             </a>
+            @endif
 
+            @if(\App\Support\AdminModules::can(auth()->user(), 'product_slots'))
             <a href="{{ route('dashboard.product-slots') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
@@ -260,23 +283,29 @@
                 <i class="fa-solid fa-business-time w-5 text-amber-600"></i>
                 <span>Product Slots</span>
             </a>
+            @endif
 
+            @if(\App\Support\AdminModules::can(auth()->user(), 'delivery_areas'))
             <a href="{{ route('dashboard.settings.delivery-areas') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
                       {{ request()->routeIs('dashboard.settings.delivery-areas') ? 'active-link' : 'text-slate-700' }}">
                 <i class="fa-solid fa-location-dot w-5 text-amber-600"></i>
-                <span>Delivery Areas</span>
+                <span>Delivery Area Management</span>
             </a>
+            @endif
 
+            @if(\App\Support\AdminModules::can(auth()->user(), 'faqs'))
             <a href="{{ route('dashboard.faqs') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
                       {{ request()->routeIs('dashboard.faqs') ? 'active-link' : 'text-slate-700' }}">
                 <i class="fa-solid fa-circle-question w-5 text-amber-600"></i>
-                <span>FAQs</span>
+                <span>Website FAQ</span>
             </a>
+            @endif
 
+            @if(\App\Support\AdminModules::can(auth()->user(), 'seo'))
             <a href="{{ route('dashboard.seo') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
@@ -284,13 +313,24 @@
                 <i class="fa-solid fa-magnifying-glass-chart w-5 text-amber-600"></i>
                 <span>SEO Management</span>
             </a>
+            @endif
+
+            @if(auth()->user()->isAdmin())
+            <a href="{{ route('dashboard.admins') }}"
+               class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
+                      hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
+                      {{ request()->routeIs('dashboard.admins*') ? 'active-link' : 'text-slate-700' }}">
+                <i class="fa-solid fa-user-shield w-5 text-amber-600"></i>
+                <span>Admin Management</span>
+            </a>
+            @endif
 
             <a href="{{ route('dashboard.profile') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
                       hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
                       {{ request()->routeIs('dashboard.profile') ? 'active-link' : 'text-slate-700' }}">
                 <i class="fa-solid fa-circle-user w-5 text-amber-600"></i>
-                <span>Profile</span>
+                <span>Profile Management</span>
             </a>
 
             
@@ -310,20 +350,26 @@
                 </div>
 
                 <div class="flex items-center gap-3">
+                    @if(\App\Support\AdminModules::can(auth()->user(), 'notifications'))
                     <a href="{{ route('dashboard.notifications') }}"
                        class="relative w-10 h-10 flex items-center justify-center bg-slate-100 rounded-xl hover:bg-porville-gold hover:text-white transition">
                         <i class="fa-regular fa-bell text-lg"></i>
                         <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full"></span>
                     </a>
+                    @endif
 
                     <div class="relative">
                         <button onclick="toggleProfile()" class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-black ring-1 ring-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-sm">
-                                {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+                            <div class="w-10 h-10 overflow-hidden rounded-full bg-black ring-1 ring-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-sm">
+                                @if(auth()->user()->photo_url)
+                                    <img src="{{ auth()->user()->photo_url }}" alt="{{ auth()->user()->name }}" class="h-full w-full object-cover">
+                                @else
+                                    {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+                                @endif
                             </div>
                             <div class="hidden sm:block text-left">
                                 <p class="text-sm font-semibold text-slate-800">{{ auth()->user()->name ?? 'Admin' }}</p>
-                                <p class="text-xs text-slate-500 capitalize">{{ auth()->user()->role ?? 'admin' }}</p>
+                                <p class="text-xs text-slate-500">{{ auth()->user()->role === 'sub_admin' ? 'Sub Admin' : 'Main Admin' }}</p>
                             </div>
                         </button>
                         <!-- userprofile -->
@@ -354,7 +400,7 @@
         </header>
 
         <!-- MAIN CONTENT  -->
-        <main class="lg:mt-[4.5rem] min-h-screen">
+        <main class="lg:mt-[4.5rem] min-h-screen pb-16">
             @if(session('success'))
                 <div data-auto-dismiss="3000" class="mx-6 mt-4 flex items-center gap-2 rounded-lg bg-green-100 p-3 text-sm text-green-700 transition-all duration-500">
                     <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
@@ -379,8 +425,8 @@
         </main>
 
         <!-- Footer -->
-        <footer class="bg-white border-t border-slate-100 px-8 py-3">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-2">
+        <footer class="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200 bg-white/95 px-4 py-2 backdrop-blur lg:left-72 lg:px-8">
+            <div class="flex flex-row flex-wrap items-center justify-between gap-2">
                 <p class="text-sm text-slate-500">
                     &copy; {{ date('Y') }} <span class="text-porville-gold font-bold">Porville</span>. All rights reserved.
                 </p>

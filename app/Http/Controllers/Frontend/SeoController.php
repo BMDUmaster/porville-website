@@ -94,7 +94,7 @@ class SeoController extends Controller
         $privatePaths = [
             '/dashboard', '/login', '/banners', '/contact-messages', '/reviews', '/categories',
             '/subcategories', '/products', '/orders', '/users', '/delivery-boys', '/notifications',
-            '/coupons', '/profile', '/settings', '/faqs', '/seo-management', '/product-slots',
+            '/coupons', '/profile', '/settings', '/faqs', '/seo-management', '/product-slots', '/admins',
             '/checkout', '/cart', '/wishlist', '/server-check', '/system-check', '/clear-cache',
         ];
 

@@ -70,29 +70,6 @@
 
 </section>
 
-@if($activeCategory && $activeCategory->is_enquiry_only)
-<section class="bg-black py-10 md:py-14">
-    <div class="mx-auto flex max-w-6xl flex-col items-center gap-5 px-4 text-center md:flex-row md:items-center md:gap-8 md:text-left">
-        <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-full border-2 border-amber-400 bg-neutral-900 shadow-[0_10px_30px_rgba(184,134,44,0.3)] md:h-32 md:w-32">
-            @if($activeCategory->image)
-                <img src="{{ asset('storage/'.$activeCategory->image) }}" alt="{{ $activeCategory->name }}" class="h-full w-full object-cover">
-            @else
-                <div class="flex h-full w-full items-center justify-center text-4xl text-amber-400">
-                    <i class="fa-solid fa-kiwi-bird"></i>
-                </div>
-            @endif
-        </div>
-        <div>
-            <p class="text-[11px] font-extrabold uppercase tracking-[0.3em] text-amber-400">Enquiry Only &middot; Call to Order</p>
-            <h1 class="font-classic mt-2 text-3xl font-bold text-white md:text-4xl">{{ $activeCategory->name }}</h1>
-            <p class="mt-3 max-w-xl text-sm leading-6 text-stone-300">
-                {{ $activeCategory->description ?: 'Healthy live farm birds and livestock raised under premium guidelines.' }}
-            </p>
-        </div>
-    </div>
-</section>
-@endif
-
 @php
     $selectedMinPrice = max((int) request('min_price', 0), 0);
     $selectedMaxPrice = (int) request('max_price', $sidebarMaxPrice);

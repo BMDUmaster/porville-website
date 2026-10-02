@@ -27,6 +27,11 @@
         </div>
 
         <div class="bg-white px-8 py-7">
+            @if(session('success'))
+                <div class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">
+                    {{ session('success') }}
+                </div>
+            @endif
             @if($errors->any())
                 <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
                     {{ $errors->first() }}
@@ -70,6 +75,7 @@
                         <input type="checkbox" name="remember" class="h-3.5 w-3.5 accent-amber-600">
                         <span>Keep me logged in</span>
                     </label>
+                    <a href="{{ route('dashboard.password.forgot') }}" class="text-amber-700 hover:underline">Forgot password?</a>
                 </div>
 
                 <button type="submit"

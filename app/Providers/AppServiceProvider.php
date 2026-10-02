@@ -66,10 +66,10 @@ class AppServiceProvider extends ServiceProvider
             }
 
             try {
-                // Product whose ordering slot closes first (header countdown).
-                $endingSlot = ProductSlotManager::endingSoonest();
+                // Open product slots, soonest closing first (header slot carousel).
+                $endingSlots = ProductSlotManager::openSlotsByEnding();
             } catch (Throwable) {
-                $endingSlot = null;
+                $endingSlots = collect();
             }
 
             $view->with([
@@ -77,7 +77,7 @@ class AppServiceProvider extends ServiceProvider
                 'frontendTickerProduct' => $tickerProduct,
                 'frontendTickerOffer' => $tickerOffer,
                 'frontendSearchNames' => $searchNames,
-                'frontendEndingSlot' => $endingSlot,
+                'frontendEndingSlots' => $endingSlots,
             ]);
         });
     }

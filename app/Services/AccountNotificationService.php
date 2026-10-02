@@ -4,15 +4,16 @@ namespace App\Services;
 
 use App\Models\Notification;
 use App\Models\User;
+use App\Support\AdminModules;
+use App\Support\PorvilleMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Throwable;
 
 class AccountNotificationService
 {
     /**
-     * Welcome the customer after signup (in-app + email).
+     * Welcome the customer after signup (in-app + email) and tell the admins.
      */
     public static function notifyRegistered(User $user): void
     {
@@ -30,18 +31,27 @@ class AccountNotificationService
             Log::error('Welcome in-app notification failed for user ' . $user->id . ': ' . $e->getMessage());
         }
 
-        self::sendAfterResponse($user->email, $subject, implode("\n", [
-            "Hello {$user->name},",
-            '',
-            $message,
-            '',
-            'Login Email: ' . $user->email,
-            'Shop now: ' . route('frontend.products'),
-            '',
-            'Warm Regards,',
-            'Porville Team',
-            config('app.url'),
-        ]));
+        PorvilleMail::sendAfterResponse($user->email, $subject, 'emails.message', [
+            'heading'      => 'Welcome to Porville!',
+            'greetingName' => $user->name,
+            'lines'        => [$message],
+            'details'      => ['Login Email' => $user->email],
+            'buttonText'   => 'Start Shopping',
+            'buttonUrl'    => route('frontend.products'),
+        ]);
+
+        PorvilleMail::sendAfterResponse(AdminModules::recipients('customers'), "New customer registered: {$user->name}", 'emails.message', [
+            'heading'    => 'New Customer Registered',
+            'lines'      => ['A new customer just created an account on Porville.'],
+            'details'    => [
+                'Name'       => $user->name,
+                'Email'      => $user->email,
+                'Phone'      => $user->phone ?: '—',
+                'Registered' => now()->format('d M Y, h:i A'),
+            ],
+            'buttonText' => 'View Customer',
+            'buttonUrl'  => route('dashboard.users.show', $user),
+        ]);
     }
 
     /**
@@ -49,43 +59,45 @@ class AccountNotificationService
      */
     public static function notifyLoggedIn(User $user, Request $request): void
     {
-        $time = now()->timezone(config('app.timezone', 'Asia/Kolkata'))->format('d M Y, h:i A');
-
-        self::sendAfterResponse($user->email, 'New login to your Porville account', implode("\n", [
-            "Hello {$user->name},",
-            '',
-            'Your Porville account was just signed in.',
-            '',
-            'Time: ' . $time,
-            'IP Address: ' . ($request->ip() ?? 'Unknown'),
-            'Device: ' . ($request->userAgent() ?: 'Unknown'),
-            '',
-            'If this was you, no action is needed.',
-            'If you do not recognise this login, please reset your password right away: ' . route('frontend.password.forgot'),
-            '',
-            'Warm Regards,',
-            'Porville Team',
-            config('app.url'),
-        ]));
+        PorvilleMail::sendAfterResponse($user->email, 'New login to your Porville account', 'emails.login-alert', [
+            'name'     => $user->name,
+            'time'     => now()->timezone(config('app.timezone', 'Asia/Kolkata'))->format('d M Y, h:i A'),
+            'ip'       => $request->ip() ?? 'Unknown',
+            'device'   => self::deviceLabel($request->userAgent()),
+            'resetUrl' => route('frontend.password.forgot'),
+        ]);
     }
 
     /**
-     * Send after the response so SMTP latency never slows down login/signup.
+     * "Chrome on Windows" style label from a user agent string.
      */
-    private static function sendAfterResponse(?string $email, string $subject, string $body): void
+    private static function deviceLabel(?string $userAgent): string
     {
-        if (! $email) {
-            return;
+        $ua = (string) $userAgent;
+
+        if ($ua === '') {
+            return 'Unknown device';
         }
 
-        dispatch(function () use ($email, $subject, $body) {
-            try {
-                Mail::raw($body, function ($mail) use ($email, $subject) {
-                    $mail->to($email)->subject($subject);
-                });
-            } catch (Throwable $e) {
-                Log::error('Account email "' . $subject . '" failed for ' . $email . ': ' . $e->getMessage());
-            }
-        })->afterResponse();
+        $browser = match (true) {
+            str_contains($ua, 'Edg/')                                => 'Edge',
+            str_contains($ua, 'OPR/') || str_contains($ua, 'Opera')  => 'Opera',
+            str_contains($ua, 'SamsungBrowser')                      => 'Samsung Internet',
+            str_contains($ua, 'Chrome/')                             => 'Chrome',
+            str_contains($ua, 'Firefox/')                            => 'Firefox',
+            str_contains($ua, 'Safari/')                             => 'Safari',
+            default                                                  => 'Browser',
+        };
+
+        $os = match (true) {
+            str_contains($ua, 'Windows')                             => 'Windows',
+            str_contains($ua, 'Android')                             => 'Android',
+            str_contains($ua, 'iPhone') || str_contains($ua, 'iPad') => 'iOS',
+            str_contains($ua, 'Mac OS')                              => 'macOS',
+            str_contains($ua, 'Linux')                               => 'Linux',
+            default                                                  => 'unknown system',
+        };
+
+        return "{$browser} on {$os}";
     }
 }
