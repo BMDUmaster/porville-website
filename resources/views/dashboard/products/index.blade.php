@@ -22,8 +22,11 @@
 
     {{-- Filters --}}
     <form method="GET" class="mb-6 flex flex-col gap-3 rounded-2xl border bg-white p-4 shadow-sm sm:flex-row sm:flex-wrap sm:items-center">
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search products..."
-               class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm outline-none focus:border-amber-500 sm:min-w-[150px] sm:flex-1">
+        <div class="relative w-full sm:min-w-[150px] sm:flex-1">
+            <i class="fa-solid fa-magnifying-glass pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search products..."
+                   class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 pl-10 pr-4 text-sm outline-none focus:border-amber-500">
+        </div>
         <select name="category" class="bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm outline-none">
             <option value="">All Categories</option>
             @foreach($categories as $cat)
