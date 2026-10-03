@@ -67,9 +67,24 @@
                     </div>
 
                     <div>
-                        <label class="mb-2 block text-sm font-bold text-slate-700">Email</label>
-                        <input type="text" value="{{ $user->email }}" disabled
-                               class="w-full rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm text-slate-400">
+                        <label class="mb-2 block text-sm font-bold text-slate-700">Email <span class="font-normal text-slate-400">(login + admin alerts)</span></label>
+                        <input type="email" name="email" id="profileEmail" value="{{ old('email', $user->email) }}" required
+                               data-original="{{ $user->email }}" oninput="toggleEmailPassword()"
+                               class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500 focus:bg-white">
+                        @error('email')
+                            <p class="mt-2 text-xs font-semibold text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Only needed when the email changes --}}
+                    <div id="emailPasswordField" class="md:col-span-2 {{ $errors->has('email_password') || old('email', $user->email) !== $user->email ? '' : 'hidden' }}">
+                        <label class="mb-2 block text-sm font-bold text-slate-700">Current Password <span class="font-normal text-slate-400">(required to change the email)</span></label>
+                        <input type="password" name="email_password" autocomplete="current-password"
+                               class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-amber-500 focus:bg-white">
+                        <p class="mt-2 text-xs text-slate-400">Use a real inbox you check: you will log in with this email, and new order / new customer emails and password reset codes go here.</p>
+                        @error('email_password')
+                            <p class="mt-2 text-xs font-semibold text-red-500">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="md:col-span-2">
@@ -140,6 +155,12 @@
 
 @section('scripts')
 <script>
+function toggleEmailPassword() {
+    const email = document.getElementById('profileEmail');
+    const changed = email.value.trim().toLowerCase() !== email.dataset.original.toLowerCase();
+    document.getElementById('emailPasswordField').classList.toggle('hidden', !changed);
+}
+
 function previewProfilePhoto(input) {
     const file = input.files && input.files[0];
     if (!file) return;

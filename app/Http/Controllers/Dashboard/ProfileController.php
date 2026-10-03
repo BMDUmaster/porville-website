@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Support\WebpImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
 {
@@ -20,9 +21,21 @@ class ProfileController extends Controller
 
         $data = $request->validate([
             'name'  => 'required|string|max:100',
+            'email' => ['required', 'email', 'max:190', Rule::unique('users', 'email')->ignore($user->id)],
             'phone' => 'nullable|string|max:20',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
+        ], [
+            'email.unique' => 'This email is already used by another account.',
         ]);
+
+        $data['email'] = strtolower(trim($data['email']));
+
+        // The email is also the login and receives admin alerts, so changing it needs the password.
+        if ($data['email'] !== strtolower($user->email)) {
+            if (! $request->filled('email_password') || ! Hash::check($request->input('email_password'), $user->password)) {
+                return back()->withInput()->withErrors(['email_password' => 'Enter your current password to change the email.']);
+            }
+        }
 
         if ($request->hasFile('photo')) {
             $data['photo'] = WebpImage::store($request->file('photo'), 'profiles');
