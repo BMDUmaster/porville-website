@@ -106,7 +106,7 @@
 
         <!-- Logo -->
         <div class="flex items-center justify-between border-b border-slate-200 bg-black p-4">
-            <a href="{{ route('dashboard.home') }}" class="flex items-center gap-2.5">
+            <a href="{{ \App\Support\AdminModules::homeUrl(auth()->user()) }}" class="flex items-center gap-2.5">
                 <img src="{{ $brandLogoUrl }}"
                      alt="Porville"
                      class="h-11 w-11 flex-shrink-0 rounded-full object-cover ring-1 ring-amber-500/40">
@@ -123,6 +123,7 @@
         <!-- Nav -->
         <nav class="px-4 py-3 space-y-1">
 
+            @if(\App\Support\AdminModules::can(auth()->user(), 'dashboard'))
             <a href="{{ route('dashboard.home') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl
                       hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white transition
@@ -130,6 +131,7 @@
                 <i class="fa-solid fa-gauge w-5 text-amber-600"></i>
                 <span>Dashboard</span>
             </a>
+            @endif
 
             @if(\App\Support\AdminModules::can(auth()->user(), 'products'))
             <!-- Products Dropdown -->
@@ -175,23 +177,39 @@
             @endif
 
             @if(\App\Support\AdminModules::can(auth()->user(), 'orders'))
-            <a href="{{ route('dashboard.orders') }}"
-               class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
-                      hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
-                      {{ request()->routeIs('dashboard.orders') ? 'active-link' : 'text-slate-700' }}">
-                <i class="fa-solid fa-bag-shopping w-5 text-amber-600"></i>
-                <span>Order Management</span>
-            </a>
-            @endif
+            <!-- Orders Dropdown -->
+            <div>
+                <button onclick="toggleOrderMenu()"
+                        class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-xl
+                               hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white transition
+                               {{ request()->routeIs('dashboard.orders*') ? 'active-link' : 'text-slate-700' }}">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-bag-shopping w-5 text-amber-600"></i>
+                        <span>Order Management</span>
+                    </div>
+                    <i id="orderArrow" class="fa-solid fa-chevron-down text-xs transition-transform duration-300
+                       {{ request()->routeIs('dashboard.orders*') ? 'rotate-180' : '' }}"></i>
+                </button>
 
-            @if(\App\Support\AdminModules::can(auth()->user(), 'orders'))
-            <a href="{{ route('dashboard.orders.history') }}"
-               class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
-                      hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
-                      {{ request()->routeIs('dashboard.orders.history') ? 'active-link' : 'text-slate-700' }}">
-                <i class="fa-solid fa-clock-rotate-left w-5 text-amber-600"></i>
-                <span>Order History</span>
-            </a>
+                <div id="orderDropdown"
+                     class="{{ request()->routeIs('dashboard.orders*') ? 'flex' : 'hidden' }}
+                            flex-col pl-9 pr-2 py-2 space-y-1 bg-amber-50/50 rounded-xl mt-1 mx-2 border-l-2 border-amber-200">
+
+                    <a href="{{ route('dashboard.orders') }}"
+                       class="sidebar-sub-link flex items-center gap-3 px-4 py-2 text-xs font-semibold rounded-lg transition
+                              hover:bg-porville-gold hover:text-white
+                              {{ request()->routeIs('dashboard.orders') || request()->routeIs('dashboard.orders.show') ? 'active-sub-link' : 'text-slate-700' }}">
+                        <i class="fa-solid fa-receipt w-4 text-amber-600"></i> Orders
+                    </a>
+
+                    <a href="{{ route('dashboard.orders.history') }}"
+                       class="sidebar-sub-link flex items-center gap-3 px-4 py-2 text-xs font-semibold rounded-lg transition
+                              hover:bg-porville-gold hover:text-white
+                              {{ request()->routeIs('dashboard.orders.history', 'dashboard.orders.total', 'dashboard.orders.category', 'dashboard.orders.report') ? 'active-sub-link' : 'text-slate-700' }}">
+                        <i class="fa-solid fa-clock-rotate-left w-4 text-amber-600"></i> Order History
+                    </a>
+                </div>
+            </div>
             @endif
 
             @if(\App\Support\AdminModules::can(auth()->user(), 'banners'))
@@ -467,6 +485,13 @@
         }
         function closeProfile() {
             document.getElementById('profileModal').classList.add('hidden');
+        }
+        function toggleOrderMenu() {
+            const menu  = document.getElementById('orderDropdown');
+            const arrow = document.getElementById('orderArrow');
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+            arrow.classList.toggle('rotate-180');
         }
         function toggleProductMenu() {
             const menu  = document.getElementById('productDropdown');

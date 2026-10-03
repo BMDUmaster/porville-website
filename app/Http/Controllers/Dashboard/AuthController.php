@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Support\AdminModules;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,7 +12,7 @@ class AuthController extends Controller
     public function showLogin()
     {
         if (Auth::check() && Auth::user()->isStaff()) {
-            return redirect()->route('dashboard.home');
+            return redirect()->to(AdminModules::homeUrl(Auth::user()));
         }
         return view('dashboard.auth.login');
     }
@@ -36,7 +37,8 @@ class AuthController extends Controller
                 return back()->withErrors(['email' => 'This admin account is disabled. Contact the main admin.']);
             }
 
-            return redirect()->intended(route('dashboard.home'));
+            // Sub admins without the Dashboard module land on their first module.
+            return redirect()->intended(AdminModules::homeUrl(Auth::user()));
         }
 
         return back()->withErrors(['email' => 'Invalid credentials.'])->onlyInput('email');

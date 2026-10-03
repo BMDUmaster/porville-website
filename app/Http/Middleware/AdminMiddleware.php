@@ -24,7 +24,7 @@ class AdminMiddleware
         // Sub admins only reach the modules the main admin assigned to them.
         if (! AdminModules::allowsRoute($user, $request->route()?->getName())) {
             if ($request->isMethod('GET') && ! $request->expectsJson()) {
-                return redirect()->route('dashboard.home')
+                return redirect()->to(AdminModules::homeUrl($user))
                     ->with('error', 'You do not have access to that section. Ask the main admin for permission.');
             }
 

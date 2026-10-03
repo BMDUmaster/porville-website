@@ -11,7 +11,7 @@
 
     <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 class="text-xl font-black text-slate-900">Admin Management</h2>
-        <p class="mt-1 text-sm text-slate-500">Add sub admins and choose which modules they can open. A sub admin only sees and works on the modules you tick here. Dashboard and their own profile are always available.</p>
+        <p class="mt-1 text-sm text-slate-500">Add sub admins and choose which modules they can open. A sub admin only sees and works on the modules you tick here (tick Dashboard to show them the dashboard). Their own profile is always available.</p>
     </div>
 
     {{-- Add / edit sub admin --}}
