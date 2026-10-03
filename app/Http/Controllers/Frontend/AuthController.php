@@ -129,12 +129,12 @@ class AuthController extends Controller
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Could not send OTP email. Please check SMTP settings and try again.',
+                    'message' => 'We could not send the OTP email right now. Please try again in a few minutes or contact Porville support.',
                 ], 422);
             }
 
             return back()
-                ->withErrors(['email' => 'Could not send OTP email. Please check SMTP settings and try again.'])
+                ->withErrors(['email' => 'We could not send the OTP email right now. Please try again in a few minutes or contact Porville support.'])
                 ->onlyInput('email');
         }
 
@@ -290,7 +290,7 @@ class AuthController extends Controller
         } catch (Throwable $exception) {
             report($exception);
 
-            $errorMsg = 'Could not send OTP email. ' . $exception->getMessage();
+            $errorMsg = 'We could not send the OTP email right now. Please try again in a few minutes or contact Porville support.';
 
             return response()->json([
                 'success' => false,
