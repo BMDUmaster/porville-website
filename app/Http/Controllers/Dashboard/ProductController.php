@@ -349,19 +349,18 @@ class ProductController extends Controller
             $data['price'] = 0;
             $data['mrp'] = 0;
         } else {
-            if (! $request->filled('price')) {
+            // Price comes from the first variant's selling price (same as when adding).
+            $data['variants'] = $this->normalizeVariants($request->input('variants', []));
+
+            if (empty($data['variants'])) {
                 throw ValidationException::withMessages([
-                    'price' => 'The price field is required.',
+                    'variants' => 'Add at least one product variant with selling price.',
                 ]);
             }
 
-            $data['variants'] = $this->normalizeVariants($request->input('variants', []));
-
-            if (! empty($data['variants'])) {
-                $data['unit'] = (string) ($data['variants'][0]['unit'] ?? ($product->unit ?: 'Unit'));
-                $data['price'] = ProductDayPricing::sellingPrice($data['variants'][0], 'today', (float) ($data['price'] ?? 0));
-                $data['mrp'] = (float) ($data['variants'][0]['mrp'] ?? $data['mrp'] ?? 0);
-            }
+            $data['unit'] = (string) ($data['variants'][0]['unit'] ?? ($product->unit ?: 'Unit'));
+            $data['price'] = ProductDayPricing::sellingPrice($data['variants'][0], 'today', (float) $product->price);
+            $data['mrp'] = (float) ($data['variants'][0]['mrp'] ?? $product->mrp ?? 0);
         }
 
         $data['stock'] = $data['is_active'] ? 1 : 0;

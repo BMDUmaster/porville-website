@@ -494,12 +494,7 @@
                        class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
                 <p class="mt-1 text-[11px] text-slate-400">Link hata doge (khali chhod doge) to YouTube video product page se hat jayega. Film/music label ki official videos dusri websites par aksar nahi chalti — apni ya embedding-allowed video ka link do.</p>
             </div>
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div id="editPriceField">
-                    <label class="text-xs font-bold text-slate-600 block mb-1">Price (₹)</label>
-                    <input type="number" name="price" id="editPrice" min="0" step="0.01"
-                           class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
-                </div>
+            <div>
                 <div>
                     <label class="text-xs font-bold text-slate-600 block mb-1">Stock Status</label>
                     <select name="is_active" id="editIsActive" class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none">
@@ -735,7 +730,6 @@ function openEditModal(source) {
     document.getElementById('editProductWeight').value = product.weight ?? '';
     document.getElementById('editCatId').value        = product.category_id ?? '';
     document.getElementById('editDescription').value  = product.description ?? '';
-    document.getElementById('editPrice').value        = product.price ?? '';
     document.getElementById('editIsActive').value     = product.is_active ?? 1;
     document.getElementById('editContactNumber').value = product.contact_number ?? '';
     document.getElementById('editProcessingNote').value = product.processing_note ?? '';
@@ -1006,12 +1000,10 @@ function toggleEnquiryMode(prefix, selectEl) {
     const weightField = document.getElementById(prefix + 'WeightField');
     const variantsSection = document.getElementById(prefix + 'VariantsSection');
     const enquiryFields = document.getElementById(prefix + 'EnquiryFields');
-    const priceField = document.getElementById('editPriceField');
 
     if (weightField) weightField.classList.toggle('hidden', isEnquiry);
     if (variantsSection) variantsSection.classList.toggle('hidden', isEnquiry);
     if (enquiryFields) enquiryFields.classList.toggle('hidden', !isEnquiry);
-    if (prefix === 'edit' && priceField) priceField.classList.toggle('hidden', isEnquiry);
 }
 
 // Variant management
