@@ -146,7 +146,7 @@ Send the token from `/login` as `Authorization: Bearer <token>`.
 
 ## Known Issues / Handover Notes
 
-- `.env` and the SQL dump `aksharac_porville.sql` are committed to git. Remove them from the repo (`git rm --cached`), add them to `.gitignore`, and rotate the Gmail app password and Razorpay secret, because both are in git history.
+- `.env` and the SQL dump `aksharac_porville.sql` used to be committed and are now git-ignored, but they are still in git history. Rotate the Gmail app password and Razorpay secret. `.env` is never in the repo, so every server and machine needs its own copy (start from `.env.example`).
 - `/server-check`, `/server-check.php` and `/clear-cache` have no login. Protect or remove them once the site is stable.
 - `QUEUE_CONNECTION=sync`, so emails are sent during the web request. A slow SMTP connection makes checkout/OTP pages slow too.
 - The `origin` remote still points to the old `farmsea.in-website` repo. The Porville repo is the `porville` remote (`BMDUmaster/porville-website`).
