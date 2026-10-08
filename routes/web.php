@@ -175,6 +175,7 @@ Route::middleware('admin')->group(function () {
 
     // Settings
     Route::get('/settings/service-charge', [ServiceChargeController::class, 'index'])->name('dashboard.settings.service-charge');
+    Route::put('/settings/service-charge', [ServiceChargeController::class, 'update'])->name('dashboard.settings.service-charge.update');
     Route::post('/settings/service-charge/tier', [ServiceChargeController::class, 'storeTier'])->name('dashboard.settings.service-charge.tier.store');
     Route::delete('/settings/service-charge/tier/{tier}', [ServiceChargeController::class, 'destroyTier'])->name('dashboard.settings.service-charge.tier.destroy');
     Route::get('/settings/delivery-slots', [DeliverySlotController::class, 'index'])->name('dashboard.settings.delivery-slots');

@@ -286,14 +286,49 @@
             </a>
             @endif
 
-            @if(\App\Support\AdminModules::can(auth()->user(), 'delivery_slots'))
-            <a href="{{ route('dashboard.settings.delivery-slots') }}"
-               class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition
-                      hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white
-                      {{ request()->routeIs('dashboard.settings.delivery-slots') ? 'active-link' : 'text-slate-700' }}">
-                <i class="fa-regular fa-clock w-5 text-amber-600"></i>
-                <span>Delivery Slots</span>
-            </a>
+            @php
+                $canDeliverySlots = \App\Support\AdminModules::can(auth()->user(), 'delivery_slots');
+                $canServiceCharge = \App\Support\AdminModules::can(auth()->user(), 'service_charge');
+                $deliveryMenuOpen = request()->routeIs('dashboard.settings.delivery-slots*', 'dashboard.settings.service-charge*');
+            @endphp
+            @if($canDeliverySlots || $canServiceCharge)
+            <!-- Delivery Slots Dropdown -->
+            <div>
+                <button onclick="toggleDeliveryMenu()"
+                        class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-xl
+                               hover:bg-gradient-to-r hover:from-amber-600 hover:to-black hover:text-white transition
+                               {{ $deliveryMenuOpen ? 'active-link' : 'text-slate-700' }}">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-regular fa-clock w-5 text-amber-600"></i>
+                        <span>Delivery Slots</span>
+                    </div>
+                    <i id="deliveryArrow" class="fa-solid fa-chevron-down text-xs transition-transform duration-300
+                       {{ $deliveryMenuOpen ? 'rotate-180' : '' }}"></i>
+                </button>
+
+                <div id="deliveryDropdown"
+                     class="{{ $deliveryMenuOpen ? 'flex' : 'hidden' }}
+                            flex-col pl-9 pr-2 py-2 space-y-1 bg-amber-50/50 rounded-xl mt-1 mx-2 border-l-2 border-amber-200">
+
+                    @if($canDeliverySlots)
+                    <a href="{{ route('dashboard.settings.delivery-slots') }}"
+                       class="sidebar-sub-link flex items-center gap-3 px-4 py-2 text-xs font-semibold rounded-lg transition
+                              hover:bg-porville-gold hover:text-white
+                              {{ request()->routeIs('dashboard.settings.delivery-slots*') ? 'active-sub-link' : 'text-slate-700' }}">
+                        <i class="fa-regular fa-calendar w-4 text-amber-600"></i> Delivery Slots
+                    </a>
+                    @endif
+
+                    @if($canServiceCharge)
+                    <a href="{{ route('dashboard.settings.service-charge') }}"
+                       class="sidebar-sub-link flex items-center gap-3 px-4 py-2 text-xs font-semibold rounded-lg transition
+                              hover:bg-porville-gold hover:text-white
+                              {{ request()->routeIs('dashboard.settings.service-charge*') ? 'active-sub-link' : 'text-slate-700' }}">
+                        <i class="fa-solid fa-percent w-4 text-amber-600"></i> Service Charge
+                    </a>
+                    @endif
+                </div>
+            </div>
             @endif
 
             @if(\App\Support\AdminModules::can(auth()->user(), 'product_slots'))
@@ -492,6 +527,13 @@
         function toggleOrderMenu() {
             const menu  = document.getElementById('orderDropdown');
             const arrow = document.getElementById('orderArrow');
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+            arrow.classList.toggle('rotate-180');
+        }
+        function toggleDeliveryMenu() {
+            const menu  = document.getElementById('deliveryDropdown');
+            const arrow = document.getElementById('deliveryArrow');
             menu.classList.toggle('hidden');
             menu.classList.toggle('flex');
             arrow.classList.toggle('rotate-180');

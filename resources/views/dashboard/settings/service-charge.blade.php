@@ -10,12 +10,35 @@
                 <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-white/70">Checkout Pricing</p>
                 <h1 class="mt-2 text-2xl font-black tracking-[-0.03em]">Service Charge</h1>
                 <p class="mt-2 max-w-2xl text-sm text-white/80">
-                    Add a charge percent for an order-amount range. Changes apply to new checkout and API orders immediately.
+                    Set the default charge percent, or add a percent for an order-amount range. Changes apply to new checkout and API orders immediately.
                 </p>
             </div>
 
             <div class="px-6 py-6 md:px-8">
-                <form method="POST" action="{{ route('dashboard.settings.service-charge.tier.store') }}" class="grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end">
+                <h2 class="text-sm font-black text-slate-800">Default Service Charge</h2>
+                <p class="mt-1 text-xs text-slate-500">Applied when an order amount doesn't fall in any tier below.</p>
+                <form method="POST" action="{{ route('dashboard.settings.service-charge.update') }}" class="mt-3 grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+                    @csrf @method('PUT')
+                    <div>
+                        <label class="mb-1.5 block text-xs font-bold text-slate-600">Today Orders (%)</label>
+                        <input type="number" name="today_percent" min="0" max="100" step="0.01" required
+                               value="{{ old('today_percent', $todayPercent) }}"
+                               class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-amber-500">
+                    </div>
+                    <div>
+                        <label class="mb-1.5 block text-xs font-bold text-slate-600">Tomorrow Orders (%)</label>
+                        <input type="number" name="tomorrow_percent" min="0" max="100" step="0.01" required
+                               value="{{ old('tomorrow_percent', $tomorrowPercent) }}"
+                               class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-amber-500">
+                    </div>
+                    <button type="submit" class="inline-flex h-[42px] items-center justify-center gap-2 rounded-xl bg-black px-5 text-sm font-bold text-white hover:bg-neutral-900">
+                        <i class="fa-solid fa-floppy-disk"></i> Save
+                    </button>
+                </form>
+
+                <h2 class="mt-8 text-sm font-black text-slate-800">Amount-Based Tiers</h2>
+                <p class="mt-1 text-xs text-slate-500">A matching tier overrides the default percent.</p>
+                <form method="POST" action="{{ route('dashboard.settings.service-charge.tier.store') }}" class="mt-3 grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end">
                     @csrf
                     <div>
                         <label class="mb-1.5 block text-xs font-bold text-slate-600">From Amount (Rs)</label>
@@ -51,7 +74,7 @@
                             </form>
                         </div>
                     @empty
-                        <p class="rounded-xl border border-dashed border-slate-300 px-4 py-6 text-center text-sm text-slate-400">No amount tiers yet — orders outside any tier use the system default ({{ rtrim(rtrim(number_format($defaultPercent, 2), '0'), '.') }}%).</p>
+                        <p class="rounded-xl border border-dashed border-slate-300 px-4 py-6 text-center text-sm text-slate-400">No amount tiers yet — all orders use the default service charge above.</p>
                     @endforelse
                 </div>
             </div>
