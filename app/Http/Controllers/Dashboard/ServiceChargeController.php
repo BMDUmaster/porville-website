@@ -11,8 +11,7 @@ class ServiceChargeController extends Controller
     public function index()
     {
         return view('dashboard.settings.service-charge', [
-            'todayPercent' => ServiceChargeManager::percentage('today'),
-            'tomorrowPercent' => ServiceChargeManager::percentage('tomorrow'),
+            'defaultPercent' => ServiceChargeManager::percentage('today'),
             'tiers' => ServiceChargeManager::tiers(),
         ]);
     }
@@ -20,12 +19,12 @@ class ServiceChargeController extends Controller
     public function update(Request $request)
     {
         $data = $request->validate([
-            'today_percent'    => ['required', 'numeric', 'min:0', 'max:100'],
-            'tomorrow_percent' => ['required', 'numeric', 'min:0', 'max:100'],
+            'default_percent' => ['required', 'numeric', 'min:0', 'max:100'],
         ]);
 
-        ServiceChargeManager::updatePercentage((float) $data['today_percent'], 'today');
-        ServiceChargeManager::updatePercentage((float) $data['tomorrow_percent'], 'tomorrow');
+        // One percent for every order, so today and tomorrow are kept in step.
+        ServiceChargeManager::updatePercentage((float) $data['default_percent'], 'today');
+        ServiceChargeManager::updatePercentage((float) $data['default_percent'], 'tomorrow');
 
         return back()->with('success', 'Default service charge updated.');
     }

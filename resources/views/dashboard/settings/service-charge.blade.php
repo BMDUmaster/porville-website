@@ -17,18 +17,12 @@
             <div class="px-6 py-6 md:px-8">
                 <h2 class="text-sm font-black text-slate-800">Default Service Charge</h2>
                 <p class="mt-1 text-xs text-slate-500">Applied when an order amount doesn't fall in any tier below.</p>
-                <form method="POST" action="{{ route('dashboard.settings.service-charge.update') }}" class="mt-3 grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+                <form method="POST" action="{{ route('dashboard.settings.service-charge.update') }}" class="mt-3 grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-[1fr_auto] sm:items-end">
                     @csrf @method('PUT')
                     <div>
-                        <label class="mb-1.5 block text-xs font-bold text-slate-600">Today Orders (%)</label>
-                        <input type="number" name="today_percent" min="0" max="100" step="0.01" required
-                               value="{{ old('today_percent', $todayPercent) }}"
-                               class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-amber-500">
-                    </div>
-                    <div>
-                        <label class="mb-1.5 block text-xs font-bold text-slate-600">Tomorrow Orders (%)</label>
-                        <input type="number" name="tomorrow_percent" min="0" max="100" step="0.01" required
-                               value="{{ old('tomorrow_percent', $tomorrowPercent) }}"
+                        <label class="mb-1.5 block text-xs font-bold text-slate-600">Service Charge (%)</label>
+                        <input type="number" name="default_percent" min="0" max="100" step="0.01" required
+                               value="{{ old('default_percent', $defaultPercent) }}"
                                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-amber-500">
                     </div>
                     <button type="submit" class="inline-flex h-[42px] items-center justify-center gap-2 rounded-xl bg-black px-5 text-sm font-bold text-white hover:bg-neutral-900">
